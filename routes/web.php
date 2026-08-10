@@ -40,6 +40,22 @@ Route::get('/storage/{path}', function ($path) {
     return response()->file($fullPath, ['Content-Type' => $mime]);
 })->where('path', '.*');
 
+// Storage Diagnostic Route
+Route::get('/check-storage', function () {
+    $target = storage_path('app/public/uploads');
+    $link = public_path('storage/uploads');
+    $files = file_exists($target) ? scandir($target) : [];
+    
+    return response()->json([
+        'target_folder' => $target,
+        'target_exists' => file_exists($target),
+        'public_link' => $link,
+        'link_exists' => file_exists($link),
+        'files_count' => count(array_diff($files, ['.', '..'])),
+        'sample_files' => array_values(array_slice(array_diff($files, ['.', '..']), 0, 10)),
+    ]);
+});
+
 // Auth Routes (Login & Logout)
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
