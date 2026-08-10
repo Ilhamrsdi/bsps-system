@@ -210,6 +210,8 @@
 
     .btn-act.view { background: rgba(0, 40, 85, 0.08); color: var(--primary); }
     .btn-act.view:hover { background: var(--primary); color: #fff; }
+    .btn-act.print { background: rgba(255, 184, 0, 0.18); color: #b88600; }
+    .btn-act.print:hover { background: #ffb800; color: #002855; }
     .btn-act.map  { background: rgba(39, 174, 96, 0.12); color: var(--success); }
     .btn-act.map:hover { background: var(--success); color: #fff; }
 
@@ -414,7 +416,10 @@
                     <option value="Backlog 2" {{ request('desil') == 'Backlog 2' ? 'selected' : '' }}>Backlog 2 Desil 1-4</option>
                 </select>
             </div>
-            <div style="display:flex;gap:10px;">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <a href="{{ route('verval-data.surat-pernyataan-kolektif', request()->all()) }}" target="_blank" class="btn" style="padding:10px 16px;font-size:13px;font-weight:700;background:#ffb800;color:#002855;text-decoration:none;border-radius:var(--radius-sm);display:inline-flex;align-items:center;gap:6px;" title="Cetak Surat Pernyataan seluruh data hasil filter saat ini">
+                    <i class="fas fa-file-signature"></i> Cetak Kolektif Surat Pernyataan
+                </a>
                 <a href="{{ url('/verval-data') }}" class="btn btn-outline" style="padding:10px 16px;font-size:13px;text-decoration:none;border-radius:var(--radius-sm);">
                     <i class="fas fa-redo"></i> Reset
                 </a>
@@ -489,6 +494,9 @@
                                 </td>
                                 <td style="padding:14px 18px;text-align:center;">
                                     <div class="action-btn-group" style="justify-content:center;">
+                                        <a href="{{ route('verval-data.surat-pernyataan', $item->id) }}" target="_blank" class="btn-act print" title="Cetak Surat Pernyataan Pemohon Ini">
+                                            <i class="fas fa-file-signature"></i>
+                                        </a>
                                         <a href="{{ url('/survey?nik=' . $item->no_ktp . '&nama=' . urlencode($item->nama) . '&desa=' . urlencode($item->desa_kelurahan) . '&kecamatan=' . urlencode($item->kecamatan) . '&alamat=' . urlencode($item->alamat)) }}" class="btn-act view" title="Mulai Survei RTLH untuk Pemohon Ini">
                                             <i class="fas fa-clipboard-check"></i>
                                         </a>

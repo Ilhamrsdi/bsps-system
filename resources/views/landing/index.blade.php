@@ -400,28 +400,28 @@
             <div class="stat-public-card">
                 <div class="icon blue"><i class="fas fa-house-user"></i></div>
                 <div class="info">
-                    <div class="number">1.450+</div>
+                    <div class="number">{{ number_format($stats['totalPenerima'], 0, ',', '.') }}</div>
                     <div class="label">Calon Penerima Terdata</div>
                 </div>
             </div>
             <div class="stat-public-card">
-                <div class="icon green"><i class="fas fa-clipboard-check"></i></div>
+                <div class="icon green"><i class="fas fa-city"></i></div>
                 <div class="info">
-                    <div class="number">850+</div>
-                    <div class="label">Rumah Tervalidasi Layak</div>
+                    <div class="number">{{ $stats['totalDesa'] }}</div>
+                    <div class="label">Desa / Kelurahan</div>
                 </div>
             </div>
             <div class="stat-public-card">
-                <div class="icon orange"><i class="fas fa-user-hard-hat"></i></div>
+                <div class="icon orange"><i class="fas fa-user-gear"></i></div>
                 <div class="info">
-                    <div class="number">42</div>
-                    <div class="label">Tenaga Fasilitator Lapangan</div>
+                    <div class="number">{{ number_format($stats['totalPetugas'], 0, ',', '.') }}</div>
+                    <div class="label">Petugas / Fasilitator</div>
                 </div>
             </div>
             <div class="stat-public-card">
                 <div class="icon purple"><i class="fas fa-map-location-dot"></i></div>
                 <div class="info">
-                    <div class="number">31</div>
+                    <div class="number">{{ $stats['totalKecamatan'] }}</div>
                     <div class="label">Wilayah Kecamatan</div>
                 </div>
             </div>

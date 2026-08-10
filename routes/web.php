@@ -48,6 +48,8 @@ Route::middleware(['auth'])->group(function () {
     // Data Verval BSPS
     Route::get('/verval-data', [VervalDataController::class, 'index'])->name('verval-data');
     Route::get('/data-verval', [VervalDataController::class, 'index']);
+    Route::get('/verval-data/surat-pernyataan-kolektif', [VervalDataController::class, 'suratPernyataanKolektif'])->name('verval-data.surat-pernyataan-kolektif');
+    Route::get('/verval-data/{id}/surat-pernyataan', [VervalDataController::class, 'suratPernyataan'])->name('verval-data.surat-pernyataan');
 
     // Geo Maps
     Route::get('/geomaps', [GeoMapController::class, 'index'])->name('geomaps');
