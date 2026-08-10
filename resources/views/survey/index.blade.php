@@ -513,6 +513,14 @@
                         {{-- 1. Sudut Depan --}}
                         <div>
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">1. Tampak Depan</label>
+                            <div style="margin-bottom: 12px; display: flex; gap: 16px; background: #f8fafc; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                                <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; color: #334155; font-weight: 600;">
+                                    <input type="radio" name="status_foto_sudut_depan" value="layak" {{ $vervalData->status_foto_sudut_depan == 'layak' ? 'checked' : '' }}> Layak
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; color: #334155; font-weight: 600;">
+                                    <input type="radio" name="status_foto_sudut_depan" value="tidak layak" {{ $vervalData->status_foto_sudut_depan == 'tidak layak' ? 'checked' : '' }}> Tidak Layak
+                                </label>
+                            </div>
                             <div class="camera-upload-card {{ $vervalData->foto_sudut_depan ? 'has-image' : '' }}" id="card_depan">
                                 <input type="file" name="foto_sudut_depan" class="camera-file-input" accept="image/*" onchange="previewCameraPhoto(this, 'preview_depan', 'card_depan')">
                                 <img src="{{ $vervalData->foto_sudut_depan ? asset('storage/' . $vervalData->foto_sudut_depan) : '' }}" class="camera-preview-img" id="preview_depan" style="{{ $vervalData->foto_sudut_depan ? '' : 'display:none;' }}" alt="Tampak Depan">
@@ -532,6 +540,14 @@
                         {{-- 2. Sudut Belakang --}}
                         <div>
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">2. Tampak Belakang</label>
+                            <div style="margin-bottom: 12px; display: flex; gap: 16px; background: #f8fafc; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                                <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; color: #334155; font-weight: 600;">
+                                    <input type="radio" name="status_foto_sudut_belakang" value="layak" {{ $vervalData->status_foto_sudut_belakang == 'layak' ? 'checked' : '' }}> Layak
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; color: #334155; font-weight: 600;">
+                                    <input type="radio" name="status_foto_sudut_belakang" value="tidak layak" {{ $vervalData->status_foto_sudut_belakang == 'tidak layak' ? 'checked' : '' }}> Tidak Layak
+                                </label>
+                            </div>
                             <div class="camera-upload-card {{ $vervalData->foto_sudut_belakang ? 'has-image' : '' }}" id="card_belakang">
                                 <input type="file" name="foto_sudut_belakang" class="camera-file-input" accept="image/*" onchange="previewCameraPhoto(this, 'preview_belakang', 'card_belakang')">
                                 <img src="{{ $vervalData->foto_sudut_belakang ? asset('storage/' . $vervalData->foto_sudut_belakang) : '' }}" class="camera-preview-img" id="preview_belakang" style="{{ $vervalData->foto_sudut_belakang ? '' : 'display:none;' }}" alt="Tampak Belakang">
@@ -551,6 +567,14 @@
                         {{-- 3. Bagian Dalam / Interior --}}
                         <div>
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">3. Bagian Dalam / Interior</label>
+                            <div style="margin-bottom: 12px; display: flex; gap: 16px; background: #f8fafc; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                                <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; color: #334155; font-weight: 600;">
+                                    <input type="radio" name="status_foto_bagian_dalam" value="layak" {{ $vervalData->status_foto_bagian_dalam == 'layak' ? 'checked' : '' }}> Layak
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; color: #334155; font-weight: 600;">
+                                    <input type="radio" name="status_foto_bagian_dalam" value="tidak layak" {{ $vervalData->status_foto_bagian_dalam == 'tidak layak' ? 'checked' : '' }}> Tidak Layak
+                                </label>
+                            </div>
                             <div class="camera-upload-card {{ $vervalData->foto_bagian_dalam ? 'has-image' : '' }}" id="card_dalam">
                                 <input type="file" name="foto_bagian_dalam" class="camera-file-input" accept="image/*" onchange="previewCameraPhoto(this, 'preview_dalam', 'card_dalam')">
                                 <img src="{{ $vervalData->foto_bagian_dalam ? asset('storage/' . $vervalData->foto_bagian_dalam) : '' }}" class="camera-preview-img" id="preview_dalam" style="{{ $vervalData->foto_bagian_dalam ? '' : 'display:none;' }}" alt="Bagian Dalam">
@@ -570,6 +594,14 @@
                         {{-- 4. Samping Kiri --}}
                         <div>
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">4. Samping Kiri</label>
+                            <div style="margin-bottom: 12px; display: flex; gap: 16px; background: #f8fafc; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                                <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; color: #334155; font-weight: 600;">
+                                    <input type="radio" name="status_foto_sudut_kiri" value="layak" {{ $vervalData->status_foto_sudut_kiri == 'layak' ? 'checked' : '' }}> Layak
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; color: #334155; font-weight: 600;">
+                                    <input type="radio" name="status_foto_sudut_kiri" value="tidak layak" {{ $vervalData->status_foto_sudut_kiri == 'tidak layak' ? 'checked' : '' }}> Tidak Layak
+                                </label>
+                            </div>
                             <div class="camera-upload-card {{ $vervalData->foto_sudut_kiri ? 'has-image' : '' }}" id="card_kiri">
                                 <input type="file" name="foto_sudut_kiri" class="camera-file-input" accept="image/*" onchange="previewCameraPhoto(this, 'preview_kiri', 'card_kiri')">
                                 <img src="{{ $vervalData->foto_sudut_kiri ? asset('storage/' . $vervalData->foto_sudut_kiri) : '' }}" class="camera-preview-img" id="preview_kiri" style="{{ $vervalData->foto_sudut_kiri ? '' : 'display:none;' }}" alt="Samping Kiri">
@@ -589,6 +621,14 @@
                         {{-- 5. Samping Kanan --}}
                         <div>
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">5. Samping Kanan</label>
+                            <div style="margin-bottom: 12px; display: flex; gap: 16px; background: #f8fafc; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                                <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; color: #334155; font-weight: 600;">
+                                    <input type="radio" name="status_foto_sudut_kanan" value="layak" {{ $vervalData->status_foto_sudut_kanan == 'layak' ? 'checked' : '' }}> Layak
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; color: #334155; font-weight: 600;">
+                                    <input type="radio" name="status_foto_sudut_kanan" value="tidak layak" {{ $vervalData->status_foto_sudut_kanan == 'tidak layak' ? 'checked' : '' }}> Tidak Layak
+                                </label>
+                            </div>
                             <div class="camera-upload-card {{ $vervalData->foto_sudut_kanan ? 'has-image' : '' }}" id="card_kanan">
                                 <input type="file" name="foto_sudut_kanan" class="camera-file-input" accept="image/*" onchange="previewCameraPhoto(this, 'preview_kanan', 'card_kanan')">
                                 <img src="{{ $vervalData->foto_sudut_kanan ? asset('storage/' . $vervalData->foto_sudut_kanan) : '' }}" class="camera-preview-img" id="preview_kanan" style="{{ $vervalData->foto_sudut_kanan ? '' : 'display:none;' }}" alt="Samping Kanan">
