@@ -315,9 +315,12 @@
                     Kecamatan <strong>{{ $user->kecamatan ?: '-' }}</strong>
                 </p>
             </div>
-            <div>
-                <a href="{{ url('/petugas/belum-survei') }}" class="btn" style="background:#ffb800;color:#002855;font-weight:800;padding:10px 18px;border-radius:var(--radius-sm);text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
-                    <i class="fas fa-clipboard-question"></i> Lihat Tugas Belum Survei
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                <a href="{{ route('verval-data.surat-pernyataan-kolektif', array_merge(['desa' => $user->desa], request()->all())) }}" target="_blank" class="btn" style="background:#ffb800;color:#002855;font-weight:800;padding:10px 18px;border-radius:var(--radius-sm);text-decoration:none;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(0,0,0,0.15);" title="Cetak Surat Pernyataan secara kolektif untuk seluruh calon penerima Desa {{ $user->desa ?: '-' }}">
+                    <i class="fas fa-file-signature"></i> Cetak Kolektif Surat Pernyataan (Desa {{ $user->desa ?: '-' }})
+                </a>
+                <a href="{{ url('/petugas/belum-survei') }}" class="btn" style="background:rgba(255,255,255,0.18);color:#fff;font-weight:700;padding:10px 18px;border-radius:var(--radius-sm);text-decoration:none;display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,0.35);">
+                    <i class="fas fa-clipboard-question"></i> Tugas Belum Survei
                 </a>
             </div>
         </div>
@@ -439,15 +442,25 @@
                     </div>
                 </div>
             </div>
+
+            {{-- Tombol Cetak Kolektif berdasarkan Filter / Search Aktif --}}
+            <a href="{{ route('verval-data.surat-pernyataan-kolektif', array_merge(['desa' => $user->desa], request()->all())) }}" target="_blank" class="btn" style="padding:10px 16px;font-size:13px;font-weight:700;background:#ffb800;color:#002855;text-decoration:none;border-radius:var(--radius-sm);display:inline-flex;align-items:center;gap:6px;" title="Cetak Surat Pernyataan Kolektif Desa {{ $user->desa ?: '-' }}">
+                <i class="fas fa-file-signature"></i> Cetak Kolektif Surat Pernyataan
+            </a>
         </form>
 
         {{-- Tabel Data Calon Penerima Desa --}}
         <div class="table-container-card">
             <div class="table-header-bar">
                 <h3><i class="fas fa-clipboard-list"></i> Daftar Calon Penerima BSPS — Desa {{ $user->desa ?: '-' }}</h3>
-                <span style="font-size:12.5px;color:var(--text-muted);font-weight:600;">
-                    Menampilkan {{ $vervals->firstItem() ?? 0 }} - {{ $vervals->lastItem() ?? 0 }} dari {{ number_format($vervals->total(), 0, ',', '.') }} data
-                </span>
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                    <a href="{{ route('verval-data.surat-pernyataan-kolektif', array_merge(['desa' => $user->desa], request()->all())) }}" target="_blank" class="btn" style="padding:8px 14px;font-size:12.5px;font-weight:800;background:#ffb800;color:#002855;text-decoration:none;border-radius:var(--radius-sm);display:inline-flex;align-items:center;gap:6px;" title="Cetak Surat Pernyataan Kolektif per Desa">
+                        <i class="fas fa-print"></i> Cetak Kolektif (Desa {{ $user->desa ?: '-' }})
+                    </a>
+                    <span style="font-size:12.5px;color:var(--text-muted);font-weight:600;">
+                        Menampilkan {{ $vervals->firstItem() ?? 0 }} - {{ $vervals->lastItem() ?? 0 }} dari {{ number_format($vervals->total(), 0, ',', '.') }} data
+                    </span>
+                </div>
             </div>
 
             <div class="table-petugas-wrapper">
@@ -460,7 +473,7 @@
                             <th style="padding:14px 18px;min-width:180px;">NIK &amp; No. KK</th>
                             <th style="padding:14px 18px;min-width:200px;">Alamat / Dusun</th>
                             <th style="padding:14px 18px;text-align:center;width:130px;">Status Survei</th>
-                            <th style="padding:14px 18px;text-align:center;min-width:140px;">Aksi</th>
+                            <th style="padding:14px 18px;text-align:center;min-width:160px;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -492,10 +505,15 @@
                                     @endif
                                 </td>
                                 <td style="padding:14px 18px;text-align:center;">
-                                    <button type="button" class="btn-act survey btn-trigger-status-modal"
-                                            data-id="{{ $item->id }}" data-nama="{{ e($item->nama) }}" data-nik="{{ e($item->no_ktp ?: '-') }}" data-alamat="{{ e($item->alamat ?: '-') }}" data-status="{{ e($item->status) }}" data-url="{{ url('/survey/' . $item->id) }}">
-                                        <i class="fas fa-camera"></i> {{ $item->foto_sudut_depan ? 'Lihat / Edit' : 'Mulai Survei' }}
-                                    </button>
+                                    <div style="display:inline-flex;align-items:center;gap:6px;">
+                                        <button type="button" class="btn-act survey btn-trigger-status-modal"
+                                                data-id="{{ $item->id }}" data-nama="{{ e($item->nama) }}" data-nik="{{ e($item->no_ktp ?: '-') }}" data-alamat="{{ e($item->alamat ?: '-') }}" data-status="{{ e($item->status) }}" data-url="{{ url('/survey/' . $item->id) }}">
+                                            <i class="fas fa-camera"></i> {{ $item->foto_sudut_depan ? 'Lihat / Edit' : 'Mulai Survei' }}
+                                        </button>
+                                        <a href="{{ route('verval-data.surat-pernyataan', $item->id) }}" target="_blank" class="btn-act" style="background:rgba(0,40,85,0.08);color:var(--primary-dark);padding:7px 10px;" title="Cetak Surat Pernyataan Satuan">
+                                            <i class="fas fa-file-signature"></i>
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                         @empty

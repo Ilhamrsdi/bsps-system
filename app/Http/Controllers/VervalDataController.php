@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DataPenerima;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class VervalDataController extends Controller
@@ -75,9 +76,26 @@ class VervalDataController extends Controller
     {
         $search = $request->get('search');
         $kecamatan = $request->get('kecamatan', 'all');
+        $desa = $request->get('desa', 'all');
         $desil = $request->get('desil', 'all');
+        $statusFilter = $request->get('status', 'all');
 
         $query = DataPenerima::query();
+
+        // Jika user yang login adalah Petugas Lapangan, batasi wilayah tugasnya secara otomatis
+        $user = Auth::user();
+        if ($user && $user->isPetugas()) {
+            $petugasId   = $user->id;
+            $petugasDesa = $user->desa;
+            $query->where(function ($q) use ($petugasId, $petugasDesa) {
+                $q->where('user_id', $petugasId);
+                if ($petugasDesa) {
+                    $q->orWhere('desa_kelurahan', $petugasDesa);
+                }
+            });
+        } elseif ($desa && $desa !== 'all') {
+            $query->where('desa_kelurahan', $desa);
+        }
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -95,6 +113,12 @@ class VervalDataController extends Controller
 
         if ($desil && $desil !== 'all') {
             $query->where('pengelompokan_desil', 'like', "%{$desil}%");
+        }
+
+        if ($statusFilter === 'sudah') {
+            $query->whereNotNull('foto_sudut_depan');
+        } elseif ($statusFilter === 'belum') {
+            $query->whereNull('foto_sudut_depan');
         }
 
         $items = $this->attachKadesInfo($query->get());
