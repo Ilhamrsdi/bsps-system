@@ -473,6 +473,9 @@
                     </p>
                 </div>
                 <div class="recipient-actions" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                    <button type="button" class="btn" onclick="openDetailProfilModal()" style="background:rgba(255,255,255,0.95);color:var(--primary);font-weight:800;font-size:13px;padding:10px 18px;border-radius:var(--radius-sm);border:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);transition:all 0.2s;">
+                        <i class="fas fa-id-card"></i> Detail Profil
+                    </button>
                     <a href="{{ route('verval-data.surat-pernyataan', $vervalData->id) }}" target="_blank" class="btn" style="background:#ffb800;color:#002855;font-weight:800;font-size:13px;padding:10px 18px;border-radius:var(--radius-sm);text-decoration:none;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 12px rgba(255,184,0,0.3);">
                         <i class="fas fa-file-signature"></i> Cetak Surat Pernyataan
                     </a>
@@ -1191,6 +1194,10 @@
                     <button type="button" class="btn btn-primary" style="padding: 9px 22px; font-size: 12.5px; background: #e11d48; border-color: #e11d48;" onclick="focusFirstInvalidField()">
                         <i class="fas fa-arrow-down"></i> Lengkapi Data Sekarang
                     </button>
+                </div>
+            </div>
+        </div>
+
         <!-- Modal Konfirmasi Hapus Foto (Custom System Modal PUPR) -->
         <div class="modal-overlay" id="deletePhotoConfirmModal">
             <div class="modal-box" style="max-width: 440px;">
@@ -1225,11 +1232,155 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal Detail Profil Calon Penerima BSPS (Custom System Modal PUPR) -->
+        <div class="modal-overlay" id="modalDetailProfil" onclick="if(event.target === this) closeDetailProfilModal()">
+            <div class="modal-box" style="max-width: 680px; padding: 0; overflow: hidden; border-radius: 16px;">
+                <div class="modal-header" style="background: var(--primary, #002855); color: #ffffff; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between;">
+                    <h3 style="color: #ffffff; display: flex; align-items: center; gap: 10px; font-size: 17px; margin: 0; font-weight: 800;">
+                        <i class="fas fa-id-card-clip" style="color: var(--secondary, #ffb800);"></i> Detail Profil Calon Penerima BSPS
+                    </h3>
+                    <button class="close-btn" type="button" style="background: rgba(255,255,255,0.15); border: none; color: #ffffff; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;" onclick="closeDetailProfilModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="modal-body" style="padding: 24px; max-height: 72vh; overflow-y: auto;">
+                    <!-- Subheader Badge Banner -->
+                    <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px 20px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--primary, #002855); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 900;">
+                                {{ strtoupper(substr($vervalData->nama, 0, 1)) }}
+                            </div>
+                            <div>
+                                <h4 style="margin: 0; font-size: 16px; font-weight: 800; color: var(--primary-dark, #001e40);">{{ $vervalData->nama }}</h4>
+                                <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;">
+                                    <i class="fas fa-location-dot" style="color: var(--primary);"></i> Desa {{ $vervalData->desa_kelurahan }}, Kec. {{ $vervalData->kecamatan }}
+                                </span>
+                            </div>
+                        </div>
+                        <div>
+                            <span style="font-size: 11.5px; font-weight: 800; padding: 5px 12px; border-radius: 20px; background: rgba(0, 40, 85, 0.08); color: var(--primary); display: inline-flex; align-items: center; gap: 6px;">
+                                <i class="fas fa-layer-group"></i> {{ $vervalData->pengelompokan_desil ?: 'Desil 1-4' }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- 1. Identitas Kependudukan -->
+                    <div style="margin-bottom: 20px;">
+                        <h5 style="font-size: 13.5px; font-weight: 800; color: var(--primary); margin: 0 0 12px 0; border-bottom: 2px solid rgba(0,40,85,0.08); padding-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-address-card"></i> Identitas Kependudukan
+                        </h5>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; font-size: 13px;">
+                            <div style="background: #f8fafc; padding: 10px 14px; border-radius: 8px; border: 1px solid #f1f5f9;">
+                                <span style="color: var(--text-muted); font-size: 11px; display: block; font-weight: 600;">NIK (No. KTP)</span>
+                                <strong style="color: var(--primary-dark); font-family: monospace; font-size: 13px;">{{ $vervalData->no_ktp ?: '-' }}</strong>
+                            </div>
+                            <div style="background: #f8fafc; padding: 10px 14px; border-radius: 8px; border: 1px solid #f1f5f9;">
+                                <span style="color: var(--text-muted); font-size: 11px; display: block; font-weight: 600;">Nomor KK</span>
+                                <strong style="color: var(--primary-dark); font-family: monospace; font-size: 13px;">{{ $vervalData->no_kk ?: '-' }}</strong>
+                            </div>
+                            <div style="background: #f8fafc; padding: 10px 14px; border-radius: 8px; border: 1px solid #f1f5f9;">
+                                <span style="color: var(--text-muted); font-size: 11px; display: block; font-weight: 600;">Jenis Kelamin</span>
+                                <strong>{{ $vervalData->jenis_kelamin == 'L' ? 'Laki-Laki (L)' : ($vervalData->jenis_kelamin == 'P' ? 'Perempuan (P)' : '-') }}</strong>
+                            </div>
+                            <div style="background: #f8fafc; padding: 10px 14px; border-radius: 8px; border: 1px solid #f1f5f9;">
+                                <span style="color: var(--text-muted); font-size: 11px; display: block; font-weight: 600;">Tempat &amp; Tanggal Lahir</span>
+                                <strong>{{ $vervalData->tempat_lahir ?: '-' }}, {{ $vervalData->tanggal_lahir ? \Carbon\Carbon::parse($vervalData->tanggal_lahir)->translatedFormat('d F Y') : '-' }}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Alamat Domisili & Wilayah -->
+                    <div style="margin-bottom: 20px;">
+                        <h5 style="font-size: 13.5px; font-weight: 800; color: var(--primary); margin: 0 0 12px 0; border-bottom: 2px solid rgba(0,40,85,0.08); padding-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-map-marked-alt"></i> Alamat Domisili &amp; Wilayah
+                        </h5>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; font-size: 13px;">
+                            <div style="background: #f8fafc; padding: 10px 14px; border-radius: 8px; border: 1px solid #f1f5f9; grid-column: 1 / -1;">
+                                <span style="color: var(--text-muted); font-size: 11px; display: block; font-weight: 600;">Alamat Lengkap</span>
+                                <strong>{{ $vervalData->alamat ?: '-' }}</strong>
+                            </div>
+                            <div style="background: #f8fafc; padding: 10px 14px; border-radius: 8px; border: 1px solid #f1f5f9;">
+                                <span style="color: var(--text-muted); font-size: 11px; display: block; font-weight: 600;">Desa / Kelurahan</span>
+                                <strong>{{ $vervalData->desa_kelurahan ?: '-' }}</strong>
+                            </div>
+                            <div style="background: #f8fafc; padding: 10px 14px; border-radius: 8px; border: 1px solid #f1f5f9;">
+                                <span style="color: var(--text-muted); font-size: 11px; display: block; font-weight: 600;">Kecamatan</span>
+                                <strong>Kec. {{ $vervalData->kecamatan ?: '-' }}</strong>
+                            </div>
+                            <div style="background: #f8fafc; padding: 10px 14px; border-radius: 8px; border: 1px solid #f1f5f9; grid-column: 1 / -1;">
+                                <span style="color: var(--text-muted); font-size: 11px; display: block; font-weight: 600;">Geotagging GPS (Koordinat)</span>
+                                @if($vervalData->latitude && $vervalData->longitude)
+                                    <strong style="color: var(--success); font-family: monospace;">
+                                        <i class="fas fa-crosshairs"></i> {{ $vervalData->latitude }}, {{ $vervalData->longitude }}
+                                    </strong>
+                                @else
+                                    <span style="color: var(--text-muted); font-size: 12px;">Belum terdeteksi (Otomatis saat survei disimpan)</span>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Status Kepemilikan & Lahan -->
+                    <div>
+                        <h5 style="font-size: 13.5px; font-weight: 800; color: var(--primary); margin: 0 0 12px 0; border-bottom: 2px solid rgba(0,40,85,0.08); padding-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-house-chimney-window"></i> Status Kepemilikan &amp; Lahan
+                        </h5>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; font-size: 13px;">
+                            <div style="background: #f8fafc; padding: 10px 14px; border-radius: 8px; border: 1px solid #f1f5f9;">
+                                <span style="color: var(--text-muted); font-size: 11px; display: block; font-weight: 600;">Status Tanah</span>
+                                <strong>{{ $vervalData->status_tanah ?: 'Belum Diisi' }}</strong>
+                            </div>
+                            <div style="background: #f8fafc; padding: 10px 14px; border-radius: 8px; border: 1px solid #f1f5f9;">
+                                <span style="color: var(--text-muted); font-size: 11px; display: block; font-weight: 600;">Jenis Bukti Lahan</span>
+                                <strong>{{ $vervalData->jenis_kepemilikan_lahan ?: 'Belum Diisi' }}</strong>
+                            </div>
+                            <div style="background: #f8fafc; padding: 10px 14px; border-radius: 8px; border: 1px solid #f1f5f9;">
+                                <span style="color: var(--text-muted); font-size: 11px; display: block; font-weight: 600;">Luas Tanah</span>
+                                <strong>{{ $vervalData->luas_tanah ?: 'Belum Diisi' }}</strong>
+                            </div>
+                            <div style="background: #f8fafc; padding: 10px 14px; border-radius: 8px; border: 1px solid #f1f5f9;">
+                                <span style="color: var(--text-muted); font-size: 11px; display: block; font-weight: 600;">Penghasilan Per Bulan</span>
+                                <strong>{{ $vervalData->penghasilan ?: 'Belum Diisi' }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer" style="padding: 14px 22px; background: #f8fafc; border-top: 1px solid rgba(0, 40, 85, 0.06); display: flex; justify-content: flex-end;">
+                    <button type="button" class="btn btn-primary" style="padding: 9px 20px; font-size: 13px; font-weight: 700; cursor: pointer;" onclick="closeDetailProfilModal()">
+                        <i class="fas fa-check"></i> Tutup Detail
+                    </button>
+                </div>
+            </div>
+        </div>
     </main>
 @endsection
 
 @push('scripts')
     <script>
+        // Modal Detail Profil Trigger Helpers
+        function openDetailProfilModal() {
+            const modal = document.getElementById('modalDetailProfil');
+            if (modal) {
+                modal.classList.add('active');
+                modal.style.display = 'flex';
+                modal.style.opacity = '1';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeDetailProfilModal() {
+            const modal = document.getElementById('modalDetailProfil');
+            if (modal) {
+                modal.classList.remove('active');
+                modal.style.display = 'none';
+                modal.style.opacity = '0';
+                document.body.style.overflow = '';
+            }
+        }
+
         let firstMissingElement = null;
 
         // Validasi Form Survei Lengkap Sebelum Disimpan
