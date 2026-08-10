@@ -12,7 +12,7 @@
         })();
     </script>
 
-    <title>@yield('title', 'PUPR Jember - Sistem Monitoring')</title>
+    <title>@yield('title', 'BSPS Verval - Sistem Informasi Verifikasi & Validasi')</title>
 
     <!-- Favicon Logo PUPR -->
     <link rel="icon" href="{{ asset('logo.jpg') }}" type="image/jpeg" />
@@ -81,7 +81,7 @@
                     Apakah Anda yakin ingin keluar?
                 </h4>
                 <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin: 0;">
-                    Sesi Anda akan diakhiri dan Anda perlu masuk kembali untuk mengakses sistem Dinas PUPR.
+                    Sesi Anda akan diakhiri dan Anda perlu masuk kembali untuk mengakses sistem BSPS Verval.
                 </p>
             </div>
 

@@ -1,12 +1,12 @@
-<!-- Dedicated Public Navbar Component (PUPR Jember - White Background Theme) -->
+<!-- Dedicated Public Navbar Component (BSPS Verval Theme) -->
 <header class="public-navbar">
     <div class="public-navbar-container">
         <!-- Brand Logo & Title -->
         <a href="{{ url('/') }}" class="public-brand">
-            <img src="{{ asset('logo.jpg') }}" alt="PUPR Logo" class="brand-logo-img" />
+            <img src="{{ asset('logo.jpg') }}" alt="BSPS Logo" class="brand-logo-img" />
             <div class="brand-text">
-                <h1>PUPR Jember</h1>
-                <span>DINAS PEKERJAAN UMUM DAN PENATAAN RUANG</span>
+                <h1>BSPS Verval</h1>
+                <span>SISTEM VERIFIKASI &amp; VALIDASI PERUMAHAN SWADAYA</span>
             </div>
         </a>
 
@@ -14,6 +14,12 @@
         <nav class="public-nav-links">
             <a href="{{ url('/') }}" class="public-nav-item {{ Request::is('/', 'landing') ? 'active' : '' }}">
                 <i class="fas fa-home"></i> Beranda
+            </a>
+            <a href="#alur-verval" class="public-nav-item">
+                <i class="fas fa-clipboard-list"></i> Alur Verval
+            </a>
+            <a href="#kriteria" class="public-nav-item">
+                <i class="fas fa-check-double"></i> Kriteria Rumah
             </a>
         </nav>
 
@@ -25,7 +31,7 @@
                 </a>
             @else
                 <a href="{{ url('/login') }}" class="btn btn-primary public-auth-btn">
-                    <i class="fas fa-sign-in-alt"></i> Login
+                    <i class="fas fa-sign-in-alt"></i> Login Petugas / Admin
                 </a>
             @endauth
         </div>
@@ -147,12 +153,7 @@
             display: none;
         }
         .public-nav-links {
-            display: flex !important;
-            gap: 4px;
-        }
-        .public-nav-item {
-            padding: 6px 10px;
-            font-size: 12px;
+            display: none !important;
         }
         .public-auth-btn {
             padding: 6px 12px;
@@ -163,10 +164,6 @@
     @media (max-width: 480px) {
         .public-navbar-container {
             padding: 0 12px !important;
-        }
-        .public-nav-item {
-            font-size: 11px;
-            padding: 5px 8px;
         }
         .public-auth-btn {
             font-size: 11px;

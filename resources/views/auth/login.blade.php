@@ -12,7 +12,7 @@
         })();
     </script>
 
-    <title>Login - Dinas PUPR Kabupaten Jember</title>
+    <title>Login - BSPS Verval (Bantuan Stimulan Perumahan Swadaya)</title>
 
     <!-- Favicon Logo PUPR -->
     <link rel="icon" href="{{ asset('logo.jpg') }}" type="image/jpeg" />
@@ -351,16 +351,16 @@
         <div class="login-card">
             <!-- Brand Logo Header -->
             <div class="login-brand">
-                <img src="{{ asset('logo.jpg') }}" alt="Logo PUPR" class="brand-logo-img" />
+                <img src="{{ asset('logo.jpg') }}" alt="Logo BSPS" class="brand-logo-img" />
                 <div class="brand-text">
-                    <h1>PUPR Jember</h1>
-                    <span>DINAS PEKERJAAN UMUM DAN PENATAAN RUANG</span>
+                    <h1>BSPS Verval</h1>
+                    <span>SISTEM VERIFIKASI &amp; VALIDASI PERUMAHAN SWADAYA</span>
                 </div>
             </div>
 
             <div class="login-header">
                 <h2>Selamat Datang</h2>
-                <p>Masuk ke Sistem Monitoring & Survei PUPR Jember</p>
+                <p>Masuk ke Sistem Verifikasi &amp; Validasi BSPS</p>
             </div>
 
             <!-- Error Notification -->
@@ -413,7 +413,7 @@
         </div>
 
         <div class="login-footer-text">
-            &copy; 2026 Dinas PUPR Kabupaten Jember. All rights reserved.<br />
+            &copy; {{ date('Y') }} BSPS Verval - Bantuan Stimulan Perumahan Swadaya.<br />
             Developed by PT Aleena Mandiri Group
         </div>
     </div>

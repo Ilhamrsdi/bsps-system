@@ -1,8 +1,8 @@
 @extends('layouts.partial.app')
 
-@section('title', 'Dinas PUPR Kabupaten Jember - Portal Resmi')
-@section('title_header', 'Selamat Datang di Dinas PUPR Jember')
-@section('subtitle_header', 'Portal Resmi Informasi Infrastruktur Bina Marga, Sumber Daya Air, dan Cipta Karya Jember')
+@section('title', 'BSPS Verval - Portal Verifikasi & Validasi Perumahan Swadaya')
+@section('title_header', 'Selamat Datang di Portal BSPS Verval')
+@section('subtitle_header', 'Sistem Informasi Pendataan, Verifikasi Lapangan, dan Validasi Calon Penerima Bantuan Stimulan Perumahan Swadaya')
 
 @push('styles')
 <style>
@@ -58,7 +58,7 @@
         line-height: 1.7;
         color: rgba(255, 255, 255, 0.88);
         margin-bottom: 30px;
-        max-width: 780px;
+        max-width: 820px;
     }
 
     .landing-cta-group {
@@ -371,23 +371,26 @@
     <main class="dashboard-content dashboard-content-public">
         <!-- Hero Section -->
         <div class="landing-hero">
-            <h1>Dinas Pekerjaan Umum dan Penataan Ruang</h1>
+            <div class="landing-badge">
+                <i class="fas fa-house-chimney"></i> Program BSPS (Bantuan Stimulan Perumahan Swadaya)
+            </div>
+            <h1>Sistem Verifikasi &amp; Validasi Perumahan Swadaya</h1>
             <p>
-                Mewujudkan infrastruktur jalan, jembatan, jaringan irigasi pertanian, serta penataan ruang bangunan 
-                yang berkualitas, tangguh, dan berkelanjutan di seluruh wilayah Kabupaten Jember.
+                Portal terpadu pelaksanaan pendataan, survei lapangan kelaikan hunian, verifikasi kelengkapan berkas, 
+                serta validasi Rumah Tidak Layak Huni (RTLH) bagi Masyarakat Berpenghasilan Rendah (MBR) secara transparan, terintegrasi, dan tepat sasaran.
             </p>
             <div class="landing-cta-group">
                 @auth
                     <a href="{{ url('/dashboard') }}" class="btn-gold">
-                        <i class="fas fa-th-large"></i> Akses Dashboard
+                        <i class="fas fa-th-large"></i> Akses Dashboard Sistem
                     </a>
                 @else
                     <a href="{{ url('/login') }}" class="btn-gold">
-                        <i class="fas fa-sign-in-alt"></i> Akses Login
+                        <i class="fas fa-sign-in-alt"></i> Login Petugas &amp; Admin
                     </a>
                 @endauth
-                <a href="#profil-dinas" class="btn-glass">
-                    <i class="fas fa-info-circle"></i> Profil &amp; Tugas Dinas
+                <a href="#alur-verval" class="btn-glass">
+                    <i class="fas fa-clipboard-list"></i> Alur Tahapan Verval
                 </a>
             </div>
         </div>
@@ -395,111 +398,111 @@
         <!-- 4 Stat Counters Grid -->
         <div class="stats-public-grid">
             <div class="stat-public-card">
-                <div class="icon blue"><i class="fas fa-road"></i></div>
+                <div class="icon blue"><i class="fas fa-house-user"></i></div>
                 <div class="info">
-                    <div class="number">1.240+ KM</div>
-                    <div class="label">Panjang Jalan Kabupaten</div>
+                    <div class="number">1.450+</div>
+                    <div class="label">Calon Penerima Terdata</div>
                 </div>
             </div>
             <div class="stat-public-card">
-                <div class="icon green"><i class="fas fa-water"></i></div>
+                <div class="icon green"><i class="fas fa-clipboard-check"></i></div>
                 <div class="info">
-                    <div class="number">86+</div>
-                    <div class="label">Daerah Irigasi Pertanian</div>
+                    <div class="number">850+</div>
+                    <div class="label">Rumah Tervalidasi Layak</div>
                 </div>
             </div>
             <div class="stat-public-card">
-                <div class="icon orange"><i class="fas fa-bridge"></i></div>
+                <div class="icon orange"><i class="fas fa-user-hard-hat"></i></div>
                 <div class="info">
-                    <div class="number">340+</div>
-                    <div class="label">Jembatan Terawat</div>
+                    <div class="number">42</div>
+                    <div class="label">Tenaga Fasilitator Lapangan</div>
                 </div>
             </div>
             <div class="stat-public-card">
                 <div class="icon purple"><i class="fas fa-map-location-dot"></i></div>
                 <div class="info">
                     <div class="number">31</div>
-                    <div class="label">Wilayah Kecamatan Jember</div>
+                    <div class="label">Wilayah Kecamatan</div>
                 </div>
             </div>
         </div>
 
-        <!-- Profil & Visi Misi -->
-        <div class="visi-misi-card" id="profil-dinas">
+        <!-- Profil & Prinsip Pelaksanaan Verval BSPS -->
+        <div class="visi-misi-card" id="alur-verval">
             <div class="section-title">
-                <h2><i class="fas fa-bullseye"></i> Visi &amp; Misi Dinas PUPR Jember</h2>
-                <p>Pedoman utama penyelenggaraan pembangunan fisik dan pengelolaan jaringan irigasi di Kabupaten Jember.</p>
+                <h2><i class="fas fa-bullseye"></i> Prinsip &amp; Tujuan Program BSPS</h2>
+                <p>Pedoman utama penyelenggaraan bantuan stimulan peningkatan kualitas rumah swadaya.</p>
             </div>
 
             <div class="visi-box">
-                <h4>Visi Utama</h4>
-                <p>&ldquo;Mewujudkan infrastruktur Jember yang andal, merata, berdaya saing, dan berkelanjutan menuju masyarakat Jember yang sejahtera.&rdquo;</p>
+                <h4>Komitmen Pelayanan</h4>
+                <p>&ldquo;Mewujudkan hunian yang layak huni, sehat, aman, dan berketahanan bagi masyarakat berpenghasilan rendah melalui bantuan stimulan perumahan swadaya yang tepat sasaran dan transparan.&rdquo;</p>
             </div>
 
             <div class="misi-grid">
                 <div class="misi-item">
                     <div class="num">1</div>
-                    <h5>Infrastruktur Jalan &amp; Jembatan</h5>
-                    <p>Meningkatkan persentase kondisi jalan mantap dan jembatan berkualitas untuk memperlancar konektivitas ekonomi warga.</p>
+                    <h5>Verifikasi Administrasi &amp; Lahan</h5>
+                    <p>Memastikan legalitas kepemilikan tanah, keabsahan identitas KTP/KK, dan kesesuaian kriteria Masyarakat Berpenghasilan Rendah (MBR).</p>
                 </div>
                 <div class="misi-item">
                     <div class="num">2</div>
-                    <h5>Irigasi &amp; Ketahanan Pangan</h5>
-                    <p>Mengoptimalkan rehabilitasi saluran irigasi pertanian dan penanggulangan banjir pendukung ketahanan pangan daerah.</p>
+                    <h5>Survei Kelaikan Fisik Bangunan</h5>
+                    <p>Penilaian kondisi teknis pondasi, kolom, rangka atap, sanitasi/MCK, ventilasi, dan pencahayaan rumah secara visual dan geolokasi.</p>
                 </div>
                 <div class="misi-item">
                     <div class="num">3</div>
-                    <h5>Tata Ruang &amp; Keselamatan Building</h5>
-                    <p>Pengawasan kesesuaian tata ruang, penerbitan Sertifikat Laik Fungsi (SLF), dan pengelolaan drainase perkotaan.</p>
+                    <h5>Validasi &amp; Penetapan Penerima</h5>
+                    <p>Penyusunan Berita Acara Rekomendasi, penetapan Surat Keputusan (SK) penerima bantuan, dan penyaluran bahan material bangunan.</p>
                 </div>
             </div>
         </div>
 
         <!-- Bidang Tugas & Layanan Utama -->
-        <div class="section-title">
-            <h2><i class="fas fa-shapes"></i> Bidang Pelayanan &amp; Tugas Utama</h2>
-            <p>Pengelompokan struktur kerja teknis pelayanan publik Dinas Pekerjaan Umum Kabupaten Jember.</p>
+        <div class="section-title" id="kriteria">
+            <h2><i class="fas fa-list-check"></i> Tahapan Verifikasi &amp; Validasi Lapangan</h2>
+            <p>Alur kerja operasional Tim Fasilitator Lapangan (TFL) dan Admin Program BSPS.</p>
         </div>
 
         <div class="services-grid">
             <div class="service-card">
                 <div class="service-card .icon-head" style="width:48px;height:48px;border-radius:12px;background:rgba(0,40,85,0.08);color:#002855;font-size:20px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
-                    <i class="fas fa-road"></i>
+                    <i class="fas fa-file-signature"></i>
                 </div>
-                <h3>Bidang Bina Marga</h3>
-                <p>Melaksanakan pemeliharaan rutin, perbaikan berkala, serta rekonstruksi ruas jalan dan jembatan kabupaten agar aman dilalui pengguna jalan.</p>
+                <h3>1. Pengusulan &amp; Seleksi Berkas</h3>
+                <p>Pemeriksaan kelengkapan dokumen pengusulan dari tingkat desa/kelurahan, verifikasi status kepemilikan tanah, dan pengecekan data kemiskinan daerah.</p>
             </div>
 
             <div class="service-card">
                 <div class="service-card .icon-head" style="width:48px;height:48px;border-radius:12px;background:rgba(39,174,96,0.12);color:#27ae60;font-size:20px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
-                    <i class="fas fa-droplet"></i>
+                    <i class="fas fa-camera-retro"></i>
                 </div>
-                <h3>Bidang Sumber Daya Air (SDA)</h3>
-                <p>Mengelola pintu air bendung, pengerukan sedimen irigasi, pembangunan tanggul sungai, dan perlindungan DAS di Kabupaten Jember.</p>
+                <h3>2. Survei Kondisi Lapangan (TFL)</h3>
+                <p>Pengambilan foto kondisi eksisting (0%), tagging titik koordinat GPS, serta penilaian kelaikan struktur keselamatan dan kesehatan bangunan.</p>
             </div>
 
             <div class="service-card">
                 <div class="service-card .icon-head" style="width:48px;height:48px;border-radius:12px;background:rgba(255,184,0,0.15);color:#d69e00;font-size:20px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
-                    <i class="fas fa-city"></i>
+                    <i class="fas fa-certificate"></i>
                 </div>
-                <h3>Bidang Cipta Karya &amp; Tata Ruang</h3>
-                <p>Verifikasi teknis kelayakan bangunan gedung (SLF), penataan drainase perkotaan bebas genangan, serta pengawasan tata ruang.</p>
+                <h3>3. Validasi &amp; Rekomendasi Bantuan</h3>
+                <p>Verifikasi akhir oleh Tim Teknis untuk menerbitkan rekomendasi bantuan perbaikan rumah, rencana anggaran biaya (RAB), dan penetapan daftar nominatif.</p>
             </div>
         </div>
 
         <!-- Contact & Location Box -->
         <div class="contact-card">
             <div>
-                <h3 style="font-size:18px;font-weight:800;color:#002855;margin-bottom:8px;">Kantor Dinas PUPR Kabupaten Jember</h3>
+                <h3 style="font-size:18px;font-weight:800;color:#002855;margin-bottom:8px;">Sekretariat Program BSPS &amp; Perumahan Swadaya</h3>
                 <div class="contact-info-list">
                     <div class="contact-info-item">
-                        <i class="fas fa-location-dot"></i> Jl. Ahmad Yani No. 80, Kabupaten Jember, Jawa Timur
+                        <i class="fas fa-location-dot"></i> Posko Fasilitator BSPS, Kabupaten Jember, Jawa Timur
                     </div>
                     <div class="contact-info-item">
-                        <i class="fas fa-clock"></i> Senin - Jumat (07.30 - 16.00 WIB)
+                        <i class="fas fa-clock"></i> Layanan Hari Kerja (08.00 - 16.00 WIB)
                     </div>
                     <div class="contact-info-item">
-                        <i class="fas fa-envelope"></i> pupr@jemberkab.go.id
+                        <i class="fas fa-envelope"></i> verval.bsps@jemberkab.go.id
                     </div>
                 </div>
             </div>
@@ -509,7 +512,7 @@
                 </a>
             @else
                 <a href="{{ url('/login') }}" class="btn-gold" style="white-space:nowrap;">
-                    <i class="fas fa-sign-in-alt"></i> Akses Login
+                    <i class="fas fa-sign-in-alt"></i> Login Petugas
                 </a>
             @endauth
         </div>
@@ -518,7 +521,7 @@
 
 @push('scripts')
 <script>
-    // Lock theme to PUPR official mode for Landing Beranda (Untouched by dynamic theme)
+    // Set theme default for landing page
     document.documentElement.setAttribute('data-theme', 'pupr');
 </script>
 @endpush

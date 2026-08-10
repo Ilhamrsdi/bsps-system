@@ -1,8 +1,8 @@
 @extends('layouts.partial.app')
 
-@section('title', 'PUPR Jember - Laporan & Rekapitulasi')
-@section('title_header', 'Laporan & Rekapitulasi')
-@section('subtitle_header', 'Rekapitulasi Laporan Survei dan Progress Pelaksanaan Pekerjaan Dinas PUPR Jember')
+@section('title', 'BSPS Verval - Laporan & Rekapitulasi')
+@section('title_header', 'Laporan & Rekapitulasi BSPS')
+@section('subtitle_header', 'Rekapitulasi Laporan Verifikasi &amp; Validasi Calon Penerima Bantuan Stimulan Perumahan Swadaya')
 
 @push('styles')
 <style>

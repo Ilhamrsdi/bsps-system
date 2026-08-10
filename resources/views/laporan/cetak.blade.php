@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cetak Rekapitulasi Laporan Pekerjaan PUPR Jember</title>
+    <title>Cetak Rekapitulasi Verifikasi &amp; Validasi BSPS</title>
 
     <link rel="icon" href="{{ asset('logo.jpg') }}" type="image/jpeg" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -201,7 +201,7 @@
     <!-- Non-Print Top Bar Controls -->
     <div class="no-print-bar no-print">
         <div>
-            <strong style="font-size:14px;"><i class="fas fa-print" style="margin-right:8px;color:#FFB800;"></i>Pratinjau Cetak Rekapitulasi Laporan Dinas PUPR Jember</strong>
+            <strong style="font-size:14px;"><i class="fas fa-print" style="margin-right:8px;color:#FFB800;"></i>Pratinjau Cetak Rekapitulasi BSPS Verval</strong>
             <div style="font-size:12px;opacity:0.8;margin-top:2px;">Gunakan orientasi Lanskap (Landscape) saat mencetak ke kertas A4 / F4.</div>
         </div>
         <div style="display:flex;gap:10px;">
@@ -214,20 +214,20 @@
         </div>
     </div>
 
-    <!-- Kop Surat Dinas PUPR Jember -->
+    <!-- Kop Surat Program BSPS -->
     <div class="kop-surat">
-        <img src="{{ asset('logo.jpg') }}" alt="Logo PUPR" class="kop-logo">
+        <img src="{{ asset('logo.jpg') }}" alt="Logo BSPS" class="kop-logo">
         <div class="kop-text">
             <h3>Pemerintah Kabupaten Jember</h3>
-            <h2>Dinas Pekerjaan Umum dan Penataan Ruang</h2>
-            <p>Jl. Ahmad Yani No. 80, Kabupaten Jember, Jawa Timur | Email: pupr@jemberkab.go.id</p>
+            <h2>Program Bantuan Stimulan Perumahan Swadaya (BSPS)</h2>
+            <p>Posko Tenaga Fasilitator Lapangan (TFL), Kabupaten Jember, Jawa Timur | Email: verval.bsps@jemberkab.go.id</p>
         </div>
     </div>
 
     <!-- Judul Dokumen -->
     <div class="doc-title">
-        <h1>Rekapitulasi Laporan Hasil Survei &amp; Pekerjaan Lapangan</h1>
-        <p>Dicetak Pada: {{ date('d F Y - H:i') }} WIB &bull; Sistem Monitoring PUPR Kabupaten Jember</p>
+        <h1>Rekapitulasi Hasil Verifikasi &amp; Validasi Calon Penerima Bantuan RTLH</h1>
+        <p>Dicetak Pada: {{ date('d F Y - H:i') }} WIB &bull; Sistem Informasi BSPS Verval Kabupaten Jember</p>
     </div>
 
     <!-- Ringkasan Statistik -->
@@ -306,7 +306,7 @@
             <div class="nip">NIP. 19750812 200212 1 003</div>
         </div>
         <div class="signature-box">
-            <div class="role">Jember, {{ date('d F Y') }}<br>Kepala Dinas PUPR Jember</div>
+            <div class="role">Jember, {{ date('d F Y') }}<br>Koordinator Fasilitator BSPS Jember</div>
             <div class="name">Dr. Ir. Eko Yuniarto, S.T., M.Si.</div>
             <div class="nip">NIP. 19700415 199603 1 002</div>
         </div>

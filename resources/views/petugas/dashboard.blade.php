@@ -1,8 +1,8 @@
 @extends('layouts.partial.app')
 
-@section('title', 'PUPR Jember - Dashboard Petugas Survei')
-@section('title_header', 'Dashboard Petugas Survei')
-@section('subtitle_header', 'Selasa, 23 Juli 2026 - Selamat datang di Ruang Kerja Petugas Survei Lapangan')
+@section('title', 'BSPS Verval - Dashboard Fasilitator')
+@section('title_header', 'Dashboard Fasilitator Lapangan')
+@section('subtitle_header', 'Ruang Kerja Fasilitator Lapangan (TFL) - Verifikasi &amp; Validasi RTLH BSPS')
 
 @push('styles')
 <style>
@@ -255,7 +255,7 @@
                 </div>
                 <div>
                     <h4 style="font-size:15px;font-weight:800;color:var(--primary-dark);margin-bottom:2px;">Sudah Siap Melakukan Survei Lapangan?</h4>
-                    <p style="font-size:13px;color:var(--text-muted);margin:0;">Klik tombol di samping untuk membuka Form Input Survei Verifikasi Fisik &amp; GPS PUPR Jember.</p>
+                    <p style="font-size:13px;color:var(--text-muted);margin:0;">Klik tombol di samping untuk membuka Form Input Survei Verifikasi Fisik &amp; GPS BSPS Verval.</p>
                 </div>
             </div>
             <div style="display:flex;gap:10px;">
