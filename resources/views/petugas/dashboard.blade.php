@@ -598,6 +598,17 @@
                 </p>
             </div>
 
+            <div class="modal-footer" style="padding: 16px 20px; background: var(--bg-body); border-top: 1px solid rgba(0, 40, 85, 0.06); display: flex; gap: 10px; justify-content: center;">
+                <button type="button" class="btn btn-outline" style="padding:10px 18px;" onclick="window.PuprModal.close('modalGpsRequired')">
+                    Batal
+                </button>
+                <button type="button" class="btn btn-primary" id="btnRetryGps" style="padding:10px 20px; font-weight:800;" onclick="retryLocationPermission()">
+                    <i class="fas fa-location-crosshairs"></i> Izinkan Lokasi &amp; Lanjutkan
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal Verifikasi Status Keberadaan Wajib Sebelum Survei -->
     <div class="modal-overlay" id="modalStatusVerification">
         <div class="modal-box" style="max-width: 480px;">
