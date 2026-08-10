@@ -29,15 +29,33 @@ Route::get('/landing', [LandingController::class, 'index']);
 
 // Storage Media Fallback Route (Bypass Nginx 403 Forbidden di Shared Hosting Hostinger)
 Route::get('/storage/{path}', function ($path) {
-    $fullPath = storage_path('app/public/' . $path);
-    if (!file_exists($fullPath)) {
-        $fullPath = public_path('storage/' . $path);
+    $possiblePaths = [
+        storage_path('app/public/' . $path),
+        public_path('storage/' . $path),
+        base_path('storage/' . $path),
+        base_path('../storage/app/public/' . $path),
+        base_path('public_html/storage/' . $path),
+        base_path('storage/uploads/' . basename($path)),
+        public_path('uploads/' . basename($path)),
+    ];
+
+    $fullPath = null;
+    foreach ($possiblePaths as $p) {
+        if (file_exists($p) && !is_dir($p)) {
+            $fullPath = $p;
+            break;
+        }
     }
-    if (!file_exists($fullPath) || is_dir($fullPath)) {
+
+    if (!$fullPath) {
         abort(404);
     }
+
     $mime = mime_content_type($fullPath) ?: 'image/jpeg';
-    return response()->file($fullPath, ['Content-Type' => $mime]);
+    return response()->file($fullPath, [
+        'Content-Type' => $mime,
+        'Cache-Control' => 'public, max-age=86400',
+    ]);
 })->where('path', '.*');
 
 // Storage Diagnostic Route
