@@ -64,6 +64,29 @@ class SurveyController extends Controller
             '_token', '_method', 'id'
         ]);
 
+        $data['indikator_lantai']      = $request->input('indikator_lantai', 'ada');
+        $data['indikator_pondasi']     = $request->input('indikator_pondasi', 'ada');
+        $data['indikator_dinding']     = $request->input('indikator_dinding', 'ada');
+        $data['indikator_struktur']    = $request->input('indikator_struktur', 'ada');
+        $data['indikator_atap']        = $request->input('indikator_atap', 'ada');
+        $data['indikator_penghasilan'] = $request->input('indikator_penghasilan', 'tidak_ada');
+
+        // Hitung total indikator RTLH yang terpenuhi:
+        // - Komponen fisik (Lantai, Pondasi, Dinding, Struktur, Atap) bernilai 'tidak_ada'
+        // - Penghasilan < UMK bernilai 'ada'
+        $totalIndikatorRtlh = 0;
+        if ($data['indikator_lantai'] === 'tidak_ada') $totalIndikatorRtlh++;
+        if ($data['indikator_pondasi'] === 'tidak_ada') $totalIndikatorRtlh++;
+        if ($data['indikator_dinding'] === 'tidak_ada') $totalIndikatorRtlh++;
+        if ($data['indikator_struktur'] === 'tidak_ada') $totalIndikatorRtlh++;
+        if ($data['indikator_atap'] === 'tidak_ada') $totalIndikatorRtlh++;
+        if ($data['indikator_penghasilan'] === 'ada') $totalIndikatorRtlh++;
+
+        $data['status_kelayakan'] = $totalIndikatorRtlh >= 2 ? 'Layak Diusulkan' : 'Tidak Layak Diusulkan';
+
+
+
+
         // Upload berkas dengan auto compression (jika GD/Intervention terpasang)
         $fileFields = [
             'ktp', 'kk', 'sertifikat_tanah',

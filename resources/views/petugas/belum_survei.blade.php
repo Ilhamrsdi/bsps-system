@@ -232,10 +232,36 @@
                                     <span style="font-size:12px;font-weight:700;color:var(--primary);">{{ $item->pengelompokan_desil ?: 'Desil 1-4' }}</span>
                                 </td>
                                 <td style="padding:14px 18px;text-align:center;">
-                                    <span class="badge-status-belum"><i class="fas fa-clock"></i> Belum Survei</span>
+                                    @if($item->status == 'ditemukan')
+                                        <span class="badge btn-trigger-status-modal" style="background:#dcfce7;color:#15803d;padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:800;cursor:pointer;"
+                                              data-id="{{ $item->id }}" data-nama="{{ e($item->nama) }}" data-nik="{{ e($item->no_ktp ?: '-') }}" data-alamat="{{ e($item->alamat ?: '-') }}" data-status="{{ e($item->status) }}" data-url="{{ url('/survey/' . $item->id) }}" title="Klik untuk ubah status">
+                                            <i class="fas fa-check-circle"></i> Ditemukan
+                                        </span>
+                                    @elseif($item->status == 'meninggal')
+                                        <span class="badge btn-trigger-status-modal" style="background:#fee2e2;color:#b91c1c;padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:800;cursor:pointer;"
+                                              data-id="{{ $item->id }}" data-nama="{{ e($item->nama) }}" data-nik="{{ e($item->no_ktp ?: '-') }}" data-alamat="{{ e($item->alamat ?: '-') }}" data-status="{{ e($item->status) }}" data-url="{{ url('/survey/' . $item->id) }}" title="Klik untuk ubah status">
+                                            <i class="fas fa-cross"></i> Meninggal
+                                        </span>
+                                    @elseif($item->status == 'pindah')
+                                        <span class="badge btn-trigger-status-modal" style="background:#fef3c7;color:#b45309;padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:800;cursor:pointer;"
+                                              data-id="{{ $item->id }}" data-nama="{{ e($item->nama) }}" data-nik="{{ e($item->no_ktp ?: '-') }}" data-alamat="{{ e($item->alamat ?: '-') }}" data-status="{{ e($item->status) }}" data-url="{{ url('/survey/' . $item->id) }}" title="Klik untuk ubah status">
+                                            <i class="fas fa-truck-ramp-box"></i> Pindah
+                                        </span>
+                                    @elseif($item->status == 'tidak diketahui')
+                                        <span class="badge btn-trigger-status-modal" style="background:#f1f5f9;color:#64748b;padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:800;cursor:pointer;"
+                                              data-id="{{ $item->id }}" data-nama="{{ e($item->nama) }}" data-nik="{{ e($item->no_ktp ?: '-') }}" data-alamat="{{ e($item->alamat ?: '-') }}" data-status="{{ e($item->status) }}" data-url="{{ url('/survey/' . $item->id) }}" title="Klik untuk ubah status">
+                                            <i class="fas fa-question-circle"></i> Tidak Diketahui
+                                        </span>
+                                    @else
+                                        <span class="badge-status-belum btn-trigger-status-modal" style="cursor:pointer;"
+                                              data-id="{{ $item->id }}" data-nama="{{ e($item->nama) }}" data-nik="{{ e($item->no_ktp ?: '-') }}" data-alamat="{{ e($item->alamat ?: '-') }}" data-status="{{ e($item->status) }}" data-url="{{ url('/survey/' . $item->id) }}" title="Klik untuk update status">
+                                            <i class="fas fa-clock"></i> Belum Survei
+                                        </span>
+                                    @endif
                                 </td>
                                 <td style="padding:14px 18px;text-align:center;">
-                                    <button type="button" class="btn-mulai-survey" onclick="startSurveyWithGps('{{ url('/survey/' . $item->id) }}')">
+                                    <button type="button" class="btn-mulai-survey btn-trigger-status-modal"
+                                            data-id="{{ $item->id }}" data-nama="{{ e($item->nama) }}" data-nik="{{ e($item->no_ktp ?: '-') }}" data-alamat="{{ e($item->alamat ?: '-') }}" data-status="{{ e($item->status) }}" data-url="{{ url('/survey/' . $item->id) }}">
                                         <i class="fas fa-camera"></i> Mulai Survei
                                     </button>
                                 </td>
@@ -339,7 +365,6 @@
                     Sebagai Petugas Lapangan, Anda <strong>wajib mengaktifkan izin GPS / Lokasi</strong> pada perangkat/browser Anda untuk memastikan koordinat geotagging rumah calon penerima tercatat secara akurat saat survei.
                 </p>
             </div>
-
             <div class="modal-footer" style="padding: 16px 20px; background: var(--bg-body); border-top: 1px solid rgba(0, 40, 85, 0.06); display: flex; gap: 10px; justify-content: center;">
                 <button type="button" class="btn btn-outline" style="padding:10px 18px;" onclick="window.PuprModal.close('modalGpsRequired')">
                     Batal
@@ -350,11 +375,203 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Verifikasi Status Keberadaan Wajib Sebelum Survei -->
+    <div class="modal-overlay" id="modalStatusVerification">
+        <div class="modal-box" style="max-width: 480px;">
+            <div class="modal-header" style="background: var(--primary); color: #ffffff;">
+                <h3 style="color: #ffffff; display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 800; margin: 0;">
+                    <i class="fas fa-user-check"></i> Update Status Keberadaan Petugas
+                </h3>
+                <button class="close-btn" type="button" onclick="window.PuprModal.close('modalStatusVerification')" style="color: #ffffff;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-body" style="padding: 20px 24px;">
+                {{-- Recipient Info Box --}}
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px;">
+                    <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Calon Penerima</div>
+                    <div id="statusModalNama" style="font-size: 15px; font-weight: 800; color: var(--primary-dark); margin-top: 2px;">-</div>
+                    <div style="display: flex; gap: 12px; margin-top: 6px; font-size: 12px; color: #475569; flex-wrap: wrap;">
+                        <span><i class="fas fa-id-card" style="color: var(--primary);"></i> NIK: <strong id="statusModalNik">-</strong></span>
+                        <span><i class="fas fa-location-dot" style="color: var(--primary);"></i> Alamat: <strong id="statusModalAlamat">-</strong></span>
+                    </div>
+                </div>
+
+                <label style="font-size: 13px; font-weight: 800; color: #1e293b; display: block; margin-bottom: 10px;">
+                    Pilih Status Keberadaan Lapangan <span style="color: #dc2626;">*</span>
+                </label>
+
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <label class="status-option-card opt-ditemukan" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1px solid #cbd5e1; border-radius: 10px; cursor: pointer; transition: all 0.2s;">
+                        <input type="radio" name="modal_verval_status" value="ditemukan" checked onchange="onModalStatusChange('ditemukan')" style="accent-color: #16a34a; width: 18px; height: 18px;">
+                        <div style="flex: 1;">
+                            <div style="font-size: 13.5px; font-weight: 800; color: #15803d; display: flex; align-items: center; gap: 6px;">
+                                <i class="fas fa-check-circle"></i> Ditemukan (Ada di Lokasi)
+                            </div>
+                            <div style="font-size: 11.5px; color: #475569; margin-top: 2px;">
+                                Penerima berada di lokasi &amp; siap untuk disurvei fisik
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="status-option-card opt-meninggal" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1px solid #cbd5e1; border-radius: 10px; cursor: pointer; transition: all 0.2s;">
+                        <input type="radio" name="modal_verval_status" value="meninggal" onchange="onModalStatusChange('meninggal')" style="accent-color: #dc2626; width: 18px; height: 18px;">
+                        <div style="flex: 1;">
+                            <div style="font-size: 13.5px; font-weight: 800; color: #b91c1c; display: flex; align-items: center; gap: 6px;">
+                                <i class="fas fa-cross"></i> Meninggal Dunia
+                            </div>
+                            <div style="font-size: 11.5px; color: #475569; margin-top: 2px;">
+                                Penerima telah meninggal dunia
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="status-option-card opt-pindah" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1px solid #cbd5e1; border-radius: 10px; cursor: pointer; transition: all 0.2s;">
+                        <input type="radio" name="modal_verval_status" value="pindah" onchange="onModalStatusChange('pindah')" style="accent-color: #d97706; width: 18px; height: 18px;">
+                        <div style="flex: 1;">
+                            <div style="font-size: 13.5px; font-weight: 800; color: #b45309; display: flex; align-items: center; gap: 6px;">
+                                <i class="fas fa-truck-ramp-box"></i> Pindah Alamat
+                            </div>
+                            <div style="font-size: 11.5px; color: #475569; margin-top: 2px;">
+                                Penerima telah pindah tempat tinggal
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="status-option-card opt-tidak-diketahui" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1px solid #cbd5e1; border-radius: 10px; cursor: pointer; transition: all 0.2s;">
+                        <input type="radio" name="modal_verval_status" value="tidak diketahui" onchange="onModalStatusChange('tidak diketahui')" style="accent-color: #475569; width: 18px; height: 18px;">
+                        <div style="flex: 1;">
+                            <div style="font-size: 13.5px; font-weight: 800; color: #475569; display: flex; align-items: center; gap: 6px;">
+                                <i class="fas fa-question-circle"></i> Tidak Diketahui
+                            </div>
+                            <div style="font-size: 11.5px; color: #475569; margin-top: 2px;">
+                                Keberadaan penerima tidak ditemukan / tidak diketahui
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="modal-footer" style="padding: 14px 20px; background: var(--bg-body); border-top: 1px solid rgba(0, 40, 85, 0.06); display: flex; gap: 10px; justify-content: flex-end;">
+                <button type="button" class="btn btn-outline" style="padding: 9px 16px;" onclick="window.PuprModal.close('modalStatusVerification')">
+                    Batal
+                </button>
+                <button type="button" class="btn btn-primary" id="btnSubmitStatusVerification" style="padding: 9px 20px; font-weight: 800; display: inline-flex; align-items: center; gap: 6px;" onclick="submitStatusVerification()">
+                    <i class="fas fa-location-crosshairs"></i> Simpan &amp; Lanjutkan Survei
+                </button>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
 <script>
     let pendingSurveyUrl = null;
+    let currentVervalId = null;
+    let currentTargetSurveyUrl = null;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('click', function (e) {
+            const btn = e.target.closest('.btn-trigger-status-modal');
+            if (btn) {
+                e.preventDefault();
+                const id = btn.getAttribute('data-id');
+                const nama = btn.getAttribute('data-nama');
+                const nik = btn.getAttribute('data-nik');
+                const alamat = btn.getAttribute('data-alamat');
+                const status = btn.getAttribute('data-status');
+                const url = btn.getAttribute('data-url');
+
+                openStatusVerificationModal(id, nama, nik, alamat, status, url);
+            }
+        });
+    });
+
+    function openStatusVerificationModal(id, nama, nik, alamat, currentStatus, surveyUrl) {
+        currentVervalId = id;
+        currentTargetSurveyUrl = surveyUrl;
+
+        document.getElementById('statusModalNama').textContent = nama || '-';
+        document.getElementById('statusModalNik').textContent = nik || '-';
+        document.getElementById('statusModalAlamat').textContent = alamat || '-';
+
+        const statusToSelect = (currentStatus && ['ditemukan', 'meninggal', 'pindah', 'tidak diketahui'].includes(currentStatus)) ? currentStatus : 'ditemukan';
+        const radio = document.querySelector(`input[name="modal_verval_status"][value="${statusToSelect}"]`);
+        if (radio) {
+            radio.checked = true;
+        }
+        onModalStatusChange(statusToSelect);
+
+        if (window.PuprModal) {
+            window.PuprModal.open('modalStatusVerification');
+        }
+    }
+
+    function onModalStatusChange(statusVal) {
+        const btn = document.getElementById('btnSubmitStatusVerification');
+        if (!btn) return;
+
+        if (statusVal === 'ditemukan') {
+            btn.className = 'btn btn-primary';
+            btn.style.background = 'var(--primary)';
+            btn.style.color = '#fff';
+            btn.innerHTML = '<i class="fas fa-location-crosshairs"></i> Simpan &amp; Lanjutkan Survei';
+        } else {
+            btn.className = 'btn btn-warning';
+            btn.style.background = '#d97706';
+            btn.style.color = '#fff';
+            btn.innerHTML = '<i class="fas fa-save"></i> Simpan Status Baru';
+        }
+    }
+
+    function submitStatusVerification() {
+        const selectedRadio = document.querySelector('input[name="modal_verval_status"]:checked');
+        if (!selectedRadio || !currentVervalId) return;
+
+        const newStatus = selectedRadio.value;
+
+        if (window.PuprLoading) {
+            window.PuprLoading.show('Memperbarui Status Penerima...');
+        }
+
+        fetch(`/data-verval/${currentVervalId}/status`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ status: newStatus })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (newStatus === 'ditemukan') {
+                    if (window.PuprModal) window.PuprModal.close('modalStatusVerification');
+                    startSurveyWithGps(currentTargetSurveyUrl);
+                } else {
+                    if (window.PuprLoading) window.PuprLoading.hide();
+                    if (window.PuprModal) window.PuprModal.close('modalStatusVerification');
+                    if (window.PuprToast) {
+                        window.PuprToast.success(`Status berhasil diperbarui menjadi "${newStatus.toUpperCase()}"`);
+                    } else {
+                        alert(`Status berhasil diperbarui menjadi "${newStatus.toUpperCase()}"`);
+                    }
+                    setTimeout(() => { window.location.reload(); }, 1000);
+                }
+            } else {
+                if (window.PuprLoading) window.PuprLoading.hide();
+                alert(data.message || 'Gagal memperbarui status.');
+            }
+        })
+        .catch(err => {
+            if (window.PuprLoading) window.PuprLoading.hide();
+            console.error(err);
+            alert('Terjadi kesalahan koneksi saat memperbarui status.');
+        });
+    }
 
     function startSurveyWithGps(targetUrl) {
         pendingSurveyUrl = targetUrl;

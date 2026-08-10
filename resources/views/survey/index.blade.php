@@ -219,6 +219,62 @@
             color: #fff;
         }
 
+        /* Indicator Radio Pills */
+        .pill-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 7px 18px;
+            border-radius: 20px;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .pill-indicator.pill-ada {
+            background: rgba(34, 197, 94, 0.08);
+            color: #15803d;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .pill-indicator.pill-ada:hover {
+            background: rgba(34, 197, 94, 0.22);
+            border-color: #16a34a;
+            color: #14532d;
+            box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .pill-indicator.pill-ada:has(input:checked) {
+            background: #dcfce7 !important;
+            color: #15803d !important;
+            border-color: #22c55e !important;
+            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.25);
+        }
+
+        .pill-indicator.pill-tidak-ada {
+            background: rgba(239, 68, 68, 0.08);
+            color: #b91c1c;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .pill-indicator.pill-tidak-ada:hover {
+            background: rgba(239, 68, 68, 0.22);
+            border-color: #ef4444;
+            color: #7f1d1d;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .pill-indicator.pill-tidak-ada:has(input:checked) {
+            background: #fee2e2 !important;
+            color: #b91c1c !important;
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.25);
+        }
+
         @media (max-width: 768px) {
             .recipient-selector-bar { padding: 18px; }
             .form-section { padding: 18px 16px; }
@@ -505,22 +561,162 @@
                     </div>
                 </div>
 
-                <!-- 4. Dokumentasi Foto Fisik RTLH 5 Sudut (Style Kamera Modern) -->
-                <div class="form-section">
-                    <h4><i class="fas fa-camera-retro"></i> 4. Dokumentasi Foto Fisik RTLH (5 Sudut Bangunan Eksisting)</h4>
+                <!-- 4. Indikator Kelayakan Calon Penerima (Status Layak Diusulkan) -->
+                <div class="form-section" style="border: 2px solid rgba(0, 40, 85, 0.12); background: #ffffff;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:16px; border-bottom:1px solid rgba(0, 40, 85, 0.08); padding-bottom:12px;">
+                        <h4 style="margin:0; border:none; padding:0;">
+                            <i class="fas fa-list-check" style="color:var(--primary);"></i> 4. Indikator Kelayakan RTLH (Kriteria Layak Diusulkan)
+                        </h4>
+                        <span style="font-size:12.5px; font-weight:700; color:#475569; background:#f1f5f9; padding:6px 12px; border-radius:20px;">
+                            <i class="fas fa-circle-info" style="color:var(--primary);"></i> Memenuhi minimal 2 indikator
+                        </span>
+                    </div>
 
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;">
+                    <p style="font-size:13.5px; color:#334155; margin-top:0; margin-bottom:20px; font-weight:600;">
+                        Indikator yang digunakan untuk menentukan layak diusulkan (Pilih <strong>Ada</strong> jika indikator terpenuhi atau <strong>Tidak Ada</strong> jika indikator tidak terpenuhi):
+                    </p>
+
+                    <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom:24px;">
+                        {{-- 1. Lantai Keramik --}}
+                        <div class="indicator-row" style="display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:12px 18px; flex-wrap:wrap; gap:12px; transition:all 0.2s;">
+                            <div style="font-size:13.5px; font-weight:700; color:#1e293b; flex:1; min-width:240px;">
+                                1. Lantai Keramik
+                            </div>
+                            <div style="display:flex; align-items:center; gap:12px;">
+                                <label class="pill-indicator pill-ada">
+                                    <input type="radio" name="indikator_lantai" value="ada" class="indikator-radio" {{ old('indikator_lantai', $vervalData->indikator_lantai) == 'ada' || $vervalData->indikator_lantai === null ? 'checked' : '' }} style="accent-color:#16a34a; cursor:pointer;">
+                                    <i class="fas fa-check-circle"></i> Ada
+                                </label>
+                                <label class="pill-indicator pill-tidak-ada">
+                                    <input type="radio" name="indikator_lantai" value="tidak_ada" class="indikator-radio" {{ old('indikator_lantai', $vervalData->indikator_lantai) == 'tidak_ada' ? 'checked' : '' }} style="accent-color:#dc2626; cursor:pointer;">
+                                    <i class="fas fa-times-circle"></i> Tidak Ada
+                                </label>
+                            </div>
+                        </div>
+
+                        {{-- 2. Pondasi Bangunan --}}
+                        <div class="indicator-row" style="display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:12px 18px; flex-wrap:wrap; gap:12px; transition:all 0.2s;">
+                            <div style="font-size:13.5px; font-weight:700; color:#1e293b; flex:1; min-width:240px;">
+                                2. Pondasi Bangunan
+                            </div>
+                            <div style="display:flex; align-items:center; gap:12px;">
+                                <label class="pill-indicator pill-ada">
+                                    <input type="radio" name="indikator_pondasi" value="ada" class="indikator-radio" {{ old('indikator_pondasi', $vervalData->indikator_pondasi) == 'ada' || $vervalData->indikator_pondasi === null ? 'checked' : '' }} style="accent-color:#16a34a; cursor:pointer;">
+                                    <i class="fas fa-check-circle"></i> Ada
+                                </label>
+                                <label class="pill-indicator pill-tidak-ada">
+                                    <input type="radio" name="indikator_pondasi" value="tidak_ada" class="indikator-radio" {{ old('indikator_pondasi', $vervalData->indikator_pondasi) == 'tidak_ada' ? 'checked' : '' }} style="accent-color:#dc2626; cursor:pointer;">
+                                    <i class="fas fa-times-circle"></i> Tidak Ada
+                                </label>
+                            </div>
+                        </div>
+
+                        {{-- 3. Dinding Bata / Tembok --}}
+                        <div class="indicator-row" style="display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:12px 18px; flex-wrap:wrap; gap:12px; transition:all 0.2s;">
+                            <div style="font-size:13.5px; font-weight:700; color:#1e293b; flex:1; min-width:240px;">
+                                3. Dinding Bata / Tembok
+                            </div>
+                            <div style="display:flex; align-items:center; gap:12px;">
+                                <label class="pill-indicator pill-ada">
+                                    <input type="radio" name="indikator_dinding" value="ada" class="indikator-radio" {{ old('indikator_dinding', $vervalData->indikator_dinding) == 'ada' || $vervalData->indikator_dinding === null ? 'checked' : '' }} style="accent-color:#16a34a; cursor:pointer;">
+                                    <i class="fas fa-check-circle"></i> Ada
+                                </label>
+                                <label class="pill-indicator pill-tidak-ada">
+                                    <input type="radio" name="indikator_dinding" value="tidak_ada" class="indikator-radio" {{ old('indikator_dinding', $vervalData->indikator_dinding) == 'tidak_ada' ? 'checked' : '' }} style="accent-color:#dc2626; cursor:pointer;">
+                                    <i class="fas fa-times-circle"></i> Tidak Ada
+                                </label>
+                            </div>
+                        </div>
+
+                        {{-- 4. Struktur Bangunan (Sloof, Kolom, Ring Balok) --}}
+                        <div class="indicator-row" style="display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:12px 18px; flex-wrap:wrap; gap:12px; transition:all 0.2s;">
+                            <div style="font-size:13.5px; font-weight:700; color:#1e293b; flex:1; min-width:240px;">
+                                4. Struktur Bangunan (Sloof, Kolom, Ring Balok)
+                            </div>
+                            <div style="display:flex; align-items:center; gap:12px;">
+                                <label class="pill-indicator pill-ada">
+                                    <input type="radio" name="indikator_struktur" value="ada" class="indikator-radio" {{ old('indikator_struktur', $vervalData->indikator_struktur) == 'ada' || $vervalData->indikator_struktur === null ? 'checked' : '' }} style="accent-color:#16a34a; cursor:pointer;">
+                                    <i class="fas fa-check-circle"></i> Ada
+                                </label>
+                                <label class="pill-indicator pill-tidak-ada">
+                                    <input type="radio" name="indikator_struktur" value="tidak_ada" class="indikator-radio" {{ old('indikator_struktur', $vervalData->indikator_struktur) == 'tidak_ada' ? 'checked' : '' }} style="accent-color:#dc2626; cursor:pointer;">
+                                    <i class="fas fa-times-circle"></i> Tidak Ada
+                                </label>
+                            </div>
+                        </div>
+
+                        {{-- 5. Penutup Atap Genteng --}}
+                        <div class="indicator-row" style="display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:12px 18px; flex-wrap:wrap; gap:12px; transition:all 0.2s;">
+                            <div style="font-size:13.5px; font-weight:700; color:#1e293b; flex:1; min-width:240px;">
+                                5. Penutup Atap Genteng
+                            </div>
+                            <div style="display:flex; align-items:center; gap:12px;">
+                                <label class="pill-indicator pill-ada">
+                                    <input type="radio" name="indikator_atap" value="ada" class="indikator-radio" {{ old('indikator_atap', $vervalData->indikator_atap) == 'ada' || $vervalData->indikator_atap === null ? 'checked' : '' }} style="accent-color:#16a34a; cursor:pointer;">
+                                    <i class="fas fa-check-circle"></i> Ada
+                                </label>
+                                <label class="pill-indicator pill-tidak-ada">
+                                    <input type="radio" name="indikator_atap" value="tidak_ada" class="indikator-radio" {{ old('indikator_atap', $vervalData->indikator_atap) == 'tidak_ada' ? 'checked' : '' }} style="accent-color:#dc2626; cursor:pointer;">
+                                    <i class="fas fa-times-circle"></i> Tidak Ada
+                                </label>
+                            </div>
+                        </div>
+
+                        {{-- 6. Penghasilan Kurang dari UMK --}}
+                        <div class="indicator-row" style="display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:12px 18px; flex-wrap:wrap; gap:12px; transition:all 0.2s;">
+                            <div style="font-size:13.5px; font-weight:700; color:#1e293b; flex:1; min-width:240px;">
+                                6. Penghasilan Kurang dari UMK
+                            </div>
+                            <div style="display:flex; align-items:center; gap:12px;">
+                                <label class="pill-indicator pill-ada">
+                                    <input type="radio" name="indikator_penghasilan" value="ada" class="indikator-radio" {{ old('indikator_penghasilan', $vervalData->indikator_penghasilan) == 'ada' ? 'checked' : '' }} style="accent-color:#16a34a; cursor:pointer;">
+                                    <i class="fas fa-check-circle"></i> Ya / Ada
+                                </label>
+                                <label class="pill-indicator pill-tidak-ada">
+                                    <input type="radio" name="indikator_penghasilan" value="tidak_ada" class="indikator-radio" {{ old('indikator_penghasilan', $vervalData->indikator_penghasilan) == 'tidak_ada' || $vervalData->indikator_penghasilan === null ? 'checked' : '' }} style="accent-color:#dc2626; cursor:pointer;">
+                                    <i class="fas fa-times-circle"></i> Tidak
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Dynamic Status Summary Card --}}
+                    <div id="statusSummaryBox" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border-radius:12px; padding:18px 22px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; border:1px solid #cbd5e1;">
+                        <div>
+                            <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#64748b;">
+                                Total Indikator Terpenuhi (Ada)
+                            </div>
+                            <div style="font-size:22px; font-weight:900; color:#0f172a; margin-top:2px;">
+                                <span id="indicatorCountDisplay">0</span> / 6 Indikator
+                            </div>
+                        </div>
+
+                        <div style="text-align:right;">
+                            <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#64748b; margin-bottom:4px;">
+                                Status Kelayakan Usulan
+                            </div>
+                            <span id="statusBadgeDisplay" class="badge" style="padding:8px 18px; border-radius:30px; font-size:14px; font-weight:800; display:inline-flex; align-items:center; gap:8px;">
+                                <!-- Updated via JS -->
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Dokumentasi Foto Fisik RTLH 5 Sudut (Style Kamera Modern - Lampiran Evidence) -->
+                <div class="form-section">
+                    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:16px; border-bottom:1px solid rgba(0, 40, 85, 0.06); padding-bottom:12px;">
+                        <h4 style="margin:0; border:none; padding:0;">
+                            <i class="fas fa-camera-retro"></i> 5. Dokumentasi Foto Fisik RTLH (Lampiran Evidence 5 Sudut)
+                        </h4>
+                        <span style="font-size:12px; font-weight:600; color:#64748b;">
+                            <i class="fas fa-paperclip"></i> Dokumen Foto Berfungsi Sebagai Berkas Lampiran Verval
+                        </span>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
                         {{-- 1. Sudut Depan --}}
                         <div>
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">1. Tampak Depan</label>
-                            <div style="margin-bottom: 12px; display: flex; gap: 16px; background: #f8fafc; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
-                                <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; color: #334155; font-weight: 600;">
-                                    <input type="radio" name="status_foto_sudut_depan" value="layak" {{ $vervalData->status_foto_sudut_depan == 'layak' ? 'checked' : '' }}> Layak
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; color: #334155; font-weight: 600;">
-                                    <input type="radio" name="status_foto_sudut_depan" value="tidak layak" {{ $vervalData->status_foto_sudut_depan == 'tidak layak' ? 'checked' : '' }}> Tidak Layak
-                                </label>
-                            </div>
                             <div class="camera-upload-card {{ $vervalData->foto_sudut_depan ? 'has-image' : '' }}" id="card_depan">
                                 <input type="file" name="foto_sudut_depan" class="camera-file-input" accept="image/*" onchange="previewCameraPhoto(this, 'preview_depan', 'card_depan')">
                                 <img src="{{ $vervalData->foto_sudut_depan ? asset('storage/' . $vervalData->foto_sudut_depan) : '' }}" class="camera-preview-img" id="preview_depan" style="{{ $vervalData->foto_sudut_depan ? '' : 'display:none;' }}" alt="Tampak Depan">
@@ -540,14 +736,6 @@
                         {{-- 2. Sudut Belakang --}}
                         <div>
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">2. Tampak Belakang</label>
-                            <div style="margin-bottom: 12px; display: flex; gap: 16px; background: #f8fafc; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
-                                <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; color: #334155; font-weight: 600;">
-                                    <input type="radio" name="status_foto_sudut_belakang" value="layak" {{ $vervalData->status_foto_sudut_belakang == 'layak' ? 'checked' : '' }}> Layak
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; color: #334155; font-weight: 600;">
-                                    <input type="radio" name="status_foto_sudut_belakang" value="tidak layak" {{ $vervalData->status_foto_sudut_belakang == 'tidak layak' ? 'checked' : '' }}> Tidak Layak
-                                </label>
-                            </div>
                             <div class="camera-upload-card {{ $vervalData->foto_sudut_belakang ? 'has-image' : '' }}" id="card_belakang">
                                 <input type="file" name="foto_sudut_belakang" class="camera-file-input" accept="image/*" onchange="previewCameraPhoto(this, 'preview_belakang', 'card_belakang')">
                                 <img src="{{ $vervalData->foto_sudut_belakang ? asset('storage/' . $vervalData->foto_sudut_belakang) : '' }}" class="camera-preview-img" id="preview_belakang" style="{{ $vervalData->foto_sudut_belakang ? '' : 'display:none;' }}" alt="Tampak Belakang">
@@ -567,14 +755,6 @@
                         {{-- 3. Bagian Dalam / Interior --}}
                         <div>
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">3. Bagian Dalam / Interior</label>
-                            <div style="margin-bottom: 12px; display: flex; gap: 16px; background: #f8fafc; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
-                                <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; color: #334155; font-weight: 600;">
-                                    <input type="radio" name="status_foto_bagian_dalam" value="layak" {{ $vervalData->status_foto_bagian_dalam == 'layak' ? 'checked' : '' }}> Layak
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; color: #334155; font-weight: 600;">
-                                    <input type="radio" name="status_foto_bagian_dalam" value="tidak layak" {{ $vervalData->status_foto_bagian_dalam == 'tidak layak' ? 'checked' : '' }}> Tidak Layak
-                                </label>
-                            </div>
                             <div class="camera-upload-card {{ $vervalData->foto_bagian_dalam ? 'has-image' : '' }}" id="card_dalam">
                                 <input type="file" name="foto_bagian_dalam" class="camera-file-input" accept="image/*" onchange="previewCameraPhoto(this, 'preview_dalam', 'card_dalam')">
                                 <img src="{{ $vervalData->foto_bagian_dalam ? asset('storage/' . $vervalData->foto_bagian_dalam) : '' }}" class="camera-preview-img" id="preview_dalam" style="{{ $vervalData->foto_bagian_dalam ? '' : 'display:none;' }}" alt="Bagian Dalam">
@@ -594,14 +774,6 @@
                         {{-- 4. Samping Kiri --}}
                         <div>
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">4. Samping Kiri</label>
-                            <div style="margin-bottom: 12px; display: flex; gap: 16px; background: #f8fafc; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
-                                <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; color: #334155; font-weight: 600;">
-                                    <input type="radio" name="status_foto_sudut_kiri" value="layak" {{ $vervalData->status_foto_sudut_kiri == 'layak' ? 'checked' : '' }}> Layak
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; color: #334155; font-weight: 600;">
-                                    <input type="radio" name="status_foto_sudut_kiri" value="tidak layak" {{ $vervalData->status_foto_sudut_kiri == 'tidak layak' ? 'checked' : '' }}> Tidak Layak
-                                </label>
-                            </div>
                             <div class="camera-upload-card {{ $vervalData->foto_sudut_kiri ? 'has-image' : '' }}" id="card_kiri">
                                 <input type="file" name="foto_sudut_kiri" class="camera-file-input" accept="image/*" onchange="previewCameraPhoto(this, 'preview_kiri', 'card_kiri')">
                                 <img src="{{ $vervalData->foto_sudut_kiri ? asset('storage/' . $vervalData->foto_sudut_kiri) : '' }}" class="camera-preview-img" id="preview_kiri" style="{{ $vervalData->foto_sudut_kiri ? '' : 'display:none;' }}" alt="Samping Kiri">
@@ -621,14 +793,6 @@
                         {{-- 5. Samping Kanan --}}
                         <div>
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">5. Samping Kanan</label>
-                            <div style="margin-bottom: 12px; display: flex; gap: 16px; background: #f8fafc; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
-                                <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; color: #334155; font-weight: 600;">
-                                    <input type="radio" name="status_foto_sudut_kanan" value="layak" {{ $vervalData->status_foto_sudut_kanan == 'layak' ? 'checked' : '' }}> Layak
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; color: #334155; font-weight: 600;">
-                                    <input type="radio" name="status_foto_sudut_kanan" value="tidak layak" {{ $vervalData->status_foto_sudut_kanan == 'tidak layak' ? 'checked' : '' }}> Tidak Layak
-                                </label>
-                            </div>
                             <div class="camera-upload-card {{ $vervalData->foto_sudut_kanan ? 'has-image' : '' }}" id="card_kanan">
                                 <input type="file" name="foto_sudut_kanan" class="camera-file-input" accept="image/*" onchange="previewCameraPhoto(this, 'preview_kanan', 'card_kanan')">
                                 <img src="{{ $vervalData->foto_sudut_kanan ? asset('storage/' . $vervalData->foto_sudut_kanan) : '' }}" class="camera-preview-img" id="preview_kanan" style="{{ $vervalData->foto_sudut_kanan ? '' : 'display:none;' }}" alt="Samping Kanan">
@@ -647,7 +811,7 @@
                     </div>
                 </div>
 
-                <!-- 5. Titik Koordinat GPS (Geotagging) -->
+                <!-- 6. Titik Koordinat GPS (Geotagging) -->
                 <div class="form-section">
                     <h4><i class="fas fa-map-location-dot"></i> 5. Titik Koordinat Lokasi Rumah (Geotagging GPS)</h4>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
@@ -759,8 +923,62 @@
             }
         }
 
+        // Recount & Update Status Kelayakan Usulan (Kriteria RTLH Terpenuhi)
+        function updateIndicatorsStatus() {
+            let countRtlh = 0;
+
+            const checkRtlhDefect = (groupName, rtlhValue) => {
+                const checkedRadio = document.querySelector(`input[name="${groupName}"]:checked`);
+                const row = checkedRadio ? checkedRadio.closest('.indicator-row') : null;
+
+                if (checkedRadio && checkedRadio.value === rtlhValue) {
+                    countRtlh++;
+                    if (row) {
+                        row.style.background = 'rgba(239, 68, 68, 0.05)';
+                        row.style.borderColor = 'rgba(239, 68, 68, 0.35)';
+                    }
+                } else if (row) {
+                    row.style.background = 'rgba(34, 197, 94, 0.04)';
+                    row.style.borderColor = 'rgba(34, 197, 94, 0.3)';
+                }
+            };
+
+            // Komponen fisik bernilai 'tidak_ada' -> Indikator RTLH terpenuhi
+            checkRtlhDefect('indikator_lantai', 'tidak_ada');
+            checkRtlhDefect('indikator_pondasi', 'tidak_ada');
+            checkRtlhDefect('indikator_dinding', 'tidak_ada');
+            checkRtlhDefect('indikator_struktur', 'tidak_ada');
+            checkRtlhDefect('indikator_atap', 'tidak_ada');
+            // Penghasilan < UMK bernilai 'ada' -> Indikator RTLH terpenuhi
+            checkRtlhDefect('indikator_penghasilan', 'ada');
+
+            const countEl = document.getElementById('indicatorCountDisplay');
+            if (countEl) countEl.textContent = countRtlh;
+
+            const badgeEl = document.getElementById('statusBadgeDisplay');
+            if (badgeEl) {
+                if (countRtlh >= 2) {
+                    badgeEl.style.background = '#dcfce7';
+                    badgeEl.style.color = '#15803d';
+                    badgeEl.style.border = '1px solid #86efac';
+                    badgeEl.innerHTML = '<i class="fas fa-check-circle"></i> LAYAK DIUSULKAN';
+                } else {
+                    badgeEl.style.background = '#fee2e2';
+                    badgeEl.style.color = '#b91c1c';
+                    badgeEl.style.border = '1px solid #fca5a5';
+                    badgeEl.innerHTML = '<i class="fas fa-times-circle"></i> TIDAK LAYAK DIUSULKAN';
+                }
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             requestLocation();
+            
+            const radios = document.querySelectorAll('.indikator-radio');
+            radios.forEach(r => {
+                r.addEventListener('change', updateIndicatorsStatus);
+            });
+            updateIndicatorsStatus();
         });
     </script>
 @endpush
