@@ -219,7 +219,7 @@
                                 </td>
                                 <td style="padding:14px 18px;text-align:center;">
                                     @if($item->foto_sudut_depan)
-                                        <img src="{{ asset('storage/' . $item->foto_sudut_depan) }}" class="thumb-survey-mini" alt="Foto">
+                                        <img src="{{ asset(str_starts_with($item->foto_sudut_depan, 'uploads/') ? $item->foto_sudut_depan : 'uploads/' . $item->foto_sudut_depan) }}" class="thumb-survey-mini" alt="Foto">
                                     @else
                                         <div style="width:44px;height:44px;border-radius:6px;background:#eee;display:flex;align-items:center;justify-content:center;margin:0 auto;color:#999;font-size:16px;">
                                             <i class="fas fa-image"></i>
