@@ -36,7 +36,7 @@
 <body>
 
 @php
-    $isPublicPage = Request::is('/', 'landing', 'survey', 'survei');
+    $isPublicPage = Request::is('/', 'landing', 'survey', 'survei', 'survey/*', 'survei/*');
 @endphp
 
     @if(!$isPublicPage)

@@ -15,10 +15,13 @@
             <a href="{{ url('/') }}" class="public-nav-item {{ Request::is('/', 'landing') ? 'active' : '' }}">
                 <i class="fas fa-home"></i> Beranda
             </a>
-            <a href="#alur-verval" class="public-nav-item">
+            <a href="{{ url('/survey') }}" class="public-nav-item {{ Request::is('survey*', 'survei*') ? 'active' : '' }}">
+                <i class="fas fa-clipboard-check"></i> Form Survei
+            </a>
+            <a href="{{ url('/#alur-verval') }}" class="public-nav-item">
                 <i class="fas fa-clipboard-list"></i> Alur Verval
             </a>
-            <a href="#kriteria" class="public-nav-item">
+            <a href="{{ url('/#kriteria') }}" class="public-nav-item">
                 <i class="fas fa-check-double"></i> Kriteria Rumah
             </a>
         </nav>

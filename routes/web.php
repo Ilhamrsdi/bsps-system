@@ -36,10 +36,11 @@ Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->nam
 // PROTECTED ROUTES (Wajib Login Sebagai Admin/Petugas)
 // ============================================================
 Route::middleware(['auth'])->group(function () {
-    // Form Survey Lapangan (Wajib Login)
-    Route::get('/survey', [SurveyController::class, 'index'])->name('survey');
-    Route::get('/survei', [SurveyController::class, 'index']);
-    Route::post('/survey', [SurveyController::class, 'store']);
+    // Form Survey Lapangan & Dokumen Verval (Wajib Login)
+    Route::get('/survey/{id?}', [SurveyController::class, 'index'])->name('survey');
+    Route::get('/survei/{id?}', [SurveyController::class, 'index']);
+    Route::post('/survey/{id?}', [SurveyController::class, 'store'])->name('survey.store');
+    Route::put('/survey/{id}', [SurveyController::class, 'store'])->name('survey.update');
     Route::post('/survey/upload-photo', [SurveyController::class, 'uploadPhoto'])->name('survey.upload-photo');
 
     // Admin Dashboard System
@@ -49,8 +50,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/data-verval', [VervalDataController::class, 'index'])->name('data-verval');
     Route::get('/verval-data/surat-pernyataan-kolektif', [VervalDataController::class, 'suratPernyataanKolektif'])->name('verval-data.surat-pernyataan-kolektif');
     Route::get('/verval-data/{id}/surat-pernyataan', [VervalDataController::class, 'suratPernyataan'])->name('verval-data.surat-pernyataan');
-    Route::get('/data-verval/{id}/edit', [VervalDataController::class, 'edit'])->name('data-verval.edit');
-    Route::put('/data-verval/{id}', [VervalDataController::class, 'update'])->name('data-verval.update');
+    Route::get('/data-verval/{id}/edit', function($id) { return redirect()->route('survey', ['id' => $id]); })->name('data-verval.edit');
+    Route::put('/data-verval/{id}', [SurveyController::class, 'store'])->name('data-verval.update');
     Route::put('/data-verval/{id}/status', [VervalDataController::class, 'updateStatus'])->name('data-verval.update-status');
 
     // Geo Maps

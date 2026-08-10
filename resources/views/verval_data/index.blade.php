@@ -628,10 +628,7 @@
                                         <a href="{{ route('verval-data.surat-pernyataan', $item->id) }}" target="_blank" class="btn-act print" style="background:rgba(255,184,0,0.15);color:#d69e00;" title="Cetak Surat Pernyataan Pemohon Ini">
                                             <i class="fas fa-file-signature"></i>
                                         </a>
-                                        <a href="{{ route('data-verval.edit', $item->id) }}" class="btn-act edit" style="background:rgba(0,40,85,0.08);color:var(--primary);" title="Edit Data Verval & Foto">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a href="{{ url('/survey?nik=' . $item->no_ktp . '&nama=' . urlencode($item->nama) . '&desa=' . urlencode($item->desa_kelurahan) . '&kecamatan=' . urlencode($item->kecamatan) . '&alamat=' . urlencode($item->alamat)) }}" class="btn-act view" style="background:rgba(39,174,96,0.12);color:var(--success);" title="Mulai Survei RTLH untuk Pemohon Ini">
+                                        <a href="{{ url('/survey/' . $item->id) }}" class="btn-act view" style="background:rgba(39,174,96,0.12);color:var(--success);" title="Buka Form Survei Lapangan & Lengkapi Data/Foto">
                                             <i class="fas fa-clipboard-check"></i>
                                         </a>
                                     </div>
