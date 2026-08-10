@@ -205,6 +205,11 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/data-verval/{id}', [SurveyController::class, 'store'])->name('data-verval.update');
     Route::put('/data-verval/{id}/status', [VervalDataController::class, 'updateStatus'])->name('data-verval.update-status');
 
+    // Pencocokan Data Kependudukan (Dataguse vs Data Penerima BSPS)
+    Route::get('/pencocokan-data', [\App\Http\Controllers\PencocokanDataController::class, 'index'])->name('pencocokan-data');
+    Route::post('/pencocokan-data/sync-batch', [\App\Http\Controllers\PencocokanDataController::class, 'syncBatch'])->name('pencocokan-data.sync-batch');
+    Route::post('/pencocokan-data/{id}/sync', [\App\Http\Controllers\PencocokanDataController::class, 'syncSingle'])->name('pencocokan-data.sync-single');
+
     // Geo Maps
     Route::get('/geomaps', [GeoMapController::class, 'index'])->name('geomaps');
     Route::get('/geoMaps', [GeoMapController::class, 'index']);

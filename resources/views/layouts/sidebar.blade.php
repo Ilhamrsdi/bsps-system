@@ -61,6 +61,10 @@
                 <i class="fas fa-clipboard-list"></i>
                 Data Verval
             </a>
+            <a class="menu-item {{ Request::is('pencocokan-data*') ? 'active' : '' }}" href="{{ url('/pencocokan-data') }}">
+                <i class="fas fa-id-card-clip"></i>
+                Pencocokan Dataguse
+            </a>
             <a class="menu-item {{ Request::is('geomaps*', 'geoMaps*') ? 'active' : '' }}" href="{{ url('/geomaps') }}">
                 <i class="fas fa-map-marked-alt"></i>
                 Geo Maps
