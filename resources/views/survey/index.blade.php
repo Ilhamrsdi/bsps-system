@@ -453,6 +453,12 @@
                 </div>
 
                 <!-- 3. Dokumen Administrasi & Berkas (Upload Style Kamera + Custom Dropdown) -->
+                @php
+                    $getPhotoUrl = function($path) {
+                        if (!$path) return '';
+                        return url('/uploads/' . basename($path));
+                    };
+                @endphp
                 <div class="form-section">
                     <h4><i class="fas fa-file-invoice"></i> 3. Berkas &amp; Dokumen Administrasi</h4>
 
@@ -462,7 +468,7 @@
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">Foto / Scan KTP</label>
                             <div class="camera-upload-card {{ $vervalData->ktp ? 'has-image' : '' }}" id="card_ktp">
                                 <input type="file" name="ktp" class="camera-file-input" accept="image/*" onchange="previewCameraPhoto(this, 'preview_ktp', 'card_ktp')">
-                                <img src="{{ $vervalData->ktp ? asset(str_starts_with($vervalData->ktp, 'uploads/') ? $vervalData->ktp : 'uploads/' . $vervalData->ktp) : '' }}" class="camera-preview-img" id="preview_ktp" style="{{ $vervalData->ktp ? '' : 'display:none;' }}" alt="KTP">
+                                <img src="{{ $getPhotoUrl($vervalData->ktp) }}" class="camera-preview-img" id="preview_ktp" style="{{ $vervalData->ktp ? '' : 'display:none;' }}" alt="KTP">
                                 <div class="camera-icon-bubble" id="icon_ktp" style="{{ $vervalData->ktp ? 'display:none;' : '' }}">
                                     <i class="fas fa-id-card"></i>
                                 </div>
@@ -481,7 +487,7 @@
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">Foto / Scan Kartu Keluarga (KK)</label>
                             <div class="camera-upload-card {{ $vervalData->kk ? 'has-image' : '' }}" id="card_kk">
                                 <input type="file" name="kk" class="camera-file-input" accept="image/*" onchange="previewCameraPhoto(this, 'preview_kk', 'card_kk')">
-                                <img src="{{ $vervalData->kk ? asset(str_starts_with($vervalData->kk, 'uploads/') ? $vervalData->kk : 'uploads/' . $vervalData->kk) : '' }}" class="camera-preview-img" id="preview_kk" style="{{ $vervalData->kk ? '' : 'display:none;' }}" alt="KK">
+                                <img src="{{ $getPhotoUrl($vervalData->kk) }}" class="camera-preview-img" id="preview_kk" style="{{ $vervalData->kk ? '' : 'display:none;' }}" alt="KK">
                                 <div class="camera-icon-bubble" id="icon_kk" style="{{ $vervalData->kk ? 'display:none;' : '' }}">
                                     <i class="fas fa-users-rectangle"></i>
                                 </div>
@@ -500,7 +506,7 @@
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">Foto Sertipikat / Bukti Tanah</label>
                             <div class="camera-upload-card {{ $vervalData->sertifikat_tanah ? 'has-image' : '' }}" id="card_sertifikat">
                                 <input type="file" name="sertifikat_tanah" class="camera-file-input" accept="image/*" onchange="previewCameraPhoto(this, 'preview_sertifikat', 'card_sertifikat')">
-                                <img src="{{ $vervalData->sertifikat_tanah ? asset(str_starts_with($vervalData->sertifikat_tanah, 'uploads/') ? $vervalData->sertifikat_tanah : 'uploads/' . $vervalData->sertifikat_tanah) : '' }}" class="camera-preview-img" id="preview_sertifikat" style="{{ $vervalData->sertifikat_tanah ? '' : 'display:none;' }}" alt="Sertifikat">
+                                <img src="{{ $getPhotoUrl($vervalData->sertifikat_tanah) }}" class="camera-preview-img" id="preview_sertifikat" style="{{ $vervalData->sertifikat_tanah ? '' : 'display:none;' }}" alt="Sertifikat">
                                 <div class="camera-icon-bubble" id="icon_sertifikat" style="{{ $vervalData->sertifikat_tanah ? 'display:none;' : '' }}">
                                     <i class="fas fa-file-contract"></i>
                                 </div>
@@ -719,7 +725,7 @@
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">1. Tampak Depan</label>
                             <div class="camera-upload-card {{ $vervalData->foto_sudut_depan ? 'has-image' : '' }}" id="card_depan">
                                 <input type="file" name="foto_sudut_depan" class="camera-file-input" accept="image/*" onchange="previewCameraPhoto(this, 'preview_depan', 'card_depan')">
-                                <img src="{{ $vervalData->foto_sudut_depan ? asset(str_starts_with($vervalData->foto_sudut_depan, 'uploads/') ? $vervalData->foto_sudut_depan : 'uploads/' . $vervalData->foto_sudut_depan) : '' }}" class="camera-preview-img" id="preview_depan" style="{{ $vervalData->foto_sudut_depan ? '' : 'display:none;' }}" alt="Tampak Depan">
+                                <img src="{{ $getPhotoUrl($vervalData->foto_sudut_depan) }}" class="camera-preview-img" id="preview_depan" style="{{ $vervalData->foto_sudut_depan ? '' : 'display:none;' }}" alt="Tampak Depan">
                                 <div class="camera-icon-bubble" id="icon_depan" style="{{ $vervalData->foto_sudut_depan ? 'display:none;' : '' }}">
                                     <i class="fas fa-camera"></i>
                                 </div>
@@ -738,7 +744,7 @@
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">2. Tampak Belakang</label>
                             <div class="camera-upload-card {{ $vervalData->foto_sudut_belakang ? 'has-image' : '' }}" id="card_belakang">
                                 <input type="file" name="foto_sudut_belakang" class="camera-file-input" accept="image/*" onchange="previewCameraPhoto(this, 'preview_belakang', 'card_belakang')">
-                                <img src="{{ $vervalData->foto_sudut_belakang ? asset(str_starts_with($vervalData->foto_sudut_belakang, 'uploads/') ? $vervalData->foto_sudut_belakang : 'uploads/' . $vervalData->foto_sudut_belakang) : '' }}" class="camera-preview-img" id="preview_belakang" style="{{ $vervalData->foto_sudut_belakang ? '' : 'display:none;' }}" alt="Tampak Belakang">
+                                <img src="{{ $getPhotoUrl($vervalData->foto_sudut_belakang) }}" class="camera-preview-img" id="preview_belakang" style="{{ $vervalData->foto_sudut_belakang ? '' : 'display:none;' }}" alt="Tampak Belakang">
                                 <div class="camera-icon-bubble" id="icon_belakang" style="{{ $vervalData->foto_sudut_belakang ? 'display:none;' : '' }}">
                                     <i class="fas fa-camera"></i>
                                 </div>
@@ -757,7 +763,7 @@
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">3. Bagian Dalam / Interior</label>
                             <div class="camera-upload-card {{ $vervalData->foto_bagian_dalam ? 'has-image' : '' }}" id="card_dalam">
                                 <input type="file" name="foto_bagian_dalam" class="camera-file-input" accept="image/*" onchange="previewCameraPhoto(this, 'preview_dalam', 'card_dalam')">
-                                <img src="{{ $vervalData->foto_bagian_dalam ? asset(str_starts_with($vervalData->foto_bagian_dalam, 'uploads/') ? $vervalData->foto_bagian_dalam : 'uploads/' . $vervalData->foto_bagian_dalam) : '' }}" class="camera-preview-img" id="preview_dalam" style="{{ $vervalData->foto_bagian_dalam ? '' : 'display:none;' }}" alt="Bagian Dalam">
+                                <img src="{{ $getPhotoUrl($vervalData->foto_bagian_dalam) }}" class="camera-preview-img" id="preview_dalam" style="{{ $vervalData->foto_bagian_dalam ? '' : 'display:none;' }}" alt="Bagian Dalam">
                                 <div class="camera-icon-bubble" id="icon_dalam" style="{{ $vervalData->foto_bagian_dalam ? 'display:none;' : '' }}">
                                     <i class="fas fa-camera"></i>
                                 </div>
@@ -776,7 +782,7 @@
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">4. Samping Kiri</label>
                             <div class="camera-upload-card {{ $vervalData->foto_sudut_kiri ? 'has-image' : '' }}" id="card_kiri">
                                 <input type="file" name="foto_sudut_kiri" class="camera-file-input" accept="image/*" onchange="previewCameraPhoto(this, 'preview_kiri', 'card_kiri')">
-                                <img src="{{ $vervalData->foto_sudut_kiri ? asset(str_starts_with($vervalData->foto_sudut_kiri, 'uploads/') ? $vervalData->foto_sudut_kiri : 'uploads/' . $vervalData->foto_sudut_kiri) : '' }}" class="camera-preview-img" id="preview_kiri" style="{{ $vervalData->foto_sudut_kiri ? '' : 'display:none;' }}" alt="Samping Kiri">
+                                <img src="{{ $getPhotoUrl($vervalData->foto_sudut_kiri) }}" class="camera-preview-img" id="preview_kiri" style="{{ $vervalData->foto_sudut_kiri ? '' : 'display:none;' }}" alt="Samping Kiri">
                                 <div class="camera-icon-bubble" id="icon_kiri" style="{{ $vervalData->foto_sudut_kiri ? 'display:none;' : '' }}">
                                     <i class="fas fa-camera"></i>
                                 </div>
@@ -795,7 +801,7 @@
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">5. Samping Kanan</label>
                             <div class="camera-upload-card {{ $vervalData->foto_sudut_kanan ? 'has-image' : '' }}" id="card_kanan">
                                 <input type="file" name="foto_sudut_kanan" class="camera-file-input" accept="image/*" onchange="previewCameraPhoto(this, 'preview_kanan', 'card_kanan')">
-                                <img src="{{ $vervalData->foto_sudut_kanan ? asset(str_starts_with($vervalData->foto_sudut_kanan, 'uploads/') ? $vervalData->foto_sudut_kanan : 'uploads/' . $vervalData->foto_sudut_kanan) : '' }}" class="camera-preview-img" id="preview_kanan" style="{{ $vervalData->foto_sudut_kanan ? '' : 'display:none;' }}" alt="Samping Kanan">
+                                <img src="{{ $getPhotoUrl($vervalData->foto_sudut_kanan) }}" class="camera-preview-img" id="preview_kanan" style="{{ $vervalData->foto_sudut_kanan ? '' : 'display:none;' }}" alt="Samping Kanan">
                                 <div class="camera-icon-bubble" id="icon_kanan" style="{{ $vervalData->foto_sudut_kanan ? 'display:none;' : '' }}">
                                     <i class="fas fa-camera"></i>
                                 </div>
