@@ -15,9 +15,11 @@
             <a href="{{ url('/') }}" class="public-nav-item {{ Request::is('/', 'landing') ? 'active' : '' }}">
                 <i class="fas fa-home"></i> Beranda
             </a>
+            @auth
             <a href="{{ url('/survey') }}" class="public-nav-item {{ Request::is('survey*', 'survei*') ? 'active' : '' }}">
                 <i class="fas fa-clipboard-check"></i> Form Survei
             </a>
+            @endauth
             <a href="{{ url('/#alur-verval') }}" class="public-nav-item">
                 <i class="fas fa-clipboard-list"></i> Alur Verval
             </a>
@@ -142,15 +144,15 @@
 
     @media (max-width: 768px) {
         .public-navbar-container {
-            padding: 0 14px !important;
+            padding: 0 16px !important;
             gap: 8px;
         }
         .public-brand .brand-logo-img {
-            width: 32px;
-            height: 32px;
+            width: 34px;
+            height: 34px;
         }
         .public-brand .brand-text h1 {
-            font-size: 14px;
+            font-size: 14.5px;
         }
         .public-brand .brand-text span {
             display: none;
@@ -166,11 +168,11 @@
 
     @media (max-width: 480px) {
         .public-navbar-container {
-            padding: 0 12px !important;
+            padding: 0 14px !important;
         }
         .public-auth-btn {
-            font-size: 11px;
-            padding: 5px 10px;
+            font-size: 11.5px;
+            padding: 6px 10px;
         }
     }
 </style>

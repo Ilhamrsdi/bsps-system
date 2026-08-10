@@ -36,12 +36,15 @@ Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->nam
 // PROTECTED ROUTES (Wajib Login Sebagai Admin/Petugas)
 // ============================================================
 Route::middleware(['auth'])->group(function () {
-    // Form Survey Lapangan & Dokumen Verval (Wajib Login)
-    Route::get('/survey/{id?}', [SurveyController::class, 'index'])->name('survey');
-    Route::get('/survei/{id?}', [SurveyController::class, 'index']);
-    Route::post('/survey/{id?}', [SurveyController::class, 'store'])->name('survey.store');
-    Route::put('/survey/{id}', [SurveyController::class, 'store'])->name('survey.update');
+    // Ajax Survey Photo Handlers (Specific routes must be defined before {id})
     Route::post('/survey/upload-photo', [SurveyController::class, 'uploadPhoto'])->name('survey.upload-photo');
+    Route::post('/survey/delete-photo', [SurveyController::class, 'deletePhoto'])->name('survey.delete-photo');
+
+    // Form Survey Lapangan & Dokumen Verval (Wajib Login)
+    Route::get('/survey/{id?}', [SurveyController::class, 'index'])->name('survey')->where('id', '[0-9]+');
+    Route::get('/survei/{id?}', [SurveyController::class, 'index'])->where('id', '[0-9]+');
+    Route::post('/survey/{id?}', [SurveyController::class, 'store'])->name('survey.store')->where('id', '[0-9]+');
+    Route::put('/survey/{id}', [SurveyController::class, 'store'])->name('survey.update')->where('id', '[0-9]+');
 
     // Admin Dashboard System
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

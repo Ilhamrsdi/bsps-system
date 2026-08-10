@@ -106,10 +106,13 @@
                         <i class="fas fa-user"></i> Profile &amp; Setting
                     </a>
                     <div class="dropdown-divider"></div>
-                    <a href="javascript:void(0)" class="user-dropdown-item logout"
-                        onclick="window.PuprModal.open('modalLogoutConfirmation')">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </a>
+                    <form action="{{ url('/logout') }}" method="POST" style="margin:0;padding:0;">
+                        @csrf
+                        <button type="submit" class="user-dropdown-item logout"
+                            style="width:100%;text-align:left;background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:10px 16px;font-size:13.5px;font-weight:600;color:var(--danger,#e74c3c);">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </form>
                 @else
                     <a href="{{ url('/login') }}" class="user-dropdown-item">
                         <i class="fas fa-sign-in-alt"></i> Login Admin

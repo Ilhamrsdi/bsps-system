@@ -108,9 +108,9 @@
         /* Camera Upload Cards */
         .camera-upload-card {
             background: var(--bg-body);
-            border: 2px dashed rgba(0, 40, 85, 0.18);
+            border: 2px dashed rgba(0, 40, 85, 0.20);
             border-radius: 12px;
-            padding: 18px;
+            padding: 20px 16px;
             text-align: center;
             position: relative;
             transition: all 0.25s ease;
@@ -118,105 +118,194 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 220px;
-            cursor: pointer;
+            min-height: 190px;
             overflow: hidden;
+            box-sizing: border-box;
         }
 
         .camera-upload-card:hover {
             border-color: var(--primary);
             background: rgba(0, 40, 85, 0.02);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 18px rgba(0, 40, 85, 0.08);
+            box-shadow: 0 4px 14px rgba(0, 40, 85, 0.06);
         }
 
         .camera-upload-card.has-image {
             border-style: solid;
             border-color: rgba(39, 174, 96, 0.35);
-            background: #fff;
+            background: rgba(39, 174, 96, 0.03);
         }
 
         .camera-icon-bubble {
-            width: 54px;
-            height: 54px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             background: rgba(0, 40, 85, 0.08);
             color: var(--primary);
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
-            margin-bottom: 12px;
+            font-size: 19px;
+            margin-bottom: 10px;
             transition: all 0.2s ease;
         }
 
-        .camera-upload-card:hover .camera-icon-bubble {
+        .camera-icon-bubble.success {
+            background: rgba(39, 174, 96, 0.12);
+            color: var(--success);
+            font-size: 22px;
+        }
+
+        .camera-upload-card:not(.has-image):hover .camera-icon-bubble {
             background: var(--primary);
             color: #fff;
-            transform: scale(1.08);
+            transform: scale(1.06);
         }
 
         .camera-upload-title {
             font-weight: 800;
-            font-size: 14px;
+            font-size: 13.5px;
             color: var(--primary-dark);
             margin-bottom: 4px;
         }
 
         .camera-upload-sub {
-            font-size: 12px;
+            font-size: 11.5px;
             color: var(--text-muted);
             margin-bottom: 12px;
-        }
-
-        .camera-file-input {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            cursor: pointer;
-            z-index: 10;
-        }
-
-        .camera-preview-img {
-            width: 100%;
-            height: 140px;
-            object-fit: cover;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .camera-upload-badge {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            padding: 5px 12px;
+            padding: 4px 10px;
             border-radius: 20px;
-            font-size: 11.5px;
+            font-size: 11px;
             font-weight: 700;
             background: rgba(39, 174, 96, 0.12);
             color: var(--success);
+            margin-bottom: 12px;
+        }
+
+        .camera-file-input {
+            display: none;
+        }
+
+        .camera-placeholder-box,
+        .camera-uploaded-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
         }
 
         .camera-upload-btn-fake {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            padding: 6px 14px;
+            padding: 8px 16px;
             border-radius: 6px;
             font-size: 12px;
             font-weight: 700;
             background: rgba(0, 40, 85, 0.08);
             color: var(--primary);
+            border: none;
+            cursor: pointer;
             transition: all 0.2s;
         }
 
-        .camera-upload-card:hover .camera-upload-btn-fake {
+        .camera-upload-btn-fake:hover {
             background: var(--primary);
             color: #fff;
+        }
+
+        /* 2 Action Buttons on Photo (Lihat Foto & Hapus) */
+        .camera-actions-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .btn-photo-action {
+            flex: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-photo-action.view {
+            background: rgba(0, 40, 85, 0.08);
+            color: var(--primary);
+            border-color: rgba(0, 40, 85, 0.15);
+        }
+        .btn-photo-action.view:hover {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+        }
+
+        .btn-photo-action.delete {
+            background: rgba(239, 68, 68, 0.10);
+            color: #dc2626;
+            border-color: rgba(239, 68, 68, 0.25);
+        }
+        .btn-photo-action.delete:hover {
+            background: #dc2626;
+            color: #ffffff;
+            border-color: #dc2626;
+        }
+
+        /* Loading Spinner Overlay */
+        .camera-loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(3px);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            z-index: 20;
+            border-radius: 10px;
+        }
+
+        .camera-loading-overlay.active {
+            display: flex;
+        }
+
+        .camera-spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid rgba(0, 40, 85, 0.15);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: cameraSpin 0.75s linear infinite;
+        }
+
+        .camera-loading-text {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        @keyframes cameraSpin {
+            to { transform: rotate(360deg); }
         }
 
         /* Indicator Radio Pills */
@@ -276,8 +365,90 @@
         }
 
         @media (max-width: 768px) {
-            .recipient-selector-bar { padding: 18px; }
-            .form-section { padding: 18px 16px; }
+            .recipient-selector-bar {
+                padding: 18px 16px;
+                border-radius: 12px;
+                gap: 14px;
+            }
+            .recipient-selector-bar h3 {
+                font-size: 18px;
+                margin-bottom: 4px;
+            }
+            .recipient-selector-bar p {
+                font-size: 12.5px;
+                line-height: 1.45;
+            }
+            .recipient-actions {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+            .recipient-actions .btn,
+            .recipient-actions .btn-outline {
+                width: 100%;
+                justify-content: center;
+                padding: 10px 14px;
+                font-size: 12.5px;
+                box-sizing: border-box;
+            }
+            .form-section {
+                padding: 18px 14px;
+                border-radius: 12px;
+                margin-bottom: 16px;
+            }
+            .form-section h4 {
+                font-size: 14.5px;
+                margin-bottom: 14px;
+                padding-bottom: 10px;
+            }
+        }
+
+        .survey-footer-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 12px;
+            padding-top: 16px;
+            padding-bottom: 40px;
+            margin-top: 10px;
+        }
+
+        .survey-footer-actions .btn {
+            padding: 12px 28px;
+            font-size: 13.5px;
+            font-weight: 800;
+            border-radius: var(--radius-sm);
+        }
+
+        @media (max-width: 768px) {
+            .survey-footer-actions {
+                flex-direction: column-reverse;
+                gap: 10px;
+                padding-bottom: 30px;
+            }
+            .survey-footer-actions .btn {
+                width: 100%;
+                justify-content: center;
+                padding: 13px 20px;
+                font-size: 13.5px;
+                box-sizing: border-box;
+            }
+        }
+
+        .is-invalid-highlight {
+            border-color: #e11d48 !important;
+            box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.20) !important;
+            animation: pulseInvalid 1.5s infinite;
+        }
+
+        @keyframes pulseInvalid {
+            0%, 100% {
+                border-color: #e11d48;
+            }
+            50% {
+                border-color: #fda4af;
+            }
         }
     </style>
 @endpush
@@ -286,17 +457,8 @@
     <!-- Dedicated Public Navbar Component (Sama Seperti Landing Page) -->
     @include('layouts.navbar_public')
 
-    <main class="dashboard-content dashboard-content-public" style="max-width:1280px; margin:0 auto; padding: 28px 32px 60px; box-sizing:border-box;">
+    <main class="dashboard-content dashboard-content-public">
         <div class="survey-container">
-            <!-- Breadcrumb -->
-            <div class="breadcrumb" style="font-size:13px;color:var(--text-muted);margin-bottom:20px;display:flex;align-items:center;gap:8px;">
-                <a href="{{ url('/') }}" style="color:var(--primary);text-decoration:none;font-weight:600;"><i class="fas fa-home"></i> Home</a>
-                <i class="fas fa-chevron-right" style="font-size:10px;"></i>
-                <a href="{{ route('verval-data') }}" style="color:var(--primary);text-decoration:none;font-weight:600;">Data Verval</a>
-                <i class="fas fa-chevron-right" style="font-size:10px;"></i>
-                <span>Form Survei &amp; Verifikasi Fisik</span>
-            </div>
-
             <!-- Recipient Quick Header Bar -->
             <div class="recipient-selector-bar">
                 <div>
@@ -310,11 +472,11 @@
                         Desa {{ $vervalData->desa_kelurahan }}, Kec. {{ $vervalData->kecamatan }}
                     </p>
                 </div>
-                <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                <div class="recipient-actions" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
                     <a href="{{ route('verval-data.surat-pernyataan', $vervalData->id) }}" target="_blank" class="btn" style="background:#ffb800;color:#002855;font-weight:800;font-size:13px;padding:10px 18px;border-radius:var(--radius-sm);text-decoration:none;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 12px rgba(255,184,0,0.3);">
                         <i class="fas fa-file-signature"></i> Cetak Surat Pernyataan
                     </a>
-                    <a href="{{ route('verval-data') }}" class="btn btn-outline" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);font-size:13px;font-weight:600;padding:10px 18px;border-radius:var(--radius-sm);text-decoration:none;">
+                    <a href="{{ Auth::user() && Auth::user()->role === 'petugas' ? route('petugas.dashboard') : route('verval-data') }}" class="btn btn-outline" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);font-size:13px;font-weight:600;padding:10px 18px;border-radius:var(--radius-sm);text-decoration:none;display:inline-flex;align-items:center;gap:8px;">
                         <i class="fas fa-arrow-left"></i> Kembali ke Daftar
                     </a>
                 </div>
@@ -339,52 +501,13 @@
                 </div>
             @endif
 
-            <!-- 1. Identitas Kependudukan Calon Penerima -->
-            <div class="form-section">
-                <h4><i class="fas fa-id-card"></i> 1. Identitas Kependudukan Calon Penerima (Dari Database Verval)</h4>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
-                    <div class="form-group">
-                        <label>Nama Lengkap</label>
-                        <input type="text" class="form-control" value="{{ $vervalData->nama }}" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label>Jenis Kelamin</label>
-                        <input type="text" class="form-control" value="{{ $vervalData->jenis_kelamin == 'L' ? 'Laki-laki (L)' : ($vervalData->jenis_kelamin == 'P' ? 'Perempuan (P)' : $vervalData->jenis_kelamin) }}" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label>Nomor Induk Kependudukan (NIK)</label>
-                        <input type="text" class="form-control" value="{{ $vervalData->no_ktp ?: '-' }}" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label>Nomor Kartu Keluarga (No. KK)</label>
-                        <input type="text" class="form-control" value="{{ $vervalData->no_kk ?: '-' }}" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label>Alamat / Dusun</label>
-                        <input type="text" class="form-control" value="{{ $vervalData->alamat ?: '-' }}" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label>Desa / Kelurahan</label>
-                        <input type="text" class="form-control" value="{{ $vervalData->desa_kelurahan ?: '-' }}" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label>Kecamatan</label>
-                        <input type="text" class="form-control" value="{{ $vervalData->kecamatan ?: '-' }}" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label>Kelompok Desil</label>
-                        <input type="text" class="form-control" value="{{ $vervalData->pengelompokan_desil ?: 'Desil 1-4' }}" disabled>
-                    </div>
-                </div>
-            </div>
-
             <!-- Form Utama Input / Edit Survei Lapangan -->
-            <form action="{{ route('survey.store', $vervalData->id) }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('survey.store', $vervalData->id) }}" method="POST" enctype="multipart/form-data" id="surveyForm" onsubmit="return validateSurveyForm(event)">
                 @csrf
 
-                <!-- 2. Data Tambahan & Lahan (Dengan Custom Dropdown PUPR) -->
+                <!-- 1. Data Tambahan & Lahan (Dengan Custom Dropdown PUPR) -->
                 <div class="form-section">
-                    <h4><i class="fas fa-user-pen"></i> 2. Data Tambahan &amp; Kelaikan Hunian</h4>
+                    <h4><i class="fas fa-user-pen"></i> 1. Data Tambahan &amp; Kelaikan Hunian</h4>
 
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
                         <div class="form-group">
@@ -452,27 +575,50 @@
                     </div>
                 </div>
 
-                <!-- 3. Dokumen Administrasi & Berkas (Upload Style Kamera + Custom Dropdown) -->
+                <!-- 2. Dokumen Administrasi & Berkas (Upload Style Kamera + Custom Dropdown) -->
                 <div class="form-section">
-                    <h4><i class="fas fa-file-invoice"></i> 3. Berkas &amp; Dokumen Administrasi</h4>
+                    <h4><i class="fas fa-file-invoice"></i> 2. Berkas &amp; Dokumen Administrasi</h4>
 
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
                         {{-- Upload KTP --}}
                         <div>
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">Foto / Scan KTP</label>
                             <div class="camera-upload-card {{ $vervalData->ktp ? 'has-image' : '' }}" id="card_ktp">
-                                <input type="file" name="ktp" class="camera-file-input" accept="image/*" onchange="previewCameraPhoto(this, 'preview_ktp', 'card_ktp')">
-                                <img src="{{ $vervalData->ktp ? asset('storage/' . $vervalData->ktp) : '' }}" class="camera-preview-img" id="preview_ktp" style="{{ $vervalData->ktp ? '' : 'display:none;' }}" alt="KTP">
-                                <div class="camera-icon-bubble" id="icon_ktp" style="{{ $vervalData->ktp ? 'display:none;' : '' }}">
-                                    <i class="fas fa-id-card"></i>
+                                <div class="camera-loading-overlay" id="loading_ktp">
+                                    <div class="camera-spinner"></div>
+                                    <span class="camera-loading-text">Menyimpan Foto...</span>
                                 </div>
-                                <div class="camera-upload-title">Unggah Berkas KTP</div>
-                                <div class="camera-upload-sub">Klik atau foto langsung via kamera</div>
-                                @if($vervalData->ktp)
-                                    <span class="camera-upload-badge"><i class="fas fa-check-circle"></i> Berkas Tersimpan</span>
-                                @else
-                                    <span class="camera-upload-btn-fake"><i class="fas fa-camera"></i> Pilih / Ambil Foto</span>
-                                @endif
+                                <input type="file" id="input_ktp" class="camera-file-input" accept="image/*" onchange="autoUploadPhoto(this, 'ktp', {{ $vervalData->id }})">
+                                <input type="hidden" id="url_ktp" value="{{ $vervalData->ktp ? asset('storage/' . $vervalData->ktp) : '' }}">
+                                
+                                {{-- State Kosong --}}
+                                <div class="camera-placeholder-box" id="placeholder_ktp" style="{{ $vervalData->ktp ? 'display:none;' : 'display:flex;' }}">
+                                    <div class="camera-icon-bubble">
+                                        <i class="fas fa-id-card"></i>
+                                    </div>
+                                    <div class="camera-upload-title">Unggah Berkas KTP</div>
+                                    <div class="camera-upload-sub">Klik untuk pilih atau foto via kamera</div>
+                                    <button type="button" class="camera-upload-btn-fake" onclick="triggerPhotoInput('input_ktp')">
+                                        <i class="fas fa-camera"></i> Ambil / Pilih Foto
+                                    </button>
+                                </div>
+
+                                {{-- State Tersimpan (Tanpa Thumbnail Preview, 2 Tombol Aksi) --}}
+                                <div class="camera-uploaded-box" id="uploaded_ktp" style="{{ $vervalData->ktp ? 'display:flex;' : 'display:none;' }}">
+                                    <div class="camera-icon-bubble success">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <div class="camera-upload-title">Berkas KTP</div>
+                                    <span class="camera-upload-badge"><i class="fas fa-file-image"></i> Foto Tersimpan</span>
+                                    <div class="camera-actions-box">
+                                        <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('ktp')">
+                                            <i class="fas fa-arrow-up-right-from-square"></i> Lihat Foto
+                                        </button>
+                                        <button type="button" class="btn-photo-action delete" onclick="deletePhotoAjax('ktp', {{ $vervalData->id }})">
+                                            <i class="fas fa-trash-alt"></i> Hapus
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -480,37 +626,83 @@
                         <div>
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">Foto / Scan Kartu Keluarga (KK)</label>
                             <div class="camera-upload-card {{ $vervalData->kk ? 'has-image' : '' }}" id="card_kk">
-                                <input type="file" name="kk" class="camera-file-input" accept="image/*" onchange="previewCameraPhoto(this, 'preview_kk', 'card_kk')">
-                                <img src="{{ $vervalData->kk ? asset('storage/' . $vervalData->kk) : '' }}" class="camera-preview-img" id="preview_kk" style="{{ $vervalData->kk ? '' : 'display:none;' }}" alt="KK">
-                                <div class="camera-icon-bubble" id="icon_kk" style="{{ $vervalData->kk ? 'display:none;' : '' }}">
-                                    <i class="fas fa-users-rectangle"></i>
+                                <div class="camera-loading-overlay" id="loading_kk">
+                                    <div class="camera-spinner"></div>
+                                    <span class="camera-loading-text">Menyimpan Foto...</span>
                                 </div>
-                                <div class="camera-upload-title">Unggah Berkas KK</div>
-                                <div class="camera-upload-sub">Klik atau foto langsung via kamera</div>
-                                @if($vervalData->kk)
-                                    <span class="camera-upload-badge"><i class="fas fa-check-circle"></i> Berkas Tersimpan</span>
-                                @else
-                                    <span class="camera-upload-btn-fake"><i class="fas fa-camera"></i> Pilih / Ambil Foto</span>
-                                @endif
+                                <input type="file" id="input_kk" class="camera-file-input" accept="image/*" onchange="autoUploadPhoto(this, 'kk', {{ $vervalData->id }})">
+                                <input type="hidden" id="url_kk" value="{{ $vervalData->kk ? asset('storage/' . $vervalData->kk) : '' }}">
+                                
+                                {{-- State Kosong --}}
+                                <div class="camera-placeholder-box" id="placeholder_kk" style="{{ $vervalData->kk ? 'display:none;' : 'display:flex;' }}">
+                                    <div class="camera-icon-bubble">
+                                        <i class="fas fa-users-rectangle"></i>
+                                    </div>
+                                    <div class="camera-upload-title">Unggah Berkas KK</div>
+                                    <div class="camera-upload-sub">Klik untuk pilih atau foto via kamera</div>
+                                    <button type="button" class="camera-upload-btn-fake" onclick="triggerPhotoInput('input_kk')">
+                                        <i class="fas fa-camera"></i> Ambil / Pilih Foto
+                                    </button>
+                                </div>
+
+                                {{-- State Tersimpan (Tanpa Thumbnail Preview, 2 Tombol Aksi) --}}
+                                <div class="camera-uploaded-box" id="uploaded_kk" style="{{ $vervalData->kk ? 'display:flex;' : 'display:none;' }}">
+                                    <div class="camera-icon-bubble success">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <div class="camera-upload-title">Berkas KK</div>
+                                    <span class="camera-upload-badge"><i class="fas fa-file-image"></i> Foto Tersimpan</span>
+                                    <div class="camera-actions-box">
+                                        <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('kk')">
+                                            <i class="fas fa-arrow-up-right-from-square"></i> Lihat Foto
+                                        </button>
+                                        <button type="button" class="btn-photo-action delete" onclick="deletePhotoAjax('kk', {{ $vervalData->id }})">
+                                            <i class="fas fa-trash-alt"></i> Hapus
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         {{-- Upload Sertifikat Tanah --}}
                         <div>
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">Foto Sertipikat / Bukti Tanah</label>
-                            <div class="camera-upload-card {{ $vervalData->sertifikat_tanah ? 'has-image' : '' }}" id="card_sertifikat">
-                                <input type="file" name="sertifikat_tanah" class="camera-file-input" accept="image/*" onchange="previewCameraPhoto(this, 'preview_sertifikat', 'card_sertifikat')">
-                                <img src="{{ $vervalData->sertifikat_tanah ? asset('storage/' . $vervalData->sertifikat_tanah) : '' }}" class="camera-preview-img" id="preview_sertifikat" style="{{ $vervalData->sertifikat_tanah ? '' : 'display:none;' }}" alt="Sertifikat">
-                                <div class="camera-icon-bubble" id="icon_sertifikat" style="{{ $vervalData->sertifikat_tanah ? 'display:none;' : '' }}">
-                                    <i class="fas fa-file-contract"></i>
+                            <div class="camera-upload-card {{ $vervalData->sertifikat_tanah ? 'has-image' : '' }}" id="card_sertifikat_tanah">
+                                <div class="camera-loading-overlay" id="loading_sertifikat_tanah">
+                                    <div class="camera-spinner"></div>
+                                    <span class="camera-loading-text">Menyimpan Foto...</span>
                                 </div>
-                                <div class="camera-upload-title">Unggah Bukti Tanah</div>
-                                <div class="camera-upload-sub">Sertipikat / Surat Keterangan Tanah</div>
-                                @if($vervalData->sertifikat_tanah)
-                                    <span class="camera-upload-badge"><i class="fas fa-check-circle"></i> Berkas Tersimpan</span>
-                                @else
-                                    <span class="camera-upload-btn-fake"><i class="fas fa-camera"></i> Pilih / Ambil Foto</span>
-                                @endif
+                                <input type="file" id="input_sertifikat_tanah" class="camera-file-input" accept="image/*" onchange="autoUploadPhoto(this, 'sertifikat_tanah', {{ $vervalData->id }})">
+                                <input type="hidden" id="url_sertifikat_tanah" value="{{ $vervalData->sertifikat_tanah ? asset('storage/' . $vervalData->sertifikat_tanah) : '' }}">
+                                
+                                {{-- State Kosong --}}
+                                <div class="camera-placeholder-box" id="placeholder_sertifikat_tanah" style="{{ $vervalData->sertifikat_tanah ? 'display:none;' : 'display:flex;' }}">
+                                    <div class="camera-icon-bubble">
+                                        <i class="fas fa-file-contract"></i>
+                                    </div>
+                                    <div class="camera-upload-title">Unggah Bukti Tanah</div>
+                                    <div class="camera-upload-sub">Sertipikat / Surat Keterangan Tanah</div>
+                                    <button type="button" class="camera-upload-btn-fake" onclick="triggerPhotoInput('input_sertifikat_tanah')">
+                                        <i class="fas fa-camera"></i> Ambil / Pilih Foto
+                                    </button>
+                                </div>
+
+                                {{-- State Tersimpan (Tanpa Thumbnail Preview, 2 Tombol Aksi) --}}
+                                <div class="camera-uploaded-box" id="uploaded_sertifikat_tanah" style="{{ $vervalData->sertifikat_tanah ? 'display:flex;' : 'display:none;' }}">
+                                    <div class="camera-icon-bubble success">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <div class="camera-upload-title">Bukti Kepemilikan Lahan</div>
+                                    <span class="camera-upload-badge"><i class="fas fa-file-image"></i> Foto Tersimpan</span>
+                                    <div class="camera-actions-box">
+                                        <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('sertifikat_tanah')">
+                                            <i class="fas fa-arrow-up-right-from-square"></i> Lihat Foto
+                                        </button>
+                                        <button type="button" class="btn-photo-action delete" onclick="deletePhotoAjax('sertifikat_tanah', {{ $vervalData->id }})">
+                                            <i class="fas fa-trash-alt"></i> Hapus
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -561,11 +753,11 @@
                     </div>
                 </div>
 
-                <!-- 4. Indikator Kelayakan Calon Penerima (Status Layak Diusulkan) -->
+                <!-- 3. Indikator Kelayakan Calon Penerima (Status Layak Diusulkan) -->
                 <div class="form-section" style="border: 2px solid rgba(0, 40, 85, 0.12); background: #ffffff;">
                     <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:16px; border-bottom:1px solid rgba(0, 40, 85, 0.08); padding-bottom:12px;">
                         <h4 style="margin:0; border:none; padding:0;">
-                            <i class="fas fa-list-check" style="color:var(--primary);"></i> 4. Indikator Kelayakan RTLH (Kriteria Layak Diusulkan)
+                            <i class="fas fa-list-check" style="color:var(--primary);"></i> 3. Indikator Kelayakan RTLH (Kriteria Layak Diusulkan)
                         </h4>
                         <span style="font-size:12.5px; font-weight:700; color:#475569; background:#f1f5f9; padding:6px 12px; border-radius:20px;">
                             <i class="fas fa-circle-info" style="color:var(--primary);"></i> Memenuhi minimal 2 indikator
@@ -578,102 +770,102 @@
 
                     <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom:24px;">
                         {{-- 1. Lantai Keramik --}}
-                        <div class="indicator-row" style="display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:12px 18px; flex-wrap:wrap; gap:12px; transition:all 0.2s;">
+                        <div class="indicator-row" id="row_indikator_lantai" style="display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:12px 18px; flex-wrap:wrap; gap:12px; transition:all 0.2s;">
                             <div style="font-size:13.5px; font-weight:700; color:#1e293b; flex:1; min-width:240px;">
                                 1. Lantai Keramik
                             </div>
                             <div style="display:flex; align-items:center; gap:12px;">
                                 <label class="pill-indicator pill-ada">
-                                    <input type="radio" name="indikator_lantai" value="ada" class="indikator-radio" {{ old('indikator_lantai', $vervalData->indikator_lantai) == 'ada' || $vervalData->indikator_lantai === null ? 'checked' : '' }} style="accent-color:#16a34a; cursor:pointer;">
+                                    <input type="radio" name="indikator_lantai" value="ada" class="indikator-radio" {{ old('indikator_lantai', $vervalData->indikator_lantai) === 'ada' ? 'checked' : '' }} style="accent-color:#16a34a; cursor:pointer;">
                                     <i class="fas fa-check-circle"></i> Ada
                                 </label>
                                 <label class="pill-indicator pill-tidak-ada">
-                                    <input type="radio" name="indikator_lantai" value="tidak_ada" class="indikator-radio" {{ old('indikator_lantai', $vervalData->indikator_lantai) == 'tidak_ada' ? 'checked' : '' }} style="accent-color:#dc2626; cursor:pointer;">
+                                    <input type="radio" name="indikator_lantai" value="tidak_ada" class="indikator-radio" {{ old('indikator_lantai', $vervalData->indikator_lantai) === 'tidak_ada' ? 'checked' : '' }} style="accent-color:#dc2626; cursor:pointer;">
                                     <i class="fas fa-times-circle"></i> Tidak Ada
                                 </label>
                             </div>
                         </div>
 
                         {{-- 2. Pondasi Bangunan --}}
-                        <div class="indicator-row" style="display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:12px 18px; flex-wrap:wrap; gap:12px; transition:all 0.2s;">
+                        <div class="indicator-row" id="row_indikator_pondasi" style="display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:12px 18px; flex-wrap:wrap; gap:12px; transition:all 0.2s;">
                             <div style="font-size:13.5px; font-weight:700; color:#1e293b; flex:1; min-width:240px;">
                                 2. Pondasi Bangunan
                             </div>
                             <div style="display:flex; align-items:center; gap:12px;">
                                 <label class="pill-indicator pill-ada">
-                                    <input type="radio" name="indikator_pondasi" value="ada" class="indikator-radio" {{ old('indikator_pondasi', $vervalData->indikator_pondasi) == 'ada' || $vervalData->indikator_pondasi === null ? 'checked' : '' }} style="accent-color:#16a34a; cursor:pointer;">
+                                    <input type="radio" name="indikator_pondasi" value="ada" class="indikator-radio" {{ old('indikator_pondasi', $vervalData->indikator_pondasi) === 'ada' ? 'checked' : '' }} style="accent-color:#16a34a; cursor:pointer;">
                                     <i class="fas fa-check-circle"></i> Ada
                                 </label>
                                 <label class="pill-indicator pill-tidak-ada">
-                                    <input type="radio" name="indikator_pondasi" value="tidak_ada" class="indikator-radio" {{ old('indikator_pondasi', $vervalData->indikator_pondasi) == 'tidak_ada' ? 'checked' : '' }} style="accent-color:#dc2626; cursor:pointer;">
+                                    <input type="radio" name="indikator_pondasi" value="tidak_ada" class="indikator-radio" {{ old('indikator_pondasi', $vervalData->indikator_pondasi) === 'tidak_ada' ? 'checked' : '' }} style="accent-color:#dc2626; cursor:pointer;">
                                     <i class="fas fa-times-circle"></i> Tidak Ada
                                 </label>
                             </div>
                         </div>
 
                         {{-- 3. Dinding Bata / Tembok --}}
-                        <div class="indicator-row" style="display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:12px 18px; flex-wrap:wrap; gap:12px; transition:all 0.2s;">
+                        <div class="indicator-row" id="row_indikator_dinding" style="display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:12px 18px; flex-wrap:wrap; gap:12px; transition:all 0.2s;">
                             <div style="font-size:13.5px; font-weight:700; color:#1e293b; flex:1; min-width:240px;">
                                 3. Dinding Bata / Tembok
                             </div>
                             <div style="display:flex; align-items:center; gap:12px;">
                                 <label class="pill-indicator pill-ada">
-                                    <input type="radio" name="indikator_dinding" value="ada" class="indikator-radio" {{ old('indikator_dinding', $vervalData->indikator_dinding) == 'ada' || $vervalData->indikator_dinding === null ? 'checked' : '' }} style="accent-color:#16a34a; cursor:pointer;">
+                                    <input type="radio" name="indikator_dinding" value="ada" class="indikator-radio" {{ old('indikator_dinding', $vervalData->indikator_dinding) === 'ada' ? 'checked' : '' }} style="accent-color:#16a34a; cursor:pointer;">
                                     <i class="fas fa-check-circle"></i> Ada
                                 </label>
                                 <label class="pill-indicator pill-tidak-ada">
-                                    <input type="radio" name="indikator_dinding" value="tidak_ada" class="indikator-radio" {{ old('indikator_dinding', $vervalData->indikator_dinding) == 'tidak_ada' ? 'checked' : '' }} style="accent-color:#dc2626; cursor:pointer;">
+                                    <input type="radio" name="indikator_dinding" value="tidak_ada" class="indikator-radio" {{ old('indikator_dinding', $vervalData->indikator_dinding) === 'tidak_ada' ? 'checked' : '' }} style="accent-color:#dc2626; cursor:pointer;">
                                     <i class="fas fa-times-circle"></i> Tidak Ada
                                 </label>
                             </div>
                         </div>
 
                         {{-- 4. Struktur Bangunan (Sloof, Kolom, Ring Balok) --}}
-                        <div class="indicator-row" style="display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:12px 18px; flex-wrap:wrap; gap:12px; transition:all 0.2s;">
+                        <div class="indicator-row" id="row_indikator_struktur" style="display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:12px 18px; flex-wrap:wrap; gap:12px; transition:all 0.2s;">
                             <div style="font-size:13.5px; font-weight:700; color:#1e293b; flex:1; min-width:240px;">
                                 4. Struktur Bangunan (Sloof, Kolom, Ring Balok)
                             </div>
                             <div style="display:flex; align-items:center; gap:12px;">
                                 <label class="pill-indicator pill-ada">
-                                    <input type="radio" name="indikator_struktur" value="ada" class="indikator-radio" {{ old('indikator_struktur', $vervalData->indikator_struktur) == 'ada' || $vervalData->indikator_struktur === null ? 'checked' : '' }} style="accent-color:#16a34a; cursor:pointer;">
+                                    <input type="radio" name="indikator_struktur" value="ada" class="indikator-radio" {{ old('indikator_struktur', $vervalData->indikator_struktur) === 'ada' ? 'checked' : '' }} style="accent-color:#16a34a; cursor:pointer;">
                                     <i class="fas fa-check-circle"></i> Ada
                                 </label>
                                 <label class="pill-indicator pill-tidak-ada">
-                                    <input type="radio" name="indikator_struktur" value="tidak_ada" class="indikator-radio" {{ old('indikator_struktur', $vervalData->indikator_struktur) == 'tidak_ada' ? 'checked' : '' }} style="accent-color:#dc2626; cursor:pointer;">
+                                    <input type="radio" name="indikator_struktur" value="tidak_ada" class="indikator-radio" {{ old('indikator_struktur', $vervalData->indikator_struktur) === 'tidak_ada' ? 'checked' : '' }} style="accent-color:#dc2626; cursor:pointer;">
                                     <i class="fas fa-times-circle"></i> Tidak Ada
                                 </label>
                             </div>
                         </div>
 
                         {{-- 5. Penutup Atap Genteng --}}
-                        <div class="indicator-row" style="display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:12px 18px; flex-wrap:wrap; gap:12px; transition:all 0.2s;">
+                        <div class="indicator-row" id="row_indikator_atap" style="display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:12px 18px; flex-wrap:wrap; gap:12px; transition:all 0.2s;">
                             <div style="font-size:13.5px; font-weight:700; color:#1e293b; flex:1; min-width:240px;">
                                 5. Penutup Atap Genteng
                             </div>
                             <div style="display:flex; align-items:center; gap:12px;">
                                 <label class="pill-indicator pill-ada">
-                                    <input type="radio" name="indikator_atap" value="ada" class="indikator-radio" {{ old('indikator_atap', $vervalData->indikator_atap) == 'ada' || $vervalData->indikator_atap === null ? 'checked' : '' }} style="accent-color:#16a34a; cursor:pointer;">
+                                    <input type="radio" name="indikator_atap" value="ada" class="indikator-radio" {{ old('indikator_atap', $vervalData->indikator_atap) === 'ada' ? 'checked' : '' }} style="accent-color:#16a34a; cursor:pointer;">
                                     <i class="fas fa-check-circle"></i> Ada
                                 </label>
                                 <label class="pill-indicator pill-tidak-ada">
-                                    <input type="radio" name="indikator_atap" value="tidak_ada" class="indikator-radio" {{ old('indikator_atap', $vervalData->indikator_atap) == 'tidak_ada' ? 'checked' : '' }} style="accent-color:#dc2626; cursor:pointer;">
+                                    <input type="radio" name="indikator_atap" value="tidak_ada" class="indikator-radio" {{ old('indikator_atap', $vervalData->indikator_atap) === 'tidak_ada' ? 'checked' : '' }} style="accent-color:#dc2626; cursor:pointer;">
                                     <i class="fas fa-times-circle"></i> Tidak Ada
                                 </label>
                             </div>
                         </div>
 
                         {{-- 6. Penghasilan Kurang dari UMK --}}
-                        <div class="indicator-row" style="display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:12px 18px; flex-wrap:wrap; gap:12px; transition:all 0.2s;">
+                        <div class="indicator-row" id="row_indikator_penghasilan" style="display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:12px 18px; flex-wrap:wrap; gap:12px; transition:all 0.2s;">
                             <div style="font-size:13.5px; font-weight:700; color:#1e293b; flex:1; min-width:240px;">
                                 6. Penghasilan Kurang dari UMK
                             </div>
                             <div style="display:flex; align-items:center; gap:12px;">
                                 <label class="pill-indicator pill-ada">
-                                    <input type="radio" name="indikator_penghasilan" value="ada" class="indikator-radio" {{ old('indikator_penghasilan', $vervalData->indikator_penghasilan) == 'ada' ? 'checked' : '' }} style="accent-color:#16a34a; cursor:pointer;">
+                                    <input type="radio" name="indikator_penghasilan" value="ada" class="indikator-radio" {{ old('indikator_penghasilan', $vervalData->indikator_penghasilan) === 'ada' ? 'checked' : '' }} style="accent-color:#16a34a; cursor:pointer;">
                                     <i class="fas fa-check-circle"></i> Ya / Ada
                                 </label>
                                 <label class="pill-indicator pill-tidak-ada">
-                                    <input type="radio" name="indikator_penghasilan" value="tidak_ada" class="indikator-radio" {{ old('indikator_penghasilan', $vervalData->indikator_penghasilan) == 'tidak_ada' || $vervalData->indikator_penghasilan === null ? 'checked' : '' }} style="accent-color:#dc2626; cursor:pointer;">
+                                    <input type="radio" name="indikator_penghasilan" value="tidak_ada" class="indikator-radio" {{ old('indikator_penghasilan', $vervalData->indikator_penghasilan) === 'tidak_ada' ? 'checked' : '' }} style="accent-color:#dc2626; cursor:pointer;">
                                     <i class="fas fa-times-circle"></i> Tidak
                                 </label>
                             </div>
@@ -702,11 +894,11 @@
                     </div>
                 </div>
 
-                <!-- 5. Dokumentasi Foto Fisik RTLH 5 Sudut (Style Kamera Modern - Lampiran Evidence) -->
+                <!-- 4. Dokumentasi Foto Fisik RTLH 5 Sudut (Style Kamera Modern - Lampiran Evidence) -->
                 <div class="form-section">
                     <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:16px; border-bottom:1px solid rgba(0, 40, 85, 0.06); padding-bottom:12px;">
                         <h4 style="margin:0; border:none; padding:0;">
-                            <i class="fas fa-camera-retro"></i> 5. Dokumentasi Foto Fisik RTLH (Lampiran Evidence 5 Sudut)
+                            <i class="fas fa-camera-retro"></i> 4. Dokumentasi Foto Fisik RTLH (Lampiran Evidence 5 Sudut)
                         </h4>
                         <span style="font-size:12px; font-weight:600; color:#64748b;">
                             <i class="fas fa-paperclip"></i> Dokumen Foto Berfungsi Sebagai Berkas Lampiran Verval
@@ -717,133 +909,225 @@
                         {{-- 1. Sudut Depan --}}
                         <div>
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">1. Tampak Depan</label>
-                            <div class="camera-upload-card {{ $vervalData->foto_sudut_depan ? 'has-image' : '' }}" id="card_depan">
-                                <input type="file" name="foto_sudut_depan" class="camera-file-input" accept="image/*" onchange="previewCameraPhoto(this, 'preview_depan', 'card_depan')">
-                                <img src="{{ $vervalData->foto_sudut_depan ? asset('storage/' . $vervalData->foto_sudut_depan) : '' }}" class="camera-preview-img" id="preview_depan" style="{{ $vervalData->foto_sudut_depan ? '' : 'display:none;' }}" alt="Tampak Depan">
-                                <div class="camera-icon-bubble" id="icon_depan" style="{{ $vervalData->foto_sudut_depan ? 'display:none;' : '' }}">
-                                    <i class="fas fa-camera"></i>
+                            <div class="camera-upload-card {{ $vervalData->foto_sudut_depan ? 'has-image' : '' }}" id="card_foto_sudut_depan">
+                                <div class="camera-loading-overlay" id="loading_foto_sudut_depan">
+                                    <div class="camera-spinner"></div>
+                                    <span class="camera-loading-text">Menyimpan Foto...</span>
                                 </div>
-                                <div class="camera-upload-title">Tampak Depan</div>
-                                <div class="camera-upload-sub">Fasad &amp; pintu utama rumah</div>
-                                @if($vervalData->foto_sudut_depan)
-                                    <span class="camera-upload-badge"><i class="fas fa-check-circle"></i> Foto Tersimpan</span>
-                                @else
-                                    <span class="camera-upload-btn-fake"><i class="fas fa-camera"></i> Ambil Foto</span>
-                                @endif
+                                <input type="file" id="input_foto_sudut_depan" class="camera-file-input" accept="image/*" onchange="autoUploadPhoto(this, 'foto_sudut_depan', {{ $vervalData->id }})">
+                                <input type="hidden" id="url_foto_sudut_depan" value="{{ $vervalData->foto_sudut_depan ? asset('storage/' . $vervalData->foto_sudut_depan) : '' }}">
+                                
+                                {{-- State Kosong --}}
+                                <div class="camera-placeholder-box" id="placeholder_foto_sudut_depan" style="{{ $vervalData->foto_sudut_depan ? 'display:none;' : 'display:flex;' }}">
+                                    <div class="camera-icon-bubble">
+                                        <i class="fas fa-camera"></i>
+                                    </div>
+                                    <div class="camera-upload-title">Tampak Depan</div>
+                                    <div class="camera-upload-sub">Fasad &amp; pintu utama rumah</div>
+                                    <button type="button" class="camera-upload-btn-fake" onclick="triggerPhotoInput('input_foto_sudut_depan')">
+                                        <i class="fas fa-camera"></i> Ambil / Pilih Foto
+                                    </button>
+                                </div>
+
+                                {{-- State Tersimpan (Tanpa Thumbnail Preview, 2 Tombol Aksi) --}}
+                                <div class="camera-uploaded-box" id="uploaded_foto_sudut_depan" style="{{ $vervalData->foto_sudut_depan ? 'display:flex;' : 'display:none;' }}">
+                                    <div class="camera-icon-bubble success">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <div class="camera-upload-title">Tampak Depan</div>
+                                    <span class="camera-upload-badge"><i class="fas fa-file-image"></i> Foto Tersimpan</span>
+                                    <div class="camera-actions-box">
+                                        <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('foto_sudut_depan')">
+                                            <i class="fas fa-arrow-up-right-from-square"></i> Lihat Foto
+                                        </button>
+                                        <button type="button" class="btn-photo-action delete" onclick="deletePhotoAjax('foto_sudut_depan', {{ $vervalData->id }})">
+                                            <i class="fas fa-trash-alt"></i> Hapus
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         {{-- 2. Sudut Belakang --}}
                         <div>
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">2. Tampak Belakang</label>
-                            <div class="camera-upload-card {{ $vervalData->foto_sudut_belakang ? 'has-image' : '' }}" id="card_belakang">
-                                <input type="file" name="foto_sudut_belakang" class="camera-file-input" accept="image/*" onchange="previewCameraPhoto(this, 'preview_belakang', 'card_belakang')">
-                                <img src="{{ $vervalData->foto_sudut_belakang ? asset('storage/' . $vervalData->foto_sudut_belakang) : '' }}" class="camera-preview-img" id="preview_belakang" style="{{ $vervalData->foto_sudut_belakang ? '' : 'display:none;' }}" alt="Tampak Belakang">
-                                <div class="camera-icon-bubble" id="icon_belakang" style="{{ $vervalData->foto_sudut_belakang ? 'display:none;' : '' }}">
-                                    <i class="fas fa-camera"></i>
+                            <div class="camera-upload-card {{ $vervalData->foto_sudut_belakang ? 'has-image' : '' }}" id="card_foto_sudut_belakang">
+                                <div class="camera-loading-overlay" id="loading_foto_sudut_belakang">
+                                    <div class="camera-spinner"></div>
+                                    <span class="camera-loading-text">Menyimpan Foto...</span>
                                 </div>
-                                <div class="camera-upload-title">Tampak Belakang</div>
-                                <div class="camera-upload-sub">Dapur / area belakang rumah</div>
-                                @if($vervalData->foto_sudut_belakang)
-                                    <span class="camera-upload-badge"><i class="fas fa-check-circle"></i> Foto Tersimpan</span>
-                                @else
-                                    <span class="camera-upload-btn-fake"><i class="fas fa-camera"></i> Ambil Foto</span>
-                                @endif
+                                <input type="file" id="input_foto_sudut_belakang" class="camera-file-input" accept="image/*" onchange="autoUploadPhoto(this, 'foto_sudut_belakang', {{ $vervalData->id }})">
+                                <input type="hidden" id="url_foto_sudut_belakang" value="{{ $vervalData->foto_sudut_belakang ? asset('storage/' . $vervalData->foto_sudut_belakang) : '' }}">
+                                
+                                {{-- State Kosong --}}
+                                <div class="camera-placeholder-box" id="placeholder_foto_sudut_belakang" style="{{ $vervalData->foto_sudut_belakang ? 'display:none;' : 'display:flex;' }}">
+                                    <div class="camera-icon-bubble">
+                                        <i class="fas fa-camera"></i>
+                                    </div>
+                                    <div class="camera-upload-title">Tampak Belakang</div>
+                                    <div class="camera-upload-sub">Dapur / area belakang rumah</div>
+                                    <button type="button" class="camera-upload-btn-fake" onclick="triggerPhotoInput('input_foto_sudut_belakang')">
+                                        <i class="fas fa-camera"></i> Ambil / Pilih Foto
+                                    </button>
+                                </div>
+
+                                {{-- State Tersimpan (Tanpa Thumbnail Preview, 2 Tombol Aksi) --}}
+                                <div class="camera-uploaded-box" id="uploaded_foto_sudut_belakang" style="{{ $vervalData->foto_sudut_belakang ? 'display:flex;' : 'display:none;' }}">
+                                    <div class="camera-icon-bubble success">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <div class="camera-upload-title">Tampak Belakang</div>
+                                    <span class="camera-upload-badge"><i class="fas fa-file-image"></i> Foto Tersimpan</span>
+                                    <div class="camera-actions-box">
+                                        <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('foto_sudut_belakang')">
+                                            <i class="fas fa-arrow-up-right-from-square"></i> Lihat Foto
+                                        </button>
+                                        <button type="button" class="btn-photo-action delete" onclick="deletePhotoAjax('foto_sudut_belakang', {{ $vervalData->id }})">
+                                            <i class="fas fa-trash-alt"></i> Hapus
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         {{-- 3. Bagian Dalam / Interior --}}
                         <div>
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">3. Bagian Dalam / Interior</label>
-                            <div class="camera-upload-card {{ $vervalData->foto_bagian_dalam ? 'has-image' : '' }}" id="card_dalam">
-                                <input type="file" name="foto_bagian_dalam" class="camera-file-input" accept="image/*" onchange="previewCameraPhoto(this, 'preview_dalam', 'card_dalam')">
-                                <img src="{{ $vervalData->foto_bagian_dalam ? asset('storage/' . $vervalData->foto_bagian_dalam) : '' }}" class="camera-preview-img" id="preview_dalam" style="{{ $vervalData->foto_bagian_dalam ? '' : 'display:none;' }}" alt="Bagian Dalam">
-                                <div class="camera-icon-bubble" id="icon_dalam" style="{{ $vervalData->foto_bagian_dalam ? 'display:none;' : '' }}">
-                                    <i class="fas fa-camera"></i>
+                            <div class="camera-upload-card {{ $vervalData->foto_bagian_dalam ? 'has-image' : '' }}" id="card_foto_bagian_dalam">
+                                <div class="camera-loading-overlay" id="loading_foto_bagian_dalam">
+                                    <div class="camera-spinner"></div>
+                                    <span class="camera-loading-text">Menyimpan Foto...</span>
                                 </div>
-                                <div class="camera-upload-title">Bagian Dalam</div>
-                                <div class="camera-upload-sub">Ruang keluarga / lantai &amp; atap</div>
-                                @if($vervalData->foto_bagian_dalam)
-                                    <span class="camera-upload-badge"><i class="fas fa-check-circle"></i> Foto Tersimpan</span>
-                                @else
-                                    <span class="camera-upload-btn-fake"><i class="fas fa-camera"></i> Ambil Foto</span>
-                                @endif
+                                <input type="file" id="input_foto_bagian_dalam" class="camera-file-input" accept="image/*" onchange="autoUploadPhoto(this, 'foto_bagian_dalam', {{ $vervalData->id }})">
+                                <input type="hidden" id="url_foto_bagian_dalam" value="{{ $vervalData->foto_bagian_dalam ? asset('storage/' . $vervalData->foto_bagian_dalam) : '' }}">
+                                
+                                {{-- State Kosong --}}
+                                <div class="camera-placeholder-box" id="placeholder_foto_bagian_dalam" style="{{ $vervalData->foto_bagian_dalam ? 'display:none;' : 'display:flex;' }}">
+                                    <div class="camera-icon-bubble">
+                                        <i class="fas fa-camera"></i>
+                                    </div>
+                                    <div class="camera-upload-title">Bagian Dalam</div>
+                                    <div class="camera-upload-sub">Ruang keluarga / lantai &amp; atap</div>
+                                    <button type="button" class="camera-upload-btn-fake" onclick="triggerPhotoInput('input_foto_bagian_dalam')">
+                                        <i class="fas fa-camera"></i> Ambil / Pilih Foto
+                                    </button>
+                                </div>
+
+                                {{-- State Tersimpan (Tanpa Thumbnail Preview, 2 Tombol Aksi) --}}
+                                <div class="camera-uploaded-box" id="uploaded_foto_bagian_dalam" style="{{ $vervalData->foto_bagian_dalam ? 'display:flex;' : 'display:none;' }}">
+                                    <div class="camera-icon-bubble success">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <div class="camera-upload-title">Bagian Dalam / Interior</div>
+                                    <span class="camera-upload-badge"><i class="fas fa-file-image"></i> Foto Tersimpan</span>
+                                    <div class="camera-actions-box">
+                                        <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('foto_bagian_dalam')">
+                                            <i class="fas fa-arrow-up-right-from-square"></i> Lihat Foto
+                                        </button>
+                                        <button type="button" class="btn-photo-action delete" onclick="deletePhotoAjax('foto_bagian_dalam', {{ $vervalData->id }})">
+                                            <i class="fas fa-trash-alt"></i> Hapus
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         {{-- 4. Samping Kiri --}}
                         <div>
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">4. Samping Kiri</label>
-                            <div class="camera-upload-card {{ $vervalData->foto_sudut_kiri ? 'has-image' : '' }}" id="card_kiri">
-                                <input type="file" name="foto_sudut_kiri" class="camera-file-input" accept="image/*" onchange="previewCameraPhoto(this, 'preview_kiri', 'card_kiri')">
-                                <img src="{{ $vervalData->foto_sudut_kiri ? asset('storage/' . $vervalData->foto_sudut_kiri) : '' }}" class="camera-preview-img" id="preview_kiri" style="{{ $vervalData->foto_sudut_kiri ? '' : 'display:none;' }}" alt="Samping Kiri">
-                                <div class="camera-icon-bubble" id="icon_kiri" style="{{ $vervalData->foto_sudut_kiri ? 'display:none;' : '' }}">
-                                    <i class="fas fa-camera"></i>
+                            <div class="camera-upload-card {{ $vervalData->foto_sudut_kiri ? 'has-image' : '' }}" id="card_foto_sudut_kiri">
+                                <div class="camera-loading-overlay" id="loading_foto_sudut_kiri">
+                                    <div class="camera-spinner"></div>
+                                    <span class="camera-loading-text">Menyimpan Foto...</span>
                                 </div>
-                                <div class="camera-upload-title">Samping Kiri</div>
-                                <div class="camera-upload-sub">Dinding / struktur sisi kiri</div>
-                                @if($vervalData->foto_sudut_kiri)
-                                    <span class="camera-upload-badge"><i class="fas fa-check-circle"></i> Foto Tersimpan</span>
-                                @else
-                                    <span class="camera-upload-btn-fake"><i class="fas fa-camera"></i> Ambil Foto</span>
-                                @endif
+                                <input type="file" id="input_foto_sudut_kiri" class="camera-file-input" accept="image/*" onchange="autoUploadPhoto(this, 'foto_sudut_kiri', {{ $vervalData->id }})">
+                                <input type="hidden" id="url_foto_sudut_kiri" value="{{ $vervalData->foto_sudut_kiri ? asset('storage/' . $vervalData->foto_sudut_kiri) : '' }}">
+                                
+                                {{-- State Kosong --}}
+                                <div class="camera-placeholder-box" id="placeholder_foto_sudut_kiri" style="{{ $vervalData->foto_sudut_kiri ? 'display:none;' : 'display:flex;' }}">
+                                    <div class="camera-icon-bubble">
+                                        <i class="fas fa-camera"></i>
+                                    </div>
+                                    <div class="camera-upload-title">Samping Kiri</div>
+                                    <div class="camera-upload-sub">Dinding / struktur sisi kiri</div>
+                                    <button type="button" class="camera-upload-btn-fake" onclick="triggerPhotoInput('input_foto_sudut_kiri')">
+                                        <i class="fas fa-camera"></i> Ambil / Pilih Foto
+                                    </button>
+                                </div>
+
+                                {{-- State Tersimpan (Tanpa Thumbnail Preview, 2 Tombol Aksi) --}}
+                                <div class="camera-uploaded-box" id="uploaded_foto_sudut_kiri" style="{{ $vervalData->foto_sudut_kiri ? 'display:flex;' : 'display:none;' }}">
+                                    <div class="camera-icon-bubble success">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <div class="camera-upload-title">Samping Kiri</div>
+                                    <span class="camera-upload-badge"><i class="fas fa-file-image"></i> Foto Tersimpan</span>
+                                    <div class="camera-actions-box">
+                                        <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('foto_sudut_kiri')">
+                                            <i class="fas fa-arrow-up-right-from-square"></i> Lihat Foto
+                                        </button>
+                                        <button type="button" class="btn-photo-action delete" onclick="deletePhotoAjax('foto_sudut_kiri', {{ $vervalData->id }})">
+                                            <i class="fas fa-trash-alt"></i> Hapus
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         {{-- 5. Samping Kanan --}}
                         <div>
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">5. Samping Kanan</label>
-                            <div class="camera-upload-card {{ $vervalData->foto_sudut_kanan ? 'has-image' : '' }}" id="card_kanan">
-                                <input type="file" name="foto_sudut_kanan" class="camera-file-input" accept="image/*" onchange="previewCameraPhoto(this, 'preview_kanan', 'card_kanan')">
-                                <img src="{{ $vervalData->foto_sudut_kanan ? asset('storage/' . $vervalData->foto_sudut_kanan) : '' }}" class="camera-preview-img" id="preview_kanan" style="{{ $vervalData->foto_sudut_kanan ? '' : 'display:none;' }}" alt="Samping Kanan">
-                                <div class="camera-icon-bubble" id="icon_kanan" style="{{ $vervalData->foto_sudut_kanan ? 'display:none;' : '' }}">
-                                    <i class="fas fa-camera"></i>
+                            <div class="camera-upload-card {{ $vervalData->foto_sudut_kanan ? 'has-image' : '' }}" id="card_foto_sudut_kanan">
+                                <div class="camera-loading-overlay" id="loading_foto_sudut_kanan">
+                                    <div class="camera-spinner"></div>
+                                    <span class="camera-loading-text">Menyimpan Foto...</span>
                                 </div>
-                                <div class="camera-upload-title">Samping Kanan</div>
-                                <div class="camera-upload-sub">Dinding / struktur sisi kanan</div>
-                                @if($vervalData->foto_sudut_kanan)
-                                    <span class="camera-upload-badge"><i class="fas fa-check-circle"></i> Foto Tersimpan</span>
-                                @else
-                                    <span class="camera-upload-btn-fake"><i class="fas fa-camera"></i> Ambil Foto</span>
-                                @endif
+                                <input type="file" id="input_foto_sudut_kanan" class="camera-file-input" accept="image/*" onchange="autoUploadPhoto(this, 'foto_sudut_kanan', {{ $vervalData->id }})">
+                                <input type="hidden" id="url_foto_sudut_kanan" value="{{ $vervalData->foto_sudut_kanan ? asset('storage/' . $vervalData->foto_sudut_kanan) : '' }}">
+                                
+                                {{-- State Kosong --}}
+                                <div class="camera-placeholder-box" id="placeholder_foto_sudut_kanan" style="{{ $vervalData->foto_sudut_kanan ? 'display:none;' : 'display:flex;' }}">
+                                    <div class="camera-icon-bubble">
+                                        <i class="fas fa-camera"></i>
+                                    </div>
+                                    <div class="camera-upload-title">Samping Kanan</div>
+                                    <div class="camera-upload-sub">Dinding / struktur sisi kanan</div>
+                                    <button type="button" class="camera-upload-btn-fake" onclick="triggerPhotoInput('input_foto_sudut_kanan')">
+                                        <i class="fas fa-camera"></i> Ambil / Pilih Foto
+                                    </button>
+                                </div>
+
+                                {{-- State Tersimpan (Tanpa Thumbnail Preview, 2 Tombol Aksi) --}}
+                                <div class="camera-uploaded-box" id="uploaded_foto_sudut_kanan" style="{{ $vervalData->foto_sudut_kanan ? 'display:flex;' : 'display:none;' }}">
+                                    <div class="camera-icon-bubble success">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <div class="camera-upload-title">Samping Kanan</div>
+                                    <span class="camera-upload-badge"><i class="fas fa-file-image"></i> Foto Tersimpan</span>
+                                    <div class="camera-actions-box">
+                                        <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('foto_sudut_kanan')">
+                                            <i class="fas fa-arrow-up-right-from-square"></i> Lihat Foto
+                                        </button>
+                                        <button type="button" class="btn-photo-action delete" onclick="deletePhotoAjax('foto_sudut_kanan', {{ $vervalData->id }})">
+                                            <i class="fas fa-trash-alt"></i> Hapus
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 6. Titik Koordinat GPS (Geotagging) -->
-                <div class="form-section">
-                    <h4><i class="fas fa-map-location-dot"></i> 5. Titik Koordinat Lokasi Rumah (Geotagging GPS)</h4>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
-                        <div class="form-group">
-                            <label>Latitude</label>
-                            <input type="text" id="disp_latitude" class="form-control" value="{{ $vervalData->latitude }}"
-                                disabled placeholder="Mendeteksi GPS...">
-                            <input type="hidden" name="latitude" id="latitude" value="{{ $vervalData->latitude }}">
-                        </div>
-                        <div class="form-group">
-                            <label>Longitude</label>
-                            <input type="text" id="disp_longitude" class="form-control" value="{{ $vervalData->longitude }}"
-                                disabled placeholder="Mendeteksi GPS...">
-                            <input type="hidden" name="longitude" id="longitude" value="{{ $vervalData->longitude }}">
-                        </div>
-                    </div>
-                    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:12px;">
-                        <small style="color: var(--text-muted);font-weight:600;">
-                            <i class="fas fa-info-circle"></i> Koordinat lokasi otomatis dicatat dari sensor GPS perangkat saat form dibuka di lapangan.
-                        </small>
-                        <button type="button" class="btn btn-outline" style="padding:8px 16px;font-size:12.5px;font-weight:700;display:inline-flex;align-items:center;gap:6px;" onclick="requestLocation()">
-                            <i class="fas fa-location-crosshairs"></i> Refresh Koordinat GPS
-                        </button>
-                    </div>
-                </div>
+                {{-- Koordinat Lokasi Geotagging GPS (Auto-filled di Background dari GPS Petugas) --}}
+                <input type="hidden" name="latitude" id="latitude" value="{{ old('latitude', $vervalData->latitude) }}">
+                <input type="hidden" name="longitude" id="longitude" value="{{ old('longitude', $vervalData->longitude) }}">
 
                 <!-- Tombol Submit Form -->
-                <div style="text-align: right; padding-bottom: 40px; display:flex; justify-content:flex-end; gap:12px; flex-wrap:wrap;">
-                    <a href="{{ route('verval-data') }}" class="btn btn-outline" style="padding: 12px 24px; border-radius: var(--radius-sm); font-weight:700;">
-                        Batal
+                <div class="survey-footer-actions">
+                    <a href="{{ Auth::user() && Auth::user()->role === 'petugas' ? route('petugas.dashboard') : route('verval-data') }}" class="btn btn-outline">
+                        <i class="fas fa-arrow-left"></i> Batal
                     </a>
-                    <button type="submit" class="btn btn-primary" style="padding: 12px 32px; font-weight: 800; border-radius: var(--radius-sm); display:inline-flex; align-items:center; gap:8px; box-shadow:0 4px 14px rgba(0,40,85,0.25);">
+                    <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save"></i> Simpan Hasil Survei Lapangan
                     </button>
                 </div>
@@ -873,52 +1157,333 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal Peringatan / Pengingat Kelengkapan Survei -->
+        <div class="modal-overlay" id="surveyValidationModal">
+            <div class="modal-box" style="max-width: 580px; padding: 0; overflow: hidden; border-radius: 16px;">
+                <div class="modal-header" style="padding: 16px 22px; background: #fff1f2; border-bottom: 1px solid #ffe4e6; display: flex; align-items: center; justify-content: space-between;">
+                    <h3 style="font-size: 16px; font-weight: 800; color: #e11d48; margin: 0; display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-triangle-exclamation" style="font-size: 18px;"></i>
+                        <span>Form Survei Belum Lengkap!</span>
+                    </h3>
+                    <button type="button" style="background: transparent; border: none; font-size: 18px; color: #9f1239; cursor: pointer;" onclick="window.PuprModal.close('surveyValidationModal')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="modal-body" style="padding: 22px; max-height: 65vh; overflow-y: auto;">
+                    <div style="display: flex; align-items: flex-start; gap: 12px; background: #fff; border: 1px solid #fee2e2; border-radius: 10px; padding: 12px 14px; margin-bottom: 18px;">
+                        <i class="fas fa-circle-info" style="color: #e11d48; font-size: 16px; margin-top: 2px;"></i>
+                        <p style="margin: 0; font-size: 13px; color: #475569; line-height: 1.5;">
+                            Hasil survei lapangan belum dapat disimpan. Harap lengkapi <strong id="validationTotalCount" style="color:#e11d48;">0</strong> data / berkas yang masih kosong di bawah ini:
+                        </p>
+                    </div>
+
+                    <div id="validationMissingList" style="display: flex; flex-direction: column; gap: 14px;">
+                        <!-- Diisi secara otomatis lewat JavaScript -->
+                    </div>
+                </div>
+
+                <div class="modal-footer" style="padding: 14px 22px; background: #f8fafc; border-top: 1px solid rgba(0, 40, 85, 0.08); display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                    <button type="button" class="btn btn-outline" style="padding: 9px 18px; font-size: 12.5px;" onclick="window.PuprModal.close('surveyValidationModal')">
+                        Tutup
+                    </button>
+                    <button type="button" class="btn btn-primary" style="padding: 9px 22px; font-size: 12.5px; background: #e11d48; border-color: #e11d48;" onclick="focusFirstInvalidField()">
+                        <i class="fas fa-arrow-down"></i> Lengkapi Data Sekarang
+                    </button>
+                </div>
+            </div>
+        </div>
     </main>
 @endsection
 
 @push('scripts')
     <script>
-        // Live Photo Preview Handler
-        function previewCameraPhoto(input, imgPreviewId, cardId) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = document.getElementById(imgPreviewId);
-                    const card = document.getElementById(cardId);
-                    if (img) {
-                        img.src = e.target.result;
-                        img.style.display = 'block';
-                    }
-                    if (card) {
-                        card.classList.add('has-image');
-                        const bubble = card.querySelector('.camera-icon-bubble');
-                        if (bubble) bubble.style.display = 'none';
-                    }
+        let firstMissingElement = null;
+
+        // Validasi Form Survei Lengkap Sebelum Disimpan
+        function validateSurveyForm(e) {
+            const missingSections = {
+                '1. Data Tambahan & Kelaikan Hunian': [],
+                '2. Berkas & Dokumen Administrasi': [],
+                '3. Indikator Kelayakan RTLH (6 Kriteria)': [],
+                '4. Dokumentasi Foto Fisik RTLH (5 Sudut)': []
+            };
+
+            firstMissingElement = null;
+
+            // Bersihkan highlight invalid sebelumnya
+            document.querySelectorAll('.is-invalid-highlight').forEach(el => el.classList.remove('is-invalid-highlight'));
+
+            const registerMissing = (section, label, el) => {
+                missingSections[section].push({ label: label, el: el });
+                if (!firstMissingElement && el) {
+                    firstMissingElement = el;
                 }
-                reader.readAsDataURL(input.files[0]);
+                if (el) {
+                    el.classList.add('is-invalid-highlight');
+                }
+            };
+
+            // Section 1: Data Tambahan
+            const tempatLahir = document.querySelector('input[name="tempat_lahir"]');
+            if (!tempatLahir || !tempatLahir.value.trim()) registerMissing('1. Data Tambahan & Kelaikan Hunian', 'Tempat Lahir', tempatLahir);
+
+            const tglLahir = document.querySelector('input[name="tanggal_lahir"]');
+            if (!tglLahir || !tglLahir.value.trim()) registerMissing('1. Data Tambahan & Kelaikan Hunian', 'Tanggal Lahir', tglLahir);
+
+            const penghasilan = document.querySelector('input[name="penghasilan"]');
+            if (!penghasilan || !penghasilan.value.trim()) registerMissing('1. Data Tambahan & Kelaikan Hunian', 'Penghasilan Per Bulan', penghasilan);
+
+            const luasTanah = document.querySelector('input[name="luas_tanah"]');
+            if (!luasTanah || !luasTanah.value.trim()) registerMissing('1. Data Tambahan & Kelaikan Hunian', 'Luas Tanah', luasTanah);
+
+            const lamaMenempati = document.querySelector('input[name="telah_ditempati_selama"]');
+            if (!lamaMenempati || !lamaMenempati.value.trim()) registerMissing('1. Data Tambahan & Kelaikan Hunian', 'Telah Ditempati Selama', lamaMenempati);
+
+            const statusTanah = document.getElementById('inputStatusTanah');
+            const ddStatusTanah = document.getElementById('ddStatusTanahWrapper');
+            if (!statusTanah || !statusTanah.value.trim()) registerMissing('1. Data Tambahan & Kelaikan Hunian', 'Status Kepemilikan Tanah', ddStatusTanah);
+
+            // Section 2: Berkas & Dokumen
+            const urlKtp = document.getElementById('url_ktp');
+            const cardKtp = document.getElementById('card_ktp');
+            if (!urlKtp || !urlKtp.value.trim()) registerMissing('2. Berkas & Dokumen Administrasi', 'Foto / Scan KTP', cardKtp);
+
+            const urlKk = document.getElementById('url_kk');
+            const cardKk = document.getElementById('card_kk');
+            if (!urlKk || !urlKk.value.trim()) registerMissing('2. Berkas & Dokumen Administrasi', 'Foto / Scan Kartu Keluarga', cardKk);
+
+            const urlSertifikat = document.getElementById('url_sertifikat_tanah');
+            const cardSertifikat = document.getElementById('card_sertifikat_tanah');
+            if (!urlSertifikat || !urlSertifikat.value.trim()) registerMissing('2. Berkas & Dokumen Administrasi', 'Foto Sertipikat / Bukti Tanah', cardSertifikat);
+
+            const jenisKepemilikan = document.getElementById('inputKepemilikan');
+            const ddKepemilikan = document.getElementById('ddKepemilikanWrapper');
+            if (!jenisKepemilikan || !jenisKepemilikan.value.trim()) registerMissing('2. Berkas & Dokumen Administrasi', 'Jenis Bukti Kepemilikan Lahan', ddKepemilikan);
+
+            // Section 3: Indikator Kelayakan RTLH (6 Kriteria)
+            const indicators = [
+                { name: 'indikator_lantai', label: 'Indikator 1: Lantai Keramik (Pilih Ada / Tidak Ada)' },
+                { name: 'indikator_pondasi', label: 'Indikator 2: Pondasi Bangunan (Pilih Ada / Tidak Ada)' },
+                { name: 'indikator_dinding', label: 'Indikator 3: Dinding Bata/Tembok (Pilih Ada / Tidak Ada)' },
+                { name: 'indikator_struktur', label: 'Indikator 4: Struktur Bangunan (Pilih Ada / Tidak Ada)' },
+                { name: 'indikator_atap', label: 'Indikator 5: Penutup Atap Genteng (Pilih Ada / Tidak Ada)' },
+                { name: 'indikator_penghasilan', label: 'Indikator 6: Penghasilan Kurang dari UMK (Pilih Ya / Tidak)' }
+            ];
+
+            indicators.forEach(ind => {
+                const checked = document.querySelector(`input[name="${ind.name}"]:checked`);
+                const row = document.getElementById('row_' + ind.name);
+                if (!checked) {
+                    registerMissing('3. Indikator Kelayakan RTLH (6 Kriteria)', ind.label, row);
+                }
+            });
+
+            // Section 4: 5 Sudut Foto Fisik
+            const housePhotos = [
+                { field: 'foto_sudut_depan', label: 'Foto Fisik 1: Tampak Depan' },
+                { field: 'foto_sudut_belakang', label: 'Foto Fisik 2: Tampak Belakang' },
+                { field: 'foto_bagian_dalam', label: 'Foto Fisik 3: Bagian Dalam / Interior' },
+                { field: 'foto_sudut_kiri', label: 'Foto Fisik 4: Samping Kiri' },
+                { field: 'foto_sudut_kanan', label: 'Foto Fisik 5: Samping Kanan' }
+            ];
+
+            housePhotos.forEach(p => {
+                const urlEl = document.getElementById('url_' + p.field);
+                const cardEl = document.getElementById('card_' + p.field);
+                if (!urlEl || !urlEl.value.trim()) {
+                    registerMissing('4. Dokumentasi Foto Fisik RTLH (5 Sudut)', p.label, cardEl);
+                }
+            });
+
+            // Hitung total item yang belum diisi
+            let totalMissing = 0;
+            for (const section in missingSections) {
+                totalMissing += missingSections[section].length;
+            }
+
+            if (totalMissing > 0) {
+                if (e) e.preventDefault();
+
+                // Tampilkan daftar ke modal pengingat
+                const container = document.getElementById('validationMissingList');
+                const totalCountEl = document.getElementById('validationTotalCount');
+                if (totalCountEl) totalCountEl.textContent = totalMissing;
+
+                if (container) {
+                    let html = '';
+                    for (const section in missingSections) {
+                        if (missingSections[section].length > 0) {
+                            html += `
+                                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 16px;">
+                                    <div style="font-size: 13px; font-weight: 800; color: var(--primary); margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                                        <i class="fas fa-folder-open"></i> ${section}
+                                    </div>
+                                    <ul style="margin: 0; padding-left: 18px; font-size: 12.5px; color: #e11d48; display: flex; flex-direction: column; gap: 4px;">
+                                        ${missingSections[section].map(item => `<li><strong style="color: #334155;">${item.label}</strong> <span style="font-size:11px; color:#e11d48;">(Belum Diisi/Diunggah)</span></li>`).join('')}
+                                    </ul>
+                                </div>
+                            `;
+                        }
+                    }
+                    container.innerHTML = html;
+                }
+
+                if (window.PuprModal) {
+                    window.PuprModal.open('surveyValidationModal');
+                }
+                return false;
+            }
+
+            return true;
+        }
+
+        // Fokus ke Elemen Pertama yang Masih Kosong
+        function focusFirstInvalidField() {
+            if (window.PuprModal) {
+                window.PuprModal.close('surveyValidationModal');
+            }
+            if (firstMissingElement) {
+                setTimeout(() => {
+                    firstMissingElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    if (firstMissingElement.focus && typeof firstMissingElement.focus === 'function') {
+                        firstMissingElement.focus();
+                    }
+                }, 300);
             }
         }
 
-        // GPS Geolocation Handler
+        // Trigger Click Hidden File Input
+        function triggerPhotoInput(inputId) {
+            const input = document.getElementById(inputId);
+            if (input) input.click();
+        }
+
+        // Auto Upload Photo via Ajax (Instant Save + Loading Animation)
+        function autoUploadPhoto(input, field, id) {
+            if (!input.files || !input.files[0]) return;
+
+            const file = input.files[0];
+            const loadingEl = document.getElementById('loading_' + field);
+
+            if (loadingEl) loadingEl.classList.add('active');
+
+            const formData = new FormData();
+            formData.append('id', id);
+            formData.append('field', field);
+            formData.append('photo', file);
+            formData.append('_token', '{{ csrf_token() }}');
+
+            fetch('{{ route("survey.upload-photo") }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (loadingEl) loadingEl.classList.remove('active');
+
+                if (data.status === 'success') {
+                    const urlInput = document.getElementById('url_' + field);
+                    const placeholder = document.getElementById('placeholder_' + field);
+                    const uploadedBox = document.getElementById('uploaded_' + field);
+                    const card = placeholder ? placeholder.closest('.camera-upload-card') : null;
+
+                    if (urlInput) urlInput.value = data.url;
+                    if (placeholder) placeholder.style.display = 'none';
+                    if (uploadedBox) uploadedBox.style.display = 'flex';
+                    if (card) {
+                        card.classList.add('has-image');
+                        card.classList.remove('is-invalid-highlight');
+                    }
+                } else {
+                    alert(data.message || 'Gagal mengunggah foto. Silakan coba lagi.');
+                }
+            })
+            .catch(error => {
+                if (loadingEl) loadingEl.classList.remove('active');
+                console.error('Upload error:', error);
+                alert('Terjadi kesalahan koneksi saat mengunggah foto.');
+            });
+        }
+
+        // Delete Photo via Ajax
+        function deletePhotoAjax(field, id) {
+            if (!confirm('Apakah Anda yakin ingin menghapus foto ini?')) return;
+
+            const loadingEl = document.getElementById('loading_' + field);
+            if (loadingEl) loadingEl.classList.add('active');
+
+            fetch('{{ route("survey.delete-photo") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ id: id, field: field })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (loadingEl) loadingEl.classList.remove('active');
+
+                if (data.status === 'success') {
+                    const urlInput = document.getElementById('url_' + field);
+                    const placeholder = document.getElementById('placeholder_' + field);
+                    const uploadedBox = document.getElementById('uploaded_' + field);
+                    const inputEl = document.getElementById('input_' + field);
+                    const card = placeholder ? placeholder.closest('.camera-upload-card') : null;
+
+                    if (urlInput) urlInput.value = '';
+                    if (inputEl) inputEl.value = '';
+                    if (placeholder) placeholder.style.display = 'flex';
+                    if (uploadedBox) uploadedBox.style.display = 'none';
+                    if (card) card.classList.remove('has-image');
+                } else {
+                    alert(data.message || 'Gagal menghapus foto.');
+                }
+            })
+            .catch(error => {
+                if (loadingEl) loadingEl.classList.remove('active');
+                console.error('Delete error:', error);
+                alert('Terjadi kesalahan koneksi saat menghapus foto.');
+            });
+        }
+
+        // Open Photo in New Browser Tab
+        function openPhotoNewTab(field) {
+            const urlInput = document.getElementById('url_' + field);
+            if (urlInput && urlInput.value) {
+                window.open(urlInput.value, '_blank');
+            } else {
+                alert('Foto belum tersedia.');
+            }
+        }
+
+        // GPS Geolocation Handler (Auto-fill hidden coordinates)
         function requestLocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function (position) {
                     const lat = position.coords.latitude;
                     const lng = position.coords.longitude;
-                    document.getElementById('disp_latitude').value = lat;
-                    document.getElementById('latitude').value = lat;
-                    document.getElementById('disp_longitude').value = lng;
-                    document.getElementById('longitude').value = lng;
+                    const latInput = document.getElementById('latitude');
+                    const lngInput = document.getElementById('longitude');
+
+                    if (latInput) latInput.value = lat;
+                    if (lngInput) lngInput.value = lng;
 
                     if (window.PuprModal) {
                         window.PuprModal.close('gpsModal');
                     }
                 }, function (error) {
-                    if (window.PuprModal) {
-                        window.PuprModal.open('gpsModal');
-                    }
+                    console.warn('GPS location request error:', error);
                 }, {
-                    enableHighAccuracy: true
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
                 });
             }
         }
@@ -926,12 +1491,32 @@
         // Recount & Update Status Kelayakan Usulan (Kriteria RTLH Terpenuhi)
         function updateIndicatorsStatus() {
             let countRtlh = 0;
+            const indicatorNames = [
+                'indikator_lantai',
+                'indikator_pondasi',
+                'indikator_dinding',
+                'indikator_struktur',
+                'indikator_atap',
+                'indikator_penghasilan'
+            ];
 
             const checkRtlhDefect = (groupName, rtlhValue) => {
                 const checkedRadio = document.querySelector(`input[name="${groupName}"]:checked`);
-                const row = checkedRadio ? checkedRadio.closest('.indicator-row') : null;
+                const row = document.getElementById('row_' + groupName);
 
-                if (checkedRadio && checkedRadio.value === rtlhValue) {
+                if (!checkedRadio) {
+                    if (row) {
+                        row.style.background = '#f8fafc';
+                        row.style.borderColor = '#cbd5e1';
+                    }
+                    return;
+                }
+
+                if (row) {
+                    row.classList.remove('is-invalid-highlight');
+                }
+
+                if (checkedRadio.value === rtlhValue) {
                     countRtlh++;
                     if (row) {
                         row.style.background = 'rgba(239, 68, 68, 0.05)';
@@ -952,6 +1537,8 @@
             // Penghasilan < UMK bernilai 'ada' -> Indikator RTLH terpenuhi
             checkRtlhDefect('indikator_penghasilan', 'ada');
 
+            const answeredCount = indicatorNames.filter(name => document.querySelector(`input[name="${name}"]:checked`)).length;
+
             const countEl = document.getElementById('indicatorCountDisplay');
             if (countEl) countEl.textContent = countRtlh;
 
@@ -962,6 +1549,11 @@
                     badgeEl.style.color = '#15803d';
                     badgeEl.style.border = '1px solid #86efac';
                     badgeEl.innerHTML = '<i class="fas fa-check-circle"></i> LAYAK DIUSULKAN';
+                } else if (answeredCount === 0) {
+                    badgeEl.style.background = '#f1f5f9';
+                    badgeEl.style.color = '#64748b';
+                    badgeEl.style.border = '1px solid #cbd5e1';
+                    badgeEl.innerHTML = '<i class="fas fa-hourglass-start"></i> BELUM DISURVEI';
                 } else {
                     badgeEl.style.background = '#fee2e2';
                     badgeEl.style.color = '#b91c1c';
@@ -979,6 +1571,18 @@
                 r.addEventListener('change', updateIndicatorsStatus);
             });
             updateIndicatorsStatus();
+
+            // Clear invalid highlight when typing or selecting dropdown
+            document.querySelectorAll('input, select').forEach(input => {
+                input.addEventListener('input', function() {
+                    this.classList.remove('is-invalid-highlight');
+                });
+                input.addEventListener('change', function() {
+                    this.classList.remove('is-invalid-highlight');
+                    const wrapper = this.closest('.pupr-dropdown-wrapper');
+                    if (wrapper) wrapper.classList.remove('is-invalid-highlight');
+                });
+            });
         });
     </script>
 @endpush

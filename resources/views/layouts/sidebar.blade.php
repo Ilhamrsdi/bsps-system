@@ -43,6 +43,12 @@
                 Sudah Survei
                 <span class="badge success" style="margin-left:auto;font-weight:800;border-radius:12px;padding:3px 9px;font-size:11.5px;background:#27ae60;color:#fff;">{{ $countSudah }}</span>
             </a>
+
+            <div class="menu-label" style="margin-top:16px;">Akun</div>
+            <a class="menu-item" style="color:var(--danger,#e74c3c);" href="javascript:void(0)" onclick="window.PuprModal.open('modalLogoutConfirmation')">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </a>
         @else
             {{-- NAVIGATION ADMINISTRATOR --}}
             <div class="menu-label">Navigasi Utama</div>
@@ -91,7 +97,8 @@
             Form Survey
         </a>
 
-        <a class="menu-item" style="margin-top:10px;" href="javascript:void(0)" onclick="window.PuprModal.open('modalLogoutConfirmation')">
+        <div class="menu-label" style="margin-top:16px;">Akun</div>
+        <a class="menu-item" style="color:var(--danger,#e74c3c);" href="javascript:void(0)" onclick="window.PuprModal.open('modalLogoutConfirmation')">
             <i class="fas fa-sign-out-alt"></i>
             Logout
         </a>
@@ -100,19 +107,19 @@
 
     <div class="sidebar-footer">
         @if(auth()->check())
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-                <div style="width:32px;height:32px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;text-align:left;">
+                <div style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.18);color:#ffffff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0;border:1px solid rgba(255,255,255,0.25);">
                     {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                 </div>
                 <div style="overflow:hidden;">
-                    <div style="font-size:12px;font-weight:700;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ auth()->user()->name }}</div>
+                    <div style="font-size:13px;font-weight:700;color:#ffffff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ auth()->user()->name }}</div>
                     <div style="display:flex;align-items:center;gap:4px;margin-top:2px;">
                         @if(auth()->user()->isAdmin())
-                            <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(0,40,85,0.12);color:var(--primary);">
+                            <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(255,255,255,0.15);color:#ffffff;">
                                 <i class="fas fa-shield-halved"></i> Admin
                             </span>
                         @else
-                            <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(255,184,0,0.15);color:#d69e00;">
+                            <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(255,184,0,0.2);color:#ffb800;">
                                 <i class="fas fa-user-hard-hat"></i> Petugas
                             </span>
                         @endif
@@ -120,6 +127,6 @@
                 </div>
             </div>
         @endif
-        BSPS Verval &bull; {{ date('Y') }}
+        <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:4px;">BSPS Verval &bull; {{ date('Y') }}</div>
     </div>
 </aside>

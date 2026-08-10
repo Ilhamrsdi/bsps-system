@@ -298,12 +298,13 @@
                     <thead>
                         <tr>
                             <th style="width:50px;">No</th>
-                            <th style="min-width:240px;">Nama Kegiatan Lapangan</th>
-                            <th style="min-width:180px;">Lokasi &amp; Alamat</th>
-                            <th style="min-width:160px;">Petugas Lapangan</th>
-                            <th style="min-width:140px;">Koordinat GPS</th>
-                            <th style="min-width:120px;">Status</th>
-                            <th style="width:160px;">Aksi</th>
+                            <th style="min-width:200px;">Nama Calon Penerima</th>
+                            <th style="min-width:160px;">NIK / No. KK</th>
+                            <th style="min-width:160px;">Lokasi / Desa</th>
+                            <th style="min-width:160px;">Petugas Survei</th>
+                            <th style="min-width:130px;">Koordinat GPS</th>
+                            <th style="min-width:130px;">Status Kelayakan</th>
+                            <th style="width:120px;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="markerTableBody">
@@ -440,17 +441,42 @@
                     bounds.push([item.lat, item.lng]);
 
                     const icon = createMarkerIcon(item.color, item.type);
-                    const imgHtml = item.foto ? `<img src="${item.foto}" style="width:100%;height:100px;object-fit:cover;border-radius:6px;margin:6px 0;" />` : '';
+                    const imgHtml = item.foto
+                        ? `<a href="${item.foto}" target="_blank" style="display:block;margin:6px 0;">
+                               <img src="${item.foto}" style="width:100%;height:90px;object-fit:cover;border-radius:6px;cursor:pointer;" title="Klik untuk lihat foto asli" />
+                           </a>`
+                        : '';
 
                     const popupContent = `
-                        <div style="font-family:Inter,sans-serif;padding:4px;max-width:230px;">
-                            <strong style="font-size:14px;color:#002855;display:block;margin-bottom:2px;">${item.name}</strong>
+                        <div style="font-family:Inter,sans-serif;padding:4px;max-width:240px;">
+                            <strong style="font-size:13.5px;color:#002855;display:block;margin-bottom:4px;">${item.name}</strong>
                             ${imgHtml}
-                            <div style="font-size:12px;color:#64748B;margin-top:4px;"><i class="fas fa-location-dot" style="color:#002855;"></i> ${item.location}</div>
-                            <div style="font-size:11.5px;color:#64748B;margin-top:2px;"><i class="fas fa-user-shield"></i> ${item.petugas || 'Petugas Lapangan'}</div>
-                            <div style="font-size:11.5px;color:#64748B;margin-top:2px;"><i class="fas fa-clock"></i> ${item.tanggal}</div>
-                            <div style="margin-top:6px;">
-                                <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:12px;background:${item.type === 'petugas' ? 'rgba(0,210,211,0.2)' : 'rgba(0,40,85,0.08)'};color:${item.type === 'petugas' ? '#008080' : '#002855'};">
+                            <div style="font-size:11.5px;color:#334155;margin-top:4px;display:flex;align-items:center;gap:5px;">
+                                <i class="fas fa-id-card" style="color:#002855;width:14px;"></i>
+                                <span>NIK: <strong>${item.nik}</strong></span>
+                            </div>
+                            <div style="font-size:11.5px;color:#475569;margin-top:2px;display:flex;align-items:center;gap:5px;">
+                                <i class="fas fa-users" style="color:#64748b;width:14px;"></i>
+                                <span>No. KK: ${item.no_kk}</span>
+                            </div>
+                            <div style="font-size:11.5px;color:#475569;margin-top:2px;display:flex;align-items:center;gap:5px;">
+                                <i class="fas fa-location-dot" style="color:#002855;width:14px;"></i>
+                                <span>${item.location}</span>
+                            </div>
+                            <div style="font-size:11.5px;color:#475569;margin-top:2px;display:flex;align-items:center;gap:5px;">
+                                <i class="fas fa-user-hard-hat" style="color:#d69e00;width:14px;"></i>
+                                <span>Petugas: <strong style="color:#002855;">${item.petugas || '-'}</strong></span>
+                            </div>
+                            <div style="font-size:11px;color:#64748b;margin-top:2px;display:flex;align-items:center;gap:5px;">
+                                <i class="fas fa-layer-group" style="width:14px;"></i>
+                                <span>${item.desil || '-'}</span>
+                            </div>
+                            <div style="font-size:11px;color:#64748b;margin-top:2px;display:flex;align-items:center;gap:5px;">
+                                <i class="fas fa-clock" style="width:14px;"></i>
+                                <span>${item.tanggal}</span>
+                            </div>
+                            <div style="margin-top:8px;">
+                                <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:12px;background:${item.color === 'green' ? 'rgba(39,174,96,0.15)' : (item.color === 'orange' ? 'rgba(255,184,0,0.15)' : 'rgba(142,68,173,0.12)')};color:${item.color === 'green' ? '#15803d' : (item.color === 'orange' ? '#b45309' : '#7e22ce')};">
                                     ${item.statusLabel}
                                 </span>
                             </div>
@@ -492,43 +518,41 @@
 
                 let html = '';
                 surveyData.forEach((item, index) => {
-                    let statusBadgeClass = item.status === 'selesai' ? 'success' : (item.status === 'proses' ? 'warning' : 'info');
-                    let badgeStyle = '';
-                    if (item.type === 'petugas') {
-                        statusBadgeClass = 'success';
-                        badgeStyle = 'background:rgba(0,210,211,0.15);color:#008080;border:1px solid rgba(0,210,211,0.3);';
-                    }
+                    const colorMap = { green: '#15803d', orange: '#b45309', purple: '#7e22ce', blue: '#002855' };
+                    const bgMap   = { green: 'rgba(39,174,96,0.12)', orange: 'rgba(255,184,0,0.15)', purple: 'rgba(142,68,173,0.12)', blue: 'rgba(0,40,85,0.08)' };
 
                     html += `
                         <tr>
                             <td>${index + 1}</td>
                             <td>
-                                <strong style="color:var(--primary-dark);font-size:13.5px;display:block;margin-bottom:2px;">${item.name}</strong>
+                                <strong style="color:var(--primary-dark);font-size:13px;display:block;">${item.name}</strong>
                                 <span style="font-size:11px;color:var(--text-muted);"><i class="fas fa-clock"></i> ${item.tanggal}</span>
                             </td>
                             <td>
-                                <div><i class="fas fa-location-dot" style="color:var(--primary);font-size:11px;"></i> ${item.location}</div>
+                                <div style="font-family:monospace;font-size:12px;"><strong>NIK:</strong> ${item.nik}</div>
+                                <div style="font-family:monospace;font-size:11px;color:var(--text-muted);">KK: ${item.no_kk}</div>
+                            </td>
+                            <td>
+                                <div style="font-size:12.5px;"><i class="fas fa-location-dot" style="color:var(--primary);font-size:11px;"></i> ${item.location}</div>
                                 <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${item.alamat || '-'}</div>
                             </td>
                             <td>
-                                <div style="font-weight:600;font-size:12.5px;"><i class="fas fa-user-shield" style="font-size:11px;color:var(--text-muted);"></i> ${item.petugas || 'Petugas'}</div>
+                                <div style="font-weight:700;font-size:12.5px;"><i class="fas fa-user-hard-hat" style="font-size:11px;color:#d69e00;"></i> ${item.petugas || '-'}</div>
                             </td>
                             <td>
                                 <span style="font-family:monospace;font-size:11.5px;background:rgba(0,40,85,0.06);padding:3px 8px;border-radius:4px;color:var(--primary-dark);">
-                                    ${item.lat.toFixed(4)}, ${item.lng.toFixed(4)}
+                                    ${item.lat.toFixed(5)}, ${item.lng.toFixed(5)}
                                 </span>
                             </td>
                             <td>
-                                <span class="badge-status ${statusBadgeClass}" style="${badgeStyle}">
+                                <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:12px;background:${bgMap[item.color] || 'rgba(0,40,85,0.08)'};color:${colorMap[item.color] || '#002855'};">
                                     ${item.statusLabel}
                                 </span>
                             </td>
                             <td>
-                                <div style="display:flex;align-items:center;gap:6px;">
-                                    <button type="button" class="btn btn-primary" style="padding:6px 14px;font-size:11px;border-radius:4px;font-weight:700;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:4px;" onclick="focusOnMapMarker(${item.lat}, ${item.lng})">
-                                        <i class="fas fa-crosshairs"></i> Lihat Peta
-                                    </button>
-                                </div>
+                                <button type="button" class="btn btn-primary" style="padding:6px 12px;font-size:11px;border-radius:4px;font-weight:700;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:4px;" onclick="focusOnMapMarker(${item.lat}, ${item.lng})">
+                                    <i class="fas fa-crosshairs"></i> Lihat
+                                </button>
                             </td>
                         </tr>
                     `;

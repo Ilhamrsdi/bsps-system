@@ -2,95 +2,82 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DataPenerima;
 use Illuminate\Http\Request;
 
 class GeoMapController extends Controller
 {
     public function index()
     {
-        // Data Dummy Titik Sebaran Calon Penerima Bantuan BSPS & RTLH
-        $markers = collect([
-            [
-                'id'          => 'survey_1',
+        // Ambil semua penerima yang SUDAH memiliki koordinat GPS dari survei lapangan
+        $penerimaList = DataPenerima::whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->where('latitude', '!=', '')
+            ->where('longitude', '!=', '')
+            ->with('petugas')
+            ->orderBy('updated_at', 'desc')
+            ->get();
+
+        $markers = $penerimaList->map(function ($item) {
+            // Hitung jumlah indikator RTLH yang terpenuhi
+            $indikatorTerpenuhi = 0;
+            if ($item->indikator_lantai === 'tidak_ada')    $indikatorTerpenuhi++;
+            if ($item->indikator_pondasi === 'tidak_ada')   $indikatorTerpenuhi++;
+            if ($item->indikator_dinding === 'tidak_ada')   $indikatorTerpenuhi++;
+            if ($item->indikator_struktur === 'tidak_ada')  $indikatorTerpenuhi++;
+            if ($item->indikator_atap === 'tidak_ada')      $indikatorTerpenuhi++;
+            if ($item->indikator_penghasilan === 'ada')     $indikatorTerpenuhi++;
+
+            $allIndicatorsFilled = !is_null($item->indikator_lantai)
+                && !is_null($item->indikator_pondasi)
+                && !is_null($item->indikator_dinding)
+                && !is_null($item->indikator_struktur)
+                && !is_null($item->indikator_atap)
+                && !is_null($item->indikator_penghasilan);
+
+            $hasAllPhotos = $item->foto_sudut_depan
+                && $item->foto_sudut_belakang
+                && $item->foto_bagian_dalam
+                && $item->foto_sudut_kiri
+                && $item->foto_sudut_kanan;
+
+            // Tentukan warna & status berdasarkan kelengkapan survei
+            if ($allIndicatorsFilled && $hasAllPhotos) {
+                $color       = $indikatorTerpenuhi >= 2 ? 'green' : 'orange';
+                $statusLabel = $indikatorTerpenuhi >= 2 ? '✅ Layak Diusulkan' : '⚠️ Tidak Layak';
+                $status      = 'selesai';
+            } else {
+                $color       = 'purple';
+                $statusLabel = '📋 Survei Belum Lengkap';
+                $status      = 'survei';
+            }
+
+            $petugasNama = $item->petugas ? $item->petugas->name : 'Petugas Lapangan';
+
+            $fotoUrl = $item->foto_sudut_depan
+                ? asset('storage/' . $item->foto_sudut_depan)
+                : null;
+
+            return [
+                'id'          => 'penerima_' . $item->id,
                 'type'        => 'survey',
-                'name'        => 'Verval Calon Penerima BSPS - Bpk. Slamet Riyadi',
-                'location'    => 'Kec. Kaliwates',
-                'alamat'      => 'Jl. Hayam Wuruk No. 45, RT 02/RW 05, Kel. Sempusari',
-                'lat'         => -8.1721,
-                'lng'         => 113.6997,
-                'status'      => 'selesai',
-                'statusLabel' => 'Layak Bantuan (PK)',
-                'color'       => 'green',
-                'petugas'     => 'Ahmad Fauzi (TFL BSPS)',
-                'tanggal'     => '10 Agt 2026',
-                'foto'        => asset('logo.jpg'),
-                'bap_id'      => null,
-            ],
-            [
-                'id'          => 'survey_2',
-                'type'        => 'survey',
-                'name'        => 'Verifikasi Lapangan RTLH - Ibu Siti Aminah',
-                'location'    => 'Kec. Patrang',
-                'alamat'      => 'Lingkungan Gebang Timur, RT 01/RW 03, Kel. Gebang',
-                'lat'         => -8.1512,
-                'lng'         => 113.7125,
-                'status'      => 'proses',
-                'statusLabel' => 'Proses Verifikasi',
-                'color'       => 'orange',
-                'petugas'     => 'Ahmad Fauzi (TFL BSPS)',
-                'tanggal'     => '09 Agt 2026',
-                'foto'        => asset('logo.jpg'),
-                'bap_id'      => null,
-            ],
-            [
-                'id'          => 'survey_3',
-                'type'        => 'survey',
-                'name'        => 'Verifikasi Validasi Rumah Swadaya - Bpk. Bambang Sutrisno',
-                'location'    => 'Kec. Sumbersari',
-                'alamat'      => 'Dusun Antirogo Krajan, RT 03/RW 01, Kel. Antirogo',
-                'lat'         => -8.1634,
-                'lng'         => 113.7258,
-                'status'      => 'survei',
-                'statusLabel' => 'Survei Lapangan',
-                'color'       => 'purple',
-                'petugas'     => 'Dwi Handoko (Koordinator)',
-                'tanggal'     => '08 Agt 2026',
-                'foto'        => asset('logo.jpg'),
-                'bap_id'      => null,
-            ],
-            [
-                'id'          => 'survey_4',
-                'type'        => 'survey',
-                'name'        => 'Survei Kelaikan Bangunan - Ibu Nurul Hidayati',
-                'location'    => 'Kec. Rambipuji',
-                'alamat'      => 'Dusun Krajan, Desa Kaliwining',
-                'lat'         => -8.2045,
-                'lng'         => 113.6087,
-                'status'      => 'selesai',
-                'statusLabel' => 'Layak Bantuan (PK)',
-                'color'       => 'green',
-                'petugas'     => 'Budi Pratama (Fasilitator)',
-                'tanggal'     => '07 Agt 2026',
-                'foto'        => asset('logo.jpg'),
-                'bap_id'      => null,
-            ],
-            [
-                'id'          => 'petugas_1',
-                'type'        => 'petugas',
-                'name'        => '📍 Posisi TFL: Ahmad Fauzi',
-                'location'    => 'Kec. Kaliwates',
-                'alamat'      => 'Perangkat HP Android (GPS Aktif)',
-                'lat'         => -8.1750,
-                'lng'         => 113.6920,
-                'status'      => 'petugas_aktif',
-                'statusLabel' => 'TFL Bertugas',
-                'color'       => 'blue',
-                'petugas'     => 'Ahmad Fauzi (TFL BSPS)',
-                'tanggal'     => 'Aktif Sekarang',
-                'foto'        => null,
-                'bap_id'      => null,
-            ],
-        ]);
+                'name'        => $item->nama,
+                'nik'         => $item->no_ktp ?: '-',
+                'no_kk'       => $item->no_kk ?: '-',
+                'location'    => 'Desa ' . ($item->desa_kelurahan ?: '-') . ', Kec. ' . ($item->kecamatan ?: '-'),
+                'alamat'      => $item->alamat ?: '-',
+                'lat'         => (float) $item->latitude,
+                'lng'         => (float) $item->longitude,
+                'status'      => $status,
+                'statusLabel' => $statusLabel,
+                'color'       => $color,
+                'petugas'     => $petugasNama,
+                'tanggal'     => $item->updated_at ? $item->updated_at->translatedFormat('d M Y, H:i') : '-',
+                'foto'        => $fotoUrl,
+                'desil'       => $item->pengelompokan_desil ?: '-',
+                'bap_id'      => $item->id,
+            ];
+        });
 
         return view('geoMaps.index', compact('markers'));
     }
