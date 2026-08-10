@@ -697,21 +697,21 @@
     let currentVervalId = null;
     let currentTargetSurveyUrl = null;
 
-    document.addEventListener('DOMContentLoaded', function () {
-        document.addEventListener('click', function (e) {
-            const btn = e.target.closest('.btn-trigger-status-modal');
-            if (btn) {
-                e.preventDefault();
-                const id = btn.getAttribute('data-id');
-                const nama = btn.getAttribute('data-nama');
-                const nik = btn.getAttribute('data-nik');
-                const alamat = btn.getAttribute('data-alamat');
-                const status = btn.getAttribute('data-status');
-                const url = btn.getAttribute('data-url');
+    // Bind click event langsung — script ini berada di @push('scripts') yang sudah di-render
+    // setelah DOM selesai, sehingga DOMContentLoaded sudah terlewat dan wrapper-nya tidak diperlukan
+    document.addEventListener('click', function (e) {
+        const btn = e.target.closest('.btn-trigger-status-modal');
+        if (btn) {
+            e.preventDefault();
+            const id = btn.getAttribute('data-id');
+            const nama = btn.getAttribute('data-nama');
+            const nik = btn.getAttribute('data-nik');
+            const alamat = btn.getAttribute('data-alamat');
+            const status = btn.getAttribute('data-status');
+            const url = btn.getAttribute('data-url');
 
-                openStatusVerificationModal(id, nama, nik, alamat, status, url);
-            }
-        });
+            openStatusVerificationModal(id, nama, nik, alamat, status, url);
+        }
     });
 
     function openStatusVerificationModal(id, nama, nik, alamat, currentStatus, surveyUrl) {
