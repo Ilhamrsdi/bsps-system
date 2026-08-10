@@ -206,14 +206,18 @@ class SurveyController extends Controller
         $field = $request->field;
         $file = $request->file('photo');
 
-        $uploadPath = storage_path('app/public/uploads');
+        // Simpan ke dedicated uploads folder di public/
+        $uploadPath = public_path('uploads');
         if (!file_exists($uploadPath)) {
-            mkdir($uploadPath, 0755, true);
+            @mkdir($uploadPath, 0755, true);
         }
 
         // Hapus foto lama jika ada
-        if ($vervalData->$field && file_exists(storage_path('app/public/' . $vervalData->$field))) {
-            @unlink(storage_path('app/public/' . $vervalData->$field));
+        if ($vervalData->$field) {
+            $oldFile = public_path(ltrim($vervalData->$field, '/'));
+            if (file_exists($oldFile)) {
+                @unlink($oldFile);
+            }
         }
 
         try {
@@ -225,9 +229,11 @@ class SurveyController extends Controller
                 $filename = uniqid($field . '_') . '.jpg';
                 $destination = $uploadPath . '/' . $filename;
                 $image->save($destination, quality: 75);
+                @chmod($destination, 0644);
             } else {
                 $filename = uniqid($field . '_') . '.' . $file->getClientOriginalExtension();
                 $file->move($uploadPath, $filename);
+                @chmod($uploadPath . '/' . $filename, 0644);
             }
 
             $relativePath = 'uploads/' . $filename;
@@ -237,13 +243,14 @@ class SurveyController extends Controller
             return response()->json([
                 'status'  => 'success',
                 'message' => 'Foto berhasil disimpan!',
-                'url'     => asset('storage/' . $relativePath),
+                'url'     => url('/uploads/' . $filename),
                 'field'   => $field,
-                'path'    => $relativePath
+                'path'    => $relativePath,
             ]);
         } catch (\Exception $e) {
             $filename = uniqid($field . '_') . '.' . $file->getClientOriginalExtension();
             $file->move($uploadPath, $filename);
+            @chmod($uploadPath . '/' . $filename, 0644);
             $relativePath = 'uploads/' . $filename;
 
             $vervalData->$field = $relativePath;
@@ -252,9 +259,9 @@ class SurveyController extends Controller
             return response()->json([
                 'status'  => 'success',
                 'message' => 'Foto berhasil disimpan!',
-                'url'     => asset('storage/' . $relativePath),
+                'url'     => url('/uploads/' . $filename),
                 'field'   => $field,
-                'path'    => $relativePath
+                'path'    => $relativePath,
             ]);
         }
     }
@@ -272,8 +279,12 @@ class SurveyController extends Controller
         $vervalData = DataPenerima::findOrFail($request->id);
         $field = $request->field;
 
-        if ($vervalData->$field && file_exists(storage_path('app/public/' . $vervalData->$field))) {
-            @unlink(storage_path('app/public/' . $vervalData->$field));
+        if ($vervalData->$field) {
+            // Hapus dari public/uploads/
+            $publicFile = public_path(ltrim($vervalData->$field, '/'));
+            if (file_exists($publicFile)) {
+                @unlink($publicFile);
+            }
         }
 
         $vervalData->$field = null;
@@ -282,7 +293,7 @@ class SurveyController extends Controller
         return response()->json([
             'status'  => 'success',
             'message' => 'Foto berhasil dihapus!',
-            'field'   => $field
+            'field'   => $field,
         ]);
     }
 }
