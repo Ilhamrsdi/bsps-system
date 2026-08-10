@@ -56,6 +56,55 @@ Route::get('/check-storage', function () {
     ]);
 });
 
+// Storage Auto-Fix Route (Konversi Symlink -> Folder Fisik untuk Bypass Nginx Hostinger 403)
+Route::get('/fix-storage', function () {
+    $target = storage_path('app/public/uploads');
+    $publicStorage = public_path('storage');
+    $publicUploads = public_path('storage/uploads');
+
+    $log = [];
+
+    // 1. Hapus symlink public/storage jika berupa symlink
+    if (is_link($publicStorage)) {
+        @unlink($publicStorage);
+        $log[] = "Unlinked symlink: $publicStorage";
+    }
+
+    // 2. Buat folder fisik asli public/storage/uploads
+    if (!file_exists($publicUploads)) {
+        @mkdir($publicUploads, 0755, true);
+        $log[] = "Created physical directory: $publicUploads";
+    }
+
+    // 3. Salin seluruh file foto dari storage/app/public/uploads ke public/storage/uploads
+    $copied = 0;
+    if (file_exists($target)) {
+        $files = scandir($target);
+        foreach ($files as $f) {
+            if ($f !== '.' && $f !== '..') {
+                $src = $target . '/' . $f;
+                $dst = $publicUploads . '/' . $f;
+                if (is_file($src)) {
+                    @copy($src, $dst);
+                    @chmod($dst, 0644);
+                    $copied++;
+                }
+            }
+        }
+    }
+    $log[] = "Successfully copied $copied files to physical folder public/storage/uploads!";
+
+    @chmod($publicStorage, 0755);
+    @chmod($publicUploads, 0755);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Symlink converted to physical folder successfully! Hostinger Nginx 403 bypassed.',
+        'copied_files_count' => $copied,
+        'logs' => $log,
+    ]);
+});
+
 // Auth Routes (Login & Logout)
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
