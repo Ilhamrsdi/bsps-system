@@ -74,35 +74,27 @@ Route::get('/check-storage', function () {
     ]);
 });
 
-// Storage Auto-Fix Route (Fix Tabrakan Folder public_html/storage pada Shared Hosting Hostinger)
+// Storage Auto-Fix Route (Pindahkan File ke Dedicated Folder /uploads/ Tanpa Symlink)
 Route::get('/fix-storage', function () {
     $target = storage_path('app/public/uploads');
-    $storageUploads = storage_path('uploads');
-    $publicUploads = public_path('storage/uploads');
+    $publicUploads = public_path('uploads');
+    $baseUploads = base_path('uploads');
 
     $log = [];
 
-    // 1. Buat Symlink/Folder storage/uploads langsung di dalam public_html/storage
-    if (!file_exists($storageUploads) && !is_link($storageUploads)) {
-        if (@symlink($target, $storageUploads)) {
-            $log[] = "Created symlink: $storageUploads -> $target";
-        } else {
-            @mkdir($storageUploads, 0755, true);
-            $log[] = "Created physical directory: $storageUploads";
-        }
+    // 1. Buat folder fisik terpisah public_path('uploads')
+    if (!file_exists($publicUploads)) {
+        @mkdir($publicUploads, 0755, true);
+        $log[] = "Created dedicated folder: $publicUploads";
     }
 
-    // 2. Buat Symlink/Folder di public_path
-    if (public_path() !== base_path() && !file_exists($publicUploads) && !is_link($publicUploads)) {
-        if (@symlink($target, $publicUploads)) {
-            $log[] = "Created symlink: $publicUploads -> $target";
-        } else {
-            @mkdir($publicUploads, 0755, true);
-            $log[] = "Created physical directory: $publicUploads";
-        }
+    // 2. Buat folder fisik terpisah base_path('uploads')
+    if (!file_exists($baseUploads)) {
+        @mkdir($baseUploads, 0755, true);
+        $log[] = "Created dedicated folder: $baseUploads";
     }
 
-    // 3. Salin/Sync file fisik foto ke storage/uploads & public/storage/uploads
+    // 3. Salin seluruh file foto ke folder fisik dedicated
     $copied = 0;
     if (file_exists($target)) {
         $files = scandir($target);
@@ -110,29 +102,26 @@ Route::get('/fix-storage', function () {
             if ($f !== '.' && $f !== '..') {
                 $src = $target . '/' . $f;
                 if (is_file($src)) {
-                    if (file_exists($storageUploads) && is_dir($storageUploads) && !is_link($storageUploads)) {
-                        @copy($src, $storageUploads . '/' . $f);
-                        @chmod($storageUploads . '/' . $f, 0644);
-                    }
-                    if (file_exists($publicUploads) && is_dir($publicUploads) && !is_link($publicUploads)) {
-                        @copy($src, $publicUploads . '/' . $f);
-                        @chmod($publicUploads . '/' . $f, 0644);
-                    }
+                    @copy($src, $publicUploads . '/' . $f);
+                    @chmod($publicUploads . '/' . $f, 0644);
+
+                    @copy($src, $baseUploads . '/' . $f);
+                    @chmod($baseUploads . '/' . $f, 0644);
+
                     $copied++;
                 }
             }
         }
     }
 
-    @chmod(storage_path('app/public'), 0755);
-    @chmod($target, 0755);
-    @chmod($storageUploads, 0755);
-    @exec("chmod -R 755 " . escapeshellarg(storage_path('app/public')));
-    @exec("chmod -R 755 " . escapeshellarg($storageUploads));
+    @chmod($publicUploads, 0755);
+    @chmod($baseUploads, 0755);
+    @exec("chmod -R 755 " . escapeshellarg($publicUploads));
+    @exec("chmod -R 755 " . escapeshellarg($baseUploads));
 
     return response()->json([
         'status' => 'success',
-        'message' => 'Successfully created storage/uploads link inside physical storage directory!',
+        'message' => 'Successfully copied all upload files into standalone dedicated uploads directory!',
         'copied_files_count' => $copied,
         'logs' => $log,
     ]);

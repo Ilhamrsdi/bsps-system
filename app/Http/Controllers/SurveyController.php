@@ -94,14 +94,14 @@ class SurveyController extends Controller
             'foto_sudut_kiri', 'foto_sudut_kanan'
         ];
 
-        $uploadPath = storage_path('app/public/uploads');
+        $uploadPath = public_path('uploads');
         if (!file_exists($uploadPath)) {
             @mkdir($uploadPath, 0755, true);
         }
 
-        $publicUploadPath = public_path('storage/uploads');
-        if (!file_exists($publicUploadPath) && !is_link(public_path('storage'))) {
-            @mkdir($publicUploadPath, 0755, true);
+        $storageBackup = storage_path('app/public/uploads');
+        if (!file_exists($storageBackup)) {
+            @mkdir($storageBackup, 0755, true);
         }
 
         foreach ($fileFields as $field) {
@@ -117,22 +117,23 @@ class SurveyController extends Controller
                         $filename = uniqid($field . '_') . '.jpg';
                         $destination = $uploadPath . '/' . $filename;
                         $image->save($destination, quality: 75);
+                        @chmod($destination, 0644);
+
+                        // Backup to storage
+                        @$image->save($storageBackup . '/' . $filename, quality: 75);
                     } else {
                         $filename = uniqid($field . '_') . '.' . $file->getClientOriginalExtension();
                         $file->move($uploadPath, $filename);
-                    }
-
-                    if (file_exists($publicUploadPath) && is_dir($publicUploadPath) && !is_link(public_path('storage'))) {
-                        @copy($uploadPath . '/' . $filename, $publicUploadPath . '/' . $filename);
+                        @chmod($uploadPath . '/' . $filename, 0644);
+                        @copy($uploadPath . '/' . $filename, $storageBackup . '/' . $filename);
                     }
 
                     $data[$field] = 'uploads/' . $filename;
                 } catch (\Exception $e) {
                     $filename = uniqid($field . '_') . '.' . $file->getClientOriginalExtension();
                     $file->move($uploadPath, $filename);
-                    if (file_exists($publicUploadPath) && is_dir($publicUploadPath) && !is_link(public_path('storage'))) {
-                        @copy($uploadPath . '/' . $filename, $publicUploadPath . '/' . $filename);
-                    }
+                    @chmod($uploadPath . '/' . $filename, 0644);
+                    @copy($uploadPath . '/' . $filename, $storageBackup . '/' . $filename);
                     $data[$field] = 'uploads/' . $filename;
                 }
             }

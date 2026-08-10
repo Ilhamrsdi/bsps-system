@@ -161,32 +161,41 @@ class VervalDataController extends Controller
         // Handle file uploads with auto compression
         $fileFields = ['ktp', 'kk', 'sertifikat_tanah', 'foto_sudut_depan', 'foto_sudut_belakang', 'foto_bagian_dalam', 'foto_sudut_kiri', 'foto_sudut_kanan'];
         
-        $uploadPath = storage_path('app/public/uploads');
+        $uploadPath = public_path('uploads');
         if (!file_exists($uploadPath)) {
-            mkdir($uploadPath, 0755, true);
+            @mkdir($uploadPath, 0755, true);
+        }
+
+        $storageBackup = storage_path('app/public/uploads');
+        if (!file_exists($storageBackup)) {
+            @mkdir($storageBackup, 0755, true);
         }
 
         foreach ($fileFields as $field) {
             if ($request->hasFile($field)) {
                 $file = $request->file($field);
-                
+
                 try {
                     $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
                     $image = $manager->decodePath($file->getRealPath());
-                    
+
                     // Auto compress and resize
-                    $image->scaleDown(1200); 
-                    
+                    $image->scaleDown(1200);
+
                     $filename = uniqid($field . '_') . '.jpg';
                     $destination = $uploadPath . '/' . $filename;
-                    
+
                     $image->save($destination, quality: 75);
-                    
+                    @chmod($destination, 0644);
+                    @$image->save($storageBackup . '/' . $filename, quality: 75);
+
                     $data[$field] = 'uploads/' . $filename;
                 } catch (\Exception $e) {
-                    // Fallback to normal store if intervention fails
-                    $path = $file->store('uploads', 'public');
-                    $data[$field] = $path;
+                    $filename = uniqid($field . '_') . '.' . $file->getClientOriginalExtension();
+                    $file->move($uploadPath, $filename);
+                    @chmod($uploadPath . '/' . $filename, 0644);
+                    @copy($uploadPath . '/' . $filename, $storageBackup . '/' . $filename);
+                    $data[$field] = 'uploads/' . $filename;
                 }
             }
         }
