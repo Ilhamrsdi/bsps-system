@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DataPenerima;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class VervalDataController extends Controller
 {
@@ -62,6 +63,7 @@ class VervalDataController extends Controller
     {
         $item = DataPenerima::findOrFail($id);
         $items = $this->attachKadesInfo(collect([$item]));
+        $items = $this->enrichFromDataguse($items);
 
         return view('verval_data.surat_pernyataan', compact('items'));
     }
@@ -96,6 +98,7 @@ class VervalDataController extends Controller
         }
 
         $items = $this->attachKadesInfo($query->get());
+        $items = $this->enrichFromDataguse($items);
 
         return view('verval_data.surat_pernyataan', compact('items'));
     }
@@ -103,6 +106,53 @@ class VervalDataController extends Controller
     /**
      * Helper untuk melampirkan Data Nama & Jabatan Kepala Desa/Lurah ke Koleksi Penerima dari Database MySQL
      */
+    /**
+     * Enrich setiap item dengan data kependudukan (tempat_lahir, tanggal_lahir, pekerjaan)
+     * dari database dataguse — lookup berdasarkan NIK (nomor_induk_kependudukan = no_ktp).
+     * Jika tidak ditemukan di dataguse, data lokal tetap digunakan.
+     */
+    private function enrichFromDataguse($items)
+    {
+        // Kumpulkan semua NIK dari koleksi penerima
+        $niks = $items->pluck('no_ktp')->filter()->unique()->values()->toArray();
+
+        if (empty($niks)) {
+            return $items;
+        }
+
+        try {
+            // Batch-fetch dari data_penduduks di koneksi dataguse
+            $pendudukRows = DB::connection('dataguse')
+                ->table('data_penduduks')
+                ->whereIn('nomor_induk_kependudukan', $niks)
+                ->select('nomor_induk_kependudukan', 'tempat_lahir', 'tanggal_lahir', 'pekerjaan', 'nomor_kartu_keluarga')
+                ->get()
+                ->keyBy('nomor_induk_kependudukan');
+
+            // Tempelkan data ke setiap item penerima
+            $items = $items->map(function ($item) use ($pendudukRows) {
+                $nik = $item->no_ktp;
+                if ($nik && isset($pendudukRows[$nik])) {
+                    $dp = $pendudukRows[$nik];
+                    // Override hanya jika data dataguse tersedia
+                    if ($dp->tempat_lahir)  $item->tempat_lahir  = $dp->tempat_lahir;
+                    if ($dp->tanggal_lahir) $item->tanggal_lahir = $dp->tanggal_lahir;
+                    if ($dp->pekerjaan)     $item->pekerjaan     = $dp->pekerjaan;
+                    if ($dp->nomor_kartu_keluarga) $item->no_kk  = $dp->nomor_kartu_keluarga;
+                    $item->dataguse_found = true;
+                } else {
+                    $item->dataguse_found = false;
+                }
+                return $item;
+            });
+        } catch (\Exception $e) {
+            // Jika koneksi dataguse gagal, lanjutkan dengan data lokal saja
+            \Log::warning('Dataguse connection failed: ' . $e->getMessage());
+        }
+
+        return $items;
+    }
+
     private function attachKadesInfo($items)
     {
         $allKades = \App\Models\KepalaDesa::all();

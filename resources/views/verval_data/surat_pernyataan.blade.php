@@ -306,6 +306,11 @@
                     <td>{{ $item->jenis_kelamin ? ucfirst(strtolower($item->jenis_kelamin)) : '..................................................' }}</td>
                 </tr>
                 <tr>
+                    <td class="col-label">pekerjaan</td>
+                    <td class="col-colon">:</td>
+                    <td>{{ $item->pekerjaan ?? '..................................................' }}</td>
+                </tr>
+                <tr>
                     <td class="col-label">nomor telepon</td>
                     <td class="col-colon">:</td>
                     <td>..................................................</td>
