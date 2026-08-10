@@ -29,14 +29,13 @@ Route::get('/landing', [LandingController::class, 'index']);
 
 // Storage Media Fallback Route (Bypass Nginx 403 Forbidden di Shared Hosting Hostinger)
 Route::get('/storage/{path}', function ($path) {
+    $filename = basename($path);
     $possiblePaths = [
+        public_path('uploads/' . $filename),
+        base_path('uploads/' . $filename),
+        storage_path('app/public/uploads/' . $filename),
         storage_path('app/public/' . $path),
-        public_path('storage/' . $path),
-        base_path('storage/' . $path),
-        base_path('../storage/app/public/' . $path),
-        base_path('public_html/storage/' . $path),
-        base_path('storage/uploads/' . basename($path)),
-        public_path('uploads/' . basename($path)),
+        storage_path('app/' . $path),
     ];
 
     $fullPath = null;
@@ -58,57 +57,108 @@ Route::get('/storage/{path}', function ($path) {
     ]);
 })->where('path', '.*');
 
+// Dynamic Uploads Route (Bypass 404 & Auto Sync Files dari Storage)
+Route::get('/uploads/{filename}', function ($filename) {
+    $possiblePaths = [
+        public_path('uploads/' . $filename),
+        base_path('uploads/' . $filename),
+        storage_path('app/public/uploads/' . $filename),
+        storage_path('app/public/' . $filename),
+        storage_path('app/' . $filename),
+        storage_path('app/uploads/' . $filename),
+    ];
+
+    $foundPath = null;
+    foreach ($possiblePaths as $p) {
+        if (file_exists($p) && !is_dir($p)) {
+            $foundPath = $p;
+            break;
+        }
+    }
+
+    if (!$foundPath) {
+        abort(404);
+    }
+
+    // Salin otomatis ke public_html/uploads agar Nginx melayani langsung untuk berikutnya
+    $dest = public_path('uploads/' . $filename);
+    if (!file_exists($dest)) {
+        @mkdir(dirname($dest), 0755, true);
+        @copy($foundPath, $dest);
+        @chmod($dest, 0644);
+    }
+
+    $mime = mime_content_type($foundPath) ?: 'image/jpeg';
+    return response()->file($foundPath, [
+        'Content-Type' => $mime,
+        'Cache-Control' => 'public, max-age=86400',
+    ]);
+})->where('filename', '.*');
+
 // Storage Diagnostic Route
 Route::get('/check-storage', function () {
     $target = storage_path('app/public/uploads');
-    $link = public_path('storage/uploads');
-    $files = file_exists($target) ? scandir($target) : [];
+    $publicUploads = public_path('uploads');
+    $targetFiles = file_exists($target) ? scandir($target) : [];
+    $publicFiles = file_exists($publicUploads) ? scandir($publicUploads) : [];
     
     return response()->json([
         'target_folder' => $target,
         'target_exists' => file_exists($target),
-        'public_link' => $link,
-        'link_exists' => file_exists($link),
-        'files_count' => count(array_diff($files, ['.', '..'])),
-        'sample_files' => array_values(array_slice(array_diff($files, ['.', '..']), 0, 10)),
+        'public_uploads' => $publicUploads,
+        'public_exists' => file_exists($publicUploads),
+        'target_files_count' => count(array_diff($targetFiles, ['.', '..'])),
+        'public_files_count' => count(array_diff($publicFiles, ['.', '..'])),
+        'public_sample_files' => array_values(array_slice(array_diff($publicFiles, ['.', '..']), 0, 15)),
     ]);
 });
 
-// Storage Auto-Fix Route (Pindahkan File ke Dedicated Folder /uploads/ Tanpa Symlink)
+// Storage Auto-Fix Route (Pindahkan Seluruh File Foto dari Storage ke /uploads/ Dedicated)
 Route::get('/fix-storage', function () {
-    $target = storage_path('app/public/uploads');
     $publicUploads = public_path('uploads');
     $baseUploads = base_path('uploads');
 
-    $log = [];
-
-    // 1. Buat folder fisik terpisah public_path('uploads')
     if (!file_exists($publicUploads)) {
         @mkdir($publicUploads, 0755, true);
-        $log[] = "Created dedicated folder: $publicUploads";
     }
-
-    // 2. Buat folder fisik terpisah base_path('uploads')
     if (!file_exists($baseUploads)) {
         @mkdir($baseUploads, 0755, true);
-        $log[] = "Created dedicated folder: $baseUploads";
     }
 
-    // 3. Salin seluruh file foto ke folder fisik dedicated
+    $searchFolders = [
+        storage_path('app/public/uploads'),
+        storage_path('app/public'),
+        storage_path('app/uploads'),
+        storage_path('app'),
+    ];
+
     $copied = 0;
-    if (file_exists($target)) {
-        $files = scandir($target);
-        foreach ($files as $f) {
-            if ($f !== '.' && $f !== '..') {
-                $src = $target . '/' . $f;
-                if (is_file($src)) {
-                    @copy($src, $publicUploads . '/' . $f);
-                    @chmod($publicUploads . '/' . $f, 0644);
+    $log = [];
 
-                    @copy($src, $baseUploads . '/' . $f);
-                    @chmod($baseUploads . '/' . $f, 0644);
+    foreach ($searchFolders as $folder) {
+        if (file_exists($folder) && is_dir($folder)) {
+            $files = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($folder, RecursiveDirectoryIterator::SKIP_DOTS),
+                RecursiveIteratorIterator::SELF_FIRST
+            );
+            foreach ($files as $file) {
+                if ($file->isFile()) {
+                    $ext = strtolower($file->getExtension());
+                    if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'pdf'])) {
+                        $filename = $file->getFilename();
+                        $destPublic = $publicUploads . '/' . $filename;
+                        $destBase = $baseUploads . '/' . $filename;
 
-                    $copied++;
+                        if (!file_exists($destPublic)) {
+                            @copy($file->getPathname(), $destPublic);
+                            @chmod($destPublic, 0644);
+                            $copied++;
+                        }
+                        if (!file_exists($destBase)) {
+                            @copy($file->getPathname(), $destBase);
+                            @chmod($destBase, 0644);
+                        }
+                    }
                 }
             }
         }
@@ -116,14 +166,12 @@ Route::get('/fix-storage', function () {
 
     @chmod($publicUploads, 0755);
     @chmod($baseUploads, 0755);
-    @exec("chmod -R 755 " . escapeshellarg($publicUploads));
-    @exec("chmod -R 755 " . escapeshellarg($baseUploads));
 
     return response()->json([
         'status' => 'success',
-        'message' => 'Successfully copied all upload files into standalone dedicated uploads directory!',
-        'copied_files_count' => $copied,
-        'logs' => $log,
+        'message' => 'Successfully scanned & synced all uploaded media files to dedicated /uploads/ directory!',
+        'synced_files_count' => $copied,
+        'public_uploads_total' => count(array_diff(scandir($publicUploads), ['.', '..'])),
     ]);
 });
 
