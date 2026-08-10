@@ -592,7 +592,7 @@
                                     <span class="camera-loading-text">Menyimpan Foto...</span>
                                 </div>
                                 <input type="file" id="input_ktp" class="camera-file-input" accept="image/*" onchange="autoUploadPhoto(this, 'ktp', {{ $vervalData->id }})">
-                                <input type="hidden" id="url_ktp" value="{{ $vervalData->ktp ? asset('storage/' . $vervalData->ktp) : '' }}">
+                                <input type="hidden" id="url_ktp" value="{{ $vervalData->ktp ? url('/uploads/' . basename($vervalData->ktp)) : '' }}">
                                 
                                 {{-- State Kosong --}}
                                 <div class="camera-placeholder-box" id="placeholder_ktp" style="{{ $vervalData->ktp ? 'display:none;' : 'display:flex;' }}">
@@ -634,7 +634,7 @@
                                     <span class="camera-loading-text">Menyimpan Foto...</span>
                                 </div>
                                 <input type="file" id="input_kk" class="camera-file-input" accept="image/*" onchange="autoUploadPhoto(this, 'kk', {{ $vervalData->id }})">
-                                <input type="hidden" id="url_kk" value="{{ $vervalData->kk ? asset('storage/' . $vervalData->kk) : '' }}">
+                                <input type="hidden" id="url_kk" value="{{ $vervalData->kk ? url('/uploads/' . basename($vervalData->kk)) : '' }}">
                                 
                                 {{-- State Kosong --}}
                                 <div class="camera-placeholder-box" id="placeholder_kk" style="{{ $vervalData->kk ? 'display:none;' : 'display:flex;' }}">
@@ -676,7 +676,7 @@
                                     <span class="camera-loading-text">Menyimpan Foto...</span>
                                 </div>
                                 <input type="file" id="input_sertifikat_tanah" class="camera-file-input" accept="image/*" onchange="autoUploadPhoto(this, 'sertifikat_tanah', {{ $vervalData->id }})">
-                                <input type="hidden" id="url_sertifikat_tanah" value="{{ $vervalData->sertifikat_tanah ? asset('storage/' . $vervalData->sertifikat_tanah) : '' }}">
+                                <input type="hidden" id="url_sertifikat_tanah" value="{{ $vervalData->sertifikat_tanah ? url('/uploads/' . basename($vervalData->sertifikat_tanah)) : '' }}">
                                 
                                 {{-- State Kosong --}}
                                 <div class="camera-placeholder-box" id="placeholder_sertifikat_tanah" style="{{ $vervalData->sertifikat_tanah ? 'display:none;' : 'display:flex;' }}">
@@ -918,7 +918,7 @@
                                     <span class="camera-loading-text">Menyimpan Foto...</span>
                                 </div>
                                 <input type="file" id="input_foto_sudut_depan" class="camera-file-input" accept="image/*" onchange="autoUploadPhoto(this, 'foto_sudut_depan', {{ $vervalData->id }})">
-                                <input type="hidden" id="url_foto_sudut_depan" value="{{ $vervalData->foto_sudut_depan ? asset('storage/' . $vervalData->foto_sudut_depan) : '' }}">
+                                <input type="hidden" id="url_foto_sudut_depan" value="{{ $vervalData->foto_sudut_depan ? url('/uploads/' . basename($vervalData->foto_sudut_depan)) : '' }}">
                                 
                                 {{-- State Kosong --}}
                                 <div class="camera-placeholder-box" id="placeholder_foto_sudut_depan" style="{{ $vervalData->foto_sudut_depan ? 'display:none;' : 'display:flex;' }}">
@@ -960,7 +960,7 @@
                                     <span class="camera-loading-text">Menyimpan Foto...</span>
                                 </div>
                                 <input type="file" id="input_foto_sudut_belakang" class="camera-file-input" accept="image/*" onchange="autoUploadPhoto(this, 'foto_sudut_belakang', {{ $vervalData->id }})">
-                                <input type="hidden" id="url_foto_sudut_belakang" value="{{ $vervalData->foto_sudut_belakang ? asset('storage/' . $vervalData->foto_sudut_belakang) : '' }}">
+                                <input type="hidden" id="url_foto_sudut_belakang" value="{{ $vervalData->foto_sudut_belakang ? url('/uploads/' . basename($vervalData->foto_sudut_belakang)) : '' }}">
                                 
                                 {{-- State Kosong --}}
                                 <div class="camera-placeholder-box" id="placeholder_foto_sudut_belakang" style="{{ $vervalData->foto_sudut_belakang ? 'display:none;' : 'display:flex;' }}">
@@ -1002,7 +1002,7 @@
                                     <span class="camera-loading-text">Menyimpan Foto...</span>
                                 </div>
                                 <input type="file" id="input_foto_bagian_dalam" class="camera-file-input" accept="image/*" onchange="autoUploadPhoto(this, 'foto_bagian_dalam', {{ $vervalData->id }})">
-                                <input type="hidden" id="url_foto_bagian_dalam" value="{{ $vervalData->foto_bagian_dalam ? asset('storage/' . $vervalData->foto_bagian_dalam) : '' }}">
+                                <input type="hidden" id="url_foto_bagian_dalam" value="{{ $vervalData->foto_bagian_dalam ? url('/uploads/' . basename($vervalData->foto_bagian_dalam)) : '' }}">
                                 
                                 {{-- State Kosong --}}
                                 <div class="camera-placeholder-box" id="placeholder_foto_bagian_dalam" style="{{ $vervalData->foto_bagian_dalam ? 'display:none;' : 'display:flex;' }}">
@@ -1044,7 +1044,7 @@
                                     <span class="camera-loading-text">Menyimpan Foto...</span>
                                 </div>
                                 <input type="file" id="input_foto_sudut_kiri" class="camera-file-input" accept="image/*" onchange="autoUploadPhoto(this, 'foto_sudut_kiri', {{ $vervalData->id }})">
-                                <input type="hidden" id="url_foto_sudut_kiri" value="{{ $vervalData->foto_sudut_kiri ? asset('storage/' . $vervalData->foto_sudut_kiri) : '' }}">
+                                <input type="hidden" id="url_foto_sudut_kiri" value="{{ $vervalData->foto_sudut_kiri ? url('/uploads/' . basename($vervalData->foto_sudut_kiri)) : '' }}">
                                 
                                 {{-- State Kosong --}}
                                 <div class="camera-placeholder-box" id="placeholder_foto_sudut_kiri" style="{{ $vervalData->foto_sudut_kiri ? 'display:none;' : 'display:flex;' }}">
@@ -1086,7 +1086,7 @@
                                     <span class="camera-loading-text">Menyimpan Foto...</span>
                                 </div>
                                 <input type="file" id="input_foto_sudut_kanan" class="camera-file-input" accept="image/*" onchange="autoUploadPhoto(this, 'foto_sudut_kanan', {{ $vervalData->id }})">
-                                <input type="hidden" id="url_foto_sudut_kanan" value="{{ $vervalData->foto_sudut_kanan ? asset('storage/' . $vervalData->foto_sudut_kanan) : '' }}">
+                                <input type="hidden" id="url_foto_sudut_kanan" value="{{ $vervalData->foto_sudut_kanan ? url('/uploads/' . basename($vervalData->foto_sudut_kanan)) : '' }}">
                                 
                                 {{-- State Kosong --}}
                                 <div class="camera-placeholder-box" id="placeholder_foto_sudut_kanan" style="{{ $vervalData->foto_sudut_kanan ? 'display:none;' : 'display:flex;' }}">
