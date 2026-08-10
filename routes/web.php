@@ -230,6 +230,9 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/update-location', [PetugasController::class, 'updateLocation'])->name('update-location');
     });
 
+    // Update Status Keberadaan Calon Penerima (via Ajax Modal Dashboard Petugas)
+    Route::put('/data-verval/{id}/status', [PetugasController::class, 'updateStatus'])->name('petugas.update-status');
+
     // Rekapitulasi Laporan
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan');
     Route::get('/laporan/export', [LaporanController::class, 'exportExcel'])->name('laporan.export');

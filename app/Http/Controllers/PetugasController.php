@@ -138,4 +138,24 @@ class PetugasController extends Controller
             'message' => 'Koordinat GPS Petugas berhasil diperbarui.'
         ]);
     }
+
+    /**
+     * Update Status Keberadaan Calon Penerima via Ajax (dari Modal Dashboard)
+     */
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:ditemukan,meninggal,pindah,tidak diketahui',
+        ]);
+
+        $penerima = DataPenerima::findOrFail($id);
+        $penerima->status = $request->status;
+        $penerima->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Status berhasil diperbarui menjadi "' . $request->status . '".',
+            'status'  => $request->status,
+        ]);
+    }
 }
