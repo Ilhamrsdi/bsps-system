@@ -884,25 +884,106 @@
 
 @push('scripts')
     <script>
-        // Live Photo Preview Handler
-        function previewCameraPhoto(input, imgPreviewId, cardId) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = document.getElementById(imgPreviewId);
-                    const card = document.getElementById(cardId);
-                    if (img) {
-                        img.src = e.target.result;
-                        img.style.display = 'block';
-                    }
-                    if (card) {
-                        card.classList.add('has-image');
-                        const bubble = card.querySelector('.camera-icon-bubble');
-                        if (bubble) bubble.style.display = 'none';
-                    }
-                }
-                reader.readAsDataURL(input.files[0]);
+        // =====================================================================
+        // Auto Compress + Live Preview Handler (Canvas API - Tanpa Library)
+        // =====================================================================
+        const COMPRESS_MAX_PX  = 1200;   // panjang sisi max setelah resize (px)
+        const COMPRESS_QUALITY = 0.72;   // kualitas JPEG output (0.0 – 1.0)
+        const COMPRESS_MAX_KB  = 600;    // batas aman target ukuran file (KB)
+
+        function formatKB(bytes) {
+            return bytes < 1024 * 1024
+                ? (bytes / 1024).toFixed(0) + ' KB'
+                : (bytes / 1024 / 1024).toFixed(1) + ' MB';
+        }
+
+        function showCompressInfo(card, origBytes, compBytes) {
+            let badge = card.querySelector('.compress-info-badge');
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.className = 'compress-info-badge';
+                badge.style.cssText = 'position:absolute;bottom:8px;left:8px;font-size:10px;font-weight:700;background:rgba(0,0,0,0.55);color:#fff;padding:2px 7px;border-radius:20px;z-index:10;';
+                card.style.position = 'relative';
+                card.appendChild(badge);
             }
+            const ratio = Math.round((1 - compBytes / origBytes) * 100);
+            badge.innerHTML = `<i class="fas fa-compress-alt"></i> ${formatKB(origBytes)} → ${formatKB(compBytes)} (−${ratio}%)`;
+        }
+
+        function compressAndPreview(input, imgPreviewId, cardId) {
+            if (!input.files || !input.files[0]) return;
+
+            const file = input.files[0];
+            const origSize = file.size;
+            const card  = document.getElementById(cardId);
+            const imgEl = document.getElementById(imgPreviewId);
+
+            // Tampilkan spinner sementara kompresi berjalan
+            if (card) {
+                const bubble = card.querySelector('.camera-icon-bubble');
+                if (bubble) bubble.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const image = new Image();
+                image.onload = function() {
+                    // Hitung dimensi baru (max COMPRESS_MAX_PX, pertahankan rasio)
+                    let w = image.width;
+                    let h = image.height;
+                    if (w > COMPRESS_MAX_PX || h > COMPRESS_MAX_PX) {
+                        if (w >= h) { h = Math.round(h * COMPRESS_MAX_PX / w); w = COMPRESS_MAX_PX; }
+                        else        { w = Math.round(w * COMPRESS_MAX_PX / h); h = COMPRESS_MAX_PX; }
+                    }
+
+                    // Gambar ke Canvas lalu export JPEG
+                    const canvas = document.createElement('canvas');
+                    canvas.width  = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(image, 0, 0, w, h);
+
+                    canvas.toBlob(function(blob) {
+                        if (!blob) return;
+
+                        // Ganti file pada input dengan Blob terkompresi
+                        const compressedFile = new File(
+                            [blob],
+                            file.name.replace(/\.[^/.]+$/, '') + '.jpg',
+                            { type: 'image/jpeg', lastModified: Date.now() }
+                        );
+                        const dt = new DataTransfer();
+                        dt.items.add(compressedFile);
+                        input.files = dt.files;
+
+                        // Update preview gambar
+                        const blobUrl = URL.createObjectURL(blob);
+                        if (imgEl) {
+                            imgEl.src = blobUrl;
+                            imgEl.style.display = 'block';
+                        }
+
+                        // Perbarui tampilan card
+                        if (card) {
+                            card.classList.add('has-image');
+                            const bubble = card.querySelector('.camera-icon-bubble');
+                            if (bubble) { bubble.style.display = 'none'; bubble.innerHTML = '<i class="fas fa-camera"></i>'; }
+                            const badge = card.querySelector('.camera-upload-badge');
+                            if (badge) badge.style.display = 'inline-flex';
+                            const fakebtn = card.querySelector('.camera-upload-btn-fake');
+                            if (fakebtn) fakebtn.style.display = 'none';
+                            showCompressInfo(card, origSize, blob.size);
+                        }
+                    }, 'image/jpeg', COMPRESS_QUALITY);
+                };
+                image.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Alias agar form lama yang pakai previewCameraPhoto() tetap berfungsi
+        function previewCameraPhoto(input, imgPreviewId, cardId) {
+            compressAndPreview(input, imgPreviewId, cardId);
         }
 
         // GPS Geolocation Handler
