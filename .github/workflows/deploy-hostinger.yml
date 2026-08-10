@@ -34,11 +34,12 @@ jobs:
           password: ${{ secrets.HOSTINGER_FTP_PASSWORD }}
           port: 21
           local-dir: ./
-          server-dir: ${{ secrets.HOSTINGER_TARGET_DIR || '/public_html/' }}
+          server-dir: ./
           exclude: |
             **/.git*
             **/.git*/**
             **/node_modules/**
+            **/vendor/**
             .env
             storage/app/public/*
             storage/framework/cache/data/*
