@@ -74,53 +74,65 @@ Route::get('/check-storage', function () {
     ]);
 });
 
-// Storage Auto-Fix Route (Konversi Symlink -> Folder Fisik untuk Bypass Nginx Hostinger 403)
+// Storage Auto-Fix Route (Fix Tabrakan Folder public_html/storage pada Shared Hosting Hostinger)
 Route::get('/fix-storage', function () {
     $target = storage_path('app/public/uploads');
-    $publicStorage = public_path('storage');
+    $storageUploads = storage_path('uploads');
     $publicUploads = public_path('storage/uploads');
 
     $log = [];
 
-    // 1. Hapus symlink public/storage jika berupa symlink
-    if (is_link($publicStorage)) {
-        @unlink($publicStorage);
-        $log[] = "Unlinked symlink: $publicStorage";
+    // 1. Buat Symlink/Folder storage/uploads langsung di dalam public_html/storage
+    if (!file_exists($storageUploads) && !is_link($storageUploads)) {
+        if (@symlink($target, $storageUploads)) {
+            $log[] = "Created symlink: $storageUploads -> $target";
+        } else {
+            @mkdir($storageUploads, 0755, true);
+            $log[] = "Created physical directory: $storageUploads";
+        }
     }
 
-    // 2. Buat folder fisik asli public/storage/uploads
-    if (!file_exists($publicUploads)) {
-        @mkdir($publicUploads, 0755, true);
-        $log[] = "Created physical directory: $publicUploads";
+    // 2. Buat Symlink/Folder di public_path
+    if (public_path() !== base_path() && !file_exists($publicUploads) && !is_link($publicUploads)) {
+        if (@symlink($target, $publicUploads)) {
+            $log[] = "Created symlink: $publicUploads -> $target";
+        } else {
+            @mkdir($publicUploads, 0755, true);
+            $log[] = "Created physical directory: $publicUploads";
+        }
     }
 
-    // 3. Salin seluruh file foto dari storage/app/public/uploads ke public/storage/uploads
+    // 3. Salin/Sync file fisik foto ke storage/uploads & public/storage/uploads
     $copied = 0;
     if (file_exists($target)) {
         $files = scandir($target);
         foreach ($files as $f) {
             if ($f !== '.' && $f !== '..') {
                 $src = $target . '/' . $f;
-                $dst = $publicUploads . '/' . $f;
                 if (is_file($src)) {
-                    @copy($src, $dst);
-                    @chmod($dst, 0644);
+                    if (file_exists($storageUploads) && is_dir($storageUploads) && !is_link($storageUploads)) {
+                        @copy($src, $storageUploads . '/' . $f);
+                        @chmod($storageUploads . '/' . $f, 0644);
+                    }
+                    if (file_exists($publicUploads) && is_dir($publicUploads) && !is_link($publicUploads)) {
+                        @copy($src, $publicUploads . '/' . $f);
+                        @chmod($publicUploads . '/' . $f, 0644);
+                    }
                     $copied++;
                 }
             }
         }
     }
-    $log[] = "Successfully copied $copied files to physical folder public/storage/uploads!";
 
-    // Enforce Linux Permissions (755 for dirs, 644 for files)
-    @chmod($publicStorage, 0755);
-    @chmod($publicUploads, 0755);
-    @exec("chmod -R 755 " . escapeshellarg($publicStorage));
-    @exec("chmod 644 " . escapeshellarg($publicUploads) . "/* 2>/dev/null || true");
+    @chmod(storage_path('app/public'), 0755);
+    @chmod($target, 0755);
+    @chmod($storageUploads, 0755);
+    @exec("chmod -R 755 " . escapeshellarg(storage_path('app/public')));
+    @exec("chmod -R 755 " . escapeshellarg($storageUploads));
 
     return response()->json([
         'status' => 'success',
-        'message' => 'Symlink converted to physical folder successfully & chmod 755 applied.',
+        'message' => 'Successfully created storage/uploads link inside physical storage directory!',
         'copied_files_count' => $copied,
         'logs' => $log,
     ]);
