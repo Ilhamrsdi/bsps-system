@@ -64,6 +64,24 @@ return [
             ]) : [],
         ],
 
+        // Koneksi ke database dataguse.aleena.co.id (Data Penduduk)
+        'dataguse' => [
+            'driver' => 'mysql',
+            'host' => env('DBDATAGUSE_HOST', '153.92.15.118'),
+            'port' => env('DBDATAGUSE_PORT', '3306'),
+            'database' => env('DBDATAGUSE_DATABASE', 'u910477049_1data'),
+            'username' => env('DBDATAGUSE_USERNAME', ''),
+            'password' => env('DBDATAGUSE_PASSWORD', ''),
+            'unix_socket' => '',
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => false,
+            'engine' => null,
+            'options' => [],
+        ],
+
         'mariadb' => [
             'driver' => 'mariadb',
             'url' => env('DB_URL'),
