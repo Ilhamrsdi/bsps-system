@@ -1,103 +1,31 @@
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
         <div class="brand-icon">
-            <img src="{{ asset('logo.jpg') }}" alt="PUPR Logo" class="brand-logo-img" />
+            <img src="{{ asset('logo.jpg') }}" alt="BSPS Logo" class="brand-logo-img" />
         </div>
         <div class="brand-text">
-            <h1>PUPR Jember</h1>
-            <span>DINAS PEKERJAAN UMUM<br>DAN PENATAAN RUANG</span>
+            <h1>BSPS Verval</h1>
+            <span>SISTEM VERIFIKASI &amp; VALIDASI<br>PERUMAHAN SWADAYA</span>
         </div>
     </div>
 
     <nav class="sidebar-menu">
-        @if(auth()->check() && auth()->user()->isPetugas())
-            {{-- NAVIGATION KHUSUS PETUGAS SURVEI --}}
-            <div class="menu-label">Navigasi Utama</div>
-            <a class="menu-item {{ Request::is('petugas/dashboard') ? 'active' : '' }}" href="{{ url('/petugas/dashboard') }}">
-                <i class="fas fa-th-large"></i>
-                Dashboard Petugas
-            </a>
-            @php
-                $userAssigned = auth()->user()->kegiatans()->get();
-                $countBelum = $userAssigned->filter(fn($k) => $k->surveys->count() == 0)->count();
-                $countSudah = $userAssigned->filter(fn($k) => $k->surveys->count() > 0)->count();
-            @endphp
-            <div class="menu-label" style="margin-top:16px;">Workspace Petugas</div>
-            <a class="menu-item {{ Request::is('petugas/belum-survei') ? 'active' : '' }}" href="{{ url('/petugas/belum-survei') }}">
-                <i class="fas fa-clipboard-question"></i>
-                Belum Survei
-                @if($countBelum > 0)
-                    <span class="badge warning">{{ $countBelum }}</span>
-                @endif
-            </a>
-            <a class="menu-item {{ Request::is('petugas/sudah-survei') ? 'active' : '' }}" href="{{ url('/petugas/sudah-survei') }}">
-                <i class="fas fa-clipboard-check"></i>
-                Sudah Survei
-                @if($countSudah > 0)
-                    <span class="badge success">{{ $countSudah }}</span>
-                @endif
-            </a>
-        @else
-            {{-- NAVIGATION ADMINISTRATOR --}}
-            <div class="menu-label">Navigasi Utama</div>
+        <div class="menu-label">Navigasi Utama</div>
 
-            <a class="menu-item {{ Request::is('dashboard') ? 'active' : '' }}" href="{{ url('/dashboard') }}">
-                <i class="fas fa-th-large"></i>
-                Dashboard
-            </a>
-            <a class="menu-item {{ Request::is('data-mingguan*', 'data_mingguan*') ? 'active' : '' }}" href="{{ url('/data-mingguan') }}">
-                <i class="fas fa-calendar-week"></i>
-                Data Mingguan
-            </a>
-            <a class="menu-item {{ Request::is('geomaps*', 'geoMaps*') ? 'active' : '' }}" href="{{ url('/geomaps') }}">
-                <i class="fas fa-map-marked-alt"></i>
-                Geo Maps
-            </a>
-            <a class="menu-item {{ Request::is('bab*') ? 'active' : '' }}" href="{{ url('/bab') }}">
-                <i class="fas fa-file-pdf"></i>
-                BAP
-            </a>
-
-            <div class="menu-label" style="margin-top:16px;">Manajemen</div>
-
-            @if(!auth()->check() || auth()->user()->isAdmin())
-            <a class="menu-item {{ Request::is('penugasan*') ? 'active' : '' }}" href="{{ url('/penugasan') }}">
-                <i class="fas fa-tasks"></i>
-                Penugasan
-            </a>
-            <a class="menu-item {{ Request::is('user') ? 'active' : '' }}" href="{{ url('/user') }}">
-                <i class="fas fa-users"></i>
-                Petugas Survei
-            </a>
-            @endif
-
-            <a class="menu-item {{ Request::is('laporan*') ? 'active' : '' }}" href="{{ url('/laporan') }}">
-                <i class="fas fa-clipboard-list"></i>
-                Laporan
-            </a>
-            <a class="menu-item {{ Request::is('setting*') ? 'active' : '' }}" href="{{ url('/setting') }}">
-                <i class="fas fa-cog"></i>
-                Pengaturan
-            </a>
-        @endif
-
-        @if(!auth()->check() || !auth()->user()->isPetugas())
-        <div class="menu-label" style="margin-top:16px;">Publik</div>
-
-        <a class="menu-item {{ Request::is('/', 'landing') ? 'active' : '' }}" href="{{ url('/') }}" target="_blank">
-            <i class="fas fa-home"></i>
-            Beranda Publik
+        <a class="menu-item {{ Request::is('dashboard*') ? 'active' : '' }}" href="{{ url('/dashboard') }}">
+            <i class="fas fa-th-large"></i>
+            Dashboard
         </a>
-        <a class="menu-item {{ Request::is('survey*', 'survei*') ? 'active' : '' }}" href="{{ url('/survey') }}">
+        <a class="menu-item {{ Request::is('data-verval*', 'data_verval*', 'verval*') ? 'active' : '' }}" href="{{ url('/data-verval') }}">
             <i class="fas fa-clipboard-check"></i>
-            Form Survey
+            Data Verval
         </a>
 
-        <a class="menu-item" style="margin-top:10px;" href="javascript:void(0)" onclick="window.PuprModal.open('modalLogoutConfirmation')">
+        <div class="menu-label" style="margin-top:24px;">Akun & Sesi</div>
+        <a class="menu-item" href="javascript:void(0)" onclick="window.PuprModal.open('modalLogoutConfirmation')">
             <i class="fas fa-sign-out-alt"></i>
             Logout
         </a>
-        @endif
     </nav>
 
     <div class="sidebar-footer">
@@ -122,6 +50,6 @@
                 </div>
             </div>
         @endif
-        PUPR Jember &bull; 2026
+        BSPS Verval &bull; {{ date('Y') }}
     </div>
 </aside>
