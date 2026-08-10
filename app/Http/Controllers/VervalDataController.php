@@ -61,7 +61,7 @@ class VervalDataController extends Controller
     public function suratPernyataan($id)
     {
         $item = DataPenerima::findOrFail($id);
-        $items = collect([$item]);
+        $items = $this->attachKadesInfo(collect([$item]));
 
         return view('verval_data.surat_pernyataan', compact('items'));
     }
@@ -95,9 +95,43 @@ class VervalDataController extends Controller
             $query->where('pengelompokan_desil', 'like', "%{$desil}%");
         }
 
-        $items = $query->get();
+        $items = $this->attachKadesInfo($query->get());
 
         return view('verval_data.surat_pernyataan', compact('items'));
+    }
+
+    /**
+     * Helper untuk melampirkan Data Nama & Jabatan Kepala Desa/Lurah ke Koleksi Penerima dari Database MySQL
+     */
+    private function attachKadesInfo($items)
+    {
+        $allKades = \App\Models\KepalaDesa::all();
+        $kadesMap = [];
+
+        foreach ($allKades as $kd) {
+            $kecKey = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', $kd->kecamatan ?? ''));
+            $desaKey = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', $kd->desa_kelurahan ?? ''));
+            $kadesMap[$kecKey . '|||' . $desaKey] = [
+                'jabatan' => $kd->jabatan,
+                'nama'    => $kd->nama,
+            ];
+        }
+
+        return $items->map(function ($item) use ($kadesMap) {
+            $kecKey = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', $item->kecamatan ?? ''));
+            $desaKey = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', $item->desa_kelurahan ?? ''));
+            $lookupKey = $kecKey . '|||' . $desaKey;
+
+            if (isset($kadesMap[$lookupKey])) {
+                $item->jabatan_kades = $kadesMap[$lookupKey]['jabatan'];
+                $item->nama_kades = $kadesMap[$lookupKey]['nama'];
+            } else {
+                $isKota = in_array(strtoupper($item->kecamatan ?? ''), ['KALIWATES', 'PATRANG', 'SUMBERSARI']);
+                $item->jabatan_kades = $isKota ? 'LURAH ' . strtoupper($item->desa_kelurahan) : 'KEPALA DESA ' . strtoupper($item->desa_kelurahan);
+                $item->nama_kades = null;
+            }
+            return $item;
+        });
     }
 
     public function edit($id)
