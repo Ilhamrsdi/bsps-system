@@ -642,7 +642,7 @@
                         <input type="radio" name="modal_verval_status" value="meninggal" onchange="onModalStatusChange('meninggal')" style="accent-color: #dc2626; width: 18px; height: 18px;">
                         <div style="flex: 1;">
                             <div style="font-size: 13.5px; font-weight: 800; color: #b91c1c; display: flex; align-items: center; gap: 6px;">
-                                <i class="fas fa-cross"></i> Meninggal Dunia
+                                <i class="fas fa-heart-crack"></i> Meninggal Dunia
                             </div>
                             <div style="font-size: 11.5px; color: #475569; margin-top: 2px;">
                                 Penerima telah meninggal dunia
@@ -654,7 +654,7 @@
                         <input type="radio" name="modal_verval_status" value="pindah" onchange="onModalStatusChange('pindah')" style="accent-color: #d97706; width: 18px; height: 18px;">
                         <div style="flex: 1;">
                             <div style="font-size: 13.5px; font-weight: 800; color: #b45309; display: flex; align-items: center; gap: 6px;">
-                                <i class="fas fa-truck-ramp-box"></i> Pindah Alamat
+                                <i class="fas fa-house-circle-xmark"></i> Pindah Alamat
                             </div>
                             <div style="font-size: 11.5px; color: #475569; margin-top: 2px;">
                                 Penerima telah pindah tempat tinggal
