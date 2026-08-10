@@ -118,18 +118,6 @@
         font-size: 14px;
     }
 
-    .filter-select {
-        padding: 10px 14px;
-        border-radius: var(--radius-sm);
-        border: 1px solid rgba(0, 40, 85, 0.14);
-        background: var(--bg-body);
-        color: var(--text-primary);
-        font-size: 13px;
-        font-weight: 600;
-        outline: none;
-        cursor: pointer;
-    }
-
     /* Table Container */
     .table-container-card {
         background: var(--bg-card);
@@ -396,23 +384,71 @@
         </div>
 
         <!-- Filter & Search Bar -->
-        <form action="{{ url('/verval-data') }}" method="GET" class="filter-section">
+        <form action="{{ url('/verval-data') }}" method="GET" class="filter-section" id="filterFormVerval">
             <div class="filter-left">
                 <div class="search-input-wrap">
                     <i class="fas fa-search"></i>
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama pemohon, NIK, No. KK, atau alamat..." />
                 </div>
-                <select name="kecamatan" class="filter-select" onchange="this.form.submit()">
-                    <option value="all" {{ request('kecamatan') == 'all' ? 'selected' : '' }}>-- Semua Kecamatan --</option>
-                    @foreach($listKecamatan as $kec)
-                        <option value="{{ $kec }}" {{ request('kecamatan') == $kec ? 'selected' : '' }}>Kec. {{ $kec }}</option>
-                    @endforeach
-                </select>
-                <select name="desil" class="filter-select" onchange="this.form.submit()">
-                    <option value="all" {{ request('desil') == 'all' ? 'selected' : '' }}>-- Semua Pengelompokan --</option>
-                    <option value="Backlog 1" {{ request('desil') == 'Backlog 1' ? 'selected' : '' }}>Backlog 1 Desil 1-4</option>
-                    <option value="Backlog 2" {{ request('desil') == 'Backlog 2' ? 'selected' : '' }}>Backlog 2 Desil 1-4</option>
-                </select>
+
+                {{-- Hidden inputs untuk submit via dropdown --}}
+                <input type="hidden" name="kecamatan" id="hiddenKecamatan" value="{{ request('kecamatan', 'all') }}" />
+                <input type="hidden" name="desil" id="hiddenDesil" value="{{ request('desil', 'all') }}" />
+
+                {{-- Custom Dropdown: Kecamatan --}}
+                <div class="pupr-dropdown-wrapper" id="ddKecWrapper">
+                    <button type="button" class="pupr-dropdown-toggle" id="ddKecBtn" onclick="window.PuprDropdown.toggle(document.getElementById('ddKecWrapper'))">
+                        <i class="fas fa-map-marker-alt" style="font-size:12px;opacity:0.6;"></i>
+                        <span class="selected-label">
+                            {{ request('kecamatan') && request('kecamatan') !== 'all' ? 'Kec. '.request('kecamatan') : 'Semua Kecamatan' }}
+                        </span>
+                        <i class="fas fa-chevron-down" style="font-size:10px;opacity:0.5;"></i>
+                    </button>
+                    <div class="pupr-dropdown-menu" style="min-width:200px;max-height:300px;overflow-y:auto;">
+                        <div class="pupr-dropdown-item {{ request('kecamatan', 'all') === 'all' ? 'active' : '' }}"
+                             data-target="hiddenKecamatan" data-value="all"
+                             onclick="selectDropdown('hiddenKecamatan', 'ddKecWrapper', 'all', 'Semua Kecamatan', 'filterFormVerval')">
+                            <i class="fas fa-th-list" style="font-size:12px;opacity:0.5;"></i> Semua Kecamatan
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        @foreach($listKecamatan as $kec)
+                        <div class="pupr-dropdown-item {{ request('kecamatan') === $kec ? 'active' : '' }}"
+                             data-target="hiddenKecamatan" data-value="{{ $kec }}"
+                             onclick="selectDropdown('hiddenKecamatan', 'ddKecWrapper', '{{ $kec }}', 'Kec. {{ $kec }}', 'filterFormVerval')">
+                            <i class="fas fa-map-pin" style="font-size:11px;opacity:0.4;"></i> Kec. {{ $kec }}
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                {{-- Custom Dropdown: Pengelompokan Desil --}}
+                <div class="pupr-dropdown-wrapper" id="ddDesilWrapper">
+                    <button type="button" class="pupr-dropdown-toggle" onclick="window.PuprDropdown.toggle(document.getElementById('ddDesilWrapper'))">
+                        <i class="fas fa-layer-group" style="font-size:12px;opacity:0.6;"></i>
+                        <span class="selected-label">
+                            @if(request('desil') === 'Backlog 1') Backlog 1 Desil 1-4
+                            @elseif(request('desil') === 'Backlog 2') Backlog 2 Desil 1-4
+                            @else Semua Pengelompokan
+                            @endif
+                        </span>
+                        <i class="fas fa-chevron-down" style="font-size:10px;opacity:0.5;"></i>
+                    </button>
+                    <div class="pupr-dropdown-menu" style="min-width:200px;">
+                        <div class="pupr-dropdown-item {{ request('desil', 'all') === 'all' ? 'active' : '' }}"
+                             onclick="selectDropdown('hiddenDesil', 'ddDesilWrapper', 'all', 'Semua Pengelompokan', 'filterFormVerval')">
+                            <i class="fas fa-th-list" style="font-size:12px;opacity:0.5;"></i> Semua Pengelompokan
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <div class="pupr-dropdown-item {{ request('desil') === 'Backlog 1' ? 'active' : '' }}"
+                             onclick="selectDropdown('hiddenDesil', 'ddDesilWrapper', 'Backlog 1', 'Backlog 1 Desil 1-4', 'filterFormVerval')">
+                            <i class="fas fa-circle" style="font-size:8px;color:var(--info);"></i> Backlog 1 Desil 1-4
+                        </div>
+                        <div class="pupr-dropdown-item {{ request('desil') === 'Backlog 2' ? 'active' : '' }}"
+                             onclick="selectDropdown('hiddenDesil', 'ddDesilWrapper', 'Backlog 2', 'Backlog 2 Desil 1-4', 'filterFormVerval')">
+                            <i class="fas fa-circle" style="font-size:8px;color:var(--success);"></i> Backlog 2 Desil 1-4
+                        </div>
+                    </div>
+                </div>
             </div>
             <div style="display:flex;gap:10px;">
                 <a href="{{ url('/verval-data') }}" class="btn btn-outline" style="padding:10px 16px;font-size:13px;text-decoration:none;border-radius:var(--radius-sm);">
@@ -584,3 +620,34 @@
         </div>
     </main>
 @endsection
+
+@push('scripts')
+<script>
+/**
+ * Helper: Pilih item di custom pupr-dropdown dan submit form
+ */
+function selectDropdown(hiddenInputId, wrapperId, value, label, formId) {
+    // Set hidden input value
+    const hidden = document.getElementById(hiddenInputId);
+    if (hidden) hidden.value = value;
+
+    // Update label tombol
+    const wrapper = document.getElementById(wrapperId);
+    if (wrapper) {
+        const lbl = wrapper.querySelector('.selected-label');
+        if (lbl) lbl.textContent = label;
+
+        // Tandai item aktif
+        wrapper.querySelectorAll('.pupr-dropdown-item').forEach(i => i.classList.remove('active'));
+        // Tutup dropdown
+        wrapper.classList.remove('active');
+    }
+
+    // Auto submit form
+    if (formId) {
+        const form = document.getElementById(formId);
+        if (form) form.submit();
+    }
+}
+</script>
+@endpush

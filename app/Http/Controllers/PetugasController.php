@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DataPenerima;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -9,37 +10,59 @@ class PetugasController extends Controller
 {
     /**
      * Dashboard Khusus Petugas / Fasilitator Lapangan
+     * Menampilkan data verval dari desa petugas yang login
      */
-    public function dashboard()
+    public function dashboard(Request $request)
     {
-        $user = Auth::user() ?? (object)['name' => 'Ahmad Fauzi', 'jabatan' => 'Tenaga Fasilitator Lapangan'];
-        
+        $user = Auth::user();
+
+        // Ambil desa dan kecamatan petugas yang login
+        $desaPetugas      = $user->desa ?? null;
+        $kecamatanPetugas = $user->kecamatan ?? null;
+
+        // Query data verval sesuai desa petugas
+        $query = DataPenerima::query();
+        if ($desaPetugas) {
+            $query->where('desa_kelurahan', $desaPetugas);
+        }
+
+        $totalData = $query->count();
+
+        // Stats berdasarkan data desa ini
+        $backlog1 = (clone $query)->where('pengelompokan_desil', 'like', 'Backlog 1%')->count();
+        $backlog2 = (clone $query)->where('pengelompokan_desil', 'like', 'Backlog 2%')->count();
+
         $stats = [
-            'total_tugas'   => 8,
-            'sudah_survei'  => 6,
-            'belum_survei'  => 2,
+            'total_data'   => $totalData,
+            'backlog1'     => $backlog1,
+            'backlog2'     => $backlog2,
+            'desa'         => $desaPetugas,
+            'kecamatan'    => $kecamatanPetugas,
         ];
 
-        $kegiatans = collect([
-            (object)[
-                'id' => 1,
-                'nama_kegiatan' => 'Verval Calon Penerima Bantuan BSPS - Bpk. Slamet Riyadi',
-                'lokasi' => 'Kaliwates',
-                'alamat' => 'Jl. Hayam Wuruk No. 45, Kel. Sempusari',
-                'status_survei' => 'selesai',
-                'tanggal' => now()->subDays(1),
-            ],
-            (object)[
-                'id' => 2,
-                'nama_kegiatan' => 'Verifikasi Lapangan RTLH - Ibu Siti Aminah',
-                'lokasi' => 'Patrang',
-                'alamat' => 'Lingkungan Gebang Timur, Kel. Gebang',
-                'status_survei' => 'belum',
-                'tanggal' => now()->subDays(2),
-            ],
-        ]);
+        // Filter & Search untuk tabel
+        $search    = $request->get('search');
+        $desilFilter = $request->get('desil', 'all');
 
-        return view('petugas.dashboard', compact('user', 'stats', 'kegiatans'));
+        $vervals = DataPenerima::when($desaPetugas, function ($q) use ($desaPetugas) {
+                        $q->where('desa_kelurahan', $desaPetugas);
+                    })
+                    ->when($search, function ($q) use ($search) {
+                        $q->where(function ($sub) use ($search) {
+                            $sub->where('nama_calon_penerima', 'like', "%$search%")
+                                ->orWhere('nik', 'like', "%$search%")
+                                ->orWhere('no_kk', 'like', "%$search%")
+                                ->orWhere('alamat', 'like', "%$search%");
+                        });
+                    })
+                    ->when($desilFilter !== 'all', function ($q) use ($desilFilter) {
+                        $q->where('pengelompokan_desil', 'like', "$desilFilter%");
+                    })
+                    ->orderBy('id')
+                    ->paginate(20)
+                    ->withQueryString();
+
+        return view('petugas.dashboard', compact('user', 'stats', 'vervals', 'search', 'desilFilter'));
     }
 
     /**
@@ -47,24 +70,12 @@ class PetugasController extends Controller
      */
     public function belumSurvei()
     {
-        $kegiatans = collect([
-            (object)[
-                'id' => 2,
-                'nama_kegiatan' => 'Verifikasi Lapangan RTLH - Ibu Siti Aminah',
-                'lokasi' => 'Patrang',
-                'nama_pemohon' => 'Ibu Siti Aminah',
-                'alamat' => 'Lingkungan Gebang Timur, RT 01/RW 03, Kel. Gebang',
-                'tanggal' => now()->subDays(2),
-            ],
-            (object)[
-                'id' => 5,
-                'nama_kegiatan' => 'Verifikasi Data Usulan BSPS - Bpk. Joko Santoso',
-                'lokasi' => 'Arjasa',
-                'nama_pemohon' => 'Bpk. Joko Santoso',
-                'alamat' => 'Dusun Krajan, Desa Kemuning',
-                'tanggal' => now()->subDays(4),
-            ],
-        ]);
+        $user = Auth::user();
+        $desaPetugas = $user->desa ?? null;
+
+        $kegiatans = DataPenerima::when($desaPetugas, function ($q) use ($desaPetugas) {
+            $q->where('desa_kelurahan', $desaPetugas);
+        })->limit(20)->get();
 
         return view('petugas.belum_survei', compact('kegiatans'));
     }
@@ -74,26 +85,12 @@ class PetugasController extends Controller
      */
     public function sudahSurvei()
     {
-        $kegiatans = collect([
-            (object)[
-                'id' => 1,
-                'nama_kegiatan' => 'Verval Calon Penerima Bantuan BSPS - Bpk. Slamet Riyadi',
-                'lokasi' => 'Kaliwates',
-                'nama_pemohon' => 'Bpk. Slamet Riyadi',
-                'alamat' => 'Jl. Hayam Wuruk No. 45, Kel. Sempusari',
-                'tanggal_survei' => now()->subDays(1),
-                'status_rekomendasi' => 'Layak Bantuan (PK)',
-            ],
-            (object)[
-                'id' => 4,
-                'nama_kegiatan' => 'Survei Kelaikan Komponen Bangunan - Ibu Nurul Hidayati',
-                'lokasi' => 'Rambipuji',
-                'nama_pemohon' => 'Ibu Nurul Hidayati',
-                'alamat' => 'Dusun Krajan, Desa Kaliwining',
-                'tanggal_survei' => now()->subDays(3),
-                'status_rekomendasi' => 'Layak Bantuan (PK)',
-            ],
-        ]);
+        $user = Auth::user();
+        $desaPetugas = $user->desa ?? null;
+
+        $kegiatans = DataPenerima::when($desaPetugas, function ($q) use ($desaPetugas) {
+            $q->where('desa_kelurahan', $desaPetugas);
+        })->limit(20)->get();
 
         return view('petugas.sudah_survei', compact('kegiatans'));
     }

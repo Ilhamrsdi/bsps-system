@@ -82,11 +82,11 @@ class UserPetugasDesaSeeder extends Seeder
                 ['email' => $email],
                 [
                     'name'      => "Petugas Verval Desa {$namaDesaFormatted}",
-                    'nip'       => '3509' . str_pad($index + 1, 6, '0', STR_PAD_LEFT),
+                    'nip'       => null,
                     'jabatan'   => "Petugas Verval Desa {$namaDesaFormatted}",
                     'kecamatan' => $namaKecFormatted,
                     'desa'      => $namaDesaFormatted,
-                    'phone'     => '08' . rand(111111111, 999999999),
+                    'phone'     => null,
                     'status'    => 'aktif',
                     'role'      => 'petugas',
                     'password'  => $defaultPassword,

@@ -1,94 +1,354 @@
 @extends('layouts.partial.app')
 
-@section('title', 'BSPS Verval - Penugasan Fasilitator Lapangan')
-@section('title_header', 'Penugasan Fasilitator Lapangan (TFL)')
-@section('subtitle_header', 'Kelola alokasi & penugasan Tenaga Fasilitator Lapangan (TFL) untuk verifikasi calon penerima bantuan BSPS')
+@section('title', 'BSPS Verval - Penugasan Petugas Verval')
+@section('title_header', 'Penugasan Petugas Verval')
+@section('subtitle_header', 'Database Calon Penerima Bantuan BSPS untuk Penugasan Verifikasi & Validasi Lapangan')
 
 @push('styles')
 <style>
-    /* Custom Petugas Badges in Table */
-    .petugas-badge-list {
+    /* Stats Grid */
+    .stats-verval {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .stat-item {
+        background: var(--bg-card);
+        border-radius: var(--radius-sm);
+        padding: 18px 20px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid rgba(0, 40, 85, 0.06);
         display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
         align-items: center;
+        gap: 14px;
+        transition: var(--transition);
     }
-    .petugas-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 4px 10px;
-        border-radius: 20px;
-        background: rgba(0, 40, 85, 0.06);
-        border: 1px solid rgba(0, 40, 85, 0.10);
-        font-size: 12px;
-        font-weight: 600;
-        color: var(--primary-dark);
+
+    .stat-item:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
     }
-    .petugas-pill .avatar-mini {
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background: var(--primary);
-        color: #fff;
-        font-size: 10px;
-        font-weight: 800;
+
+    .stat-item .icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
+        font-size: 20px;
         flex-shrink: 0;
     }
 
-    /* Option Item Hover in Searchable Multi-Select */
-    .petugas-option-item:hover {
-        background: rgba(0, 40, 85, 0.06);
-    }
-    html[data-theme="dark"] .petugas-option-item:hover {
-        background: rgba(255, 255, 255, 0.08);
+    .stat-item .icon.blue { background: rgba(0, 40, 85, 0.10); color: var(--primary); }
+    .stat-item .icon.green { background: rgba(39, 174, 96, 0.12); color: var(--success); }
+    .stat-item .icon.orange { background: rgba(255, 184, 0, 0.15); color: #d69e00; }
+    .stat-item .icon.purple { background: rgba(142, 68, 173, 0.12); color: var(--purple, #8e44ad); }
+
+    .stat-item .info .value {
+        font-size: 24px;
+        font-weight: 800;
+        line-height: 1.2;
+        color: var(--primary-dark);
     }
 
-    /* Responsive Penugasan Layout */
-    @media (max-width: 1024px) {
-        .filter-section { padding: 16px; flex-direction: column; align-items: stretch; gap: 12px; }
-        .filter-section .filter-group { width: 100%; }
-        .filter-section .filter-group .pupr-search-group,
-        .filter-section .filter-group .pupr-dropdown-wrapper,
-        .filter-section .filter-group .pupr-dropdown-toggle { width: 100%; justify-content: space-between; }
-        .filter-section .filter-actions { width: 100%; margin-left: 0; flex-wrap: wrap; }
-        .filter-section .filter-actions .btn { flex: 1; min-width: 120px; justify-content: center; }
-        .table-card .table-header { flex-direction: column; align-items: stretch; gap: 12px; }
+    .stat-item .info .label {
+        font-size: 12px;
+        color: var(--text-muted);
+        font-weight: 600;
+        margin-top: 2px;
     }
 
-    @media (max-width: 768px) {
-        .table-wrapper {
-            overflow-x: auto !important;
-            overflow-y: hidden !important;
-            -webkit-overflow-scrolling: touch !important;
-            touch-action: pan-x pan-y !important;
-            overscroll-behavior-x: contain !important;
-            transform: translateZ(0);
-            width: 100% !important;
-            display: block !important;
-        }
-        .table-card table {
-            width: 100% !important;
-            min-width: 750px !important;
-            border-collapse: collapse;
-            font-size: 13.5px;
-            white-space: nowrap !important;
-        }
-        .table-card table tr,
-        .table-card table th,
-        .table-card table td {
-            transition: none !important;
-            white-space: nowrap !important;
-        }
-        .table-footer { flex-direction: column; align-items: center; text-align: center; gap: 10px; }
+    /* Filter Section */
+    .filter-section {
+        background: var(--bg-card);
+        border-radius: var(--radius);
+        padding: 16px 20px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid rgba(0, 40, 85, 0.06);
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
     }
 
-    @media (max-width: 480px) {
-        .dashboard-content { padding: 12px; }
-        .modal-box { padding: 20px 16px; }
+    .filter-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex: 1;
+        flex-wrap: wrap;
+    }
+
+    .search-input-wrap {
+        position: relative;
+        min-width: 260px;
+        flex: 1;
+    }
+
+    .search-input-wrap input {
+        width: 100%;
+        padding: 10px 14px 10px 38px;
+        border-radius: var(--radius-sm);
+        border: 1px solid rgba(0, 40, 85, 0.14);
+        background: var(--bg-body);
+        color: var(--text-primary);
+        font-size: 13.5px;
+        outline: none;
+        transition: all 0.2s ease;
+        box-sizing: border-box;
+    }
+
+    .search-input-wrap input:focus {
+        border-color: var(--primary);
+        background: var(--bg-card);
+        box-shadow: 0 0 0 3px rgba(0, 40, 85, 0.08);
+    }
+
+    .search-input-wrap i {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        font-size: 14px;
+    }
+
+    /* Table Container */
+    .table-container-card {
+        background: var(--bg-card);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid rgba(0, 40, 85, 0.06);
+        overflow: hidden;
+    }
+
+    .table-header-bar {
+        padding: 18px 24px;
+        border-bottom: 1px solid rgba(0, 40, 85, 0.06);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .table-header-bar h3 {
+        font-size: 16px;
+        font-weight: 800;
+        color: var(--primary);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .badge-desil {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        background: rgba(0, 40, 85, 0.08);
+        color: var(--primary);
+    }
+
+    .badge-desil.backlog-1 {
+        background: rgba(39, 174, 96, 0.12);
+        color: var(--success);
+    }
+
+    .badge-gender {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 800;
+    }
+    .badge-gender.l { background: rgba(0, 40, 85, 0.10); color: var(--primary); border: 1px solid rgba(0, 40, 85, 0.18); }
+    .badge-gender.p { background: rgba(212, 63, 120, 0.12); color: #d43f78; border: 1px solid rgba(212, 63, 120, 0.22); }
+
+    .action-btn-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-act {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .btn-act.view { background: rgba(0, 40, 85, 0.08); color: var(--primary); }
+    .btn-act.view:hover { background: var(--primary); color: #fff; }
+    .btn-act.map  { background: rgba(39, 174, 96, 0.12); color: var(--success); }
+    .btn-act.map:hover { background: var(--success); color: #fff; }
+
+    /* Custom Pagination Styling */
+    .pagination-custom-bar {
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+        border-top: 1px solid rgba(0, 40, 85, 0.08);
+        background: var(--bg-card);
+    }
+
+    .pagination-info-text {
+        font-size: 13px;
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    .pagination-info-text strong {
+        color: var(--primary-dark);
+        font-weight: 700;
+    }
+
+    .pagination-nav {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin: 0;
+        padding: 0;
+    }
+
+    .pg-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 36px;
+        height: 36px;
+        padding: 0 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text-primary);
+        background: var(--bg-body);
+        border: 1px solid rgba(0, 40, 85, 0.14);
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .pg-link:hover {
+        background: var(--primary);
+        color: #ffffff;
+        border-color: var(--primary);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .pg-link.active {
+        background: var(--primary);
+        color: #ffffff;
+        border-color: var(--primary);
+        box-shadow: 0 2px 6px rgba(0, 40, 85, 0.25);
+    }
+
+    .pg-link.disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        pointer-events: none;
+        background: var(--bg-body);
+        color: var(--text-muted);
+        border-color: rgba(0, 40, 85, 0.08);
+    }
+
+    .pg-dots {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 30px;
+        height: 36px;
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-muted);
+        letter-spacing: 2px;
+    }
+
+    /* Jump to Page Form */
+    .jump-page-form {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-left: 12px;
+    }
+
+    .jump-page-input {
+        width: 54px;
+        height: 36px;
+        text-align: center;
+        border-radius: 8px;
+        border: 1px solid rgba(0, 40, 85, 0.16);
+        background: var(--bg-body);
+        color: var(--text-primary);
+        font-size: 13px;
+        font-weight: 700;
+        outline: none;
+        transition: all 0.2s ease;
+    }
+
+    .jump-page-input:focus {
+        border-color: var(--primary);
+        background: var(--bg-card);
+        box-shadow: 0 0 0 3px rgba(0, 40, 85, 0.08);
+    }
+
+    .jump-page-btn {
+        height: 36px;
+        padding: 0 12px;
+        border-radius: 8px;
+        background: var(--primary);
+        color: #fff;
+        border: none;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .jump-page-btn:hover {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+    }
+
+    @media (max-width: 992px) {
+        .stats-verval {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 576px) {
+        .stats-verval {
+            grid-template-columns: 1fr;
+        }
+        .filter-section {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .filter-left {
+            flex-direction: column;
+            align-items: stretch;
+        }
     }
 </style>
 @endpush
@@ -102,308 +362,255 @@
         <div class="breadcrumb" style="font-size:13px;color:var(--text-muted);margin-bottom:20px;display:flex;align-items:center;gap:8px;">
             <a href="{{ url('/') }}" style="color:var(--primary);text-decoration:none;font-weight:500;"><i class="fas fa-home"></i> Home</a>
             <i class="fas fa-chevron-right" style="font-size:10px;"></i>
-            <span>Penugasan Petugas</span>
+            <span>Penugasan Petugas Verval</span>
         </div>
 
-        {{-- Alert Sukses --}}
-        @if(session('success'))
-            <div style="background:rgba(39,174,96,0.10);border:1px solid rgba(39,174,96,0.30);border-radius:var(--radius-sm);padding:14px 18px;margin-bottom:20px;font-size:13px;color:var(--success);display:flex;align-items:center;gap:10px;">
-                <i class="fas fa-check-circle" style="font-size:16px;"></i>
-                <span>{{ session('success') }}</span>
-            </div>
-        @endif
-
-        <!-- Filter & Search Section (System Component Design System) -->
-        <form action="{{ route('penugasan') }}" method="GET" class="filter-section">
-            <div class="filter-group">
-                <div class="pupr-search-group">
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama kegiatan, kecamatan, petugas..." class="pupr-search-input" />
-                    <button type="submit" class="pupr-search-btn"><i class="fas fa-search"></i></button>
+        <!-- 4 Top Stat Summary Cards -->
+        <div class="stats-verval">
+            <div class="stat-item">
+                <div class="icon blue"><i class="fas fa-users-viewfinder"></i></div>
+                <div class="info">
+                    <div class="value">{{ number_format($stats['total'], 0, ',', '.') }}</div>
+                    <div class="label">Total Calon Penerima</div>
                 </div>
             </div>
-
-            {{-- Filter Status Penugasan --}}
-            <div class="filter-group">
-                <div class="pupr-dropdown-wrapper">
-                    <button type="button" class="btn btn-outline pupr-dropdown-toggle" data-toggle="pupr-dropdown">
-                        @php
-                            $reqPenugasan = request('status_penugasan');
-                            $labelPenugasan = $reqPenugasan === 'sudah' ? 'Sudah Ditugaskan' : ($reqPenugasan === 'belum' ? 'Belum Ditugaskan' : 'Semua Status Penugasan');
-                        @endphp
-                        <span class="selected-label">{{ $labelPenugasan }}</span>
-                        <i class="fas fa-chevron-down" style="font-size:10px;margin-left:8px;"></i>
-                    </button>
-                    <div class="pupr-dropdown-menu" id="dropdownPenugasanMenu">
-                        <div class="pupr-dropdown-item {{ !$reqPenugasan || $reqPenugasan=='all' ? 'active' : '' }}" data-value="all">Semua Status Penugasan</div>
-                        <div class="pupr-dropdown-item {{ $reqPenugasan=='sudah' ? 'active' : '' }}" data-value="sudah">Sudah Ditugaskan</div>
-                        <div class="pupr-dropdown-item {{ $reqPenugasan=='belum' ? 'active' : '' }}" data-value="belum">Belum Ditugaskan</div>
-                    </div>
+            <div class="stat-item">
+                <div class="icon green"><i class="fas fa-map-location-dot"></i></div>
+                <div class="info">
+                    <div class="value">{{ $stats['kecamatan'] }}</div>
+                    <div class="label">Kecamatan Terdata</div>
                 </div>
-                <input type="hidden" name="status_penugasan" id="inputFilterStatusPenugasan" value="{{ request('status_penugasan') }}" />
             </div>
+            <div class="stat-item">
+                <div class="icon orange"><i class="fas fa-building-columns"></i></div>
+                <div class="info">
+                    <div class="value">{{ $stats['desa'] }}</div>
+                    <div class="label">Desa / Kelurahan</div>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="icon purple"><i class="fas fa-filter"></i></div>
+                <div class="info">
+                    <div class="value">{{ number_format($stats['filter'], 0, ',', '.') }}</div>
+                    <div class="label">Hasil Saringan Data</div>
+                </div>
+            </div>
+        </div>
 
-            {{-- Filter Kecamatan --}}
-            <div class="filter-group">
-                <div class="pupr-dropdown-wrapper">
-                    <button type="button" class="btn btn-outline pupr-dropdown-toggle" data-toggle="pupr-dropdown">
-                        @php
-                            $reqLokasi = request('lokasi');
-                            $labelLokasi = $reqLokasi && $reqLokasi != 'all' ? 'Kec. '.ucwords(str_replace('_',' ',$reqLokasi)) : 'Semua Kecamatan';
-                        @endphp
-                        <span class="selected-label">{{ $labelLokasi }}</span>
-                        <i class="fas fa-chevron-down" style="font-size:10px;margin-left:8px;"></i>
+        <!-- Filter & Search Bar Form (Custom PuprDropdown) -->
+        <form action="{{ url('/penugasan') }}" method="GET" class="filter-section" id="filterFormPenugasan">
+            <div class="filter-left">
+                <div class="search-input-wrap">
+                    <i class="fas fa-search"></i>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama pemohon, NIK, No. KK, atau alamat..." />
+                </div>
+
+                {{-- Hidden inputs untuk submit via dropdown --}}
+                <input type="hidden" name="kecamatan" id="hiddenKecamatanPenugasan" value="{{ request('kecamatan', 'all') }}" />
+                <input type="hidden" name="desil" id="hiddenDesilPenugasan" value="{{ request('desil', 'all') }}" />
+
+                {{-- Custom Dropdown: Kecamatan --}}
+                <div class="pupr-dropdown-wrapper" id="ddKecPenugasanWrapper">
+                    <button type="button" class="pupr-dropdown-toggle" id="ddKecPenugasanBtn" onclick="window.PuprDropdown.toggle(document.getElementById('ddKecPenugasanWrapper'))">
+                        <i class="fas fa-map-marker-alt" style="font-size:12px;opacity:0.6;"></i>
+                        <span class="selected-label">
+                            {{ request('kecamatan') && request('kecamatan') !== 'all' ? 'Kec. '.request('kecamatan') : 'Semua Kecamatan' }}
+                        </span>
+                        <i class="fas fa-chevron-down" style="font-size:10px;opacity:0.5;"></i>
                     </button>
-                    <div class="pupr-dropdown-menu" id="dropdownLokasiMenu" style="max-height:220px;overflow-y:auto;">
-                        <div class="pupr-dropdown-item {{ !$reqLokasi || $reqLokasi=='all' ? 'active' : '' }}" data-value="all">Semua Kecamatan</div>
-                        @foreach(['Kaliwates','Sumbersari','Patrang','Ajung','Rambipuji','Balung','Ambulu','Wuluhan','Puger','Kencong','Gumukmas','Umbulsari','Semboro','Jombang','Silo','Mayang','Mumbulsari','Jenggawah','Tempurejo','Pakusari','Sukowono','Kalisat','Ledokombo','Sumberjambe','Arjasa','Jelbuk','Bangsalsari','Panti','Sukorambi','Tanggul','Sumberbaru'] as $kec)
-                            <div class="pupr-dropdown-item {{ $reqLokasi == strtolower(str_replace(' ','_',$kec)) ? 'active' : '' }}" data-value="{{ strtolower(str_replace(' ','_',$kec)) }}">Kec. {{ $kec }}</div>
+                    <div class="pupr-dropdown-menu" style="min-width:200px;max-height:300px;overflow-y:auto;">
+                        <div class="pupr-dropdown-item {{ request('kecamatan', 'all') === 'all' ? 'active' : '' }}"
+                             onclick="selectDropdown('hiddenKecamatanPenugasan', 'ddKecPenugasanWrapper', 'all', 'Semua Kecamatan', 'filterFormPenugasan')">
+                            <i class="fas fa-th-list" style="font-size:12px;opacity:0.5;"></i> Semua Kecamatan
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        @foreach($listKecamatan as $kec)
+                        <div class="pupr-dropdown-item {{ request('kecamatan') === $kec ? 'active' : '' }}"
+                             onclick="selectDropdown('hiddenKecamatanPenugasan', 'ddKecPenugasanWrapper', '{{ $kec }}', 'Kec. {{ $kec }}', 'filterFormPenugasan')">
+                            <i class="fas fa-map-pin" style="font-size:11px;opacity:0.4;"></i> Kec. {{ $kec }}
+                        </div>
                         @endforeach
                     </div>
                 </div>
-                <input type="hidden" name="lokasi" id="inputFilterLokasi" value="{{ request('lokasi') }}" />
-            </div>
 
-            <div class="filter-actions">
-                <a href="{{ route('penugasan') }}" class="btn btn-outline"><i class="fas fa-redo"></i> Reset</a>
+                {{-- Custom Dropdown: Pengelompokan Desil --}}
+                <div class="pupr-dropdown-wrapper" id="ddDesilPenugasanWrapper">
+                    <button type="button" class="pupr-dropdown-toggle" onclick="window.PuprDropdown.toggle(document.getElementById('ddDesilPenugasanWrapper'))">
+                        <i class="fas fa-layer-group" style="font-size:12px;opacity:0.6;"></i>
+                        <span class="selected-label">
+                            @if(request('desil') === 'Backlog 1') Backlog 1 Desil 1-4
+                            @elseif(request('desil') === 'Backlog 2') Backlog 2 Desil 1-4
+                            @else Semua Pengelompokan
+                            @endif
+                        </span>
+                        <i class="fas fa-chevron-down" style="font-size:10px;opacity:0.5;"></i>
+                    </button>
+                    <div class="pupr-dropdown-menu" style="min-width:200px;">
+                        <div class="pupr-dropdown-item {{ request('desil', 'all') === 'all' ? 'active' : '' }}"
+                             onclick="selectDropdown('hiddenDesilPenugasan', 'ddDesilPenugasanWrapper', 'all', 'Semua Pengelompokan', 'filterFormPenugasan')">
+                            <i class="fas fa-th-list" style="font-size:12px;opacity:0.5;"></i> Semua Pengelompokan
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <div class="pupr-dropdown-item {{ request('desil') === 'Backlog 1' ? 'active' : '' }}"
+                             onclick="selectDropdown('hiddenDesilPenugasan', 'ddDesilPenugasanWrapper', 'Backlog 1', 'Backlog 1 Desil 1-4', 'filterFormPenugasan')">
+                            <i class="fas fa-circle" style="font-size:8px;color:var(--info);"></i> Backlog 1 Desil 1-4
+                        </div>
+                        <div class="pupr-dropdown-item {{ request('desil') === 'Backlog 2' ? 'active' : '' }}"
+                             onclick="selectDropdown('hiddenDesilPenugasan', 'ddDesilPenugasanWrapper', 'Backlog 2', 'Backlog 2 Desil 1-4', 'filterFormPenugasan')">
+                            <i class="fas fa-circle" style="font-size:8px;color:var(--success);"></i> Backlog 2 Desil 1-4
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="display:flex;gap:10px;">
+                <a href="{{ url('/penugasan') }}" class="btn btn-outline" style="padding:10px 16px;font-size:13px;text-decoration:none;border-radius:var(--radius-sm);">
+                    <i class="fas fa-redo"></i> Reset
+                </a>
             </div>
         </form>
 
-        <!-- Tabel Penugasan (Menggunakan Desain Tabel PUPR Sistem) -->
-        <div class="table-card">
-            <div class="table-header">
-                <h3><i class="fas fa-tasks" style="color:var(--primary);margin-right:10px;"></i>Daftar Penugasan Petugas Lapangan</h3>
+        <!-- Main Data Table -->
+        <div class="table-container-card">
+            <div class="table-header-bar">
+                <h3><i class="fas fa-clipboard-list"></i> Database Calon Penerima Bantuan BSPS (Data Penugasan Verval)</h3>
+                <span style="font-size:12.5px;color:var(--text-muted);font-weight:600;">
+                    Menampilkan {{ $vervals->firstItem() ?? 0 }} - {{ $vervals->lastItem() ?? 0 }} dari {{ number_format($vervals->total(), 0, ',', '.') }} data
+                </span>
             </div>
 
-            <div class="table-wrapper">
-                <table>
+            <div style="overflow-x:auto;">
+                <table class="table" style="width:100%;border-collapse:collapse;">
                     <thead>
-                        <tr>
-                            <th style="width:60px;">No</th>
-                            <th style="min-width:280px;">Nama Kegiatan &amp; Kecamatan</th>
-                            <th style="min-width:260px;">Petugas Lapangan (Ditugaskan)</th>
-                            <th style="width:140px;">Aksi</th>
+                        <tr style="background:var(--bg-body);border-bottom:1px solid rgba(0,40,85,0.08);text-align:left;font-size:12.5px;color:var(--text-muted);">
+                            <th style="padding:14px 18px;">No</th>
+                            <th style="padding:14px 18px;">Nama Calon Penerima</th>
+                            <th style="padding:14px 18px;text-align:center;">L/P</th>
+                            <th style="padding:14px 18px;">NIK &amp; No. KK</th>
+                            <th style="padding:14px 18px;">Alamat &amp; Dusun</th>
+                            <th style="padding:14px 18px;">Desa / Kelurahan</th>
+                            <th style="padding:14px 18px;">Kecamatan</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($kegiatans as $index => $item)
-                        <tr>
-                            <td>{{ $kegiatans->firstItem() + $index }}</td>
-                            <td>
-                                <strong style="color:var(--primary-dark);font-size:14px;display:block;margin-bottom:4px;">{{ $item->nama_kegiatan }}</strong>
-                                <span style="font-size:12px;color:var(--text-muted);display:inline-flex;align-items:center;gap:4px;">
-                                    <i class="fas fa-location-dot" style="color:var(--primary);font-size:11px;"></i> Kec. {{ ucwords(str_replace('_',' ',$item->lokasi)) }}
-                                </span>
-                            </td>
-                            <td>
-                                @if($item->petugas->count() > 0)
-                                    <div class="petugas-badge-list">
-                                        @foreach($item->petugas as $p)
-                                            <span class="petugas-pill" title="{{ $p->name }} (NIP: {{ $p->nip ?? '-' }})">
-                                                <span class="avatar-mini">{{ strtoupper(substr($p->name, 0, 1)) }}</span>
-                                                <span>{{ $p->name }}</span>
-                                            </span>
-                                        @endforeach
+                        @forelse($vervals as $index => $item)
+                            <tr style="border-bottom:1px solid rgba(0,40,85,0.06);font-size:13px;transition:all 0.15s ease;">
+                                <td style="padding:14px 18px;font-weight:700;color:var(--text-muted);">
+                                    {{ $vervals->firstItem() + $index }}
+                                </td>
+                                <td style="padding:14px 18px;">
+                                    <div style="font-weight:800;color:var(--primary-dark);">
+                                        {{ $item->nama }}
                                     </div>
-                                @else
-                                    <span style="font-size:12px;color:var(--text-muted);font-style:italic;">
-                                        <i class="fas fa-user-slash" style="opacity:0.5;margin-right:4px;"></i> Belum ada petugas
+                                </td>
+                                <td style="padding:14px 18px;text-align:center;">
+                                    <span class="badge-gender {{ strtolower($item->jenis_kelamin) }}">
+                                        {{ $item->jenis_kelamin == 'L' ? 'L' : ($item->jenis_kelamin == 'P' ? 'P' : ($item->jenis_kelamin ?: '-')) }}
                                     </span>
-                                @endif
-                            </td>
-                            <td>
-                                <div class="table-actions-cell" style="display:flex;gap:6px;">
-                                    <button type="button" class="btn-icon edit"
-                                        style="padding:6px 14px;border-radius:6px;"
-                                        onclick="openModalPenugasan({{ $item->id }}, '{{ addslashes($item->nama_kegiatan) }}', 'Kec. {{ ucwords(str_replace('_',' ',$item->lokasi)) }}', {{ json_encode($item->petugas->pluck('id')->toArray()) }})"
-                                    >
-                                        <i class="fas fa-user-plus"></i> Penugasan
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
+                                </td>
+                                <td style="padding:14px 18px;">
+                                    <div style="font-family:monospace;font-weight:700;color:var(--text-primary);letter-spacing:0.3px;">
+                                        <span style="font-size:11px;color:var(--text-muted);font-weight:600;margin-right:4px;">NIK:</span>{{ $item->no_ktp ?: '-' }}
+                                    </div>
+                                    <div style="font-family:monospace;font-weight:600;color:var(--text-muted);font-size:12px;margin-top:3px;letter-spacing:0.3px;">
+                                        <span style="font-size:11px;color:var(--text-muted);font-weight:600;margin-right:4px;">KK:</span>{{ $item->no_kk ?: '-' }}
+                                    </div>
+                                </td>
+                                <td style="padding:14px 18px;color:var(--text-secondary);">
+                                    {{ $item->alamat ?: '-' }}
+                                </td>
+                                <td style="padding:14px 18px;font-weight:600;color:var(--primary-dark);">
+                                    {{ $item->desa_kelurahan ?: '-' }}
+                                </td>
+                                <td style="padding:14px 18px;">
+                                    <span style="font-weight:700;color:var(--primary);">Kec. {{ $item->kecamatan }}</span>
+                                </td>
+                            </tr>
                         @empty
-                        <tr>
-                            <td colspan="4" style="text-align:center;padding:40px;color:var(--text-muted);">
-                                <i class="fas fa-inbox" style="font-size:32px;display:block;margin-bottom:10px;opacity:0.4;"></i>
-                                Belum ada data kegiatan untuk penugasan.
-                            </td>
-                        </tr>
+                            <tr>
+                                <td colspan="7" style="text-align:center;padding:32px;color:var(--text-muted);">
+                                    <i class="fas fa-clipboard-question" style="font-size:28px;display:block;margin-bottom:8px;opacity:0.4;"></i>
+                                    Tidak ada data calon penerima yang sesuai dengan kriteria saringan.
+                                </td>
+                            </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
 
-            <div class="table-footer">
-                <span>Menampilkan {{ $kegiatans->firstItem() ?? 0 }}-{{ $kegiatans->lastItem() ?? 0 }} dari {{ $kegiatans->total() }} data kegiatan</span>
+            <!-- Pagination Bar Custom -->
+            <div class="pagination-custom-bar">
+                <div class="pagination-info-text">
+                    Menampilkan <strong>{{ $vervals->firstItem() ?? 0 }}</strong> - <strong>{{ $vervals->lastItem() ?? 0 }}</strong> dari <strong>{{ number_format($vervals->total(), 0, ',', '.') }}</strong> penerima (Halaman <strong>{{ $vervals->currentPage() }}</strong> dari <strong>{{ $vervals->lastPage() }}</strong>)
+                </div>
 
-                @if($kegiatans->hasPages())
-                    <div class="pagination">
-                        @if($kegiatans->onFirstPage())
-                            <span class="page disabled"><i class="fas fa-chevron-left"></i></span>
+                @php
+                    $current = $vervals->currentPage();
+                    $last = $vervals->lastPage();
+                    $delta = 2;
+                    $left = $current - $delta;
+                    $right = $current + $delta + 1;
+                    $range = [];
+                    $rangeWithDots = [];
+                    $l = null;
+
+                    for ($i = 1; $i <= $last; $i++) {
+                        if ($i == 1 || $i == $last || ($i >= $left && $i < $right)) {
+                            $range[] = $i;
+                        }
+                    }
+
+                    foreach ($range as $i) {
+                        if ($l) {
+                            if ($i - $l === 2) {
+                                $rangeWithDots[] = $l + 1;
+                            } elseif ($i - $l !== 1) {
+                                $rangeWithDots[] = '...';
+                            }
+                        }
+                        $rangeWithDots[] = $i;
+                        $l = $i;
+                    }
+                @endphp
+
+                <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;">
+                    <div class="pagination-nav">
+                        {{-- Tombol Previous --}}
+                        @if($vervals->onFirstPage())
+                            <span class="pg-link disabled"><i class="fas fa-chevron-left"></i></span>
                         @else
-                            <a href="{{ $kegiatans->previousPageUrl() }}" class="page"><i class="fas fa-chevron-left"></i></a>
+                            <a href="{{ $vervals->previousPageUrl() }}" class="pg-link"><i class="fas fa-chevron-left"></i></a>
                         @endif
 
-                        @foreach($kegiatans->getUrlRange(max(1, $kegiatans->currentPage() - 2), min($kegiatans->lastPage(), $kegiatans->currentPage() + 2)) as $page => $url)
-                            @if($page == $kegiatans->currentPage())
-                                <span class="page active">{{ $page }}</span>
+                        {{-- Halaman 1 sampai N dengan Ellipsis pintar --}}
+                        @foreach($rangeWithDots as $pageItem)
+                            @if($pageItem === '...')
+                                <span class="pg-dots">&hellip;</span>
+                            @elseif($pageItem == $current)
+                                <span class="pg-link active">{{ $pageItem }}</span>
                             @else
-                                <a href="{{ $url }}" class="page">{{ $page }}</a>
+                                <a href="{{ $vervals->url($pageItem) }}" class="pg-link">{{ $pageItem }}</a>
                             @endif
                         @endforeach
 
-                        @if($kegiatans->hasMorePages())
-                            <a href="{{ $kegiatans->nextPageUrl() }}" class="page"><i class="fas fa-chevron-right"></i></a>
+                        {{-- Tombol Next --}}
+                        @if($vervals->hasMorePages())
+                            <a href="{{ $vervals->nextPageUrl() }}" class="pg-link"><i class="fas fa-chevron-right"></i></a>
                         @else
-                            <span class="page disabled"><i class="fas fa-chevron-right"></i></span>
+                            <span class="pg-link disabled"><i class="fas fa-chevron-right"></i></span>
                         @endif
                     </div>
-                @endif
+
+                    <!-- Jump To Page Form -->
+                    <form action="{{ url('/penugasan') }}" method="GET" class="jump-page-form">
+                        @if(request('search')) <input type="hidden" name="search" value="{{ request('search') }}"> @endif
+                        @if(request('kecamatan') && request('kecamatan') != 'all') <input type="hidden" name="kecamatan" value="{{ request('kecamatan') }}"> @endif
+                        @if(request('desil') && request('desil') != 'all') <input type="hidden" name="desil" value="{{ request('desil') }}"> @endif
+                        <span style="font-size:12px;color:var(--text-muted);font-weight:600;">Lompat:</span>
+                        <input type="number" name="page" min="1" max="{{ $last }}" value="{{ $current }}" class="jump-page-input" title="Masukkan nomor halaman" />
+                        <button type="submit" class="jump-page-btn" title="Buka Halaman">Go</button>
+                    </form>
+                </div>
             </div>
         </div>
     </main>
-
-    <!-- ============================================================
-         Modal Form Penugasan (Menggunakan PuprModal Sistem Seperti user/index)
-         ============================================================ -->
-    <div class="modal-overlay" id="modalPenugasan">
-        <div class="modal-box" style="max-width:540px;">
-            <div class="modal-header">
-                <h3 id="modalPenugasanTitle"><i class="fas fa-user-plus" style="color:var(--primary);margin-right:10px;"></i>Penugasan Petugas Survei</h3>
-                <button class="close-btn" id="closeModalPenugasanBtn" type="button" onclick="window.PuprModal.close('modalPenugasan')"><i class="fas fa-times"></i></button>
-            </div>
-
-            <form id="formPenugasan" action="" method="POST">
-                @csrf
-                <div class="modal-body">
-                    <!-- Detail Informasi Kegiatan -->
-                    <div style="background:rgba(0,40,85,0.04);border:1px solid rgba(0,40,85,0.08);border-radius:10px;padding:14px 16px;margin-bottom:18px;">
-                        <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text-muted);letter-spacing:0.5px;margin-bottom:4px;">Nama Kegiatan</div>
-                        <div style="font-size:15px;font-weight:800;color:var(--primary-dark);" id="modalNamaKegiatan">-</div>
-                        <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;" id="modalLokasiKegiatan">-</div>
-                    </div>
-
-                    <div class="form-group">
-                        <label style="display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:8px;">
-                            <span><i class="fas fa-users" style="color:var(--primary);margin-right:6px;"></i>Pilih Petugas Survei Lapangan</span>
-                            <span style="font-size:11px;font-weight:400;color:var(--text-muted);" id="counterPetugasSelected">0 dipilih</span>
-                        </label>
-
-                        <!-- Input Live Search Petugas -->
-                        <div class="pupr-search-group" style="margin-bottom:10px;">
-                            <input type="text" id="searchPetugasInput" placeholder="Ketik nama, NIP, atau kecamatan petugas..." class="pupr-search-input" style="padding:8px 12px;font-size:13px;" />
-                            <button type="button" class="pupr-search-btn"><i class="fas fa-search"></i></button>
-                        </div>
-
-                        <!-- Checkbox Container List Petugas (User Role 'petugas') -->
-                        <div id="petugasListContainer" style="max-height:220px;overflow-y:auto;border:1px solid rgba(0,40,85,0.14);border-radius:8px;padding:6px;background:var(--bg-body);">
-                            @foreach($allPetugas as $p)
-                                <label class="petugas-option-item" data-search="{{ strtolower($p->name . ' ' . $p->nip . ' ' . $p->kecamatan . ' ' . $p->jabatan) }}" style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:6px;cursor:pointer;transition:background 0.15s ease;margin-bottom:2px;">
-                                    <input type="checkbox" name="petugas_ids[]" value="{{ $p->id }}" class="petugas-checkbox" style="width:17px;height:17px;cursor:pointer;accent-color:var(--primary);" onchange="handlePetugasCheckboxChange(this)" />
-                                    <div class="avatar-mini" style="width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                                        {{ strtoupper(substr($p->name, 0, 1)) }}
-                                    </div>
-                                    <div style="flex:1;overflow:hidden;">
-                                        <div style="font-weight:700;font-size:13px;color:var(--text-primary);">{{ $p->name }}</div>
-                                        <div style="font-size:11px;color:var(--text-muted);">{{ $p->jabatan }} &bull; <span style="color:var(--primary);font-weight:600;">Kec. {{ $p->kecamatan }}</span></div>
-                                    </div>
-                                </label>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-cancel" id="cancelModalPenugasanBtn" onclick="window.PuprModal.close('modalPenugasan')">Batal</button>
-                    <button type="submit" class="btn btn-submit" id="btnSimpanPenugasan">
-                        <i class="fas fa-save"></i> Simpan Penugasan
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
 @endsection
-
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Event listener filter dropdown penugasan
-        document.querySelectorAll('#dropdownPenugasanMenu .pupr-dropdown-item').forEach(item => {
-            item.addEventListener('click', function() {
-                document.getElementById('inputFilterStatusPenugasan').value = this.dataset.value;
-                this.closest('form').submit();
-            });
-        });
-
-        // Event listener filter dropdown lokasi
-        document.querySelectorAll('#dropdownLokasiMenu .pupr-dropdown-item').forEach(item => {
-            item.addEventListener('click', function() {
-                document.getElementById('inputFilterLokasi').value = this.dataset.value;
-                this.closest('form').submit();
-            });
-        });
-
-        // Live Search Input Filter di dalam Modal Penugasan
-        const searchInput = document.getElementById('searchPetugasInput');
-        if (searchInput) {
-            searchInput.addEventListener('input', function() {
-                const query = this.value.toLowerCase().trim();
-                document.querySelectorAll('.petugas-option-item').forEach(item => {
-                    const text = item.getAttribute('data-search') || '';
-                    item.style.display = text.includes(query) ? 'flex' : 'none';
-                });
-            });
-        }
-
-        // Trigger Loading Overlay saat submit form penugasan
-        const form = document.getElementById('formPenugasan');
-        if (form) {
-            form.addEventListener('submit', function() {
-                window.PuprLoading.show('Menyimpan Penugasan...');
-            });
-        }
-    });
-
-    // Buka Modal Penugasan
-    function openModalPenugasan(kegiatanId, namaKegiatan, lokasiKegiatan, assignedUserIds) {
-        document.getElementById('modalNamaKegiatan').textContent = namaKegiatan;
-        document.getElementById('modalLokasiKegiatan').textContent = lokasiKegiatan;
-        document.getElementById('formPenugasan').action = "{{ url('/penugasan') }}/" + kegiatanId;
-
-        // Reset input search
-        const searchInput = document.getElementById('searchPetugasInput');
-        if (searchInput) {
-            searchInput.value = '';
-            document.querySelectorAll('.petugas-option-item').forEach(item => item.style.display = 'flex');
-        }
-
-        // Check checkbox yang sudah ditugaskan
-        document.querySelectorAll('.petugas-checkbox').forEach(cb => {
-            cb.checked = assignedUserIds.includes(parseInt(cb.value));
-        });
-
-        updateSelectedCounter();
-
-        // Buka modal menggunakan sistem PuprModal global persis seperti user/index
-        window.PuprModal.open('modalPenugasan');
-    }
-
-    // Counter update jumlah petugas dipilih
-    function handlePetugasCheckboxChange(checkbox) {
-        const checkedList = document.querySelectorAll('.petugas-checkbox:checked');
-        if (checkedList.length > 2) {
-            checkbox.checked = false;
-            alert('Maksimal penugasan adalah 2 orang petugas survei per kegiatan!');
-        }
-        updateSelectedCounter();
-    }
-
-    function updateSelectedCounter() {
-        const checkedCount = document.querySelectorAll('.petugas-checkbox:checked').length;
-        const counterEl = document.getElementById('counterPetugasSelected');
-        if (counterEl) {
-            counterEl.textContent = checkedCount + ' / 2 petugas dipilih';
-        }
-    }
-</script>
-@endpush

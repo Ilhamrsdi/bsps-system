@@ -45,7 +45,13 @@ class UserController extends Controller
         $bertugasCount = User::where('status', 'bertugas')->count();
         $cutiCount = User::where('status', 'cuti')->count();
 
-        return view('user.index', compact('users', 'totalCount', 'aktifCount', 'bertugasCount', 'cutiCount'));
+        // Daftar Kecamatan untuk filter
+        $kecamatanList = \App\Models\DataPenerima::distinct('kecamatan')
+            ->whereNotNull('kecamatan')
+            ->orderBy('kecamatan', 'asc')
+            ->pluck('kecamatan');
+
+        return view('user.index', compact('users', 'totalCount', 'aktifCount', 'bertugasCount', 'cutiCount', 'kecamatanList'));
     }
 
     /**

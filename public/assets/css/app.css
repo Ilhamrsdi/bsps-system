@@ -379,8 +379,11 @@ html, body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    max-width: 100%;
+    width: calc(100% - var(--sidebar-width));
+    max-width: calc(100% - var(--sidebar-width));
+    min-width: 0;
     position: relative;
+    box-sizing: border-box;
 }
 
 .navbar {

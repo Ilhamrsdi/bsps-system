@@ -67,10 +67,6 @@
             </a>
             @endif
 
-            <a class="menu-item {{ Request::is('laporan*') ? 'active' : '' }}" href="{{ url('/laporan') }}">
-                <i class="fas fa-clipboard-list"></i>
-                Laporan
-            </a>
             <a class="menu-item {{ Request::is('setting*') ? 'active' : '' }}" href="{{ url('/setting') }}">
                 <i class="fas fa-cog"></i>
                 Pengaturan
