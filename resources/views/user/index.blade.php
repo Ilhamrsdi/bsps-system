@@ -243,7 +243,14 @@
                                 </td>
                                 <td><span style="font-family:monospace;font-size:12px;font-weight:600;">{{ $item->nip ?? '-' }}</span></td>
                                 <td><span style="font-weight:600;color:var(--primary);">{{ $item->jabatan }}</span></td>
-                                <td><i class="fas fa-location-dot" style="color:var(--text-muted);font-size:12px;"></i> {{ $item->kecamatan }}</td>
+                                <td>
+                                    @if($item->desa)
+                                        <div style="font-weight:700;color:var(--primary-dark);"><i class="fas fa-location-dot" style="color:var(--primary);font-size:11px;margin-right:3px;"></i> Desa {{ $item->desa }}</div>
+                                        <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">Kec. {{ $item->kecamatan }}</div>
+                                    @else
+                                        <i class="fas fa-location-dot" style="color:var(--text-muted);font-size:12px;"></i> {{ $item->kecamatan }}
+                                    @endif
+                                </td>
                                 <td>{{ $item->phone ?? '-' }}</td>
                                 <td>
                                     @if($item->role === 'admin')
