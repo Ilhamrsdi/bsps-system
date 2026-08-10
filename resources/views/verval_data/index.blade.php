@@ -334,88 +334,61 @@
             <table class="data-table-verval">
                 <thead>
                     <tr>
-                        <th style="width: 50px;">No</th>
-                        <th>Kode BNBA &amp; NIK</th>
-                        <th>Nama Kepala Keluarga</th>
-                        <th>Alamat &amp; Lokasi RTLH</th>
-                        <th>Kondisi Kerusakan</th>
-                        <th>Skor RTLH</th>
-                        <th>Status Verval</th>
-                        <th>Tenaga Fasilitator (TFL)</th>
-                        <th style="text-align: center; width: 100px;">Aksi</th>
+                        <th style="width: 50px; text-align: center;">NO</th>
+                        <th>NAMA</th>
+                        <th>L/P</th>
+                        <th>NO KTP</th>
+                        <th>NO KK</th>
+                        <th>ALAMAT</th>
+                        <th>DESA/KELURAHAN</th>
+                        <th>KECAMATAN</th>
+                        <th style="text-align: center;">STATUS</th>
+                        <th style="text-align: center;">AKSI</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($vervalData as $index => $item)
                         <tr>
                             <td style="font-weight: 700; color: var(--text-muted); text-align: center;">
-                                {{ $index + 1 }}
+                                {{ $vervalData->firstItem() + $index }}
                             </td>
-                            <td>
-                                <div style="font-weight: 800; color: var(--primary);">{{ $item['id'] }}</div>
-                                <span class="nik-badge">{{ $item['nik'] }}</span>
+                            <td style="font-weight: 700; color: var(--text-primary);">
+                                {{ $item->nama ?? '-' }}
                             </td>
-                            <td>
-                                <div style="font-weight: 700; color: var(--text-primary);">{{ $item['nama_kk'] }}</div>
-                                <div style="font-size: 12px; color: var(--text-muted);">
-                                    {{ $item['pekerjaan'] }} &bull; {{ $item['penghasilan'] }}
-                                </div>
-                            </td>
-                            <td>
-                                <div style="font-weight: 600; color: var(--text-primary);">Desa {{ $item['desa'] }}, Kec. {{ $item['kecamatan'] }}</div>
-                                <div style="font-size: 12px; color: var(--text-muted);">{{ $item['dusun'] }}</div>
-                            </td>
-                            <td>
-                                <div style="font-size: 12px; line-height: 1.4;">
-                                    <strong style="color: var(--primary-dark);">Atap:</strong> {{ $item['kondisi_atap'] }}<br>
-                                    <strong style="color: var(--primary-dark);">Dinding:</strong> {{ $item['kondisi_dinding'] }}<br>
-                                    <strong style="color: var(--primary-dark);">Lantai:</strong> {{ $item['kondisi_lantai'] }}
-                                </div>
-                            </td>
-                            <td>
+                            <td>{{ $item->jenis_kelamin ?? '-' }}</td>
+                            <td><span class="nik-badge">{{ $item->no_ktp ?? '-' }}</span></td>
+                            <td><span class="nik-badge">{{ $item->no_kk ?? '-' }}</span></td>
+                            <td>{{ $item->alamat ?? '-' }}</td>
+                            <td>{{ $item->desa_kelurahan ?? '-' }}</td>
+                            <td>{{ $item->kecamatan ?? '-' }}</td>
+                            <td style="text-align: center;">
                                 @php
-                                    $scoreClass = $item['skor_kelaikan'] >= 80 ? 'score-high' : ($item['skor_kelaikan'] >= 60 ? 'score-mid' : 'score-low');
+                                    $currentStatus = $item->status ?? 'ditemukan';
+                                    $statusColors = [
+                                        'ditemukan' => '#28a745',
+                                        'meninggal' => '#343a40',
+                                        'pindah' => '#ffc107',
+                                        'tidak diketahui' => '#dc3545',
+                                    ];
+                                    $textColor = $currentStatus == 'pindah' ? '#000' : '#fff';
+                                    $bgColor = $statusColors[$currentStatus] ?? '#28a745';
                                 @endphp
-                                <span class="score-badge {{ $scoreClass }}">
-                                    <i class="fas fa-gauge-high"></i> {{ $item['skor_kelaikan'] }}%
-                                </span>
-                            </td>
-                            <td>
-                                @if($item['status_badge'] === 'success')
-                                    <span class="badge success" style="font-weight: 700; padding: 4px 10px;">
-                                        <i class="fas fa-check-circle"></i> {{ $item['status_verval'] }}
-                                    </span>
-                                @elseif($item['status_badge'] === 'warning')
-                                    <span class="badge warning" style="font-weight: 700; padding: 4px 10px;">
-                                        <i class="fas fa-clock"></i> {{ $item['status_verval'] }}
-                                    </span>
-                                @elseif($item['status_badge'] === 'info')
-                                    <span class="badge info" style="font-weight: 700; padding: 4px 10px; background: rgba(52, 152, 219, 0.15); color: #2980b9;">
-                                        <i class="fas fa-exclamation-circle"></i> {{ $item['status_verval'] }}
-                                    </span>
-                                @else
-                                    <span class="badge danger" style="font-weight: 700; padding: 4px 10px;">
-                                        <i class="fas fa-times-circle"></i> {{ $item['status_verval'] }}
-                                    </span>
-                                @endif
-                            </td>
-                            <td>
-                                <div style="font-size: 12.5px; font-weight: 700; color: var(--text-primary);">
-                                    {{ $item['fasilitator'] }}
-                                </div>
-                                <div style="font-size: 11px; color: var(--text-muted);">
-                                    <i class="fas fa-calendar-alt"></i> {{ \Carbon\Carbon::parse($item['tgl_verval'])->translatedFormat('d M Y') }}
-                                </div>
+                                <select class="form-select status-select" data-id="{{ $item->id }}" style="background-color: {{ $bgColor }}; color: {{ $textColor }}; font-weight: bold; border: none; border-radius: 20px; padding: 4px 12px; font-size: 12px; width: 130px; text-align: center; cursor: pointer; outline: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                    <option value="ditemukan" {{ $currentStatus == 'ditemukan' ? 'selected' : '' }} style="background: #fff; color: #000;">Ditemukan</option>
+                                    <option value="meninggal" {{ $currentStatus == 'meninggal' ? 'selected' : '' }} style="background: #fff; color: #000;">Meninggal</option>
+                                    <option value="pindah" {{ $currentStatus == 'pindah' ? 'selected' : '' }} style="background: #fff; color: #000;">Pindah</option>
+                                    <option value="tidak diketahui" {{ $currentStatus == 'tidak diketahui' ? 'selected' : '' }} style="background: #fff; color: #000;">Tidak Diketahui</option>
+                                </select>
                             </td>
                             <td style="text-align: center;">
-                                <button type="button" class="btn btn-outline" style="padding: 6px 10px; font-size: 12px;" onclick="showVervalDetail({{ json_encode($item) }})" title="Lihat Detail Verval">
-                                    <i class="fas fa-eye"></i>
-                                </button>
+                                <a href="{{ route('data-verval.edit', $item->id) }}" class="btn btn-primary" style="padding: 6px 12px; font-size: 12px; border-radius: 4px;">
+                                    <i class="fas fa-edit"></i> Isi Data
+                                </a>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                            <td colspan="10" style="text-align: center; padding: 40px; color: var(--text-muted);">
                                 <i class="fas fa-folder-open" style="font-size: 32px; display: block; margin-bottom: 8px; opacity: 0.5;"></i>
                                 Tidak ada data BNBA yang cocok dengan kriteria pencarian / filter Anda.
                             </td>
@@ -423,6 +396,9 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+        <div style="padding: 16px 22px; border-top: 1px solid rgba(0, 40, 85, 0.06);">
+            {{ $vervalData->links('pagination::bootstrap-5') }}
         </div>
     </div>
 </div>
@@ -538,5 +514,46 @@ function showVervalDetail(data) {
 
     window.PuprModal.open('modalVervalDetail');
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.status-select').forEach(function(select) {
+        select.addEventListener('change', function() {
+            var id = this.getAttribute('data-id');
+            var status = this.value;
+            var selectElement = this;
+            
+            var colors = {
+                'ditemukan': '#28a745',
+                'meninggal': '#343a40',
+                'pindah': '#ffc107',
+                'tidak diketahui': '#dc3545'
+            };
+            
+            selectElement.style.backgroundColor = colors[status];
+            selectElement.style.color = (status === 'pindah') ? '#000' : '#fff';
+            
+            // Send AJAX
+            fetch("{{ url('/data-verval') }}/" + id + "/status", {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ status: status })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(!data.success) {
+                    alert('Gagal memperbarui status');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan saat memperbarui status');
+            });
+        });
+    });
+});
 </script>
 @endpush

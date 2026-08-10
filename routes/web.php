@@ -26,6 +26,9 @@ Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->nam
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/data-verval', [VervalDataController::class, 'index'])->name('data-verval');
+    Route::get('/data-verval/{id}/edit', [VervalDataController::class, 'edit'])->name('data-verval.edit');
+    Route::put('/data-verval/{id}', [VervalDataController::class, 'update'])->name('data-verval.update');
+    Route::put('/data-verval/{id}/status', [VervalDataController::class, 'updateStatus'])->name('data-verval.update-status');
     Route::get('/data_verval', [VervalDataController::class, 'index']);
 
     // Setting
