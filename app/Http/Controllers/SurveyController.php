@@ -96,7 +96,12 @@ class SurveyController extends Controller
 
         $uploadPath = storage_path('app/public/uploads');
         if (!file_exists($uploadPath)) {
-            mkdir($uploadPath, 0755, true);
+            @mkdir($uploadPath, 0755, true);
+        }
+
+        $publicUploadPath = public_path('storage/uploads');
+        if (!file_exists($publicUploadPath) && !is_link(public_path('storage'))) {
+            @mkdir($publicUploadPath, 0755, true);
         }
 
         foreach ($fileFields as $field) {
@@ -117,10 +122,17 @@ class SurveyController extends Controller
                         $file->move($uploadPath, $filename);
                     }
 
+                    if (file_exists($publicUploadPath) && is_dir($publicUploadPath) && !is_link(public_path('storage'))) {
+                        @copy($uploadPath . '/' . $filename, $publicUploadPath . '/' . $filename);
+                    }
+
                     $data[$field] = 'uploads/' . $filename;
                 } catch (\Exception $e) {
                     $filename = uniqid($field . '_') . '.' . $file->getClientOriginalExtension();
                     $file->move($uploadPath, $filename);
+                    if (file_exists($publicUploadPath) && is_dir($publicUploadPath) && !is_link(public_path('storage'))) {
+                        @copy($uploadPath . '/' . $filename, $publicUploadPath . '/' . $filename);
+                    }
                     $data[$field] = 'uploads/' . $filename;
                 }
             }

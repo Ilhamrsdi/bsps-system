@@ -27,6 +27,19 @@ use App\Http\Controllers\SettingController;
 Route::get('/', [LandingController::class, 'index'])->name('landing');
 Route::get('/landing', [LandingController::class, 'index']);
 
+// Storage Media Fallback Route (Bypass Nginx 403 Forbidden di Shared Hosting Hostinger)
+Route::get('/storage/{path}', function ($path) {
+    $fullPath = storage_path('app/public/' . $path);
+    if (!file_exists($fullPath)) {
+        $fullPath = public_path('storage/' . $path);
+    }
+    if (!file_exists($fullPath) || is_dir($fullPath)) {
+        abort(404);
+    }
+    $mime = mime_content_type($fullPath) ?: 'image/jpeg';
+    return response()->file($fullPath, ['Content-Type' => $mime]);
+})->where('path', '.*');
+
 // Auth Routes (Login & Logout)
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
