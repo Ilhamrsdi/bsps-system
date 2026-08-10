@@ -5,356 +5,414 @@
 @section('subtitle_header', 'Database Calon Penerima Bantuan Stimulan Perumahan Swadaya (BSPS) Kabupaten Jember')
 
 @push('styles')
-<style>
-    /* Stats Grid */
-    .stats-verval {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 16px;
-        margin-bottom: 24px;
-    }
+    <style>
+        /* Stats Grid */
+        .stats-verval {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
 
-    .stat-item {
-        background: var(--bg-card);
-        border-radius: var(--radius-sm);
-        padding: 18px 20px;
-        box-shadow: var(--shadow-sm);
-        border: 1px solid rgba(0, 40, 85, 0.06);
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        transition: var(--transition);
-    }
+        .stat-item {
+            background: var(--bg-card);
+            border-radius: var(--radius-sm);
+            padding: 18px 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(0, 40, 85, 0.06);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: var(--transition);
+        }
 
-    .stat-item:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
-    }
+        .stat-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
 
-    .stat-item .icon {
-        width: 46px;
-        height: 46px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 20px;
-        flex-shrink: 0;
-    }
+        .stat-item .icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
 
-    .stat-item .icon.blue { background: rgba(0, 40, 85, 0.10); color: var(--primary); }
-    .stat-item .icon.green { background: rgba(39, 174, 96, 0.12); color: var(--success); }
-    .stat-item .icon.orange { background: rgba(255, 184, 0, 0.15); color: #d69e00; }
-    .stat-item .icon.purple { background: rgba(142, 68, 173, 0.12); color: var(--purple, #8e44ad); }
+        .stat-item .icon.blue {
+            background: rgba(0, 40, 85, 0.10);
+            color: var(--primary);
+        }
 
-    .stat-item .info .value {
-        font-size: 24px;
-        font-weight: 800;
-        line-height: 1.2;
-        color: var(--primary-dark);
-    }
+        .stat-item .icon.green {
+            background: rgba(39, 174, 96, 0.12);
+            color: var(--success);
+        }
 
-    .stat-item .info .label {
-        font-size: 12px;
-        color: var(--text-muted);
-        font-weight: 600;
-        margin-top: 2px;
-    }
+        .stat-item .icon.orange {
+            background: rgba(255, 184, 0, 0.15);
+            color: #d69e00;
+        }
 
-    /* Filter Section */
-    .filter-section {
-        background: var(--bg-card);
-        border-radius: var(--radius);
-        padding: 16px 20px;
-        box-shadow: var(--shadow-sm);
-        border: 1px solid rgba(0, 40, 85, 0.06);
-        margin-bottom: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 16px;
-        flex-wrap: wrap;
-    }
+        .stat-item .icon.purple {
+            background: rgba(142, 68, 173, 0.12);
+            color: var(--purple, #8e44ad);
+        }
 
-    .filter-left {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        flex: 1;
-        flex-wrap: wrap;
-    }
+        .stat-item .info .value {
+            font-size: 24px;
+            font-weight: 800;
+            line-height: 1.2;
+            color: var(--primary-dark);
+        }
 
-    .search-input-wrap {
-        position: relative;
-        min-width: 260px;
-        flex: 1;
-    }
+        .stat-item .info .label {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-top: 2px;
+        }
 
-    .search-input-wrap input {
-        width: 100%;
-        padding: 10px 14px 10px 38px;
-        border-radius: var(--radius-sm);
-        border: 1px solid rgba(0, 40, 85, 0.14);
-        background: var(--bg-body);
-        color: var(--text-primary);
-        font-size: 13.5px;
-        outline: none;
-        transition: all 0.2s ease;
-        box-sizing: border-box;
-    }
+        /* Filter Section */
+        .filter-section {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(0, 40, 85, 0.06);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
 
-    .search-input-wrap input:focus {
-        border-color: var(--primary);
-        background: var(--bg-card);
-        box-shadow: 0 0 0 3px rgba(0, 40, 85, 0.08);
-    }
+        .filter-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            flex-wrap: wrap;
+        }
 
-    .search-input-wrap i {
-        position: absolute;
-        left: 14px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--text-muted);
-        font-size: 14px;
-    }
+        .search-input-wrap {
+            position: relative;
+            min-width: 260px;
+            flex: 1;
+        }
 
-    /* Table Container */
-    .table-container-card {
-        background: var(--bg-card);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow-sm);
-        border: 1px solid rgba(0, 40, 85, 0.06);
-        overflow: hidden;
-    }
+        .search-input-wrap input {
+            width: 100%;
+            padding: 10px 14px 10px 38px;
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(0, 40, 85, 0.14);
+            background: var(--bg-body);
+            color: var(--text-primary);
+            font-size: 13.5px;
+            outline: none;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
 
-    .table-header-bar {
-        padding: 18px 24px;
-        border-bottom: 1px solid rgba(0, 40, 85, 0.06);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-    }
+        .search-input-wrap input:focus {
+            border-color: var(--primary);
+            background: var(--bg-card);
+            box-shadow: 0 0 0 3px rgba(0, 40, 85, 0.08);
+        }
 
-    .table-header-bar h3 {
-        font-size: 16px;
-        font-weight: 800;
-        color: var(--primary);
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
+        .search-input-wrap i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 14px;
+        }
 
-    .badge-desil {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 700;
-        background: rgba(0, 40, 85, 0.08);
-        color: var(--primary);
-    }
+        /* Table Container */
+        .table-container-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(0, 40, 85, 0.06);
+            overflow: hidden;
+        }
 
-    .badge-desil.backlog-1 {
-        background: rgba(39, 174, 96, 0.12);
-        color: var(--success);
-    }
+        .table-header-bar {
+            padding: 18px 24px;
+            border-bottom: 1px solid rgba(0, 40, 85, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
 
-    .badge-gender {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 28px;
-        height: 28px;
-        border-radius: 8px;
-        font-size: 12px;
-        font-weight: 800;
-    }
-    .badge-gender.l { background: rgba(0, 40, 85, 0.10); color: var(--primary); border: 1px solid rgba(0, 40, 85, 0.18); }
-    .badge-gender.p { background: rgba(212, 63, 120, 0.12); color: #d43f78; border: 1px solid rgba(212, 63, 120, 0.22); }
+        .table-header-bar h3 {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-    .action-btn-group {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
+        .badge-desil {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            background: rgba(0, 40, 85, 0.08);
+            color: var(--primary);
+        }
 
-    .btn-act {
-        width: 32px;
-        height: 32px;
-        border-radius: 8px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 12px;
-        border: none;
-        cursor: pointer;
-        text-decoration: none;
-        transition: all 0.2s ease;
-    }
+        .badge-desil.backlog-1 {
+            background: rgba(39, 174, 96, 0.12);
+            color: var(--success);
+        }
 
-    .btn-act.view { background: rgba(0, 40, 85, 0.08); color: var(--primary); }
-    .btn-act.view:hover { background: var(--primary); color: #fff; }
-    .btn-act.map  { background: rgba(39, 174, 96, 0.12); color: var(--success); }
-    .btn-act.map:hover { background: var(--success); color: #fff; }
+        .badge-gender {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 800;
+        }
 
-    /* Custom Pagination Styling */
-    .pagination-custom-bar {
-        padding: 16px 24px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 16px;
-        flex-wrap: wrap;
-        border-top: 1px solid rgba(0, 40, 85, 0.08);
-        background: var(--bg-card);
-    }
+        .badge-gender.l {
+            background: rgba(0, 40, 85, 0.10);
+            color: var(--primary);
+            border: 1px solid rgba(0, 40, 85, 0.18);
+        }
 
-    .pagination-info-text {
-        font-size: 13px;
-        color: var(--text-muted);
-        font-weight: 500;
-    }
+        .badge-gender.p {
+            background: rgba(212, 63, 120, 0.12);
+            color: #d43f78;
+            border: 1px solid rgba(212, 63, 120, 0.22);
+        }
 
-    .pagination-info-text strong {
-        color: var(--primary-dark);
-        font-weight: 700;
-    }
+        .action-btn-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
 
-    .pagination-nav {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        margin: 0;
-        padding: 0;
-    }
+        .btn-act {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
 
-    .pg-link {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 36px;
-        height: 36px;
-        padding: 0 12px;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 700;
-        color: var(--text-primary);
-        background: var(--bg-body);
-        border: 1px solid rgba(0, 40, 85, 0.14);
-        text-decoration: none;
-        transition: all 0.2s ease;
-    }
+        .btn-act.view {
+            background: rgba(0, 40, 85, 0.08);
+            color: var(--primary);
+        }
 
-    .pg-link:hover:not(.disabled):not(.active) {
-        background: rgba(0, 40, 85, 0.08);
-        border-color: var(--primary);
-        color: var(--primary);
-    }
+        .btn-act.view:hover {
+            background: var(--primary);
+            color: #fff;
+        }
 
-    .pg-link.active {
-        background: var(--primary) !important;
-        color: #ffffff !important;
-        border-color: var(--primary) !important;
-        box-shadow: 0 3px 8px rgba(0, 40, 85, 0.25);
-    }
+        .btn-act.map {
+            background: rgba(39, 174, 96, 0.12);
+            color: var(--success);
+        }
 
-    .pg-link.disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
-        pointer-events: none;
-        background: var(--bg-body);
-    }
+        .btn-act.map:hover {
+            background: var(--success);
+            color: #fff;
+        }
 
-    .pg-dots {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 24px;
-        height: 36px;
-        font-size: 13px;
-        color: var(--text-muted);
-        letter-spacing: 2px;
-    }
+        /* Custom Pagination Styling */
+        .pagination-custom-bar {
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            border-top: 1px solid rgba(0, 40, 85, 0.08);
+            background: var(--bg-card);
+        }
 
-    .jump-page-form {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        margin-left: 6px;
-    }
+        .pagination-info-text {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
 
-    .jump-page-input {
-        width: 60px;
-        height: 36px;
-        padding: 0 6px;
-        text-align: center;
-        border-radius: 8px;
-        border: 1px solid rgba(0, 40, 85, 0.16);
-        background: var(--bg-body);
-        color: var(--text-primary);
-        font-size: 13px;
-        font-weight: 700;
-        outline: none;
-        transition: all 0.2s ease;
-    }
+        .pagination-info-text strong {
+            color: var(--primary-dark);
+            font-weight: 700;
+        }
 
-    .jump-page-input:focus {
-        border-color: var(--primary);
-        background: var(--bg-card);
-        box-shadow: 0 0 0 3px rgba(0, 40, 85, 0.08);
-    }
+        .pagination-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0;
+            padding: 0;
+        }
 
-    .jump-page-btn {
-        height: 36px;
-        padding: 0 14px;
-        border-radius: 8px;
-        border: none;
-        background: var(--primary);
-        color: #ffffff;
-        font-size: 12.5px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
+        .pg-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 36px;
+            height: 36px;
+            padding: 0 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+            background: var(--bg-body);
+            border: 1px solid rgba(0, 40, 85, 0.14);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
 
-    .jump-page-btn:hover {
-        background: var(--primary-light);
-    }
+        .pg-link:hover {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
 
-    @media (max-width: 1024px) {
-        .stats-verval { grid-template-columns: repeat(2, 1fr); }
-    }
+        .pg-link.active {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+            box-shadow: 0 2px 6px rgba(0, 40, 85, 0.25);
+        }
 
-    @media (max-width: 768px) {
-        .filter-section { flex-direction: column; align-items: stretch; }
-        .filter-left { flex-direction: column; }
-        .search-input-wrap { width: 100%; }
-        .filter-select { width: 100%; }
-        .pagination-custom-bar { flex-direction: column; align-items: stretch; gap: 14px; }
-        .pagination-nav { flex-wrap: wrap; justify-content: center; }
-        .jump-page-form { justify-content: center; width: 100%; }
-    }
-</style>
+        .pg-link.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+            background: var(--bg-body);
+            color: var(--text-muted);
+            border-color: rgba(0, 40, 85, 0.08);
+        }
+
+        .pg-dots {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 30px;
+            height: 36px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+        }
+
+        /* Jump to Page Form */
+        .jump-page-form {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: 12px;
+        }
+
+        .jump-page-input {
+            width: 54px;
+            height: 36px;
+            text-align: center;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 40, 85, 0.16);
+            background: var(--bg-body);
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 700;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .jump-page-input:focus {
+            border-color: var(--primary);
+            background: var(--bg-card);
+            box-shadow: 0 0 0 3px rgba(0, 40, 85, 0.08);
+        }
+
+        .jump-page-btn {
+            height: 36px;
+            padding: 0 12px;
+            border-radius: 8px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .jump-page-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 992px) {
+            .stats-verval {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .stats-verval {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-left {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
 @endpush
 
 @section('content')
+    <!-- Navbar Component -->
     @include('layouts.navbar')
 
     <main class="dashboard-content">
-        <div class="breadcrumb" style="font-size:13px;color:var(--text-muted);margin-bottom:20px;display:flex;align-items:center;gap:8px;">
-            <a href="{{ url('/dashboard') }}" style="color:var(--primary);text-decoration:none;font-weight:600;"><i class="fas fa-home"></i> Dashboard</a>
+        <!-- Breadcrumb -->
+        <div class="breadcrumb"
+            style="font-size:13px;color:var(--text-muted);margin-bottom:20px;display:flex;align-items:center;gap:8px;">
+            <a href="{{ url('/') }}" style="color:var(--primary);text-decoration:none;font-weight:500;"><i
+                    class="fas fa-home"></i> Home</a>
             <i class="fas fa-chevron-right" style="font-size:10px;"></i>
             <span>Data Verval BSPS</span>
         </div>
 
-        <!-- 4 Stat Counters -->
+        <!-- 4 Top Stat Summary Cards -->
         <div class="stats-verval">
             <div class="stat-item">
-                <div class="icon blue"><i class="fas fa-users"></i></div>
+                <div class="icon blue"><i class="fas fa-users-viewfinder"></i></div>
                 <div class="info">
                     <div class="value">{{ number_format($stats['total'], 0, ',', '.') }}</div>
                     <div class="label">Total Calon Penerima</div>
@@ -368,7 +426,7 @@
                 </div>
             </div>
             <div class="stat-item">
-                <div class="icon orange"><i class="fas fa-city"></i></div>
+                <div class="icon orange"><i class="fas fa-building-columns"></i></div>
                 <div class="info">
                     <div class="value">{{ $stats['desa'] }}</div>
                     <div class="label">Desa / Kelurahan</div>
@@ -388,7 +446,8 @@
             <div class="filter-left">
                 <div class="search-input-wrap">
                     <i class="fas fa-search"></i>
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama pemohon, NIK, No. KK, atau alamat..." />
+                    <input type="text" name="search" value="{{ request('search') }}"
+                        placeholder="Cari nama pemohon, NIK, No. KK, atau alamat..." />
                 </div>
 
                 {{-- Hidden inputs untuk submit via dropdown --}}
@@ -406,14 +465,12 @@
                     </button>
                     <div class="pupr-dropdown-menu" style="min-width:200px;max-height:300px;overflow-y:auto;">
                         <div class="pupr-dropdown-item {{ request('kecamatan', 'all') === 'all' ? 'active' : '' }}"
-                             data-target="hiddenKecamatan" data-value="all"
                              onclick="selectDropdown('hiddenKecamatan', 'ddKecWrapper', 'all', 'Semua Kecamatan', 'filterFormVerval')">
                             <i class="fas fa-th-list" style="font-size:12px;opacity:0.5;"></i> Semua Kecamatan
                         </div>
                         <div class="dropdown-divider"></div>
                         @foreach($listKecamatan as $kec)
                         <div class="pupr-dropdown-item {{ request('kecamatan') === $kec ? 'active' : '' }}"
-                             data-target="hiddenKecamatan" data-value="{{ $kec }}"
                              onclick="selectDropdown('hiddenKecamatan', 'ddKecWrapper', '{{ $kec }}', 'Kec. {{ $kec }}', 'filterFormVerval')">
                             <i class="fas fa-map-pin" style="font-size:11px;opacity:0.4;"></i> Kec. {{ $kec }}
                         </div>
@@ -451,10 +508,12 @@
                 </div>
             </div>
             <div style="display:flex;gap:10px;">
-                <a href="{{ url('/verval-data') }}" class="btn btn-outline" style="padding:10px 16px;font-size:13px;text-decoration:none;border-radius:var(--radius-sm);">
+                <a href="{{ url('/verval-data') }}" class="btn btn-outline"
+                    style="padding:10px 16px;font-size:13px;text-decoration:none;border-radius:var(--radius-sm);">
                     <i class="fas fa-redo"></i> Reset
                 </a>
-                <a href="{{ url('/survey') }}" class="btn btn-primary" style="padding:10px 20px;font-size:13px;font-weight:700;background:var(--primary);color:#fff;text-decoration:none;border-radius:var(--radius-sm);display:inline-flex;align-items:center;gap:8px;">
+                <a href="{{ url('/survey') }}" class="btn btn-primary"
+                    style="padding:10px 20px;font-size:13px;font-weight:700;background:var(--primary);color:#fff;text-decoration:none;border-radius:var(--radius-sm);display:inline-flex;align-items:center;gap:8px;">
                     <i class="fas fa-plus"></i> Input Survei Baru
                 </a>
             </div>
@@ -465,14 +524,16 @@
             <div class="table-header-bar">
                 <h3><i class="fas fa-clipboard-list"></i> Database Calon Penerima Bantuan BSPS (Verval Data)</h3>
                 <span style="font-size:12.5px;color:var(--text-muted);font-weight:600;">
-                    Menampilkan {{ $vervals->firstItem() ?? 0 }} - {{ $vervals->lastItem() ?? 0 }} dari {{ number_format($vervals->total(), 0, ',', '.') }} data
+                    Menampilkan {{ $vervals->firstItem() ?? 0 }} - {{ $vervals->lastItem() ?? 0 }} dari
+                    {{ number_format($vervals->total(), 0, ',', '.') }} data
                 </span>
             </div>
 
             <div style="overflow-x:auto;">
                 <table class="table" style="width:100%;border-collapse:collapse;">
                     <thead>
-                        <tr style="background:var(--bg-body);border-bottom:1px solid rgba(0,40,85,0.08);text-align:left;font-size:12.5px;color:var(--text-muted);">
+                        <tr
+                            style="background:var(--bg-body);border-bottom:1px solid rgba(0,40,85,0.08);text-align:left;font-size:12.5px;color:var(--text-muted);">
                             <th style="padding:14px 18px;">No</th>
                             <th style="padding:14px 18px;">Nama Calon Penerima</th>
                             <th style="padding:14px 18px;text-align:center;">L/P</th>
@@ -481,6 +542,7 @@
                             <th style="padding:14px 18px;">Desa / Kelurahan</th>
                             <th style="padding:14px 18px;">Kecamatan</th>
                             <th style="padding:14px 18px;">Kelompok Desil</th>
+                            <th style="padding:14px 18px;text-align:center;">Status</th>
                             <th style="padding:14px 18px;text-align:center;">Aksi</th>
                         </tr>
                     </thead>
@@ -501,11 +563,15 @@
                                     </span>
                                 </td>
                                 <td style="padding:14px 18px;">
-                                    <div style="font-family:monospace;font-weight:700;color:var(--text-primary);letter-spacing:0.3px;">
-                                        <span style="font-size:11px;color:var(--text-muted);font-weight:600;margin-right:4px;">NIK:</span>{{ $item->no_ktp ?: '-' }}
+                                    <div
+                                        style="font-family:monospace;font-weight:700;color:var(--text-primary);letter-spacing:0.3px;">
+                                        <span
+                                            style="font-size:11px;color:var(--text-muted);font-weight:600;margin-right:4px;">NIK:</span>{{ $item->no_ktp ?: '-' }}
                                     </div>
-                                    <div style="font-family:monospace;font-weight:600;color:var(--text-muted);font-size:12px;margin-top:3px;letter-spacing:0.3px;">
-                                        <span style="font-size:11px;color:var(--text-muted);font-weight:600;margin-right:4px;">KK:</span>{{ $item->no_kk ?: '-' }}
+                                    <div
+                                        style="font-family:monospace;font-weight:600;color:var(--text-muted);font-size:12px;margin-top:3px;letter-spacing:0.3px;">
+                                        <span
+                                            style="font-size:11px;color:var(--text-muted);font-weight:600;margin-right:4px;">KK:</span>{{ $item->no_kk ?: '-' }}
                                     </div>
                                 </td>
                                 <td style="padding:14px 18px;color:var(--text-secondary);">
@@ -518,27 +584,50 @@
                                     <span style="font-weight:700;color:var(--primary);">Kec. {{ $item->kecamatan }}</span>
                                 </td>
                                 <td style="padding:14px 18px;">
-                                    <span class="badge-desil {{ str_contains($item->pengelompokan_desil, 'Backlog 1') ? 'backlog-1' : '' }}">
+                                    <span
+                                        class="badge-desil {{ str_contains($item->pengelompokan_desil, 'Backlog 1') ? 'backlog-1' : '' }}">
                                         <i class="fas fa-layer-group" style="font-size:10px;"></i>
                                         {{ $item->pengelompokan_desil ?: 'Desil 1-4' }}
                                     </span>
                                 </td>
                                 <td style="padding:14px 18px;text-align:center;">
+                                    @php
+                                        $currentStatus = $item->status ?? 'ditemukan';
+                                        $statusColors = [
+                                            'ditemukan' => '#28a745',
+                                            'meninggal' => '#343a40',
+                                            'pindah' => '#ffc107',
+                                            'tidak diketahui' => '#dc3545',
+                                        ];
+                                        $textColor = $currentStatus == 'pindah' ? '#000' : '#fff';
+                                        $bgColor = $statusColors[$currentStatus] ?? '#28a745';
+                                    @endphp
+                                    <select class="form-select status-select" data-id="{{ $item->id }}"
+                                        style="background-color: {{ $bgColor }}; color: {{ $textColor }}; font-weight: bold; border: none; border-radius: 20px; padding: 4px 12px; font-size: 11px; width: 120px; text-align: center; cursor: pointer; outline: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                        <option value="ditemukan" {{ $currentStatus == 'ditemukan' ? 'selected' : '' }}
+                                            style="background: #fff; color: #000;">Ditemukan</option>
+                                        <option value="meninggal" {{ $currentStatus == 'meninggal' ? 'selected' : '' }}
+                                            style="background: #fff; color: #000;">Meninggal</option>
+                                        <option value="pindah" {{ $currentStatus == 'pindah' ? 'selected' : '' }}
+                                            style="background: #fff; color: #000;">Pindah</option>
+                                        <option value="tidak diketahui" {{ $currentStatus == 'tidak diketahui' ? 'selected' : '' }} style="background: #fff; color: #000;">Tidak Diketahui</option>
+                                    </select>
+                                </td>
+                                <td style="padding:14px 18px;text-align:center;">
                                     <div class="action-btn-group" style="justify-content:center;">
-                                        <a href="{{ url('/survey?nik=' . $item->no_ktp . '&nama=' . urlencode($item->nama) . '&desa=' . urlencode($item->desa_kelurahan) . '&kecamatan=' . urlencode($item->kecamatan) . '&alamat=' . urlencode($item->alamat)) }}" class="btn-act view" title="Mulai Survei RTLH untuk Pemohon Ini">
+                                        <a href="{{ route('data-verval.edit', $item->id) }}" class="btn-act view"
+                                            title="Mulai Survei RTLH untuk Pemohon Ini">
                                             <i class="fas fa-clipboard-check"></i>
-                                        </a>
-                                        <a href="{{ url('/geomaps') }}" class="btn-act map" title="Lihat Peta Lokasi">
-                                            <i class="fas fa-map-marker-alt"></i>
                                         </a>
                                     </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" style="text-align:center;padding:32px;color:var(--text-muted);">
-                                    <i class="fas fa-clipboard-question" style="font-size:28px;display:block;margin-bottom:8px;opacity:0.4;"></i>
-                                    Tidak ditemukan data calon penerima yang sesuai dengan filter pencarian.
+                                <td colspan="10" style="text-align:center;padding:32px;color:var(--text-muted);">
+                                    <i class="fas fa-clipboard-question"
+                                        style="font-size:28px;display:block;margin-bottom:8px;opacity:0.4;"></i>
+                                    Tidak ada data calon penerima yang sesuai dengan kriteria saringan.
                                 </td>
                             </tr>
                         @endforelse
@@ -549,7 +638,10 @@
             <!-- Pagination Bar Custom -->
             <div class="pagination-custom-bar">
                 <div class="pagination-info-text">
-                    Menampilkan <strong>{{ $vervals->firstItem() ?? 0 }}</strong> - <strong>{{ $vervals->lastItem() ?? 0 }}</strong> dari <strong>{{ number_format($vervals->total(), 0, ',', '.') }}</strong> penerima (Halaman <strong>{{ $vervals->currentPage() }}</strong> dari <strong>{{ $vervals->lastPage() }}</strong>)
+                    Menampilkan <strong>{{ $vervals->firstItem() ?? 0 }}</strong> -
+                    <strong>{{ $vervals->lastItem() ?? 0 }}</strong> dari
+                    <strong>{{ number_format($vervals->total(), 0, ',', '.') }}</strong> penerima (Halaman
+                    <strong>{{ $vervals->currentPage() }}</strong> dari <strong>{{ $vervals->lastPage() }}</strong>)
                 </div>
 
                 @php
@@ -581,38 +673,46 @@
                     }
                 @endphp
 
-                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-                    <!-- Navigation Buttons -->
+                <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;">
                     <div class="pagination-nav">
-                        <!-- Prev Button -->
-                        <a href="{{ $vervals->previousPageUrl() ?: '#' }}" class="pg-link {{ $vervals->onFirstPage() ? 'disabled' : '' }}" title="Halaman Sebelumnya">
-                            <i class="fas fa-chevron-left" style="margin-right:4px;"></i> Prev
-                        </a>
+                        {{-- Tombol Previous --}}
+                        @if($vervals->onFirstPage())
+                            <span class="pg-link disabled"><i class="fas fa-chevron-left"></i></span>
+                        @else
+                            <a href="{{ $vervals->previousPageUrl() }}" class="pg-link"><i
+                                    class="fas fa-chevron-left"></i></a>
+                        @endif
 
-                        <!-- Page Numbers with Sliding Window -->
-                        @foreach($rangeWithDots as $p)
-                            @if($p === '...')
-                                <span class="pg-dots">&bull;&bull;&bull;</span>
+                        {{-- Halaman 1 sampai N dengan Ellipsis pintar --}}
+                        @foreach($rangeWithDots as $pageItem)
+                            @if($pageItem === '...')
+                                <span class="pg-dots">&hellip;</span>
+                            @elseif($pageItem == $current)
+                                <span class="pg-link active">{{ $pageItem }}</span>
                             @else
-                                <a href="{{ $vervals->url($p) }}" class="pg-link {{ $p == $current ? 'active' : '' }}">
-                                    {{ $p }}
-                                </a>
+                                <a href="{{ $vervals->url($pageItem) }}" class="pg-link">{{ $pageItem }}</a>
                             @endif
                         @endforeach
 
-                        <!-- Next Button -->
-                        <a href="{{ $vervals->nextPageUrl() ?: '#' }}" class="pg-link {{ !$vervals->hasMorePages() ? 'disabled' : '' }}" title="Halaman Berikutnya">
-                            Next <i class="fas fa-chevron-right" style="margin-left:4px;"></i>
-                        </a>
+                        {{-- Tombol Next --}}
+                        @if($vervals->hasMorePages())
+                            <a href="{{ $vervals->nextPageUrl() }}" class="pg-link"><i
+                                    class="fas fa-chevron-right"></i></a>
+                        @else
+                            <span class="pg-link disabled"><i class="fas fa-chevron-right"></i></span>
+                        @endif
                     </div>
 
                     <!-- Jump To Page Form -->
                     <form action="{{ url('/verval-data') }}" method="GET" class="jump-page-form">
                         @if(request('search')) <input type="hidden" name="search" value="{{ request('search') }}"> @endif
-                        @if(request('kecamatan') && request('kecamatan') != 'all') <input type="hidden" name="kecamatan" value="{{ request('kecamatan') }}"> @endif
-                        @if(request('desil') && request('desil') != 'all') <input type="hidden" name="desil" value="{{ request('desil') }}"> @endif
+                        @if(request('kecamatan') && request('kecamatan') != 'all') <input type="hidden" name="kecamatan"
+                        value="{{ request('kecamatan') }}"> @endif
+                        @if(request('desil') && request('desil') != 'all') <input type="hidden" name="desil"
+                        value="{{ request('desil') }}"> @endif
                         <span style="font-size:12px;color:var(--text-muted);font-weight:600;">Lompat:</span>
-                        <input type="number" name="page" min="1" max="{{ $last }}" value="{{ $current }}" class="jump-page-input" title="Masukkan nomor halaman" />
+                        <input type="number" name="page" min="1" max="{{ $last }}" value="{{ $current }}"
+                            class="jump-page-input" title="Masukkan nomor halaman" />
                         <button type="submit" class="jump-page-btn" title="Buka Halaman">Go</button>
                     </form>
                 </div>
@@ -622,32 +722,101 @@
 @endsection
 
 @push('scripts')
-<script>
-/**
- * Helper: Pilih item di custom pupr-dropdown dan submit form
- */
-function selectDropdown(hiddenInputId, wrapperId, value, label, formId) {
-    // Set hidden input value
-    const hidden = document.getElementById(hiddenInputId);
-    if (hidden) hidden.value = value;
+    <script>
+        /**
+         * Helper: Pilih item di custom pupr-dropdown dan submit form
+         */
+        function selectDropdown(hiddenInputId, wrapperId, value, label, formId) {
+            const hidden = document.getElementById(hiddenInputId);
+            if (hidden) hidden.value = value;
 
-    // Update label tombol
-    const wrapper = document.getElementById(wrapperId);
-    if (wrapper) {
-        const lbl = wrapper.querySelector('.selected-label');
-        if (lbl) lbl.textContent = label;
+            const wrapper = document.getElementById(wrapperId);
+            if (wrapper) {
+                const lbl = wrapper.querySelector('.selected-label');
+                if (lbl) lbl.textContent = label;
+                wrapper.querySelectorAll('.pupr-dropdown-item').forEach(i => i.classList.remove('active'));
+                wrapper.classList.remove('active');
+            }
 
-        // Tandai item aktif
-        wrapper.querySelectorAll('.pupr-dropdown-item').forEach(i => i.classList.remove('active'));
-        // Tutup dropdown
-        wrapper.classList.remove('active');
-    }
+            if (formId) {
+                const form = document.getElementById(formId);
+                if (form) form.submit();
+            }
+        }
 
-    // Auto submit form
-    if (formId) {
-        const form = document.getElementById(formId);
-        if (form) form.submit();
-    }
-}
-</script>
+        function showToast(message, type = 'success') {
+            let toastContainer = document.getElementById('toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'toast-container';
+                toastContainer.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;';
+                document.body.appendChild(toastContainer);
+            }
+
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? '#27ae60' : '#e74c3c';
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+
+            toast.style.cssText = `background-color:${bgColor};color:#fff;padding:12px 20px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);font-size:14px;font-weight:600;display:flex;align-items:center;gap:10px;transform:translateY(100%);opacity:0;transition:all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);`;
+            toast.innerHTML = `<i class="fas ${icon}"></i> ${message}`;
+
+            toastContainer.appendChild(toast);
+
+            // Animate in
+            setTimeout(() => {
+                toast.style.transform = 'translateY(0)';
+                toast.style.opacity = '1';
+            }, 10);
+
+            // Animate out and remove
+            setTimeout(() => {
+                toast.style.transform = 'translateY(100%)';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.status-select').forEach(function (select) {
+                select.addEventListener('change', function () {
+                    var id = this.getAttribute('data-id');
+                    var status = this.value;
+                    var selectElement = this;
+
+                    var colors = {
+                        'ditemukan': '#28a745',
+                        'meninggal': '#343a40',
+                        'pindah': '#ffc107',
+                        'tidak diketahui': '#dc3545'
+                    };
+
+                    selectElement.style.backgroundColor = colors[status];
+                    selectElement.style.color = (status === 'pindah') ? '#000' : '#fff';
+
+                    // Send AJAX
+                    fetch("{{ url('/data-verval') }}/" + id + "/status", {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ status: status })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (!data.success) {
+                                showToast('Gagal memperbarui status', 'error');
+                            } else {
+                                showToast('Status berhasil diperbarui', 'success');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showToast('Terjadi kesalahan saat memperbarui status', 'error');
+                        });
+                });
+            });
+        });
+    </script>
 @endpush

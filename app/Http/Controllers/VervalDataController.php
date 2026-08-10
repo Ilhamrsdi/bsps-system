@@ -55,4 +55,81 @@ class VervalDataController extends Controller
 
         return view('verval_data.index', compact('vervals', 'stats', 'listKecamatan'));
     }
+
+    public function edit($id)
+    {
+        $vervalData = \App\Models\DataPenerima::findOrFail($id);
+        return view('verval_data.edit', compact('vervalData'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $vervalData = \App\Models\DataPenerima::findOrFail($id);
+        
+        $request->validate([
+            'ktp' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'kk' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'sertifikat_tanah' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'jenis_kepemilikan_lahan' => 'nullable|string',
+            'foto_sudut_depan' => 'nullable|image|max:5120',
+            'foto_sudut_belakang' => 'nullable|image|max:5120',
+            'foto_bagian_dalam' => 'nullable|image|max:5120',
+            'foto_sudut_kiri' => 'nullable|image|max:5120',
+            'foto_sudut_kanan' => 'nullable|image|max:5120',
+        ]);
+
+        $data = $request->except(['ktp', 'kk', 'sertifikat_tanah', 'foto_sudut_depan', 'foto_sudut_belakang', 'foto_bagian_dalam', 'foto_sudut_kiri', 'foto_sudut_kanan', '_token', '_method']);
+
+        // Handle file uploads with auto compression
+        $fileFields = ['ktp', 'kk', 'sertifikat_tanah', 'foto_sudut_depan', 'foto_sudut_belakang', 'foto_bagian_dalam', 'foto_sudut_kiri', 'foto_sudut_kanan'];
+        
+        $uploadPath = storage_path('app/public/uploads');
+        if (!file_exists($uploadPath)) {
+            mkdir($uploadPath, 0755, true);
+        }
+
+        foreach ($fileFields as $field) {
+            if ($request->hasFile($field)) {
+                $file = $request->file($field);
+                
+                try {
+                    $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+                    $image = $manager->decodePath($file->getRealPath());
+                    
+                    // Auto compress and resize
+                    $image->scaleDown(1200); 
+                    
+                    $filename = uniqid($field . '_') . '.jpg';
+                    $destination = $uploadPath . '/' . $filename;
+                    
+                    $image->save($destination, quality: 75);
+                    
+                    $data[$field] = 'uploads/' . $filename;
+                } catch (\Exception $e) {
+                    // Fallback to normal store if intervention fails
+                    $path = $file->store('uploads', 'public');
+                    $data[$field] = $path;
+                }
+            }
+        }
+
+        $vervalData->update($data);
+
+        return redirect()->route('data-verval')->with('success', 'Data berhasil disimpan!');
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|string|in:ditemukan,meninggal,pindah,tidak diketahui'
+        ]);
+        
+        $vervalData = \App\Models\DataPenerima::findOrFail($id);
+        $vervalData->update(['status' => $request->status]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Status berhasil diperbarui'
+        ]);
+    }
 }

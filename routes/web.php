@@ -44,10 +44,12 @@ Route::middleware(['auth'])->group(function () {
 
     // Admin Dashboard System
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
     // Data Verval BSPS
     Route::get('/verval-data', [VervalDataController::class, 'index'])->name('verval-data');
-    Route::get('/data-verval', [VervalDataController::class, 'index']);
+    Route::get('/data-verval', [VervalDataController::class, 'index'])->name('data-verval');
+    Route::get('/data-verval/{id}/edit', [VervalDataController::class, 'edit'])->name('data-verval.edit');
+    Route::put('/data-verval/{id}', [VervalDataController::class, 'update'])->name('data-verval.update');
+    Route::put('/data-verval/{id}/status', [VervalDataController::class, 'updateStatus'])->name('data-verval.update-status');
 
     // Geo Maps
     Route::get('/geomaps', [GeoMapController::class, 'index'])->name('geomaps');
