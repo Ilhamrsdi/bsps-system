@@ -1,0 +1,367 @@
+    /* ============================================================
+   REUSABLE TABLE & FILTER COMPONENTS (PUPR THEME - TABLE.CSS)
+   ============================================================ */
+
+/* ============================================================
+   1. FILTER SECTION
+   ============================================================ */
+.filter-section {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    padding: 18px 24px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(0, 40, 85, 0.06);
+    margin-bottom: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+}
+
+.filter-section .filter-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.filter-section .filter-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.filter-section .filter-actions {
+    display: flex;
+    gap: 10px;
+    margin-left: auto;
+}
+
+.filter-section .filter-actions .btn {
+    padding: 8px 18px;
+    border-radius: var(--radius-sm);
+    border: none;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-section .filter-actions .btn-primary { background: var(--primary); color: #fff; }
+.filter-section .filter-actions .btn-success { background: var(--success); color: #fff; }
+.filter-section .filter-actions .btn-outline {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid rgba(0, 40, 85, 0.12);
+    text-decoration: none;
+}
+
+/* ============================================================
+   2. TABLE CARD
+   ============================================================ */
+.table-card {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(0, 40, 85, 0.06);
+    overflow: hidden;
+}
+
+.table-card .table-header {
+    padding: 18px 24px;
+    border-bottom: 1px solid rgba(0, 40, 85, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.table-card .table-header h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.table-card .table-header .table-actions { display: flex; gap: 8px; }
+
+.table-card .table-header .table-actions .btn {
+    padding: 6px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(0, 40, 85, 0.12);
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.table-card .table-header .table-actions .btn:hover {
+    background: var(--bg-body);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+/* ============================================================
+   3. TABLE STRUCTURE (HARDWARE ACCELERATED TOUCH SCROLL)
+   ============================================================ */
+.table-wrapper {
+    overflow-x: auto !important;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-x pan-y !important;
+    overscroll-behavior-x: contain;
+    transform: translateZ(0);
+    width: 100% !important;
+    display: block;
+}
+
+.table-wrapper::-webkit-scrollbar {
+    height: 5px;
+}
+.table-wrapper::-webkit-scrollbar-track {
+    background: rgba(0, 40, 85, 0.04);
+}
+.table-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(0, 40, 85, 0.25);
+    border-radius: 10px;
+}
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+}
+
+.table-card table {
+    width: 100%;
+    min-width: 950px;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    white-space: nowrap;
+}
+
+.table-card table tr,
+.table-card table th,
+.table-card table td {
+    transition: none !important;
+}
+
+.table-card table thead { background: var(--bg-body); }
+
+.table-card table thead th {
+    padding: 14px 18px;
+    text-align: left;
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    border-bottom: 1px solid rgba(0, 40, 85, 0.06);
+    letter-spacing: 0.5px;
+}
+
+.table-card table tbody td {
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(0, 40, 85, 0.06);
+    vertical-align: middle;
+}
+
+.table-card table tbody tr:hover { background: rgba(0, 40, 85, 0.02); }
+
+/* ============================================================
+   4. TABLE FOOTER / PAGINATION INFO
+   ============================================================ */
+.table-footer {
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--text-muted);
+    border-top: 1px solid rgba(0, 40, 85, 0.06);
+}
+
+/* ============================================================
+   5. TABLE ACTION BUTTONS (INLINE)
+   ============================================================ */
+.table-actions-cell .btn-icon {
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    border: none;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.table-actions-cell .btn-icon.view  { background: rgba(0, 40, 85, 0.08); color: var(--primary); }
+.table-actions-cell .btn-icon.edit  { background: rgba(255, 184, 0, 0.15); color: #d69e00; }
+.table-actions-cell .btn-icon.delete { background: rgba(231, 76, 60, 0.12); color: var(--danger); }
+
+/* ============================================================
+   6. AVATAR CELLS
+   ============================================================ */
+.petugas-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    font-weight: 800;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* ============================================================
+   7. BADGE STATUS EXTRA (TABLE-SPECIFIC VARIANTS)
+   ============================================================ */
+.badge-status.aktif    { background: rgba(39, 174, 96, 0.12); color: var(--success); }
+.badge-status.bertugas { background: rgba(255, 184, 0, 0.15); color: #d69e00; }
+.badge-status.cuti     { background: rgba(231, 76, 60, 0.12); color: var(--danger); }
+
+/* ============================================================
+   8. DARK MODE OVERRIDES
+   ============================================================ */
+html[data-theme="dark"] .filter-section {
+    background: var(--bg-card) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+html[data-theme="dark"] .table-card {
+    background: var(--bg-card) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+html[data-theme="dark"] .table-card table thead {
+    background: rgba(11, 19, 41, 0.8) !important;
+}
+
+html[data-theme="dark"] .table-card table thead th,
+html[data-theme="dark"] .table-card table tbody td {
+    color: var(--text-primary) !important;
+    border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+html[data-theme="dark"] .table-card table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+html[data-theme="dark"] .table-footer {
+    border-color: rgba(255, 255, 255, 0.06) !important;
+    color: var(--text-muted) !important;
+}
+
+html[data-theme="dark"] .table-card .table-header {
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+html[data-theme="dark"] .badge-status.aktif {
+    background: rgba(39, 174, 96, 0.2);
+    color: #34D399;
+}
+
+html[data-theme="dark"] .badge-status.bertugas {
+    background: rgba(255, 184, 0, 0.2);
+    color: #FFB800;
+}
+
+html[data-theme="dark"] .badge-status.cuti {
+    background: rgba(231, 76, 60, 0.2);
+    color: #FCA5A5;
+}
+
+/* ============================================================
+   9. PAGINATION
+   ============================================================ */
+.table-footer .pagination {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.table-footer .pagination .page {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 40, 85, 0.12);
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 12px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.table-footer .pagination .page:hover {
+    background: rgba(0, 40, 85, 0.06);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.table-footer .pagination .page.active {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+    font-weight: 700;
+    cursor: default;
+}
+
+.table-footer .pagination .page.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Dark Mode */
+html[data-theme="dark"] .table-footer .pagination .page {
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    color: var(--text-secondary) !important;
+}
+
+html[data-theme="dark"] .table-footer .pagination .page:hover {
+    background: rgba(255, 255, 255, 0.06) !important;
+    border-color: var(--primary) !important;
+    color: var(--primary) !important;
+}
+
+html[data-theme="dark"] .table-footer .pagination .page.active {
+    background: var(--primary) !important;
+    color: #fff !important;
+    border-color: var(--primary) !important;
+}
+
+/* ============================================================
+   10. RESPONSIVE
+   ============================================================ */
+@media (max-width: 768px) {
+    .filter-section {
+        padding: 16px;
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .filter-section .filter-group { width: 100%; }
+    .filter-section .filter-actions { width: 100%; margin-left: 0; }
+    .filter-section .filter-actions .btn { flex: 1; justify-content: center; }
+    .table-card .table-header { padding: 14px 16px; }
+    .table-card table thead th,
+    .table-card table tbody td { padding: 10px 14px; }
+    .table-footer { flex-direction: column; gap: 8px; }
+    .table-footer .pagination { flex-wrap: wrap; justify-content: center; }
+}

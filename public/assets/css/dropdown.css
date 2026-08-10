@@ -1,0 +1,232 @@
+/* ============================================================
+   SYSTEM UNIVERSAL DROPDOWN COMPONENT (PUPR THEME)
+   ============================================================ */
+
+/* Standard Custom Styled Select Inputs (Overriding Browser Defaults) */
+select,
+.filter-group select,
+.filter-item select,
+.filter-section select,
+.form-group select {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    background-color: var(--bg-body, #f8fafc) !important;
+    color: var(--text-primary, #0f172a) !important;
+    border: 1px solid rgba(0, 40, 85, 0.15) !important;
+    border-radius: var(--radius-sm, 6px) !important;
+    padding: 8px 36px 8px 14px !important;
+    font-family: inherit !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    outline: none !important;
+    cursor: pointer !important;
+    transition: var(--transition, all 0.2s ease) !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23002855' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 14px center !important;
+    background-size: 12px !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+select:hover,
+.filter-group select:hover,
+.filter-item select:hover,
+.filter-section select:hover,
+.form-group select:hover {
+    border-color: var(--primary, #002855) !important;
+    background-color: var(--bg-card, #ffffff) !important;
+}
+
+select:focus,
+.filter-group select:focus,
+.filter-item select:focus,
+.filter-section select:focus,
+.form-group select:focus {
+    border-color: var(--primary, #002855) !important;
+    box-shadow: 0 0 0 4px rgba(0, 40, 85, 0.08) !important;
+    background-color: var(--bg-card, #ffffff) !important;
+}
+
+/* Dark Mode Select Override */
+html[data-theme="dark"] select,
+html[data-theme="dark"] .filter-group select,
+html[data-theme="dark"] .filter-item select,
+html[data-theme="dark"] .filter-section select,
+html[data-theme="dark"] .form-group select {
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23cbd5e1' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
+}
+
+html[data-theme="dark"] select:hover,
+html[data-theme="dark"] select:focus {
+    background-color: #1e293b !important;
+    border-color: var(--primary, #002855) !important;
+}
+
+/* Custom Dropdown Toggle Button (.pupr-dropdown-toggle) */
+.pupr-dropdown-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.pupr-dropdown-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 14px;
+    background: var(--bg-body, #f8fafc);
+    color: var(--text-primary, #0f172a);
+    border: 1px solid rgba(0, 40, 85, 0.15);
+    border-radius: var(--radius-sm, 6px);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition, all 0.2s ease);
+    outline: none;
+    white-space: nowrap;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.pupr-dropdown-toggle:hover {
+    border-color: var(--primary, #002855);
+    background: var(--bg-card, #ffffff);
+    color: var(--primary, #002855);
+}
+
+.pupr-dropdown-wrapper.active .pupr-dropdown-toggle {
+    border-color: var(--primary, #002855);
+    box-shadow: 0 0 0 4px rgba(0, 40, 85, 0.08);
+    background: var(--bg-card, #ffffff);
+}
+
+html[data-theme="dark"] .pupr-dropdown-toggle {
+    background: #0f172a;
+    color: #f8fafc;
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+html[data-theme="dark"] .pupr-dropdown-toggle:hover,
+html[data-theme="dark"] .pupr-dropdown-wrapper.active .pupr-dropdown-toggle {
+    background: #1e293b;
+    border-color: var(--primary, #002855);
+    color: #ffffff;
+}
+
+/* Custom Animated Dropdown Menu Wrapper (like User Profile) */
+.pupr-dropdown-menu,
+.user-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid rgba(0, 40, 85, 0.1);
+    border-radius: var(--radius-sm, 8px);
+    box-shadow: 0 10px 30px rgba(0, 40, 85, 0.15);
+    min-width: 220px;
+    padding: 6px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px) scale(0.96);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+}
+
+/* Right align for navbar profile dropdown */
+.user-profile-wrapper .user-dropdown-menu {
+    left: auto;
+    right: 0;
+}
+
+.pupr-dropdown-wrapper.active .pupr-dropdown-menu,
+.user-profile-wrapper.active .user-dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+/* Dropdown Menu Header & Divider */
+.user-dropdown-header,
+.pupr-dropdown-header {
+    padding: 10px 12px 8px;
+    display: flex;
+    flex-direction: column;
+}
+
+.user-dropdown-header strong,
+.pupr-dropdown-header strong {
+    font-size: 13px;
+    color: var(--text-primary, #0f172a);
+    font-weight: 700;
+}
+
+.user-dropdown-header span,
+.pupr-dropdown-header span {
+    font-size: 11px;
+    color: var(--text-muted, #64748b);
+}
+
+.dropdown-divider {
+    height: 1px;
+    background: rgba(0, 40, 85, 0.08);
+    margin: 4px 0;
+}
+
+html[data-theme="dark"] .dropdown-divider {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Dropdown Items */
+.user-dropdown-item,
+.pupr-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary, #0f172a);
+    text-decoration: none;
+    border-radius: 6px;
+    transition: var(--transition, all 0.2s ease);
+    cursor: pointer;
+}
+
+.user-dropdown-item:hover,
+.pupr-dropdown-item:hover {
+    background: rgba(0, 40, 85, 0.06);
+    color: var(--primary, #002855);
+}
+
+.pupr-dropdown-item.active {
+    background: rgba(0, 40, 85, 0.08);
+    color: var(--primary, #002855);
+    font-weight: 700;
+}
+
+html[data-theme="dark"] .user-dropdown-item,
+html[data-theme="dark"] .pupr-dropdown-item {
+    color: #f8fafc;
+}
+
+html[data-theme="dark"] .user-dropdown-item:hover,
+html[data-theme="dark"] .pupr-dropdown-item:hover,
+html[data-theme="dark"] .pupr-dropdown-item.active {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+.user-dropdown-item.logout,
+.pupr-dropdown-item.danger {
+    color: var(--danger, #e74c3c);
+}
+
+.user-dropdown-item.logout:hover,
+.pupr-dropdown-item.danger:hover {
+    background: rgba(231, 76, 60, 0.12);
+    color: var(--danger, #e74c3c);
+}
