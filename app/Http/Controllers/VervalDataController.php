@@ -101,12 +101,21 @@ class VervalDataController extends Controller
     }
 
     /**
-     * Helper untuk melampirkan Data Nama & Jabatan Kepala Desa/Lurah ke Koleksi Penerima
+     * Helper untuk melampirkan Data Nama & Jabatan Kepala Desa/Lurah ke Koleksi Penerima dari Database MySQL
      */
     private function attachKadesInfo($items)
     {
-        $jsonPath = storage_path('app/kepala_desa.json');
-        $kadesMap = file_exists($jsonPath) ? json_decode(file_get_contents($jsonPath), true) : [];
+        $allKades = \App\Models\KepalaDesa::all();
+        $kadesMap = [];
+
+        foreach ($allKades as $kd) {
+            $kecKey = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', $kd->kecamatan ?? ''));
+            $desaKey = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', $kd->desa_kelurahan ?? ''));
+            $kadesMap[$kecKey . '|||' . $desaKey] = [
+                'jabatan' => $kd->jabatan,
+                'nama'    => $kd->nama,
+            ];
+        }
 
         return $items->map(function ($item) use ($kadesMap) {
             $kecKey = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', $item->kecamatan ?? ''));
