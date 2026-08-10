@@ -37,7 +37,7 @@ class VervalDataController extends Controller
         }
 
         // Hitung total penerima
-        $totalPenerima = DataPenerima::count();
+        $totalPenerima = DataPenerima::distinct('no_ktp')->count('no_ktp');
         $totalKecamatan = DataPenerima::distinct('kecamatan')->count('kecamatan');
         $totalDesa = DataPenerima::distinct('desa_kelurahan')->count('desa_kelurahan');
 

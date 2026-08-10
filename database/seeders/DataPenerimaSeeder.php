@@ -12,6 +12,8 @@ class DataPenerimaSeeder extends Seeder
      */
     public function run(): void
     {
+        \App\Models\DataPenerima::truncate();
+
         $json = file_get_contents(storage_path('app/12_ribu.json'));
         $data = json_decode($json, true);
         
