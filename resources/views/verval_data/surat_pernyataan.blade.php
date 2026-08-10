@@ -237,6 +237,47 @@
     </div>
 
     @foreach($items as $item)
+        @php
+            // Nama Bulan Indonesia
+            $bulanId = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+            // Format Tanggal Lahir
+            $tglLahir = '..................................';
+            if ($item->tanggal_lahir) {
+                try {
+                    $dt = \Carbon\Carbon::parse($item->tanggal_lahir);
+                    $tglLahir = $dt->day . ' ' . $bulanId[$dt->month] . ' ' . $dt->year;
+                } catch (\Exception $e) {}
+            }
+
+            // Tempat, Tanggal Lahir
+            $tempatLahir = $item->tempat_lahir ? strtoupper($item->tempat_lahir) : '..................................';
+            $ttl = $tempatLahir . ', ' . $tglLahir;
+
+            // Penghasilan — format Rupiah
+            $penghasilan = '..................................';
+            if ($item->penghasilan) {
+                $penghasilan = 'Rp ' . number_format($item->penghasilan, 0, ',', '.');
+            }
+
+            // Luas Tanah
+            $luasTanah = $item->luas_tanah ? $item->luas_tanah . ' m²' : '.......... m²';
+
+            // Jenis Kepemilikan Lahan
+            $kepemilikan = $item->jenis_kepemilikan_lahan ?: '..................................';
+
+            // Telah Ditempati Selama
+            $ditempati = $item->telah_ditempati_selama ? $item->telah_ditempati_selama . ' tahun' : '.......... tahun';
+
+            // Tanggal Cetak (hari ini)
+            $now = \Carbon\Carbon::now();
+            $tglCetak = $now->day . ' ' . $bulanId[$now->month] . ' ' . $now->year;
+            $kotaCetak = $item->kabupaten_kota
+                ? ucwords(strtolower(str_replace(['KAB. ', 'KOTA ', 'KAB '], '', $item->kabupaten_kota)))
+                : 'Jember';
+        @endphp
+
         <div class="page-container">
             <div class="surat-header">
                 <h3>SURAT PERNYATAAN MENEMPATI RUMAH TIDAK LAYAK HUNI DAN TANAH</h3>
@@ -257,12 +298,12 @@
                 <tr>
                     <td class="col-label">tempat, tanggal lahir</td>
                     <td class="col-colon">:</td>
-                    <td>..................................................</td>
+                    <td>{{ $ttl }}</td>
                 </tr>
                 <tr>
-                    <td class="col-label">pekerjaan</td>
+                    <td class="col-label">jenis kelamin</td>
                     <td class="col-colon">:</td>
-                    <td>..................................................</td>
+                    <td>{{ $item->jenis_kelamin ? ucfirst(strtolower($item->jenis_kelamin)) : '..................................................' }}</td>
                 </tr>
                 <tr>
                     <td class="col-label">nomor telepon</td>
@@ -304,24 +345,24 @@
                                 <tr>
                                     <td style="width: 170px;">luas tanah</td>
                                     <td class="col-colon">:</td>
-                                    <td>.................. m²</td>
+                                    <td>{{ $luasTanah }}</td>
                                 </tr>
                                 <tr>
-                                    <td>status tanah</td>
+                                    <td>status kepemilikan tanah</td>
                                     <td class="col-colon">:</td>
-                                    <td>................................, tidak dalam sengketa</td>
+                                    <td>{{ $kepemilikan }}, tidak dalam sengketa</td>
                                 </tr>
                                 <tr>
                                     <td>telah ditempati selama</td>
                                     <td class="col-colon">:</td>
-                                    <td>...... tahun <em>(minimal 1 (satu) tahun)</em> yang saya tempati/peroleh dari .......................................... sejak tahun ..........</td>
+                                    <td>{{ $ditempati }} <em>(minimal 1 (satu) tahun)</em></td>
                                 </tr>
                             </table>
                         </div>
                     </div>
                 </li>
                 <li>
-                    memiliki penghasilan sendiri jika lajang atau penghasilan bersama suami-istri jika berpasangan*), rata-rata sebesar Rp .......................................... per bulan;
+                    memiliki penghasilan sendiri jika lajang atau penghasilan bersama suami-istri jika berpasangan*), rata-rata sebesar <strong>{{ $penghasilan }}</strong> per bulan;
                 </li>
                 <li>
                     belum pernah menerima Bantuan Stimulan Perumahan Swadaya (BSPS), Bedah Rumah, atau program kemudahan dan bantuan pembiayaan perumahan dari pemerintah dalam 5 (lima) tahun terakhir, kecuali karena bencana, kebakaran, dan/atau penataan kumuh;
@@ -355,7 +396,7 @@
                     <div class="sig-note">nama tanpa gelar</div>
                 </div>
                 <div class="sig-col">
-                    <div class="sig-title">Jember, .............................. 20...</div>
+                    <div class="sig-title">{{ $kotaCetak }}, {{ $tglCetak }}</div>
                     <div class="sig-title">Calon Penerima Bantuan,</div>
                     <div class="sig-space"></div>
                     <div class="sig-note">tanda tangan/cap jari</div>
