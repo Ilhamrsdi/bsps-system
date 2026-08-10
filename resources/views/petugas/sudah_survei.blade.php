@@ -1,7 +1,7 @@
 @extends('layouts.partial.app')
 
-@section('title', 'PUPR Jember - Tugas Sudah Di-survei')
-@section('title_header', 'Tugas Sudah Di-survei')
+@section('title', 'BSPS Verval - Usulan Sudah Di-survei')
+@section('title_header', 'Usulan Sudah Di-survei')
 @push('styles')
 <style>
     @media (max-width: 1024px) {

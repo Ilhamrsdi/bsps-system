@@ -1,8 +1,8 @@
 @extends('layouts.partial.app')
 
-@section('title', 'PUPR Jember - Pengaturan')
-@section('title_header', 'Pengaturan')
-@section('subtitle_header', 'Konfigurasi sistem dan preferensi Dinas PUPR Kabupaten Jember')
+@section('title', 'BSPS Verval - Pengaturan')
+@section('title_header', 'Pengaturan Sistem')
+@section('subtitle_header', 'Konfigurasi tema visual dan log aktivitas sistem BSPS Verval')
 
 @push('styles')
 <style>

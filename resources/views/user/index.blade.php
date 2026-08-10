@@ -1,8 +1,8 @@
 @extends('layouts.partial.app')
 
-@section('title', 'PUPR Jember - Petugas Survei')
-@section('title_header', 'Petugas Survei System')
-@section('subtitle_header', 'Kelola data petugas survei lapangan dan pengguna sistem Dinas PUPR Kabupaten Jember')
+@section('title', 'BSPS Verval - Tenaga Fasilitator Lapangan')
+@section('title_header', 'Petugas & Fasilitator BSPS')
+@section('subtitle_header', 'Kelola data Tenaga Fasilitator Lapangan (TFL), koordinator, dan pengguna sistem BSPS Verval')
 
 @push('styles')
 <style>
@@ -243,7 +243,14 @@
                                 </td>
                                 <td><span style="font-family:monospace;font-size:12px;font-weight:600;">{{ $item->nip ?? '-' }}</span></td>
                                 <td><span style="font-weight:600;color:var(--primary);">{{ $item->jabatan }}</span></td>
-                                <td><i class="fas fa-location-dot" style="color:var(--text-muted);font-size:12px;"></i> {{ $item->kecamatan }}</td>
+                                <td>
+                                    @if($item->desa)
+                                        <div style="font-weight:700;color:var(--primary-dark);"><i class="fas fa-location-dot" style="color:var(--primary);font-size:11px;margin-right:3px;"></i> Desa {{ $item->desa }}</div>
+                                        <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">Kec. {{ $item->kecamatan }}</div>
+                                    @else
+                                        <i class="fas fa-location-dot" style="color:var(--text-muted);font-size:12px;"></i> {{ $item->kecamatan }}
+                                    @endif
+                                </td>
                                 <td>{{ $item->phone ?? '-' }}</td>
                                 <td>
                                     @if($item->role === 'admin')
@@ -381,7 +388,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Email (Login)</label>
-                            <input type="email" name="email" id="inputEmail" placeholder="petugas@pupr.jember.go.id" required />
+                            <input type="email" name="email" id="inputEmail" placeholder="petugas.tfl@bsps.jemberkab.go.id" required />
                         </div>
                         <div class="form-group">
                             <label>Password</label>
@@ -393,7 +400,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Jabatan Petugas</label>
-                            <input type="text" name="jabatan" id="inputJabatan" value="Petugas Survei Lapangan" required />
+                            <input type="text" name="jabatan" id="inputJabatan" value="Tenaga Fasilitator Lapangan (TFL)" required />
                         </div>
                         <div class="form-group">
                             <label>No. HP / WhatsApp</label>

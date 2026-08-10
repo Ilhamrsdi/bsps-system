@@ -1,8 +1,8 @@
 @extends('layouts.partial.app')
 
-@section('title', 'PUPR Jember - Geo Maps')
-@section('title_header', 'Geo Maps')
-@section('subtitle_header', 'Peta Google Maps Resmi Persebaran Titik Survei & Lokasi Kegiatan PUPR Jember')
+@section('title', 'BSPS Verval - Geo Maps')
+@section('title_header', 'Geo Maps Sebaran RTLH')
+@section('subtitle_header', 'Peta Geotagging Persebaran Titik Survei Lapangan & Calon Penerima Bantuan BSPS')
 
 @push('styles')
     <!-- Leaflet CSS & Plugins -->
@@ -268,7 +268,7 @@
         <!-- Map Wrapper Full Width -->
         <div class="map-wrapper-card" style="margin-bottom:24px;">
             <div class="map-header">
-                <h3><i class="fab fa-google" style="color:var(--secondary);margin-right:8px;"></i>Google Maps - Persebaran Titik Survei Lapangan PUPR Jember</h3>
+                <h3><i class="fab fa-google" style="color:var(--secondary);margin-right:8px;"></i>Google Maps - Persebaran Titik Survei Lapangan BSPS Verval</h3>
                 <div class="layer-toggle">
                     <button class="layer-btn active" data-layer="google_street"><i class="fab fa-google"></i> Google Jalan</button>
                     <button class="layer-btn" data-layer="google_hybrid"><i class="fas fa-globe-asia"></i> Google Satelit</button>

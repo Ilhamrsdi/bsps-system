@@ -1,30 +1,22 @@
 @extends('layouts.partial.app')
 
 @section('title', 'BSPS Verval - Data Verifikasi & Validasi')
-@section('title_header', 'Data Verifikasi & Validasi (Verval)')
-@section('subtitle_header', 'Basis Data Calon Penerima Bantuan Stimulan Perumahan Swadaya (BSPS)')
+@section('title_header', 'Data Verval BSPS')
+@section('subtitle_header', 'Database Calon Penerima Bantuan Stimulan Perumahan Swadaya (BSPS) Kabupaten Jember')
 
 @push('styles')
 <style>
-    .verval-page-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 24px;
-        flex-wrap: wrap;
-        gap: 16px;
-    }
-
-    .verval-stats-grid {
+    /* Stats Grid */
+    .stats-verval {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         gap: 16px;
         margin-bottom: 24px;
     }
 
-    .stat-mini-card {
+    .stat-item {
         background: var(--bg-card);
-        border-radius: var(--radius);
+        border-radius: var(--radius-sm);
         padding: 18px 20px;
         box-shadow: var(--shadow-sm);
         border: 1px solid rgba(0, 40, 85, 0.06);
@@ -34,12 +26,12 @@
         transition: var(--transition);
     }
 
-    .stat-mini-card:hover {
+    .stat-item:hover {
         transform: translateY(-2px);
         box-shadow: var(--shadow-md);
     }
 
-    .stat-mini-icon {
+    .stat-item .icon {
         width: 46px;
         height: 46px;
         border-radius: 12px;
@@ -50,73 +42,95 @@
         flex-shrink: 0;
     }
 
-    .stat-mini-info .stat-number {
-        font-size: 22px;
+    .stat-item .icon.blue { background: rgba(0, 40, 85, 0.10); color: var(--primary); }
+    .stat-item .icon.green { background: rgba(39, 174, 96, 0.12); color: var(--success); }
+    .stat-item .icon.orange { background: rgba(255, 184, 0, 0.15); color: #d69e00; }
+    .stat-item .icon.purple { background: rgba(142, 68, 173, 0.12); color: var(--purple, #8e44ad); }
+
+    .stat-item .info .value {
+        font-size: 24px;
         font-weight: 800;
-        color: var(--primary);
-        line-height: 1.1;
+        line-height: 1.2;
+        color: var(--primary-dark);
     }
 
-    .stat-mini-info .stat-label {
+    .stat-item .info .label {
         font-size: 12px;
         color: var(--text-muted);
         font-weight: 600;
-        margin-top: 3px;
+        margin-top: 2px;
     }
 
-    /* Filter & Search Bar */
-    .filter-card {
+    /* Filter Section */
+    .filter-section {
         background: var(--bg-card);
         border-radius: var(--radius);
-        padding: 18px 22px;
-        margin-bottom: 20px;
+        padding: 16px 20px;
         box-shadow: var(--shadow-sm);
         border: 1px solid rgba(0, 40, 85, 0.06);
-    }
-
-    .filter-form {
+        margin-bottom: 24px;
         display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
         align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
     }
 
-    .filter-input-search {
+    .filter-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
         flex: 1;
-        min-width: 240px;
-        position: relative;
+        flex-wrap: wrap;
     }
 
-    .filter-input-search input {
+    .search-input-wrap {
+        position: relative;
+        min-width: 260px;
+        flex: 1;
+    }
+
+    .search-input-wrap input {
         width: 100%;
         padding: 10px 14px 10px 38px;
-        border: 1px solid rgba(0, 40, 85, 0.15);
         border-radius: var(--radius-sm);
+        border: 1px solid rgba(0, 40, 85, 0.14);
         background: var(--bg-body);
         color: var(--text-primary);
         font-size: 13.5px;
+        outline: none;
+        transition: all 0.2s ease;
+        box-sizing: border-box;
     }
 
-    .filter-input-search i {
+    .search-input-wrap input:focus {
+        border-color: var(--primary);
+        background: var(--bg-card);
+        box-shadow: 0 0 0 3px rgba(0, 40, 85, 0.08);
+    }
+
+    .search-input-wrap i {
         position: absolute;
         left: 14px;
         top: 50%;
         transform: translateY(-50%);
         color: var(--text-muted);
+        font-size: 14px;
     }
 
     .filter-select {
         padding: 10px 14px;
-        border: 1px solid rgba(0, 40, 85, 0.15);
         border-radius: var(--radius-sm);
+        border: 1px solid rgba(0, 40, 85, 0.14);
         background: var(--bg-body);
         color: var(--text-primary);
-        font-size: 13.5px;
-        min-width: 170px;
+        font-size: 13px;
+        font-weight: 600;
+        outline: none;
         cursor: pointer;
     }
 
-    /* Table & Actions */
+    /* Table Container */
     .table-container-card {
         background: var(--bg-card);
         border-radius: var(--radius);
@@ -125,396 +139,477 @@
         overflow: hidden;
     }
 
-    .table-header-custom {
-        padding: 16px 22px;
+    .table-header-bar {
+        padding: 18px 24px;
         border-bottom: 1px solid rgba(0, 40, 85, 0.06);
         display: flex;
-        justify-content: space-between;
         align-items: center;
+        justify-content: space-between;
+        gap: 12px;
     }
 
-    .table-responsive {
-        width: 100%;
-        overflow-x: auto;
+    .table-header-bar h3 {
+        font-size: 16px;
+        font-weight: 800;
+        color: var(--primary);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
-    .data-table-verval {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 13.5px;
-        text-align: left;
-    }
-
-    .data-table-verval th {
-        background: rgba(0, 40, 85, 0.03);
-        color: var(--primary-dark);
+    .badge-desil {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 11px;
         font-weight: 700;
-        padding: 12px 18px;
-        border-bottom: 1.5px solid rgba(0, 40, 85, 0.08);
-        white-space: nowrap;
-    }
-
-    .data-table-verval td {
-        padding: 14px 18px;
-        border-bottom: 1px solid rgba(0, 40, 85, 0.05);
-        vertical-align: middle;
-    }
-
-    .data-table-verval tbody tr:hover {
-        background: rgba(0, 40, 85, 0.02);
-    }
-
-    .nik-badge {
-        font-family: monospace;
-        font-size: 12px;
-        background: rgba(0, 40, 85, 0.06);
-        padding: 2px 6px;
-        border-radius: 4px;
+        background: rgba(0, 40, 85, 0.08);
         color: var(--primary);
     }
 
-    .score-badge {
+    .badge-desil.backlog-1 {
+        background: rgba(39, 174, 96, 0.12);
+        color: var(--success);
+    }
+
+    .badge-gender {
         display: inline-flex;
         align-items: center;
-        gap: 4px;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        font-size: 12px;
         font-weight: 800;
+    }
+    .badge-gender.l { background: rgba(0, 40, 85, 0.10); color: var(--primary); border: 1px solid rgba(0, 40, 85, 0.18); }
+    .badge-gender.p { background: rgba(212, 63, 120, 0.12); color: #d43f78; border: 1px solid rgba(212, 63, 120, 0.22); }
+
+    .action-btn-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-act {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .btn-act.view { background: rgba(0, 40, 85, 0.08); color: var(--primary); }
+    .btn-act.view:hover { background: var(--primary); color: #fff; }
+    .btn-act.map  { background: rgba(39, 174, 96, 0.12); color: var(--success); }
+    .btn-act.map:hover { background: var(--success); color: #fff; }
+
+    /* Custom Pagination Styling */
+    .pagination-custom-bar {
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+        border-top: 1px solid rgba(0, 40, 85, 0.08);
+        background: var(--bg-card);
+    }
+
+    .pagination-info-text {
+        font-size: 13px;
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    .pagination-info-text strong {
+        color: var(--primary-dark);
+        font-weight: 700;
+    }
+
+    .pagination-nav {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin: 0;
+        padding: 0;
+    }
+
+    .pg-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 36px;
+        height: 36px;
+        padding: 0 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text-primary);
+        background: var(--bg-body);
+        border: 1px solid rgba(0, 40, 85, 0.14);
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .pg-link:hover:not(.disabled):not(.active) {
+        background: rgba(0, 40, 85, 0.08);
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+    .pg-link.active {
+        background: var(--primary) !important;
+        color: #ffffff !important;
+        border-color: var(--primary) !important;
+        box-shadow: 0 3px 8px rgba(0, 40, 85, 0.25);
+    }
+
+    .pg-link.disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        pointer-events: none;
+        background: var(--bg-body);
+    }
+
+    .pg-dots {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 36px;
+        font-size: 13px;
+        color: var(--text-muted);
+        letter-spacing: 2px;
+    }
+
+    .jump-page-form {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-left: 6px;
+    }
+
+    .jump-page-input {
+        width: 60px;
+        height: 36px;
+        padding: 0 6px;
+        text-align: center;
+        border-radius: 8px;
+        border: 1px solid rgba(0, 40, 85, 0.16);
+        background: var(--bg-body);
+        color: var(--text-primary);
+        font-size: 13px;
+        font-weight: 700;
+        outline: none;
+        transition: all 0.2s ease;
+    }
+
+    .jump-page-input:focus {
+        border-color: var(--primary);
+        background: var(--bg-card);
+        box-shadow: 0 0 0 3px rgba(0, 40, 85, 0.08);
+    }
+
+    .jump-page-btn {
+        height: 36px;
+        padding: 0 14px;
+        border-radius: 8px;
+        border: none;
+        background: var(--primary);
+        color: #ffffff;
         font-size: 12.5px;
-        padding: 3px 10px;
-        border-radius: 20px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
     }
 
-    .score-high {
-        background: rgba(39, 174, 96, 0.12);
-        color: #27ae60;
+    .jump-page-btn:hover {
+        background: var(--primary-light);
     }
 
-    .score-mid {
-        background: rgba(243, 156, 18, 0.12);
-        color: #d68910;
+    @media (max-width: 1024px) {
+        .stats-verval { grid-template-columns: repeat(2, 1fr); }
     }
 
-    .score-low {
-        background: rgba(231, 76, 60, 0.12);
-        color: #e74c3c;
-    }
-
-    @media (max-width: 992px) {
-        .verval-stats-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-
-    @media (max-width: 576px) {
-        .verval-stats-grid {
-            grid-template-columns: 1fr;
-        }
+    @media (max-width: 768px) {
+        .filter-section { flex-direction: column; align-items: stretch; }
+        .filter-left { flex-direction: column; }
+        .search-input-wrap { width: 100%; }
+        .filter-select { width: 100%; }
+        .pagination-custom-bar { flex-direction: column; align-items: stretch; gap: 14px; }
+        .pagination-nav { flex-wrap: wrap; justify-content: center; }
+        .jump-page-form { justify-content: center; width: 100%; }
     }
 </style>
 @endpush
 
 @section('content')
-<div class="content-body" style="padding: 24px;">
+    @include('layouts.navbar')
 
-    <!-- Breadcrumb & Title -->
-    <div class="verval-page-header">
-        <div>
-            <div style="font-size: 12px; font-weight: 700; color: var(--secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">
-                <i class="fas fa-database"></i> Verifikasi &amp; Validasi BSPS
-            </div>
-            <h1 style="font-size: 24px; font-weight: 900; color: var(--primary); margin: 0;">
-                Data Calon Penerima Bantuan (BNBA)
-            </h1>
+    <main class="dashboard-content">
+        <div class="breadcrumb" style="font-size:13px;color:var(--text-muted);margin-bottom:20px;display:flex;align-items:center;gap:8px;">
+            <a href="{{ url('/dashboard') }}" style="color:var(--primary);text-decoration:none;font-weight:600;"><i class="fas fa-home"></i> Dashboard</a>
+            <i class="fas fa-chevron-right" style="font-size:10px;"></i>
+            <span>Data Verval BSPS</span>
         </div>
 
-        <div style="display: flex; gap: 10px;">
-            <button class="btn btn-primary" onclick="alert('Fitur Sinkronisasi Data BNBA Berhasil! Data telah diperbarui.')">
-                <i class="fas fa-sync-alt"></i> Sinkronisasi Data
-            </button>
-            <button class="btn btn-outline" onclick="window.print()">
-                <i class="fas fa-print"></i> Cetak Rekap
-            </button>
-        </div>
-    </div>
-
-    <!-- Mini Stat Cards -->
-    <div class="verval-stats-grid">
-        <div class="stat-mini-card">
-            <div class="stat-mini-icon" style="background: rgba(0, 40, 85, 0.08); color: var(--primary);">
-                <i class="fas fa-users-viewfinder"></i>
+        <!-- 4 Stat Counters -->
+        <div class="stats-verval">
+            <div class="stat-item">
+                <div class="icon blue"><i class="fas fa-users"></i></div>
+                <div class="info">
+                    <div class="value">{{ number_format($stats['total'], 0, ',', '.') }}</div>
+                    <div class="label">Total Calon Penerima</div>
+                </div>
             </div>
-            <div class="stat-mini-info">
-                <div class="stat-number">{{ number_format($stats['total_usulan']) }}</div>
-                <div class="stat-label">Total Usulan BNBA</div>
+            <div class="stat-item">
+                <div class="icon green"><i class="fas fa-map-location-dot"></i></div>
+                <div class="info">
+                    <div class="value">{{ $stats['kecamatan'] }}</div>
+                    <div class="label">Kecamatan Terdata</div>
+                </div>
             </div>
-        </div>
-
-        <div class="stat-mini-card">
-            <div class="stat-mini-icon" style="background: rgba(39, 174, 96, 0.12); color: var(--success);">
-                <i class="fas fa-check-double"></i>
+            <div class="stat-item">
+                <div class="icon orange"><i class="fas fa-city"></i></div>
+                <div class="info">
+                    <div class="value">{{ $stats['desa'] }}</div>
+                    <div class="label">Desa / Kelurahan</div>
+                </div>
             </div>
-            <div class="stat-mini-info">
-                <div class="stat-number" style="color: var(--success);">{{ number_format($stats['lolos_verval']) }}</div>
-                <div class="stat-label">Memenuhi Syarat (MS)</div>
+            <div class="stat-item">
+                <div class="icon purple"><i class="fas fa-filter"></i></div>
+                <div class="info">
+                    <div class="value">{{ number_format($stats['filter'], 0, ',', '.') }}</div>
+                    <div class="label">Hasil Saringan Data</div>
+                </div>
             </div>
         </div>
 
-        <div class="stat-mini-card">
-            <div class="stat-mini-icon" style="background: rgba(243, 156, 18, 0.12); color: var(--warning);">
-                <i class="fas fa-hourglass-half"></i>
+        <!-- Filter & Search Bar -->
+        <form action="{{ url('/verval-data') }}" method="GET" class="filter-section">
+            <div class="filter-left">
+                <div class="search-input-wrap">
+                    <i class="fas fa-search"></i>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama pemohon, NIK, No. KK, atau alamat..." />
+                </div>
+                <select name="kecamatan" class="filter-select" onchange="this.form.submit()">
+                    <option value="all" {{ request('kecamatan') == 'all' ? 'selected' : '' }}>-- Semua Kecamatan --</option>
+                    @foreach($listKecamatan as $kec)
+                        <option value="{{ $kec }}" {{ request('kecamatan') == $kec ? 'selected' : '' }}>Kec. {{ $kec }}</option>
+                    @endforeach
+                </select>
+                <select name="desil" class="filter-select" onchange="this.form.submit()">
+                    <option value="all" {{ request('desil') == 'all' ? 'selected' : '' }}>-- Semua Pengelompokan --</option>
+                    <option value="Backlog 1" {{ request('desil') == 'Backlog 1' ? 'selected' : '' }}>Backlog 1 Desil 1-4</option>
+                    <option value="Backlog 2" {{ request('desil') == 'Backlog 2' ? 'selected' : '' }}>Backlog 2 Desil 1-4</option>
+                </select>
             </div>
-            <div class="stat-mini-info">
-                <div class="stat-number" style="color: #d68910;">{{ number_format($stats['menunggu_survei']) }}</div>
-                <div class="stat-label">Menunggu Survei</div>
-            </div>
-        </div>
-
-        <div class="stat-mini-card">
-            <div class="stat-mini-icon" style="background: rgba(231, 76, 60, 0.12); color: var(--danger);">
-                <i class="fas fa-times-circle"></i>
-            </div>
-            <div class="stat-mini-info">
-                <div class="stat-number" style="color: var(--danger);">{{ number_format($stats['tidak_lolos']) }}</div>
-                <div class="stat-label">Tidak Memenuhi Syarat</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Filter Card -->
-    <div class="filter-card">
-        <form action="{{ url('/data-verval') }}" method="GET" class="filter-form">
-            <div class="filter-input-search">
-                <i class="fas fa-search"></i>
-                <input type="text" name="search" value="{{ $search }}" placeholder="Cari NIK, Nama Kepala Keluarga, Desa, atau Fasilitator..." />
-            </div>
-
-            <select name="status" class="filter-select" onchange="this.form.submit()">
-                <option value="">-- Semua Status Verval --</option>
-                <option value="Memenuhi Syarat" {{ $status == 'Memenuhi Syarat' ? 'selected' : '' }}>Memenuhi Syarat (MS)</option>
-                <option value="Menunggu Survei" {{ $status == 'Menunggu Survei' ? 'selected' : '' }}>Menunggu Survei</option>
-                <option value="Perbaikan Berkas" {{ $status == 'Perbaikan Berkas' ? 'selected' : '' }}>Perbaikan Berkas</option>
-                <option value="Tidak Memenuhi Syarat" {{ $status == 'Tidak Memenuhi Syarat' ? 'selected' : '' }}>Tidak Memenuhi Syarat (TMS)</option>
-            </select>
-
-            <select name="kecamatan" class="filter-select" onchange="this.form.submit()">
-                <option value="">-- Semua Kecamatan --</option>
-                <option value="Kalisat" {{ $kecamatan == 'Kalisat' ? 'selected' : '' }}>Kalisat</option>
-                <option value="Sukowono" {{ $kecamatan == 'Sukowono' ? 'selected' : '' }}>Sukowono</option>
-                <option value="Silo" {{ $kecamatan == 'Silo' ? 'selected' : '' }}>Silo</option>
-                <option value="Arjasa" {{ $kecamatan == 'Arjasa' ? 'selected' : '' }}>Arjasa</option>
-                <option value="Tempurejo" {{ $kecamatan == 'Tempurejo' ? 'selected' : '' }}>Tempurejo</option>
-                <option value="Tanggul" {{ $kecamatan == 'Tanggul' ? 'selected' : '' }}>Tanggul</option>
-                <option value="Sumberbaru" {{ $kecamatan == 'Sumberbaru' ? 'selected' : '' }}>Sumberbaru</option>
-            </select>
-
-            <button type="submit" class="btn btn-primary" style="padding: 10px 18px;">
-                <i class="fas fa-filter"></i> Filter
-            </button>
-
-            @if(!empty($search) || !empty($status) || !empty($kecamatan))
-                <a href="{{ url('/data-verval') }}" class="btn btn-outline" style="padding: 10px 16px;">
-                    <i class="fas fa-rotate-left"></i> Reset
+            <div style="display:flex;gap:10px;">
+                <a href="{{ url('/verval-data') }}" class="btn btn-outline" style="padding:10px 16px;font-size:13px;text-decoration:none;border-radius:var(--radius-sm);">
+                    <i class="fas fa-redo"></i> Reset
                 </a>
-            @endif
+                <a href="{{ url('/survey') }}" class="btn btn-primary" style="padding:10px 20px;font-size:13px;font-weight:700;background:var(--primary);color:#fff;text-decoration:none;border-radius:var(--radius-sm);display:inline-flex;align-items:center;gap:8px;">
+                    <i class="fas fa-plus"></i> Input Survei Baru
+                </a>
+            </div>
         </form>
-    </div>
 
-    <!-- Table Card -->
-    <div class="table-container-card">
-        <div class="table-header-custom">
-            <div style="font-weight: 800; font-size: 15px; color: var(--primary);">
-                <i class="fas fa-list-ol" style="margin-right: 6px; color: var(--secondary);"></i>
-                Daftar Calon Penerima BSPS ({{ count($vervalData) }} Data Ditampilkan)
+        <!-- Main Data Table -->
+        <div class="table-container-card">
+            <div class="table-header-bar">
+                <h3><i class="fas fa-clipboard-list"></i> Database Calon Penerima Bantuan BSPS (Verval Data)</h3>
+                <span style="font-size:12.5px;color:var(--text-muted);font-weight:600;">
+                    Menampilkan {{ $vervals->firstItem() ?? 0 }} - {{ $vervals->lastItem() ?? 0 }} dari {{ number_format($vervals->total(), 0, ',', '.') }} data
+                </span>
             </div>
-            <span style="font-size: 12px; color: var(--text-muted);">
-                Tahun Anggaran {{ date('Y') }}
-            </span>
-        </div>
 
-        <div class="table-responsive">
-            <table class="data-table-verval">
-                <thead>
-                    <tr>
-                        <th style="width: 50px; text-align: center;">NO</th>
-                        <th>NAMA</th>
-                        <th>L/P</th>
-                        <th>NO KTP</th>
-                        <th>NO KK</th>
-                        <th>ALAMAT</th>
-                        <th>DESA/KELURAHAN</th>
-                        <th>KECAMATAN</th>
-                        <th style="text-align: center;">STATUS</th>
-                        <th style="text-align: center;">AKSI</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($vervalData as $index => $item)
-                        <tr>
-                            <td style="font-weight: 700; color: var(--text-muted); text-align: center;">
-                                {{ $vervalData->firstItem() + $index }}
-                            </td>
-                            <td style="font-weight: 700; color: var(--text-primary);">
-                                {{ $item->nama ?? '-' }}
-                            </td>
-                            <td>{{ $item->jenis_kelamin ?? '-' }}</td>
-                            <td><span class="nik-badge">{{ $item->no_ktp ?? '-' }}</span></td>
-                            <td><span class="nik-badge">{{ $item->no_kk ?? '-' }}</span></td>
-                            <td>{{ $item->alamat ?? '-' }}</td>
-                            <td>{{ $item->desa_kelurahan ?? '-' }}</td>
-                            <td>{{ $item->kecamatan ?? '-' }}</td>
-                            <td style="text-align: center;">
-                                @php
-                                    $currentStatus = $item->status ?? 'ditemukan';
-                                    $statusColors = [
-                                        'ditemukan' => '#28a745',
-                                        'meninggal' => '#343a40',
-                                        'pindah' => '#ffc107',
-                                        'tidak diketahui' => '#dc3545',
-                                    ];
-                                    $textColor = $currentStatus == 'pindah' ? '#000' : '#fff';
-                                    $bgColor = $statusColors[$currentStatus] ?? '#28a745';
-                                @endphp
-                                <select class="form-select status-select" data-id="{{ $item->id }}" style="background-color: {{ $bgColor }}; color: {{ $textColor }}; font-weight: bold; border: none; border-radius: 20px; padding: 4px 12px; font-size: 12px; width: 130px; text-align: center; cursor: pointer; outline: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                                    <option value="ditemukan" {{ $currentStatus == 'ditemukan' ? 'selected' : '' }} style="background: #fff; color: #000;">Ditemukan</option>
-                                    <option value="meninggal" {{ $currentStatus == 'meninggal' ? 'selected' : '' }} style="background: #fff; color: #000;">Meninggal</option>
-                                    <option value="pindah" {{ $currentStatus == 'pindah' ? 'selected' : '' }} style="background: #fff; color: #000;">Pindah</option>
-                                    <option value="tidak diketahui" {{ $currentStatus == 'tidak diketahui' ? 'selected' : '' }} style="background: #fff; color: #000;">Tidak Diketahui</option>
-                                </select>
-                            </td>
-                            <td style="text-align: center;">
-                                <a href="{{ route('data-verval.edit', $item->id) }}" class="btn btn-primary" style="padding: 6px 12px; font-size: 12px; border-radius: 4px;">
-                                    <i class="fas fa-edit"></i> Isi Data
+            <div style="overflow-x:auto;">
+                <table class="table" style="width:100%;border-collapse:collapse;">
+                    <thead>
+                        <tr style="background:var(--bg-body);border-bottom:1px solid rgba(0,40,85,0.08);text-align:left;font-size:12.5px;color:var(--text-muted);">
+                            <th style="padding:14px 18px;">No</th>
+                            <th style="padding:14px 18px;">Nama Calon Penerima</th>
+                            <th style="padding:14px 18px;text-align:center;">L/P</th>
+                            <th style="padding:14px 18px;">NIK &amp; No. KK</th>
+                            <th style="padding:14px 18px;">Alamat &amp; Dusun</th>
+                            <th style="padding:14px 18px;">Desa / Kelurahan</th>
+                            <th style="padding:14px 18px;">Kecamatan</th>
+                            <th style="padding:14px 18px;">Kelompok Desil</th>
+                            <th style="padding:14px 18px;text-align:center;">Status</th>
+                            <th style="padding:14px 18px;text-align:center;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($vervals as $index => $item)
+                            <tr style="border-bottom:1px solid rgba(0,40,85,0.06);font-size:13px;transition:all 0.15s ease;">
+                                <td style="padding:14px 18px;font-weight:700;color:var(--text-muted);">
+                                    {{ $vervals->firstItem() + $index }}
+                                </td>
+                                <td style="padding:14px 18px;">
+                                    <div style="font-weight:800;color:var(--primary-dark);">
+                                        {{ $item->nama }}
+                                    </div>
+                                </td>
+                                <td style="padding:14px 18px;text-align:center;">
+                                    <span class="badge-gender {{ strtolower($item->jenis_kelamin) }}">
+                                        {{ $item->jenis_kelamin == 'L' ? 'L' : ($item->jenis_kelamin == 'P' ? 'P' : ($item->jenis_kelamin ?: '-')) }}
+                                    </span>
+                                </td>
+                                <td style="padding:14px 18px;">
+                                    <div style="font-family:monospace;font-weight:700;color:var(--text-primary);letter-spacing:0.3px;">
+                                        <span style="font-size:11px;color:var(--text-muted);font-weight:600;margin-right:4px;">NIK:</span>{{ $item->no_ktp ?: '-' }}
+                                    </div>
+                                    <div style="font-family:monospace;font-weight:600;color:var(--text-muted);font-size:12px;margin-top:3px;letter-spacing:0.3px;">
+                                        <span style="font-size:11px;color:var(--text-muted);font-weight:600;margin-right:4px;">KK:</span>{{ $item->no_kk ?: '-' }}
+                                    </div>
+                                </td>
+                                <td style="padding:14px 18px;color:var(--text-secondary);">
+                                    {{ $item->alamat ?: '-' }}
+                                </td>
+                                <td style="padding:14px 18px;font-weight:600;color:var(--primary-dark);">
+                                    {{ $item->desa_kelurahan ?: '-' }}
+                                </td>
+                                <td style="padding:14px 18px;">
+                                    <span style="font-weight:700;color:var(--primary);">Kec. {{ $item->kecamatan }}</span>
+                                </td>
+                                <td style="padding:14px 18px;">
+                                    <span class="badge-desil {{ str_contains($item->pengelompokan_desil, 'Backlog 1') ? 'backlog-1' : '' }}">
+                                        <i class="fas fa-layer-group" style="font-size:10px;"></i>
+                                        {{ $item->pengelompokan_desil ?: 'Desil 1-4' }}
+                                    </span>
+                                </td>
+                                <td style="padding:14px 18px;text-align:center;">
+                                    @php
+                                        $currentStatus = $item->status ?? 'ditemukan';
+                                        $statusColors = [
+                                            'ditemukan' => '#28a745',
+                                            'meninggal' => '#343a40',
+                                            'pindah' => '#ffc107',
+                                            'tidak diketahui' => '#dc3545',
+                                        ];
+                                        $textColor = $currentStatus == 'pindah' ? '#000' : '#fff';
+                                        $bgColor = $statusColors[$currentStatus] ?? '#28a745';
+                                    @endphp
+                                    <select class="form-select status-select" data-id="{{ $item->id }}" style="background-color: {{ $bgColor }}; color: {{ $textColor }}; font-weight: bold; border: none; border-radius: 20px; padding: 4px 12px; font-size: 11px; width: 120px; text-align: center; cursor: pointer; outline: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                        <option value="ditemukan" {{ $currentStatus == 'ditemukan' ? 'selected' : '' }} style="background: #fff; color: #000;">Ditemukan</option>
+                                        <option value="meninggal" {{ $currentStatus == 'meninggal' ? 'selected' : '' }} style="background: #fff; color: #000;">Meninggal</option>
+                                        <option value="pindah" {{ $currentStatus == 'pindah' ? 'selected' : '' }} style="background: #fff; color: #000;">Pindah</option>
+                                        <option value="tidak diketahui" {{ $currentStatus == 'tidak diketahui' ? 'selected' : '' }} style="background: #fff; color: #000;">Tidak Diketahui</option>
+                                    </select>
+                                </td>
+                                <td style="padding:14px 18px;text-align:center;">
+                                    <div class="action-btn-group" style="justify-content:center;">
+                                        <a href="{{ route('data-verval.edit', $item->id) }}" class="btn-act view" title="Isi Data" style="background: rgba(41, 128, 185, 0.12); color: #2980b9;">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{{ url('/survey?nik=' . $item->no_ktp . '&nama=' . urlencode($item->nama) . '&desa=' . urlencode($item->desa_kelurahan) . '&kecamatan=' . urlencode($item->kecamatan) . '&alamat=' . urlencode($item->alamat)) }}" class="btn-act view" title="Mulai Survei RTLH untuk Pemohon Ini">
+                                            <i class="fas fa-clipboard-check"></i>
+                                        </a>
+                                        <a href="{{ url('/geomaps') }}" class="btn-act map" title="Lihat Peta Lokasi">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="10" style="text-align:center;padding:32px;color:var(--text-muted);">
+                                    <i class="fas fa-clipboard-question" style="font-size:28px;display:block;margin-bottom:8px;opacity:0.4;"></i>
+                                    Tidak ditemukan data calon penerima yang sesuai dengan filter pencarian.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Bar Custom -->
+            <div class="pagination-custom-bar">
+                <div class="pagination-info-text">
+                    Menampilkan <strong>{{ $vervals->firstItem() ?? 0 }}</strong> - <strong>{{ $vervals->lastItem() ?? 0 }}</strong> dari <strong>{{ number_format($vervals->total(), 0, ',', '.') }}</strong> penerima (Halaman <strong>{{ $vervals->currentPage() }}</strong> dari <strong>{{ $vervals->lastPage() }}</strong>)
+                </div>
+
+                @php
+                    $current = $vervals->currentPage();
+                    $last = $vervals->lastPage();
+                    $delta = 2;
+                    $left = $current - $delta;
+                    $right = $current + $delta + 1;
+                    $range = [];
+                    $rangeWithDots = [];
+                    $l = null;
+
+                    for ($i = 1; $i <= $last; $i++) {
+                        if ($i == 1 || $i == $last || ($i >= $left && $i < $right)) {
+                            $range[] = $i;
+                        }
+                    }
+
+                    foreach ($range as $i) {
+                        if ($l) {
+                            if ($i - $l === 2) {
+                                $rangeWithDots[] = $l + 1;
+                            } elseif ($i - $l !== 1) {
+                                $rangeWithDots[] = '...';
+                            }
+                        }
+                        $rangeWithDots[] = $i;
+                        $l = $i;
+                    }
+                @endphp
+
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                    <!-- Navigation Buttons -->
+                    <div class="pagination-nav">
+                        <!-- Prev Button -->
+                        <a href="{{ $vervals->previousPageUrl() ?: '#' }}" class="pg-link {{ $vervals->onFirstPage() ? 'disabled' : '' }}" title="Halaman Sebelumnya">
+                            <i class="fas fa-chevron-left" style="margin-right:4px;"></i> Prev
+                        </a>
+
+                        <!-- Page Numbers with Sliding Window -->
+                        @foreach($rangeWithDots as $p)
+                            @if($p === '...')
+                                <span class="pg-dots">&bull;&bull;&bull;</span>
+                            @else
+                                <a href="{{ $vervals->url($p) }}" class="pg-link {{ $p == $current ? 'active' : '' }}">
+                                    {{ $p }}
                                 </a>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="10" style="text-align: center; padding: 40px; color: var(--text-muted);">
-                                <i class="fas fa-folder-open" style="font-size: 32px; display: block; margin-bottom: 8px; opacity: 0.5;"></i>
-                                Tidak ada data BNBA yang cocok dengan kriteria pencarian / filter Anda.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-        <div style="padding: 16px 22px; border-top: 1px solid rgba(0, 40, 85, 0.06);">
-            {{ $vervalData->links('pagination::bootstrap-5') }}
-        </div>
-    </div>
-</div>
+                            @endif
+                        @endforeach
 
-<!-- Modal Detail Calon Penerima BSPS -->
-<div class="modal-overlay" id="modalVervalDetail">
-    <div class="modal-box" style="max-width: 680px;">
-        <div class="modal-header" style="background: var(--primary); color: #fff;">
-            <h3 style="color: #fff; display: flex; align-items: center; gap: 8px; font-size: 16px;">
-                <i class="fas fa-home-user"></i> Lembar Verifikasi &amp; Validasi BSPS
-            </h3>
-            <button class="close-btn" style="color:#fff;" type="button" onclick="window.PuprModal.close('modalVervalDetail')">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
+                        <!-- Next Button -->
+                        <a href="{{ $vervals->nextPageUrl() ?: '#' }}" class="pg-link {{ !$vervals->hasMorePages() ? 'disabled' : '' }}" title="Halaman Berikutnya">
+                            Next <i class="fas fa-chevron-right" style="margin-left:4px;"></i>
+                        </a>
+                    </div>
 
-        <div class="modal-body" style="padding: 24px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(0,40,85,0.08);">
-                <div>
-                    <span id="modalVervalId" style="font-size: 16px; font-weight: 800; color: var(--primary);">BSPS-2026-001</span>
-                    <span id="modalVervalStatusBadge" style="margin-left: 8px;"></span>
-                </div>
-                <div id="modalVervalSkor" style="font-weight: 800; font-size: 14px;"></div>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px;">
-                <div>
-                    <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-muted);">Nama Kepala Keluarga</div>
-                    <div id="modalVervalNama" style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin-top: 2px;"></div>
-                </div>
-                <div>
-                    <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-muted);">Nomor Induk Kependudukan (NIK)</div>
-                    <div id="modalVervalNik" style="font-size: 14px; font-family: monospace; font-weight: 700; color: var(--primary); margin-top: 2px;"></div>
-                </div>
-                <div>
-                    <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-muted);">Pekerjaan &amp; Penghasilan</div>
-                    <div id="modalVervalPekerjaan" style="font-size: 13.5px; font-weight: 600; color: var(--text-primary); margin-top: 2px;"></div>
-                </div>
-                <div>
-                    <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-muted);">Status Legalitas Tanah</div>
-                    <div id="modalVervalTanah" style="font-size: 13.5px; font-weight: 600; color: var(--text-primary); margin-top: 2px;"></div>
+                    <!-- Jump To Page Form -->
+                    <form action="{{ url('/verval-data') }}" method="GET" class="jump-page-form">
+                        @if(request('search')) <input type="hidden" name="search" value="{{ request('search') }}"> @endif
+                        @if(request('kecamatan') && request('kecamatan') != 'all') <input type="hidden" name="kecamatan" value="{{ request('kecamatan') }}"> @endif
+                        @if(request('desil') && request('desil') != 'all') <input type="hidden" name="desil" value="{{ request('desil') }}"> @endif
+                        <span style="font-size:12px;color:var(--text-muted);font-weight:600;">Lompat:</span>
+                        <input type="number" name="page" min="1" max="{{ $last }}" value="{{ $current }}" class="jump-page-input" title="Masukkan nomor halaman" />
+                        <button type="submit" class="jump-page-btn" title="Buka Halaman">Go</button>
+                    </form>
                 </div>
             </div>
-
-            <div style="background: rgba(0, 40, 85, 0.03); border-radius: 8px; padding: 14px; margin-bottom: 18px; border-left: 4px solid var(--secondary);">
-                <div style="font-size: 11.5px; font-weight: 700; color: var(--primary-dark); text-transform: uppercase; margin-bottom: 6px;">
-                    <i class="fas fa-map-marker-alt"></i> Alamat Lengkap Objek RTLH
-                </div>
-                <div id="modalVervalAlamat" style="font-size: 13.5px; color: var(--text-primary); font-weight: 500;"></div>
-            </div>
-
-            <div style="border: 1px solid rgba(0,40,85,0.08); border-radius: 8px; padding: 14px; margin-bottom: 18px;">
-                <div style="font-size: 12px; font-weight: 800; color: var(--primary); margin-bottom: 8px;">
-                    <i class="fas fa-hammer"></i> Rincian Kerusakan Komponen Rumah (RTLH):
-                </div>
-                <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
-                    <li><strong>Kondisi Atap:</strong> <span id="modalVervalAtap"></span></li>
-                    <li><strong>Kondisi Dinding:</strong> <span id="modalVervalDinding"></span></li>
-                    <li><strong>Kondisi Lantai:</strong> <span id="modalVervalLantai"></span></li>
-                </ul>
-            </div>
-
-            <div style="background: rgba(255, 184, 0, 0.08); border-radius: 8px; padding: 12px; font-size: 12.5px; color: var(--text-primary);">
-                <strong>Catatan Verifikator (TFL):</strong>
-                <p id="modalVervalCatatan" style="margin: 4px 0 0 0; color: var(--text-secondary); font-style: italic;"></p>
-                <div style="margin-top: 8px; font-size: 11.5px; font-weight: 700; color: var(--primary);" id="modalVervalTfl"></div>
-            </div>
         </div>
-
-        <div class="modal-footer" style="padding: 14px 20px; background: var(--bg-body); border-top: 1px solid rgba(0, 40, 85, 0.06); display: flex; justify-content: flex-end; gap: 10px;">
-            <button type="button" class="btn btn-outline" onclick="window.PuprModal.close('modalVervalDetail')">
-                Tutup
-            </button>
-            <button type="button" class="btn btn-primary" onclick="alert('Mencetak Lembar Verifikasi Lengkap (Format Resmi BSPS)...')">
-                <i class="fas fa-print"></i> Cetak Lembar Verval
-            </button>
-        </div>
-    </div>
-</div>
+    </main>
 @endsection
 
 @push('scripts')
 <script>
-function showVervalDetail(data) {
-    document.getElementById('modalVervalId').innerText = data.id;
-    document.getElementById('modalVervalNama').innerText = data.nama_kk + ' (' + data.umur + ' Thn / ' + data.tanggungan + ' Tanggungan)';
-    document.getElementById('modalVervalNik').innerText = data.nik;
-    document.getElementById('modalVervalPekerjaan').innerText = data.pekerjaan + ' - ' + data.penghasilan;
-    document.getElementById('modalVervalTanah').innerText = data.legalitas_tanah;
-    document.getElementById('modalVervalAlamat').innerText = data.dusun + ', Desa ' + data.desa + ', Kecamatan ' + data.kecamatan + ', Kabupaten Jember';
-    document.getElementById('modalVervalAtap').innerText = data.kondisi_atap;
-    document.getElementById('modalVervalDinding').innerText = data.kondisi_dinding;
-    document.getElementById('modalVervalLantai').innerText = data.kondisi_lantai;
-    document.getElementById('modalVervalCatatan').innerText = data.catatan;
-    document.getElementById('modalVervalTfl').innerText = 'Petugas TFL: ' + data.fasilitator + ' (' + data.tgl_verval + ')';
-
-    // Status Badge
-    let badgeHtml = '';
-    if(data.status_badge === 'success') {
-        badgeHtml = '<span class="badge success" style="padding: 4px 10px;"><i class="fas fa-check-circle"></i> ' + data.status_verval + '</span>';
-    } else if(data.status_badge === 'warning') {
-        badgeHtml = '<span class="badge warning" style="padding: 4px 10px;"><i class="fas fa-clock"></i> ' + data.status_verval + '</span>';
-    } else if(data.status_badge === 'info') {
-        badgeHtml = '<span class="badge info" style="padding: 4px 10px; background: rgba(52, 152, 219, 0.15); color: #2980b9;"><i class="fas fa-exclamation-circle"></i> ' + data.status_verval + '</span>';
-    } else {
-        badgeHtml = '<span class="badge danger" style="padding: 4px 10px;"><i class="fas fa-times-circle"></i> ' + data.status_verval + '</span>';
-    }
-    document.getElementById('modalVervalStatusBadge').innerHTML = badgeHtml;
-
-    // Skor Badge
-    let scoreClass = data.skor_kelaikan >= 80 ? 'score-high' : (data.skor_kelaikan >= 60 ? 'score-mid' : 'score-low');
-    document.getElementById('modalVervalSkor').innerHTML = '<span class="score-badge ' + scoreClass + '"><i class="fas fa-gauge-high"></i> Skor RTLH: ' + data.skor_kelaikan + '%</span>';
-
-    window.PuprModal.open('modalVervalDetail');
-}
-
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.status-select').forEach(function(select) {
         select.addEventListener('change', function() {

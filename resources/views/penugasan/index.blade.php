@@ -1,8 +1,8 @@
 @extends('layouts.partial.app')
 
-@section('title', 'PUPR Jember - Penugasan Petugas Survei')
-@section('title_header', 'Penugasan Petugas Survei')
-@section('subtitle_header', 'Kelola alokasi & penugasan petugas survei lapangan untuk kegiatan Dinas PUPR Jember')
+@section('title', 'BSPS Verval - Penugasan Fasilitator Lapangan')
+@section('title_header', 'Penugasan Fasilitator Lapangan (TFL)')
+@section('subtitle_header', 'Kelola alokasi & penugasan Tenaga Fasilitator Lapangan (TFL) untuk verifikasi calon penerima bantuan BSPS')
 
 @push('styles')
 <style>

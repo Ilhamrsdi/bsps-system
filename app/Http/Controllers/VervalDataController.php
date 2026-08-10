@@ -2,40 +2,58 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DataPenerima;
 use Illuminate\Http\Request;
-use App\Services\DummyVervalService;
 
 class VervalDataController extends Controller
 {
+    /**
+     * Tampilkan Halaman Daftar Data Verval Calon Penerima BSPS
+     */
     public function index(Request $request)
     {
-        $query = \App\Models\DataPenerima::query();
+        $search = $request->get('search');
+        $kecamatan = $request->get('kecamatan', 'all');
+        $desil = $request->get('desil', 'all');
 
-        $search = $request->query('search');
-        if (!empty($search)) {
+        $query = DataPenerima::query();
+
+        if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%")
                   ->orWhere('no_ktp', 'like', "%{$search}%")
+                  ->orWhere('no_kk', 'like', "%{$search}%")
+                  ->orWhere('alamat', 'like', "%{$search}%")
                   ->orWhere('desa_kelurahan', 'like', "%{$search}%");
             });
         }
 
-        $kecamatan = $request->query('kecamatan');
-        if (!empty($kecamatan)) {
+        if ($kecamatan && $kecamatan !== 'all') {
             $query->where('kecamatan', $kecamatan);
         }
 
-        $stats = \App\Services\DummyVervalService::getStats(); // Keep dummy stats for layout
+        if ($desil && $desil !== 'all') {
+            $query->where('pengelompokan_desil', 'like', "%{$desil}%");
+        }
 
-        $vervalData = $query->paginate(20)->withQueryString();
+        // Hitung total penerima
+        $totalPenerima = DataPenerima::count();
+        $totalKecamatan = DataPenerima::distinct('kecamatan')->count('kecamatan');
+        $totalDesa = DataPenerima::distinct('desa_kelurahan')->count('desa_kelurahan');
 
-        return view('verval_data.index', [
-            'vervalData' => $vervalData,
-            'stats'      => $stats,
-            'search'     => $search,
-            'status'     => $request->query('status'),
-            'kecamatan'  => $kecamatan,
-        ]);
+        $stats = [
+            'total'     => $totalPenerima,
+            'kecamatan' => $totalKecamatan,
+            'desa'      => $totalDesa,
+            'filter'    => $query->count(),
+        ];
+
+        // Daftar Kecamatan untuk filter dropdown
+        $listKecamatan = DataPenerima::distinct()->orderBy('kecamatan', 'asc')->pluck('kecamatan')->filter()->values();
+
+        $vervals = $query->paginate(20)->withQueryString();
+
+        return view('verval_data.index', compact('vervals', 'stats', 'listKecamatan'));
     }
 
     public function edit($id)
