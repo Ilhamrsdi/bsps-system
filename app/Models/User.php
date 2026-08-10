@@ -24,6 +24,7 @@ class User extends Authenticatable
         'nip',
         'jabatan',
         'kecamatan',
+        'desa',
         'phone',
         'status',
         'role',

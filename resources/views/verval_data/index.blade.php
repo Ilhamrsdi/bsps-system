@@ -176,14 +176,17 @@
     }
 
     .badge-gender {
-        display: inline-block;
-        padding: 2px 7px;
-        border-radius: 6px;
-        font-size: 10.5px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        font-size: 12px;
         font-weight: 800;
     }
-    .badge-gender.l { background: rgba(0, 40, 85, 0.10); color: var(--primary); }
-    .badge-gender.p { background: rgba(212, 63, 120, 0.12); color: #d43f78; }
+    .badge-gender.l { background: rgba(0, 40, 85, 0.10); color: var(--primary); border: 1px solid rgba(0, 40, 85, 0.18); }
+    .badge-gender.p { background: rgba(212, 63, 120, 0.12); color: #d43f78; border: 1px solid rgba(212, 63, 120, 0.22); }
 
     .action-btn-group {
         display: flex;
@@ -210,13 +213,128 @@
     .btn-act.map  { background: rgba(39, 174, 96, 0.12); color: var(--success); }
     .btn-act.map:hover { background: var(--success); color: #fff; }
 
-    /* Pagination */
-    .pagination-wrapper {
+    /* Custom Pagination Styling */
+    .pagination-custom-bar {
         padding: 16px 24px;
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        border-top: 1px solid rgba(0, 40, 85, 0.06);
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+        border-top: 1px solid rgba(0, 40, 85, 0.08);
+        background: var(--bg-card);
+    }
+
+    .pagination-info-text {
+        font-size: 13px;
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    .pagination-info-text strong {
+        color: var(--primary-dark);
+        font-weight: 700;
+    }
+
+    .pagination-nav {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin: 0;
+        padding: 0;
+    }
+
+    .pg-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 36px;
+        height: 36px;
+        padding: 0 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text-primary);
+        background: var(--bg-body);
+        border: 1px solid rgba(0, 40, 85, 0.14);
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .pg-link:hover:not(.disabled):not(.active) {
+        background: rgba(0, 40, 85, 0.08);
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+    .pg-link.active {
+        background: var(--primary) !important;
+        color: #ffffff !important;
+        border-color: var(--primary) !important;
+        box-shadow: 0 3px 8px rgba(0, 40, 85, 0.25);
+    }
+
+    .pg-link.disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        pointer-events: none;
+        background: var(--bg-body);
+    }
+
+    .pg-dots {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 36px;
+        font-size: 13px;
+        color: var(--text-muted);
+        letter-spacing: 2px;
+    }
+
+    .jump-page-form {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-left: 6px;
+    }
+
+    .jump-page-input {
+        width: 60px;
+        height: 36px;
+        padding: 0 6px;
+        text-align: center;
+        border-radius: 8px;
+        border: 1px solid rgba(0, 40, 85, 0.16);
+        background: var(--bg-body);
+        color: var(--text-primary);
+        font-size: 13px;
+        font-weight: 700;
+        outline: none;
+        transition: all 0.2s ease;
+    }
+
+    .jump-page-input:focus {
+        border-color: var(--primary);
+        background: var(--bg-card);
+        box-shadow: 0 0 0 3px rgba(0, 40, 85, 0.08);
+    }
+
+    .jump-page-btn {
+        height: 36px;
+        padding: 0 14px;
+        border-radius: 8px;
+        border: none;
+        background: var(--primary);
+        color: #ffffff;
+        font-size: 12.5px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .jump-page-btn:hover {
+        background: var(--primary-light);
     }
 
     @media (max-width: 1024px) {
@@ -228,7 +346,9 @@
         .filter-left { flex-direction: column; }
         .search-input-wrap { width: 100%; }
         .filter-select { width: 100%; }
-        .pagination-wrapper { flex-direction: column; gap: 12px; }
+        .pagination-custom-bar { flex-direction: column; align-items: stretch; gap: 14px; }
+        .pagination-nav { flex-wrap: wrap; justify-content: center; }
+        .jump-page-form { justify-content: center; width: 100%; }
     }
 </style>
 @endpush
@@ -319,8 +439,8 @@
                         <tr style="background:var(--bg-body);border-bottom:1px solid rgba(0,40,85,0.08);text-align:left;font-size:12.5px;color:var(--text-muted);">
                             <th style="padding:14px 18px;">No</th>
                             <th style="padding:14px 18px;">Nama Calon Penerima</th>
-                            <th style="padding:14px 18px;">No. KTP (NIK)</th>
-                            <th style="padding:14px 18px;">No. KK</th>
+                            <th style="padding:14px 18px;text-align:center;">L/P</th>
+                            <th style="padding:14px 18px;">NIK &amp; No. KK</th>
                             <th style="padding:14px 18px;">Alamat &amp; Dusun</th>
                             <th style="padding:14px 18px;">Desa / Kelurahan</th>
                             <th style="padding:14px 18px;">Kecamatan</th>
@@ -335,16 +455,22 @@
                                     {{ $vervals->firstItem() + $index }}
                                 </td>
                                 <td style="padding:14px 18px;">
-                                    <div style="font-weight:800;color:var(--primary-dark);display:flex;align-items:center;gap:6px;">
+                                    <div style="font-weight:800;color:var(--primary-dark);">
                                         {{ $item->nama }}
-                                        <span class="badge-gender {{ strtolower($item->jenis_kelamin) }}">{{ $item->jenis_kelamin }}</span>
                                     </div>
                                 </td>
-                                <td style="padding:14px 18px;font-family:monospace;font-weight:600;color:var(--text-primary);">
-                                    {{ $item->no_ktp ?: '-' }}
+                                <td style="padding:14px 18px;text-align:center;">
+                                    <span class="badge-gender {{ strtolower($item->jenis_kelamin) }}">
+                                        {{ $item->jenis_kelamin == 'L' ? 'L' : ($item->jenis_kelamin == 'P' ? 'P' : ($item->jenis_kelamin ?: '-')) }}
+                                    </span>
                                 </td>
-                                <td style="padding:14px 18px;font-family:monospace;font-weight:600;color:var(--text-muted);">
-                                    {{ $item->no_kk ?: '-' }}
+                                <td style="padding:14px 18px;">
+                                    <div style="font-family:monospace;font-weight:700;color:var(--text-primary);letter-spacing:0.3px;">
+                                        <span style="font-size:11px;color:var(--text-muted);font-weight:600;margin-right:4px;">NIK:</span>{{ $item->no_ktp ?: '-' }}
+                                    </div>
+                                    <div style="font-family:monospace;font-weight:600;color:var(--text-muted);font-size:12px;margin-top:3px;letter-spacing:0.3px;">
+                                        <span style="font-size:11px;color:var(--text-muted);font-weight:600;margin-right:4px;">KK:</span>{{ $item->no_kk ?: '-' }}
+                                    </div>
                                 </td>
                                 <td style="padding:14px 18px;color:var(--text-secondary);">
                                     {{ $item->alamat ?: '-' }}
@@ -384,13 +510,75 @@
                 </table>
             </div>
 
-            <!-- Pagination Bar -->
-            <div class="pagination-wrapper">
-                <div style="font-size:13px;color:var(--text-muted);font-weight:500;">
-                    Halaman <strong>{{ $vervals->currentPage() }}</strong> dari <strong>{{ $vervals->lastPage() }}</strong>
+            <!-- Pagination Bar Custom -->
+            <div class="pagination-custom-bar">
+                <div class="pagination-info-text">
+                    Menampilkan <strong>{{ $vervals->firstItem() ?? 0 }}</strong> - <strong>{{ $vervals->lastItem() ?? 0 }}</strong> dari <strong>{{ number_format($vervals->total(), 0, ',', '.') }}</strong> penerima (Halaman <strong>{{ $vervals->currentPage() }}</strong> dari <strong>{{ $vervals->lastPage() }}</strong>)
                 </div>
-                <div>
-                    {{ $vervals->links() }}
+
+                @php
+                    $current = $vervals->currentPage();
+                    $last = $vervals->lastPage();
+                    $delta = 2;
+                    $left = $current - $delta;
+                    $right = $current + $delta + 1;
+                    $range = [];
+                    $rangeWithDots = [];
+                    $l = null;
+
+                    for ($i = 1; $i <= $last; $i++) {
+                        if ($i == 1 || $i == $last || ($i >= $left && $i < $right)) {
+                            $range[] = $i;
+                        }
+                    }
+
+                    foreach ($range as $i) {
+                        if ($l) {
+                            if ($i - $l === 2) {
+                                $rangeWithDots[] = $l + 1;
+                            } elseif ($i - $l !== 1) {
+                                $rangeWithDots[] = '...';
+                            }
+                        }
+                        $rangeWithDots[] = $i;
+                        $l = $i;
+                    }
+                @endphp
+
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                    <!-- Navigation Buttons -->
+                    <div class="pagination-nav">
+                        <!-- Prev Button -->
+                        <a href="{{ $vervals->previousPageUrl() ?: '#' }}" class="pg-link {{ $vervals->onFirstPage() ? 'disabled' : '' }}" title="Halaman Sebelumnya">
+                            <i class="fas fa-chevron-left" style="margin-right:4px;"></i> Prev
+                        </a>
+
+                        <!-- Page Numbers with Sliding Window -->
+                        @foreach($rangeWithDots as $p)
+                            @if($p === '...')
+                                <span class="pg-dots">&bull;&bull;&bull;</span>
+                            @else
+                                <a href="{{ $vervals->url($p) }}" class="pg-link {{ $p == $current ? 'active' : '' }}">
+                                    {{ $p }}
+                                </a>
+                            @endif
+                        @endforeach
+
+                        <!-- Next Button -->
+                        <a href="{{ $vervals->nextPageUrl() ?: '#' }}" class="pg-link {{ !$vervals->hasMorePages() ? 'disabled' : '' }}" title="Halaman Berikutnya">
+                            Next <i class="fas fa-chevron-right" style="margin-left:4px;"></i>
+                        </a>
+                    </div>
+
+                    <!-- Jump To Page Form -->
+                    <form action="{{ url('/verval-data') }}" method="GET" class="jump-page-form">
+                        @if(request('search')) <input type="hidden" name="search" value="{{ request('search') }}"> @endif
+                        @if(request('kecamatan') && request('kecamatan') != 'all') <input type="hidden" name="kecamatan" value="{{ request('kecamatan') }}"> @endif
+                        @if(request('desil') && request('desil') != 'all') <input type="hidden" name="desil" value="{{ request('desil') }}"> @endif
+                        <span style="font-size:12px;color:var(--text-muted);font-weight:600;">Lompat:</span>
+                        <input type="number" name="page" min="1" max="{{ $last }}" value="{{ $current }}" class="jump-page-input" title="Masukkan nomor halaman" />
+                        <button type="submit" class="jump-page-btn" title="Buka Halaman">Go</button>
+                    </form>
                 </div>
             </div>
         </div>
