@@ -20,6 +20,9 @@ Options +FollowSymLinks
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
 
+    # Force storage requests through front controller (Laravel PHP)
+    RewriteRule ^storage/(.*)$ index.php [L,QSA]
+
     # Send Requests To Front Controller...
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
