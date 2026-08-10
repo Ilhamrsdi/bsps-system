@@ -94,12 +94,15 @@ Route::get('/fix-storage', function () {
     }
     $log[] = "Successfully copied $copied files to physical folder public/storage/uploads!";
 
+    // Enforce Linux Permissions (755 for dirs, 644 for files)
     @chmod($publicStorage, 0755);
     @chmod($publicUploads, 0755);
+    @exec("chmod -R 755 " . escapeshellarg($publicStorage));
+    @exec("chmod 644 " . escapeshellarg($publicUploads) . "/* 2>/dev/null || true");
 
     return response()->json([
         'status' => 'success',
-        'message' => 'Symlink converted to physical folder successfully! Hostinger Nginx 403 bypassed.',
+        'message' => 'Symlink converted to physical folder successfully & chmod 755 applied.',
         'copied_files_count' => $copied,
         'logs' => $log,
     ]);
