@@ -23,6 +23,18 @@ return new class extends Migration
             $table->string('kabupaten_kota')->nullable();
             $table->string('provinsi')->nullable();
             $table->string('pengelompokan_desil')->nullable();
+            $table->string('latitude')->nullable();
+            $table->string('longitude')->nullable();
+            $table->string('ktp')->nullable(); // path gambar
+            $table->string('kk')->nullable(); // path gambar
+            $table->string('sertifikat_tanah')->nullable(); // path gambar
+            $table->string('jenis_kepemilikan_lahan')->nullable();
+            $table->string('foto_sudut_depan')->nullable(); // path gambar
+            $table->string('foto_sudut_belakang')->nullable(); // path gambar
+            $table->string('foto_bagian_dalam')->nullable(); // path gambar
+            $table->string('foto_sudut_kiri')->nullable(); // path gambar
+            $table->string('foto_sudut_kanan')->nullable(); // path gambar
+            $table->string('status')->nullable();
             $table->timestamps();
         });
     }
