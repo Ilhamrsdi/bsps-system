@@ -313,3 +313,51 @@ Route::get('/sync-tanggal-lahir', function () {
         'skipped'      => $skipped,
     ]);
 });
+
+// Debug: Cek format NIK di kedua database
+Route::get('/debug-nik', function () {
+    // 5 sampel NIK dari lokal
+    $lokal = \App\Models\DataPenerima::whereNotNull('no_ktp')
+        ->select('no_ktp')->limit(5)->get()
+        ->map(function ($r) {
+            return ['val' => $r->no_ktp, 'len' => strlen($r->no_ktp), 'hex' => bin2hex(substr($r->no_ktp, 0, 4))];
+        });
+
+    // 5 sampel NIK dari dataguse
+    $dataguse = \Illuminate\Support\Facades\DB::connection('dataguse')
+        ->table('data_penduduks')->select('nomor_induk_kependudukan')->limit(5)->get()
+        ->map(function ($r) {
+            $v = $r->nomor_induk_kependudukan ?? '';
+            return ['val' => $v, 'len' => strlen($v), 'hex' => bin2hex(substr($v, 0, 4))];
+        });
+
+    // Coba cross-match satu NIK lokal di dataguse (TRIM LIKE)
+    $sampleNik = trim(\App\Models\DataPenerima::whereNotNull('no_ktp')->value('no_ktp'));
+    $crossNik = \Illuminate\Support\Facades\DB::connection('dataguse')
+        ->table('data_penduduks')
+        ->whereRaw("TRIM(nomor_induk_kependudukan) = ?", [$sampleNik])
+        ->select('nomor_induk_kependudukan', 'nama', 'tanggal_lahir')
+        ->first();
+
+    // Coba match pakai nama
+    $sampleNama = strtoupper(trim(\App\Models\DataPenerima::whereNotNull('nama')->value('nama')));
+    $crossNama = \Illuminate\Support\Facades\DB::connection('dataguse')
+        ->table('data_penduduks')
+        ->whereRaw("UPPER(TRIM(nama)) = ?", [$sampleNama])
+        ->select('nomor_induk_kependudukan', 'nama', 'tanggal_lahir')
+        ->first();
+
+    // Cek total baris dataguse
+    $totalDg = \Illuminate\Support\Facades\DB::connection('dataguse')
+        ->table('data_penduduks')->count();
+
+    return response()->json([
+        'total_dataguse'     => $totalDg,
+        'lokal_sample'       => $lokal,
+        'dataguse_sample'    => $dataguse,
+        'tested_nik'         => $sampleNik,
+        'cross_nik_result'   => $crossNik,
+        'tested_nama'        => $sampleNama,
+        'cross_nama_result'  => $crossNama,
+    ]);
+});
