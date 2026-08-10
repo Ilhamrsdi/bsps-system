@@ -15,9 +15,9 @@ class DashboardController extends Controller
         }
 
         // 1. Ringkasan Utama dari Database Real (DataPenerima)
-        $totalPenerima = DataPenerima::count();
+        $totalPenerima = DataPenerima::distinct('no_ktp')->count('no_ktp');
         $totalKecamatan = DataPenerima::distinct('kecamatan')->count('kecamatan');
-        $totalDesa = DataPenerima::distinct('desa_kelurahan')->count('desa_kelurahan');
+        $totalDesa = DataPenerima::selectRaw("COUNT(DISTINCT CONCAT(kecamatan, ' - ', desa_kelurahan)) as total")->value('total');
 
         // 2. Statistik Desil Global (Backlog 1 vs Backlog 2)
         $desilStats = DataPenerima::selectRaw('pengelompokan_desil, count(*) as total')

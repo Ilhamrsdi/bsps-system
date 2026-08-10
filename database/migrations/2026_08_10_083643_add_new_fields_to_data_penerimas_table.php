@@ -15,6 +15,7 @@ return new class extends Migration
             $table->string('tempat_lahir')->nullable()->after('nama');
             $table->date('tanggal_lahir')->nullable()->after('tempat_lahir');
             $table->string('luas_tanah')->nullable()->after('jenis_kepemilikan_lahan');
+            $table->string('status_tanah')->nullable()->after('luas_tanah');
             $table->string('telah_ditempati_selama')->nullable()->after('status_tanah');
             $table->string('penghasilan')->nullable()->after('telah_ditempati_selama');
         });
