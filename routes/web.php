@@ -240,15 +240,15 @@ Route::middleware(['auth'])->group(function () {
 // SYNC TANGGAL LAHIR dari Dataguse → Data Penerima Lokal
 // ============================================================
 Route::get('/sync-tanggal-lahir', function () {
-    $updated    = 0;
-    $notFound   = 0;
-    $skipped    = 0;
-    $errors     = [];
+    $updated         = 0;
+    $notFound        = 0;
+    $skipped         = 0;
+    $dataguseFetched = 0;
 
     try {
-        // Ambil semua NIK dari data_penerimas yang belum ada tanggal_lahirnya (atau semua)
+        // 1. Ambil semua NIK dari data_penerimas
         $penerimas = \App\Models\DataPenerima::whereNotNull('no_ktp')
-            ->select('id', 'no_ktp', 'tanggal_lahir', 'tempat_lahir')
+            ->select('id', 'no_ktp')
             ->get();
 
         if ($penerimas->isEmpty()) {
@@ -257,23 +257,27 @@ Route::get('/sync-tanggal-lahir', function () {
 
         $allNiks = $penerimas->pluck('no_ktp')->unique()->values()->toArray();
 
-        // Batch-fetch dari data_penduduks di koneksi dataguse (pakai chunk 500)
-        $pendudukMap = collect();
-        foreach (array_chunk($allNiks, 500) as $chunk) {
+        // 2. Batch-fetch dari dataguse → simpan ke plain PHP array (bukan Collection)
+        $pendudukMap = []; // [ 'NIK' => stdClass{tanggal_lahir, tempat_lahir} ]
+
+        foreach (array_chunk($allNiks, 200) as $chunk) {
             $rows = \Illuminate\Support\Facades\DB::connection('dataguse')
                 ->table('data_penduduks')
                 ->whereIn('nomor_induk_kependudukan', $chunk)
                 ->select('nomor_induk_kependudukan', 'tanggal_lahir', 'tempat_lahir')
-                ->get()
-                ->keyBy('nomor_induk_kependudukan');
-            $pendudukMap = $pendudukMap->merge($rows);
+                ->get();
+
+            foreach ($rows as $row) {
+                $pendudukMap[trim($row->nomor_induk_kependudukan)] = $row;
+                $dataguseFetched++;
+            }
         }
 
-        // Update satu per satu
+        // 3. Update data_penerimas berdasarkan lookup array
         foreach ($penerimas as $penerima) {
-            $nik = $penerima->no_ktp;
+            $nik = trim($penerima->no_ktp);
 
-            if (!isset($pendudukMap[$nik])) {
+            if (!array_key_exists($nik, $pendudukMap)) {
                 $notFound++;
                 continue;
             }
@@ -281,10 +285,10 @@ Route::get('/sync-tanggal-lahir', function () {
             $dp = $pendudukMap[$nik];
             $updateData = [];
 
-            if ($dp->tanggal_lahir) {
+            if (!empty($dp->tanggal_lahir)) {
                 $updateData['tanggal_lahir'] = $dp->tanggal_lahir;
             }
-            if ($dp->tempat_lahir) {
+            if (!empty($dp->tempat_lahir)) {
                 $updateData['tempat_lahir'] = $dp->tempat_lahir;
             }
 
@@ -293,7 +297,9 @@ Route::get('/sync-tanggal-lahir', function () {
                 continue;
             }
 
-            \App\Models\DataPenerima::where('id', $penerima->id)->update($updateData);
+            \Illuminate\Support\Facades\DB::table('data_penerimas')
+                ->where('id', $penerima->id)
+                ->update($updateData);
             $updated++;
         }
 
@@ -301,16 +307,18 @@ Route::get('/sync-tanggal-lahir', function () {
         return response()->json([
             'status'  => 'error',
             'message' => $e->getMessage(),
+            'trace'   => $e->getTraceAsString(),
         ], 500);
     }
 
     return response()->json([
-        'status'       => 'success',
-        'message'      => "Sync tanggal lahir selesai!",
-        'total'        => $penerimas->count(),
-        'updated'      => $updated,
-        'not_found'    => $notFound,
-        'skipped'      => $skipped,
+        'status'           => 'success',
+        'message'          => 'Sync tanggal lahir selesai!',
+        'total_penerima'   => $penerimas->count(),
+        'dataguse_fetched' => $dataguseFetched,
+        'updated'          => $updated,
+        'not_found'        => $notFound,
+        'skipped'          => $skipped,
     ]);
 });
 
