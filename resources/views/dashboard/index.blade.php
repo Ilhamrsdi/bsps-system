@@ -298,6 +298,24 @@
         overflow: hidden;
     }
 
+    .table-sample-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table-sample-card table {
+        width: 100%;
+        min-width: 880px;
+        border-collapse: collapse;
+        white-space: nowrap;
+    }
+
+    .table-sample-card table th,
+    .table-sample-card table td {
+        white-space: nowrap;
+    }
+
     .badge-gender {
         display: inline-flex;
         align-items: center;
@@ -311,16 +329,47 @@
     .badge-gender.l { background: rgba(0, 40, 85, 0.10); color: var(--primary); }
     .badge-gender.p { background: rgba(212, 63, 120, 0.12); color: #d43f78; }
 
+    .dashboard-hero-title-wrap {
+        margin-bottom: 20px;
+    }
+    .dashboard-main-title {
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--primary-dark);
+        margin-bottom: 6px;
+        letter-spacing: -0.3px;
+        line-height: 1.3;
+    }
+    .dashboard-main-subtitle {
+        font-size: 13.5px;
+        color: var(--text-muted);
+        margin: 0;
+        line-height: 1.5;
+    }
+
     @media (max-width: 1100px) {
-        .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
         .desil-banner-grid { grid-template-columns: 1fr; }
         .chart-section { grid-template-columns: 1fr; }
         .dashboard-split-grid { grid-template-columns: 1fr; }
     }
 
-    @media (max-width: 600px) {
-        .stats-grid { grid-template-columns: 1fr; }
+    @media (max-width: 768px) {
+        .dashboard-hero-title-wrap { margin-bottom: 16px; }
+        .dashboard-main-title { font-size: 18px; }
+        .dashboard-main-subtitle { font-size: 12.5px; }
+        .chart-wrapper { height: 240px; }
+    }
+
+    @media (max-width: 576px) {
+        .stats-grid { grid-template-columns: 1fr; gap: 10px; }
+        .stat-card { padding: 14px 16px; gap: 12px; border-radius: 12px; }
+        .stat-card .stat-icon { width: 44px; height: 44px; font-size: 18px; border-radius: 10px; }
+        .stat-card .stat-info .stat-value { font-size: 20px; }
+        .stat-card .stat-info .stat-label { font-size: 11.5px; }
+        .stat-card .stat-info .stat-change { font-size: 10.5px; }
         .metric-mini-grid { grid-template-columns: 1fr; }
+        .card-panel .panel-body { padding: 14px 16px; }
     }
 </style>
 @endpush
@@ -330,11 +379,11 @@
 
     <main class="dashboard-content">
         <!-- Greeting Header -->
-        <div style="margin-bottom:20px;">
-            <h1 style="font-size:22px;font-weight:800;color:var(--primary);margin-bottom:4px;">
+        <div class="dashboard-hero-title-wrap">
+            <h1 class="dashboard-main-title">
                 Dashboard Analisis Desil BSPS Verval
             </h1>
-            <p style="font-size:13.5px;color:var(--text-muted);margin:0;">
+            <p class="dashboard-main-subtitle">
                 Sebaran data calon penerima Bantuan Stimulan Perumahan Swadaya berdasarkan kriteria <strong>Backlog 1 &amp; Backlog 2 Desil 1-4</strong> se-Kabupaten Jember.
             </p>
         </div>
@@ -559,7 +608,7 @@
 
         <!-- Sampel Calon Penerima Terbaru -->
         <div class="table-sample-card">
-            <div class="panel-header" style="padding:18px 24px;border-bottom:1px solid rgba(0,40,85,0.06);display:flex;align-items:center;justify-content:space-between;">
+            <div class="panel-header" style="padding:18px 24px;border-bottom:1px solid rgba(0,40,85,0.06);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
                 <h3 style="font-size:15px;font-weight:800;color:var(--primary);margin:0;display:flex;align-items:center;gap:8px;">
                     <i class="fas fa-clipboard-list"></i> Sampel Usulan Calon Penerima BSPS Terdaftar
                 </h3>
@@ -568,8 +617,8 @@
                 </a>
             </div>
 
-            <div style="overflow-x:auto;">
-                <table class="table" style="width:100%;border-collapse:collapse;">
+            <div class="table-sample-wrapper">
+                <table class="table" style="width:100%;border-collapse:collapse;min-width:880px;">
                     <thead>
                         <tr style="background:var(--bg-body);border-bottom:1px solid rgba(0,40,85,0.08);text-align:left;font-size:12px;color:var(--text-muted);">
                             <th style="padding:12px 18px;">Nama Calon Penerima</th>

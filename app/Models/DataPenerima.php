@@ -10,4 +10,12 @@ class DataPenerima extends Model
     use HasFactory;
 
     protected $guarded = [];
+
+    /**
+     * Relasi ke Akun Petugas Verval (User)
+     */
+    public function petugas()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

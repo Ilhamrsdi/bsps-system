@@ -378,25 +378,101 @@
             transform: translateY(-1px);
         }
 
+        .table-verval-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table-container-card table {
+            width: 100%;
+            min-width: 1050px;
+            border-collapse: collapse;
+            white-space: nowrap;
+        }
+
+        .table-container-card table th,
+        .table-container-card table td {
+            white-space: nowrap;
+        }
+
         @media (max-width: 992px) {
             .stats-verval {
                 grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .table-header-bar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .pagination-custom-bar {
+                flex-direction: column;
+                align-items: center;
+                gap: 12px;
+                text-align: center;
             }
         }
 
         @media (max-width: 576px) {
             .stats-verval {
                 grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .stat-item {
+                padding: 14px 16px;
+                gap: 12px;
+                border-radius: 12px;
+            }
+
+            .stat-item .icon {
+                width: 42px;
+                height: 42px;
+                font-size: 18px;
+                border-radius: 10px;
+            }
+
+            .stat-item .info .value {
+                font-size: 20px;
+            }
+
+            .stat-item .info .label {
+                font-size: 11.5px;
             }
 
             .filter-section {
                 flex-direction: column;
                 align-items: stretch;
+                padding: 14px;
+                gap: 10px;
             }
 
             .filter-left {
                 flex-direction: column;
                 align-items: stretch;
+                gap: 10px;
+            }
+
+            .search-input-wrap {
+                min-width: 100%;
+            }
+
+            .pupr-dropdown-wrapper,
+            .pupr-dropdown-toggle {
+                width: 100%;
+            }
+
+            .pupr-dropdown-toggle {
+                justify-content: space-between;
+            }
+
+            .pagination-nav {
+                flex-wrap: wrap;
+                justify-content: center;
             }
         }
     </style>
@@ -539,8 +615,8 @@
                 </span>
             </div>
 
-            <div style="overflow-x:auto;">
-                <table class="table" style="width:100%;border-collapse:collapse;">
+            <div class="table-verval-wrapper">
+                <table class="table" style="width:100%;border-collapse:collapse;min-width:1050px;">
                     <thead>
                         <tr
                             style="background:var(--bg-body);border-bottom:1px solid rgba(0,40,85,0.08);text-align:left;font-size:12.5px;color:var(--text-muted);">

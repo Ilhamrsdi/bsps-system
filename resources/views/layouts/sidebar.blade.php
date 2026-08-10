@@ -7,6 +7,9 @@
             <h1>BSPS Verval</h1>
             <span>SISTEM VERIFIKASI &amp; VALIDASI<br>PERUMAHAN SWADAYA</span>
         </div>
+        <button type="button" class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Tutup Sidebar">
+            <i class="fas fa-times"></i>
+        </button>
     </div>
 
     <nav class="sidebar-menu">
@@ -18,24 +21,27 @@
                 Dashboard Petugas
             </a>
             @php
-                $userAssigned = auth()->user()->kegiatans()->get();
-                $countBelum = $userAssigned->filter(fn($k) => $k->surveys->count() == 0)->count();
-                $countSudah = $userAssigned->filter(fn($k) => $k->surveys->count() > 0)->count();
+                $petugasId   = auth()->user()->id;
+                $petugasDesa = auth()->user()->desa;
+                $penerimaQuery = \App\Models\DataPenerima::where(function($q) use ($petugasId, $petugasDesa) {
+                    $q->where('user_id', $petugasId);
+                    if ($petugasDesa) {
+                        $q->orWhere('desa_kelurahan', $petugasDesa);
+                    }
+                });
+                $countSudah = (clone $penerimaQuery)->whereNotNull('foto_sudut_depan')->count();
+                $countBelum = (clone $penerimaQuery)->whereNull('foto_sudut_depan')->count();
             @endphp
             <div class="menu-label" style="margin-top:16px;">Workspace Petugas</div>
-            <a class="menu-item {{ Request::is('petugas/belum-survei') ? 'active' : '' }}" href="{{ url('/petugas/belum-survei') }}">
+            <a class="menu-item {{ Request::is('petugas/belum-survei*') ? 'active' : '' }}" href="{{ url('/petugas/belum-survei') }}">
                 <i class="fas fa-clipboard-question"></i>
                 Belum Survei
-                @if($countBelum > 0)
-                    <span class="badge warning">{{ $countBelum }}</span>
-                @endif
+                <span class="badge warning" style="margin-left:auto;font-weight:800;border-radius:12px;padding:3px 9px;font-size:11.5px;background:#ffb800;color:#002855;">{{ $countBelum }}</span>
             </a>
-            <a class="menu-item {{ Request::is('petugas/sudah-survei') ? 'active' : '' }}" href="{{ url('/petugas/sudah-survei') }}">
+            <a class="menu-item {{ Request::is('petugas/sudah-survei*') ? 'active' : '' }}" href="{{ url('/petugas/sudah-survei') }}">
                 <i class="fas fa-clipboard-check"></i>
                 Sudah Survei
-                @if($countSudah > 0)
-                    <span class="badge success">{{ $countSudah }}</span>
-                @endif
+                <span class="badge success" style="margin-left:auto;font-weight:800;border-radius:12px;padding:3px 9px;font-size:11.5px;background:#27ae60;color:#fff;">{{ $countSudah }}</span>
             </a>
         @else
             {{-- NAVIGATION ADMINISTRATOR --}}

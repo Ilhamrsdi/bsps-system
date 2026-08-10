@@ -11,7 +11,8 @@ use Illuminate\Support\Str;
 class UserPetugasDesaSeeder extends Seeder
 {
     /**
-     * Seed 1 Akun Petugas untuk Setiap 1 Desa / Kelurahan se-Kabupaten Jember.
+     * Seed 1 Akun Petugas untuk Setiap 1 Desa / Kelurahan se-Kabupaten Jember
+     * dan otomatis menghubungkan setiap Data Calon Penerima ke Akun Petugas Desa-nya.
      */
     public function run(): void
     {
@@ -78,7 +79,7 @@ class UserPetugasDesaSeeder extends Seeder
             $namaDesaFormatted = ucwords(strtolower($desaClean));
             $namaKecFormatted  = ucwords(strtolower($kecClean));
 
-            User::updateOrCreate(
+            $petugas = User::updateOrCreate(
                 ['email' => $email],
                 [
                     'name'      => "Petugas Verval Desa {$namaDesaFormatted}",
@@ -92,6 +93,10 @@ class UserPetugasDesaSeeder extends Seeder
                     'password'  => $defaultPassword,
                 ]
             );
+
+            // 3. Hubungkan seluruh data penerima di desa ini ke akun petugas tersebut
+            DataPenerima::where('desa_kelurahan', $desaClean)
+                ->update(['user_id' => $petugas->id]);
         }
     }
 }

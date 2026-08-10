@@ -21,34 +21,72 @@ document.addEventListener('DOMContentLoaded', function() {
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebarOverlay');
     const hamburger = document.getElementById('hamburgerBtn');
+    const closeBtn = document.getElementById('sidebarCloseBtn');
 
-    if (sidebar && overlay && hamburger) {
-        function toggleSidebar() {
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('active');
-            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+    function openSidebar() {
+        if (sidebar) sidebar.classList.add('open');
+        if (overlay) overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeSidebar() {
+        if (sidebar) sidebar.classList.remove('open');
+        if (overlay) overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function toggleSidebar() {
+        if (sidebar && sidebar.classList.contains('open')) {
+            closeSidebar();
+        } else {
+            openSidebar();
         }
+    }
 
-        hamburger.addEventListener('click', toggleSidebar);
-        overlay.addEventListener('click', toggleSidebar);
-
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && sidebar.classList.contains('open')) {
-                toggleSidebar();
-            }
-        });
-
-        let windowWidth = window.innerWidth;
-        window.addEventListener('resize', function() {
-            const newWidth = window.innerWidth;
-            if (newWidth > 768 && newWidth !== windowWidth) {
-                sidebar.classList.remove('open');
-                overlay.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-            windowWidth = newWidth;
+    if (hamburger) {
+        hamburger.addEventListener('click', function(e) {
+            e.stopPropagation();
+            toggleSidebar();
         });
     }
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            closeSidebar();
+        });
+    }
+
+    if (overlay) {
+        overlay.addEventListener('click', closeSidebar);
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && sidebar && sidebar.classList.contains('open')) {
+            closeSidebar();
+        }
+    });
+
+    // Auto-close sidebar on mobile when a link is clicked
+    if (sidebar) {
+        sidebar.querySelectorAll('.menu-item').forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 1024) {
+                    closeSidebar();
+                }
+            });
+        });
+    }
+
+    // Auto-close sidebar on window resize to desktop
+    let windowWidth = window.innerWidth;
+    window.addEventListener('resize', function() {
+        const newWidth = window.innerWidth;
+        if (newWidth > 1024 && newWidth !== windowWidth) {
+            closeSidebar();
+        }
+        windowWidth = newWidth;
+    });
 
     // Navbar User Profile Dropdown Toggle
     const userProfileDropdown = document.getElementById('userProfileDropdown');
@@ -57,13 +95,20 @@ document.addEventListener('DOMContentLoaded', function() {
     if (userProfileDropdown && userProfileToggle) {
         userProfileToggle.addEventListener('click', function(e) {
             e.stopPropagation();
+            const notifDropdown = document.getElementById('notifDropdownWrapper');
+            if (notifDropdown) notifDropdown.classList.remove('active', 'open');
             userProfileDropdown.classList.toggle('open');
         });
-
-        document.addEventListener('click', function(e) {
-            if (!userProfileDropdown.contains(e.target)) {
-                userProfileDropdown.classList.remove('open');
-            }
-        });
     }
+
+    // Close any dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (userProfileDropdown && !userProfileDropdown.contains(e.target)) {
+            userProfileDropdown.classList.remove('open', 'active');
+        }
+        const notifDropdown = document.getElementById('notifDropdownWrapper');
+        if (notifDropdown && !notifDropdown.contains(e.target)) {
+            notifDropdown.classList.remove('active', 'open');
+        }
+    });
 });

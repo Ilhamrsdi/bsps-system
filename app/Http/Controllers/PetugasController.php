@@ -9,90 +9,123 @@ use Illuminate\Support\Facades\Auth;
 class PetugasController extends Controller
 {
     /**
+     * Helper Query Calon Penerima di Desa Petugas yang Login
+     */
+    private function getPetugasQuery()
+    {
+        $user = Auth::user();
+        $petugasId   = $user->id;
+        $petugasDesa = $user->desa;
+
+        return DataPenerima::where(function ($q) use ($petugasId, $petugasDesa) {
+            $q->where('user_id', $petugasId);
+            if ($petugasDesa) {
+                $q->orWhere('desa_kelurahan', $petugasDesa);
+            }
+        });
+    }
+
+    /**
      * Dashboard Khusus Petugas / Fasilitator Lapangan
-     * Menampilkan data verval dari desa petugas yang login
      */
     public function dashboard(Request $request)
     {
         $user = Auth::user();
+        $query = $this->getPetugasQuery();
 
-        // Ambil desa dan kecamatan petugas yang login
-        $desaPetugas      = $user->desa ?? null;
-        $kecamatanPetugas = $user->kecamatan ?? null;
-
-        // Query data verval sesuai desa petugas
-        $query = DataPenerima::query();
-        if ($desaPetugas) {
-            $query->where('desa_kelurahan', $desaPetugas);
-        }
-
-        $totalData = $query->count();
-
-        // Stats berdasarkan data desa ini
-        $backlog1 = (clone $query)->where('pengelompokan_desil', 'like', 'Backlog 1%')->count();
-        $backlog2 = (clone $query)->where('pengelompokan_desil', 'like', 'Backlog 2%')->count();
+        $totalTugas     = (clone $query)->count();
+        $sudahSurvei    = (clone $query)->whereNotNull('foto_sudut_depan')->count();
+        $belumSurvei    = (clone $query)->whereNull('foto_sudut_depan')->count();
+        $lakiCount      = (clone $query)->where('jenis_kelamin', 'L')->count();
+        $perempuanCount = (clone $query)->where('jenis_kelamin', 'P')->count();
+        $backlog1Count  = (clone $query)->where('pengelompokan_desil', 'like', '%Backlog 1%')->count();
+        $backlog2Count  = (clone $query)->where('pengelompokan_desil', 'like', '%Backlog 2%')->count();
+        $persentase     = $totalTugas > 0 ? round(($sudahSurvei / $totalTugas) * 100) : 0;
 
         $stats = [
-            'total_data'   => $totalData,
-            'backlog1'     => $backlog1,
-            'backlog2'     => $backlog2,
-            'desa'         => $desaPetugas,
-            'kecamatan'    => $kecamatanPetugas,
+            'total_tugas'        => $totalTugas,
+            'sudah_survei'       => $sudahSurvei,
+            'belum_survei'       => $belumSurvei,
+            'laki_count'         => $lakiCount,
+            'perempuan_count'    => $perempuanCount,
+            'backlog1_count'     => $backlog1Count,
+            'backlog2_count'     => $backlog2Count,
+            'persentase_selesai' => $persentase,
+            'desa'               => $user->desa,
+            'kecamatan'          => $user->kecamatan,
         ];
 
-        // Filter & Search untuk tabel
-        $search    = $request->get('search');
-        $desilFilter = $request->get('desil', 'all');
+        // Search & Filter
+        $search = $request->get('search');
+        $statusFilter = $request->get('status', 'all');
+        $tableQuery = $this->getPetugasQuery();
 
-        $vervals = DataPenerima::when($desaPetugas, function ($q) use ($desaPetugas) {
-                        $q->where('desa_kelurahan', $desaPetugas);
-                    })
-                    ->when($search, function ($q) use ($search) {
-                        $q->where(function ($sub) use ($search) {
-                            $sub->where('nama_calon_penerima', 'like', "%$search%")
-                                ->orWhere('nik', 'like', "%$search%")
-                                ->orWhere('no_kk', 'like', "%$search%")
-                                ->orWhere('alamat', 'like', "%$search%");
-                        });
-                    })
-                    ->when($desilFilter !== 'all', function ($q) use ($desilFilter) {
-                        $q->where('pengelompokan_desil', 'like', "$desilFilter%");
-                    })
-                    ->orderBy('id')
-                    ->paginate(20)
-                    ->withQueryString();
+        if ($search) {
+            $tableQuery->where(function ($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                  ->orWhere('no_ktp', 'like', "%{$search}%")
+                  ->orWhere('no_kk', 'like', "%{$search}%")
+                  ->orWhere('alamat', 'like', "%{$search}%");
+            });
+        }
 
-        return view('petugas.dashboard', compact('user', 'stats', 'vervals', 'search', 'desilFilter'));
+        if ($statusFilter === 'sudah') {
+            $tableQuery->whereNotNull('foto_sudut_depan');
+        } elseif ($statusFilter === 'belum') {
+            $tableQuery->whereNull('foto_sudut_depan');
+        }
+
+        $vervals = $tableQuery->orderBy('id', 'asc')->paginate(15)->withQueryString();
+
+        return view('petugas.dashboard', compact('user', 'stats', 'vervals', 'search', 'statusFilter'));
     }
 
     /**
-     * Halaman Tugas Belum Survei
+     * Halaman Tugas Belum Di-survei
      */
-    public function belumSurvei()
+    public function belumSurvei(Request $request)
     {
         $user = Auth::user();
-        $desaPetugas = $user->desa ?? null;
+        $search = $request->get('search');
 
-        $kegiatans = DataPenerima::when($desaPetugas, function ($q) use ($desaPetugas) {
-            $q->where('desa_kelurahan', $desaPetugas);
-        })->limit(20)->get();
+        $query = $this->getPetugasQuery()->whereNull('foto_sudut_depan');
 
-        return view('petugas.belum_survei', compact('kegiatans'));
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                  ->orWhere('no_ktp', 'like', "%{$search}%")
+                  ->orWhere('no_kk', 'like', "%{$search}%")
+                  ->orWhere('alamat', 'like', "%{$search}%");
+            });
+        }
+
+        $penerimas = $query->orderBy('id', 'asc')->paginate(20)->withQueryString();
+
+        return view('petugas.belum_survei', compact('user', 'penerimas', 'search'));
     }
 
     /**
-     * Halaman Tugas Sudah Survei
+     * Halaman Tugas Sudah Di-survei
      */
-    public function sudahSurvei()
+    public function sudahSurvei(Request $request)
     {
         $user = Auth::user();
-        $desaPetugas = $user->desa ?? null;
+        $search = $request->get('search');
 
-        $kegiatans = DataPenerima::when($desaPetugas, function ($q) use ($desaPetugas) {
-            $q->where('desa_kelurahan', $desaPetugas);
-        })->limit(20)->get();
+        $query = $this->getPetugasQuery()->whereNotNull('foto_sudut_depan');
 
-        return view('petugas.sudah_survei', compact('kegiatans'));
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                  ->orWhere('no_ktp', 'like', "%{$search}%")
+                  ->orWhere('no_kk', 'like', "%{$search}%")
+                  ->orWhere('alamat', 'like', "%{$search}%");
+            });
+        }
+
+        $penerimas = $query->orderBy('updated_at', 'desc')->paginate(20)->withQueryString();
+
+        return view('petugas.sudah_survei', compact('user', 'penerimas', 'search'));
     }
 
     /**

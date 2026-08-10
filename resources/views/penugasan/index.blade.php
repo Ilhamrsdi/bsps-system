@@ -1,13 +1,13 @@
 @extends('layouts.partial.app')
 
-@section('title', 'BSPS Verval - Penugasan Petugas Verval')
+@section('title', 'BSPS Verval - Penugasan Petugas Lapangan')
 @section('title_header', 'Penugasan Petugas Verval')
-@section('subtitle_header', 'Database Calon Penerima Bantuan BSPS untuk Penugasan Verifikasi & Validasi Lapangan')
+@section('subtitle_header', 'Alokasi & Penugasan Petugas Lapangan per Desa untuk Verifikasi Calon Penerima Bantuan')
 
 @push('styles')
 <style>
     /* Stats Grid */
-    .stats-verval {
+    .stats-penugasan {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         gap: 16px;
@@ -42,8 +42,8 @@
         flex-shrink: 0;
     }
 
-    .stat-item .icon.blue { background: rgba(0, 40, 85, 0.10); color: var(--primary); }
-    .stat-item .icon.green { background: rgba(39, 174, 96, 0.12); color: var(--success); }
+    .stat-item .icon.blue   { background: rgba(0, 40, 85, 0.10); color: var(--primary); }
+    .stat-item .icon.green  { background: rgba(39, 174, 96, 0.12); color: var(--success); }
     .stat-item .icon.orange { background: rgba(255, 184, 0, 0.15); color: #d69e00; }
     .stat-item .icon.purple { background: rgba(142, 68, 173, 0.12); color: var(--purple, #8e44ad); }
 
@@ -146,21 +146,44 @@
         gap: 8px;
     }
 
-    .badge-desil {
+    /* Petugas Badge / Pill */
+    .petugas-pill {
         display: inline-flex;
         align-items: center;
-        gap: 5px;
-        padding: 4px 10px;
+        gap: 8px;
+        padding: 5px 12px;
         border-radius: 20px;
-        font-size: 11px;
+        background: rgba(0, 40, 85, 0.06);
+        border: 1px solid rgba(0, 40, 85, 0.12);
+        font-size: 12.5px;
         font-weight: 700;
-        background: rgba(0, 40, 85, 0.08);
-        color: var(--primary);
+        color: var(--primary-dark);
     }
 
-    .badge-desil.backlog-1 {
-        background: rgba(39, 174, 96, 0.12);
-        color: var(--success);
+    .petugas-pill .avatar-mini {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: var(--primary);
+        color: #fff;
+        font-size: 11px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .badge-unassigned {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        background: rgba(231, 76, 60, 0.10);
+        color: #e74c3c;
+        font-size: 11.5px;
+        font-weight: 700;
     }
 
     .badge-gender {
@@ -176,12 +199,6 @@
     .badge-gender.l { background: rgba(0, 40, 85, 0.10); color: var(--primary); border: 1px solid rgba(0, 40, 85, 0.18); }
     .badge-gender.p { background: rgba(212, 63, 120, 0.12); color: #d43f78; border: 1px solid rgba(212, 63, 120, 0.22); }
 
-    .action-btn-group {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-
     .btn-act {
         width: 32px;
         height: 32px;
@@ -195,11 +212,8 @@
         text-decoration: none;
         transition: all 0.2s ease;
     }
-
-    .btn-act.view { background: rgba(0, 40, 85, 0.08); color: var(--primary); }
-    .btn-act.view:hover { background: var(--primary); color: #fff; }
-    .btn-act.map  { background: rgba(39, 174, 96, 0.12); color: var(--success); }
-    .btn-act.map:hover { background: var(--success); color: #fff; }
+    .btn-act.survey { background: rgba(39, 174, 96, 0.12); color: var(--success); }
+    .btn-act.survey:hover { background: var(--success); color: #fff; }
 
     /* Custom Pagination Styling */
     .pagination-custom-bar {
@@ -331,24 +345,54 @@
         transform: translateY(-1px);
     }
 
+    .table-penugasan-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table-container-card table {
+        width: 100%;
+        min-width: 980px;
+        border-collapse: collapse;
+        white-space: nowrap;
+    }
+
+    .table-container-card table th,
+    .table-container-card table td {
+        white-space: nowrap;
+    }
+
     @media (max-width: 992px) {
-        .stats-verval {
-            grid-template-columns: repeat(2, 1fr);
+        .stats-penugasan { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    }
+
+    @media (max-width: 768px) {
+        .table-header-bar {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .pagination-custom-bar {
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            text-align: center;
         }
     }
 
     @media (max-width: 576px) {
-        .stats-verval {
-            grid-template-columns: 1fr;
-        }
-        .filter-section {
-            flex-direction: column;
-            align-items: stretch;
-        }
-        .filter-left {
-            flex-direction: column;
-            align-items: stretch;
-        }
+        .stats-penugasan { grid-template-columns: 1fr; gap: 10px; }
+        .stat-item { padding: 14px 16px; gap: 12px; border-radius: 12px; }
+        .stat-item .icon { width: 42px; height: 42px; font-size: 18px; border-radius: 10px; }
+        .stat-item .info .value { font-size: 20px; }
+        .stat-item .info .label { font-size: 11.5px; }
+        .filter-section { flex-direction: column; align-items: stretch; padding: 14px; gap: 10px; }
+        .filter-left { flex-direction: column; align-items: stretch; gap: 10px; }
+        .search-input-wrap { min-width: 100%; }
+        .pupr-dropdown-wrapper, .pupr-dropdown-toggle { width: 100%; }
+        .pupr-dropdown-toggle { justify-content: space-between; }
+        .pagination-nav { flex-wrap: wrap; justify-content: center; }
     }
 </style>
 @endpush
@@ -366,7 +410,7 @@
         </div>
 
         <!-- 4 Top Stat Summary Cards -->
-        <div class="stats-verval">
+        <div class="stats-penugasan">
             <div class="stat-item">
                 <div class="icon blue"><i class="fas fa-users-viewfinder"></i></div>
                 <div class="info">
@@ -375,39 +419,39 @@
                 </div>
             </div>
             <div class="stat-item">
-                <div class="icon green"><i class="fas fa-map-location-dot"></i></div>
+                <div class="icon green"><i class="fas fa-user-check"></i></div>
                 <div class="info">
-                    <div class="value">{{ $stats['kecamatan'] }}</div>
-                    <div class="label">Kecamatan Terdata</div>
+                    <div class="value">{{ number_format($stats['ditugaskan'], 0, ',', '.') }}</div>
+                    <div class="label">Penerima Ditugaskan</div>
                 </div>
             </div>
             <div class="stat-item">
-                <div class="icon orange"><i class="fas fa-building-columns"></i></div>
+                <div class="icon orange"><i class="fas fa-user-shield"></i></div>
+                <div class="info">
+                    <div class="value">{{ $stats['total_petugas'] }}</div>
+                    <div class="label">Petugas Desa Terdaftar</div>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="icon purple"><i class="fas fa-building-columns"></i></div>
                 <div class="info">
                     <div class="value">{{ $stats['desa'] }}</div>
                     <div class="label">Desa / Kelurahan</div>
                 </div>
             </div>
-            <div class="stat-item">
-                <div class="icon purple"><i class="fas fa-filter"></i></div>
-                <div class="info">
-                    <div class="value">{{ number_format($stats['filter'], 0, ',', '.') }}</div>
-                    <div class="label">Hasil Saringan Data</div>
-                </div>
-            </div>
         </div>
 
-        <!-- Filter & Search Bar Form (Custom PuprDropdown) -->
+        <!-- Filter & Search Bar Form -->
         <form action="{{ url('/penugasan') }}" method="GET" class="filter-section" id="filterFormPenugasan">
             <div class="filter-left">
                 <div class="search-input-wrap">
                     <i class="fas fa-search"></i>
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama pemohon, NIK, No. KK, atau alamat..." />
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama calon penerima, NIK, alamat, desa, atau nama petugas..." />
                 </div>
 
-                {{-- Hidden inputs untuk submit via dropdown --}}
+                {{-- Hidden inputs --}}
                 <input type="hidden" name="kecamatan" id="hiddenKecamatanPenugasan" value="{{ request('kecamatan', 'all') }}" />
-                <input type="hidden" name="desil" id="hiddenDesilPenugasan" value="{{ request('desil', 'all') }}" />
+                <input type="hidden" name="petugas_id" id="hiddenPetugasPenugasan" value="{{ request('petugas_id', 'all') }}" />
 
                 {{-- Custom Dropdown: Kecamatan --}}
                 <div class="pupr-dropdown-wrapper" id="ddKecPenugasanWrapper">
@@ -418,7 +462,7 @@
                         </span>
                         <i class="fas fa-chevron-down" style="font-size:10px;opacity:0.5;"></i>
                     </button>
-                    <div class="pupr-dropdown-menu" style="min-width:200px;max-height:300px;overflow-y:auto;">
+                    <div class="pupr-dropdown-menu" style="min-width:210px;max-height:300px;overflow-y:auto;">
                         <div class="pupr-dropdown-item {{ request('kecamatan', 'all') === 'all' ? 'active' : '' }}"
                              onclick="selectDropdown('hiddenKecamatanPenugasan', 'ddKecPenugasanWrapper', 'all', 'Semua Kecamatan', 'filterFormPenugasan')">
                             <i class="fas fa-th-list" style="font-size:12px;opacity:0.5;"></i> Semua Kecamatan
@@ -433,35 +477,34 @@
                     </div>
                 </div>
 
-                {{-- Custom Dropdown: Pengelompokan Desil --}}
-                <div class="pupr-dropdown-wrapper" id="ddDesilPenugasanWrapper">
-                    <button type="button" class="pupr-dropdown-toggle" onclick="window.PuprDropdown.toggle(document.getElementById('ddDesilPenugasanWrapper'))">
-                        <i class="fas fa-layer-group" style="font-size:12px;opacity:0.6;"></i>
+                {{-- Custom Dropdown: Filter Petugas Desa --}}
+                <div class="pupr-dropdown-wrapper" id="ddPetugasPenugasanWrapper">
+                    <button type="button" class="pupr-dropdown-toggle" onclick="window.PuprDropdown.toggle(document.getElementById('ddPetugasPenugasanWrapper'))">
+                        <i class="fas fa-user-shield" style="font-size:12px;opacity:0.6;"></i>
                         <span class="selected-label">
-                            @if(request('desil') === 'Backlog 1') Backlog 1 Desil 1-4
-                            @elseif(request('desil') === 'Backlog 2') Backlog 2 Desil 1-4
-                            @else Semua Pengelompokan
-                            @endif
+                            @php
+                                $selectedPetugas = $listPetugas->firstWhere('id', request('petugas_id'));
+                            @endphp
+                            {{ $selectedPetugas ? $selectedPetugas->name : 'Semua Petugas Desa' }}
                         </span>
                         <i class="fas fa-chevron-down" style="font-size:10px;opacity:0.5;"></i>
                     </button>
-                    <div class="pupr-dropdown-menu" style="min-width:200px;">
-                        <div class="pupr-dropdown-item {{ request('desil', 'all') === 'all' ? 'active' : '' }}"
-                             onclick="selectDropdown('hiddenDesilPenugasan', 'ddDesilPenugasanWrapper', 'all', 'Semua Pengelompokan', 'filterFormPenugasan')">
-                            <i class="fas fa-th-list" style="font-size:12px;opacity:0.5;"></i> Semua Pengelompokan
+                    <div class="pupr-dropdown-menu" style="min-width:260px;max-height:300px;overflow-y:auto;">
+                        <div class="pupr-dropdown-item {{ request('petugas_id', 'all') === 'all' ? 'active' : '' }}"
+                             onclick="selectDropdown('hiddenPetugasPenugasan', 'ddPetugasPenugasanWrapper', 'all', 'Semua Petugas Desa', 'filterFormPenugasan')">
+                            <i class="fas fa-users" style="font-size:12px;opacity:0.5;"></i> Semua Petugas Desa
                         </div>
                         <div class="dropdown-divider"></div>
-                        <div class="pupr-dropdown-item {{ request('desil') === 'Backlog 1' ? 'active' : '' }}"
-                             onclick="selectDropdown('hiddenDesilPenugasan', 'ddDesilPenugasanWrapper', 'Backlog 1', 'Backlog 1 Desil 1-4', 'filterFormPenugasan')">
-                            <i class="fas fa-circle" style="font-size:8px;color:var(--info);"></i> Backlog 1 Desil 1-4
+                        @foreach($listPetugas as $p)
+                        <div class="pupr-dropdown-item {{ request('petugas_id') == $p->id ? 'active' : '' }}"
+                             onclick="selectDropdown('hiddenPetugasPenugasan', 'ddPetugasPenugasanWrapper', '{{ $p->id }}', '{{ $p->name }}', 'filterFormPenugasan')">
+                            <i class="fas fa-user-check" style="font-size:11px;color:var(--primary);"></i> {{ $p->name }}
                         </div>
-                        <div class="pupr-dropdown-item {{ request('desil') === 'Backlog 2' ? 'active' : '' }}"
-                             onclick="selectDropdown('hiddenDesilPenugasan', 'ddDesilPenugasanWrapper', 'Backlog 2', 'Backlog 2 Desil 1-4', 'filterFormPenugasan')">
-                            <i class="fas fa-circle" style="font-size:8px;color:var(--success);"></i> Backlog 2 Desil 1-4
-                        </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
+
             <div style="display:flex;gap:10px;">
                 <a href="{{ url('/penugasan') }}" class="btn btn-outline" style="padding:10px 16px;font-size:13px;text-decoration:none;border-radius:var(--radius-sm);">
                     <i class="fas fa-redo"></i> Reset
@@ -469,26 +512,27 @@
             </div>
         </form>
 
-        <!-- Main Data Table -->
+        <!-- Main Data Table Penugasan -->
         <div class="table-container-card">
             <div class="table-header-bar">
-                <h3><i class="fas fa-clipboard-list"></i> Database Calon Penerima Bantuan BSPS (Data Penugasan Verval)</h3>
+                <h3><i class="fas fa-tasks"></i> Data Calon Penerima &amp; Petugas Penanggung Jawab Desa</h3>
                 <span style="font-size:12.5px;color:var(--text-muted);font-weight:600;">
                     Menampilkan {{ $vervals->firstItem() ?? 0 }} - {{ $vervals->lastItem() ?? 0 }} dari {{ number_format($vervals->total(), 0, ',', '.') }} data
                 </span>
             </div>
 
-            <div style="overflow-x:auto;">
-                <table class="table" style="width:100%;border-collapse:collapse;">
+            <div class="table-penugasan-wrapper">
+                <table class="table" style="width:100%;border-collapse:collapse;min-width:980px;">
                     <thead>
                         <tr style="background:var(--bg-body);border-bottom:1px solid rgba(0,40,85,0.08);text-align:left;font-size:12.5px;color:var(--text-muted);">
-                            <th style="padding:14px 18px;">No</th>
-                            <th style="padding:14px 18px;">Nama Calon Penerima</th>
-                            <th style="padding:14px 18px;text-align:center;">L/P</th>
-                            <th style="padding:14px 18px;">NIK &amp; No. KK</th>
-                            <th style="padding:14px 18px;">Alamat &amp; Dusun</th>
-                            <th style="padding:14px 18px;">Desa / Kelurahan</th>
-                            <th style="padding:14px 18px;">Kecamatan</th>
+                            <th style="padding:14px 18px;width:50px;">No</th>
+                            <th style="padding:14px 18px;min-width:200px;">Nama Calon Penerima</th>
+                            <th style="padding:14px 18px;text-align:center;width:60px;">L/P</th>
+                            <th style="padding:14px 18px;min-width:180px;">NIK &amp; No. KK</th>
+                            <th style="padding:14px 18px;min-width:200px;">Alamat &amp; Dusun</th>
+                            <th style="padding:14px 18px;min-width:160px;">Desa / Kelurahan</th>
+                            <th style="padding:14px 18px;min-width:140px;">Kecamatan</th>
+                            <th style="padding:14px 18px;min-width:260px;">Petugas Verval Ditugaskan</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -518,18 +562,33 @@
                                 <td style="padding:14px 18px;color:var(--text-secondary);">
                                     {{ $item->alamat ?: '-' }}
                                 </td>
-                                <td style="padding:14px 18px;font-weight:600;color:var(--primary-dark);">
+                                <td style="padding:14px 18px;font-weight:700;color:var(--primary-dark);">
                                     {{ $item->desa_kelurahan ?: '-' }}
                                 </td>
                                 <td style="padding:14px 18px;">
                                     <span style="font-weight:700;color:var(--primary);">Kec. {{ $item->kecamatan }}</span>
                                 </td>
+                                <td style="padding:14px 18px;">
+                                    @if($item->petugas)
+                                        <div class="petugas-pill">
+                                            <span class="avatar-mini">{{ strtoupper(substr($item->petugas->name, 0, 1)) }}</span>
+                                            <div>
+                                                <div style="font-size:12.5px;color:var(--primary-dark);font-weight:800;">{{ $item->petugas->name }}</div>
+                                                <div style="font-size:11px;color:var(--text-muted);font-weight:500;">{{ $item->petugas->email }}</div>
+                                            </div>
+                                        </div>
+                                    @else
+                                        <span class="badge-unassigned">
+                                            <i class="fas fa-user-slash"></i> Belum Ada Petugas
+                                        </span>
+                                    @endif
+                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" style="text-align:center;padding:32px;color:var(--text-muted);">
+                                <td colspan="8" style="text-align:center;padding:32px;color:var(--text-muted);">
                                     <i class="fas fa-clipboard-question" style="font-size:28px;display:block;margin-bottom:8px;opacity:0.4;"></i>
-                                    Tidak ada data calon penerima yang sesuai dengan kriteria saringan.
+                                    Tidak ada data penugasan calon penerima yang sesuai dengan kriteria saringan.
                                 </td>
                             </tr>
                         @endforelse
@@ -604,7 +663,7 @@
                     <form action="{{ url('/penugasan') }}" method="GET" class="jump-page-form">
                         @if(request('search')) <input type="hidden" name="search" value="{{ request('search') }}"> @endif
                         @if(request('kecamatan') && request('kecamatan') != 'all') <input type="hidden" name="kecamatan" value="{{ request('kecamatan') }}"> @endif
-                        @if(request('desil') && request('desil') != 'all') <input type="hidden" name="desil" value="{{ request('desil') }}"> @endif
+                        @if(request('petugas_id') && request('petugas_id') != 'all') <input type="hidden" name="petugas_id" value="{{ request('petugas_id') }}"> @endif
                         <span style="font-size:12px;color:var(--text-muted);font-weight:600;">Lompat:</span>
                         <input type="number" name="page" min="1" max="{{ $last }}" value="{{ $current }}" class="jump-page-input" title="Masukkan nomor halaman" />
                         <button type="submit" class="jump-page-btn" title="Buka Halaman">Go</button>

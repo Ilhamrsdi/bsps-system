@@ -1,47 +1,165 @@
 @extends('layouts.partial.app')
 
-@section('title', 'BSPS Verval - Usulan Belum Di-survei')
-@section('title_header', 'Usulan Belum Di-survei')
+@section('title', 'BSPS Verval - Tugas Belum Di-survei')
+@section('title_header', 'Tugas Belum Di-survei')
+@section('subtitle_header', 'Daftar Calon Penerima BSPS Desa {{ Auth::user()->desa ?? "-" }} yang Menunggu Verifikasi Lapangan')
+
 @push('styles')
 <style>
-    @media (max-width: 1024px) {
-        .filter-section { padding: 16px; flex-direction: column; align-items: stretch; gap: 12px; }
-        .filter-section .filter-group { width: 100%; }
-        .filter-section .filter-group .pupr-search-group { width: 100%; }
-        .filter-section .filter-actions { width: 100%; margin-left: 0; }
-        .filter-section .filter-actions .btn { width: 100%; justify-content: center; }
-        .table-card .table-header { flex-direction: column; align-items: stretch; gap: 12px; }
+    .filter-section {
+        background: var(--bg-card);
+        border-radius: var(--radius);
+        padding: 16px 20px;
+        margin-bottom: 18px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid rgba(0,40,85,0.06);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+    .search-input-wrap { position: relative; flex: 1; min-width: 260px; }
+    .search-input-wrap input {
+        width: 100%; padding: 10px 14px 10px 38px;
+        border-radius: var(--radius-sm);
+        border: 1px solid rgba(0,40,85,0.14);
+        background: var(--bg-body); color: var(--text-primary);
+        font-size: 13.5px; outline: none; box-sizing: border-box;
+    }
+    .search-input-wrap input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,40,85,0.08); background: var(--bg-card); }
+    .search-input-wrap i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 14px; }
+
+    .table-container-card {
+        background: var(--bg-card);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid rgba(0, 40, 85, 0.06);
+        overflow: hidden;
+    }
+    .table-header-bar {
+        padding: 18px 24px;
+        border-bottom: 1px solid rgba(0,40,85,0.06);
+        display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .table-header-bar h3 { font-size: 15px; font-weight: 800; color: #b88600; display: flex; align-items: center; gap: 8px; margin: 0; }
+
+    .badge-status-belum {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 11.5px;
+        font-weight: 700;
+        background: rgba(255, 184, 0, 0.15);
+        color: #b88600;
+    }
+
+    .badge-gender {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 800;
+    }
+    .badge-gender.l { background: rgba(0, 40, 85, 0.10); color: var(--primary); }
+    .badge-gender.p { background: rgba(212, 63, 120, 0.12); color: #d43f78; }
+
+    .btn-mulai-survey {
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 12.5px;
+        font-weight: 800;
+        background: var(--primary);
+        color: #ffffff;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 6px rgba(0,40,85,0.15);
+        border: none;
+        cursor: pointer;
+    }
+    .btn-mulai-survey:hover {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+        color: #fff;
+    }
+
+    /* Custom Pagination Styling */
+    .pagination-custom-bar {
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+        border-top: 1px solid rgba(0, 40, 85, 0.08);
+        background: var(--bg-card);
+    }
+    .pagination-info-text { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+    .pagination-info-text strong { color: var(--primary-dark); font-weight: 700; }
+    .pagination-nav { display: inline-flex; align-items: center; gap: 6px; margin: 0; padding: 0; }
+    .pg-link {
+        display: inline-flex; align-items: center; justify-content: center;
+        min-width: 36px; height: 36px; padding: 0 12px;
+        border-radius: 8px; font-size: 13px; font-weight: 700;
+        color: var(--text-primary); background: var(--bg-body);
+        border: 1px solid rgba(0, 40, 85, 0.14); text-decoration: none;
+        transition: all 0.2s ease;
+    }
+    .pg-link:hover { background: var(--primary); color: #fff; border-color: var(--primary); transform: translateY(-1px); }
+    .pg-link.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 2px 6px rgba(0, 40, 85, 0.25); }
+    .pg-link.disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+    .pg-dots { display: inline-flex; align-items: center; justify-content: center; min-width: 30px; height: 36px; font-size: 14px; font-weight: 700; color: var(--text-muted); letter-spacing: 2px; }
+
+    /* Jump to Page Form */
+    .jump-page-form { display: inline-flex; align-items: center; gap: 6px; margin-left: 12px; }
+    .jump-page-input {
+        width: 54px; height: 36px; text-align: center;
+        border-radius: 8px; border: 1px solid rgba(0, 40, 85, 0.16);
+        background: var(--bg-body); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;
+    }
+    .table-petugas-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table-container-card table {
+        width: 100%;
+        min-width: 920px;
+        border-collapse: collapse;
+        white-space: nowrap;
+    }
+
+    .table-container-card table th,
+    .table-container-card table td {
+        white-space: nowrap;
     }
 
     @media (max-width: 768px) {
-        .table-wrapper {
-            overflow-x: auto !important;
-            overflow-y: hidden !important;
-            -webkit-overflow-scrolling: touch !important;
-            touch-action: pan-x pan-y !important;
-            overscroll-behavior-x: contain !important;
-            transform: translateZ(0);
-            width: 100% !important;
-            display: block !important;
+        .table-header-bar {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
         }
-        .table-card table {
-            width: 100% !important;
-            min-width: 800px !important;
-            border-collapse: collapse;
-            font-size: 13.5px;
-            white-space: nowrap !important;
+        .pagination-custom-bar {
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            text-align: center;
         }
-        .table-card table tr,
-        .table-card table th,
-        .table-card table td {
-            transition: none !important;
-            white-space: nowrap !important;
-        }
-        .table-footer { flex-direction: column; align-items: center; text-align: center; gap: 10px; }
     }
 
-    @media (max-width: 480px) {
-        .dashboard-content { padding: 12px; }
+    @media (max-width: 576px) {
+        .filter-section { flex-direction: column; align-items: stretch; padding: 14px; gap: 10px; }
+        .search-input-wrap { min-width: 100%; }
+        .pagination-nav { flex-wrap: wrap; justify-content: center; }
     }
 </style>
 @endpush
@@ -53,144 +171,181 @@
     <main class="dashboard-content">
         <!-- Breadcrumb -->
         <div class="breadcrumb" style="font-size:13px;color:var(--text-muted);margin-bottom:20px;display:flex;align-items:center;gap:8px;">
-            <a href="{{ route('petugas.dashboard') }}" style="color:var(--primary);text-decoration:none;font-weight:500;"><i class="fas fa-home"></i> Dashboard Petugas</a>
+            <a href="{{ route('petugas.dashboard') }}" style="color:var(--primary);text-decoration:none;font-weight:600;"><i class="fas fa-home"></i> Dashboard Petugas</a>
             <i class="fas fa-chevron-right" style="font-size:10px;"></i>
-            <span>Belum Survei</span>
+            <span>Tugas Belum Survei (Desa {{ $user->desa ?: '-' }})</span>
         </div>
 
-        {{-- Alert Sukses --}}
-        @if(session('success'))
-            <div style="background:rgba(39,174,96,0.10);border:1px solid rgba(39,174,96,0.30);border-radius:var(--radius-sm);padding:14px 18px;margin-bottom:20px;font-size:13px;color:var(--success);display:flex;align-items:center;gap:10px;">
-                <i class="fas fa-check-circle" style="font-size:16px;"></i>
-                <span>{{ session('success') }}</span>
-            </div>
-        @endif
-
-        <!-- Filter & Search Section -->
+        {{-- Filter & Search --}}
         <form action="{{ route('petugas.belum-survei') }}" method="GET" class="filter-section">
-            <div class="filter-group">
-                <div class="pupr-search-group">
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari kegiatan atau lokasi penugasan Anda..." class="pupr-search-input" />
-                    <button type="submit" class="pupr-search-btn"><i class="fas fa-search"></i></button>
-                </div>
-            </div>
-
-            <div class="filter-actions">
-                <a href="{{ route('petugas.belum-survei') }}" class="btn btn-outline"><i class="fas fa-redo"></i> Reset</a>
+            <div class="search-input-wrap">
+                <i class="fas fa-search"></i>
+                <input type="text" name="search" value="{{ $search }}" placeholder="Cari nama calon penerima yang belum disurvei, NIK, atau alamat..." />
             </div>
         </form>
 
-        <!-- Table Tugas Belum Survei -->
-        <div class="table-card">
-            <div class="table-header">
-                <h3><i class="fas fa-clipboard-question" style="color:#d69e00;margin-right:10px;"></i>Kegiatan Belum Di-survei (Menunggu Pengisian Form)</h3>
+        {{-- Tabel Data Belum Di-survei --}}
+        <div class="table-container-card">
+            <div class="table-header-bar">
+                <h3><i class="fas fa-clock"></i> Daftar Calon Penerima Belum Di-survei — Desa {{ $user->desa ?: '-' }}</h3>
+                <span style="font-size:12.5px;color:var(--text-muted);font-weight:600;">
+                    Menampilkan {{ $penerimas->firstItem() ?? 0 }} - {{ $penerimas->lastItem() ?? 0 }} dari {{ number_format($penerimas->total(), 0, ',', '.') }} calon penerima
+                </span>
             </div>
 
-            <div class="table-wrapper">
-                <table>
+            <div class="table-petugas-wrapper">
+                <table class="table" style="width:100%;border-collapse:collapse;min-width:920px;">
                     <thead>
-                        <tr>
-                            <th style="width:60px;">No</th>
-                            <th style="min-width:280px;">Nama Kegiatan &amp; Alamat</th>
-                            <th style="min-width:160px;">Lokasi &amp; Tanggal</th>
-                            <th style="min-width:140px;">Status Penugasan</th>
-                            <th style="width:180px;">Aksi</th>
+                        <tr style="background:var(--bg-body);border-bottom:1px solid rgba(0,40,85,0.08);text-align:left;font-size:12.5px;color:var(--text-muted);">
+                            <th style="padding:14px 18px;width:50px;">No</th>
+                            <th style="padding:14px 18px;min-width:180px;">Nama Calon Penerima</th>
+                            <th style="padding:14px 18px;text-align:center;width:60px;">L/P</th>
+                            <th style="padding:14px 18px;min-width:180px;">NIK &amp; No. KK</th>
+                            <th style="padding:14px 18px;min-width:200px;">Alamat / Dusun</th>
+                            <th style="padding:14px 18px;min-width:140px;">Pengelompokan</th>
+                            <th style="padding:14px 18px;text-align:center;width:120px;">Status</th>
+                            <th style="padding:14px 18px;text-align:center;min-width:150px;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($kegiatans as $index => $item)
-                        <tr>
-                            <td>{{ $kegiatans->firstItem() + $index }}</td>
-                            <td>
-                                <strong style="color:var(--primary-dark);font-size:14px;display:block;margin-bottom:4px;">{{ $item->nama_kegiatan }}</strong>
-                                <span style="font-size:12px;color:var(--text-muted);"><i class="fas fa-house"></i> {{ $item->alamat ?: '-' }}</span>
-                            </td>
-                            <td>
-                                <div><i class="fas fa-location-dot" style="color:var(--primary);font-size:12px;"></i> Kec. {{ ucwords(str_replace('_',' ',$item->lokasi)) }}</div>
-                                <div style="font-size:12px;color:var(--text-muted);margin-top:2px;"><i class="fas fa-calendar-alt"></i> {{ $item->tanggal->format('d M Y') }}</div>
-                            </td>
-                            <td>
-                                <span class="badge-status warning" style="background:rgba(255,184,0,0.15);color:#d69e00;">
-                                    <i class="fas fa-clock"></i> Belum Di-survei
-                                </span>
-                            </td>
-                            <td>
-                                <div class="table-actions-cell">
-                                    <button type="button" class="btn" style="padding:8px 18px;border-radius:6px;background:var(--primary);color:#fff;font-weight:700;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;" onclick="startSurveyWithGps({{ $item->id }}, '{{ addslashes($item->nama_kegiatan) }}')" title="Mulai Survei Lapangan">
-                                        <i class="fas fa-pen-to-square"></i> Mulai Survei
+                        @forelse($penerimas as $index => $item)
+                            <tr style="border-bottom:1px solid rgba(0,40,85,0.06);font-size:13px;">
+                                <td style="padding:14px 18px;font-weight:700;color:var(--text-muted);">
+                                    {{ $penerimas->firstItem() + $index }}
+                                </td>
+                                <td style="padding:14px 18px;">
+                                    <div style="font-weight:800;color:var(--primary-dark);">{{ $item->nama }}</div>
+                                </td>
+                                <td style="padding:14px 18px;text-align:center;">
+                                    <span class="badge-gender {{ strtolower($item->jenis_kelamin) }}">
+                                        {{ $item->jenis_kelamin ?: '-' }}
+                                    </span>
+                                </td>
+                                <td style="padding:14px 18px;">
+                                    <div style="font-family:monospace;font-weight:700;color:var(--text-primary);">NIK: {{ $item->no_ktp ?: '-' }}</div>
+                                    <div style="font-family:monospace;font-size:12px;color:var(--text-muted);margin-top:2px;">KK: {{ $item->no_kk ?: '-' }}</div>
+                                </td>
+                                <td style="padding:14px 18px;color:var(--text-secondary);">
+                                    {{ $item->alamat ?: '-' }}
+                                </td>
+                                <td style="padding:14px 18px;">
+                                    <span style="font-size:12px;font-weight:700;color:var(--primary);">{{ $item->pengelompokan_desil ?: 'Desil 1-4' }}</span>
+                                </td>
+                                <td style="padding:14px 18px;text-align:center;">
+                                    <span class="badge-status-belum"><i class="fas fa-clock"></i> Belum Survei</span>
+                                </td>
+                                <td style="padding:14px 18px;text-align:center;">
+                                    <button type="button" class="btn-mulai-survey" onclick="startSurveyWithGps('{{ url('/survey/' . $item->id) }}')">
+                                        <i class="fas fa-camera"></i> Mulai Survei
                                     </button>
-                                </div>
-                            </td>
-                        </tr>
+                                </td>
+                            </tr>
                         @empty
-                        <tr>
-                            <td colspan="5" style="text-align:center;padding:44px;color:var(--text-muted);">
-                                <i class="fas fa-circle-check" style="font-size:40px;display:block;margin-bottom:12px;color:var(--success);opacity:0.6;"></i>
-                                <strong style="font-size:15px;color:var(--primary-dark);">Tidak Ada Tugas Pending!</strong>
-                                <p style="margin-top:6px;font-size:13px;">Semua kegiatan yang ditugaskan Admin telah selesai Anda survei.</p>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td colspan="8" style="text-align:center;padding:40px;color:var(--text-muted);">
+                                    <i class="fas fa-check-double" style="font-size:36px;color:var(--success);display:block;margin-bottom:10px;"></i>
+                                    <strong>Luar biasa!</strong> Seluruh calon penerima di Desa {{ $user->desa ?: '-' }} telah selesai di-survei.
+                                </td>
+                            </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
 
-            <div class="table-footer">
-                <span>Menampilkan {{ $kegiatans->firstItem() ?? 0 }}-{{ $kegiatans->lastItem() ?? 0 }} dari {{ $kegiatans->total() }} kegiatan pending</span>
+            <!-- Custom Pagination Bar -->
+            <div class="pagination-custom-bar">
+                <div class="pagination-info-text">
+                    Menampilkan <strong>{{ $penerimas->firstItem() ?? 0 }}</strong> - <strong>{{ $penerimas->lastItem() ?? 0 }}</strong> dari <strong>{{ number_format($penerimas->total(), 0, ',', '.') }}</strong> calon penerima (Halaman <strong>{{ $penerimas->currentPage() }}</strong> dari <strong>{{ $penerimas->lastPage() }}</strong>)
+                </div>
 
-                @if($kegiatans->hasPages())
-                    <div class="pagination">
-                        @if($kegiatans->onFirstPage())
-                            <span class="page disabled"><i class="fas fa-chevron-left"></i></span>
+                @php
+                    $current = $penerimas->currentPage();
+                    $last = $penerimas->lastPage();
+                    $delta = 2;
+                    $left = $current - $delta;
+                    $right = $current + $delta + 1;
+                    $range = [];
+                    $rangeWithDots = [];
+                    $l = null;
+
+                    for ($i = 1; $i <= $last; $i++) {
+                        if ($i == 1 || $i == $last || ($i >= $left && $i < $right)) {
+                            $range[] = $i;
+                        }
+                    }
+
+                    foreach ($range as $i) {
+                        if ($l) {
+                            if ($i - $l === 2) {
+                                $rangeWithDots[] = $l + 1;
+                            } elseif ($i - $l !== 1) {
+                                $rangeWithDots[] = '...';
+                            }
+                        }
+                        $rangeWithDots[] = $i;
+                        $l = $i;
+                    }
+                @endphp
+
+                <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;">
+                    <div class="pagination-nav">
+                        @if($penerimas->onFirstPage())
+                            <span class="pg-link disabled"><i class="fas fa-chevron-left"></i></span>
                         @else
-                            <a href="{{ $kegiatans->previousPageUrl() }}" class="page"><i class="fas fa-chevron-left"></i></a>
+                            <a href="{{ $penerimas->previousPageUrl() }}" class="pg-link"><i class="fas fa-chevron-left"></i></a>
                         @endif
 
-                        @foreach($kegiatans->getUrlRange(max(1, $kegiatans->currentPage() - 2), min($kegiatans->lastPage(), $kegiatans->currentPage() + 2)) as $page => $url)
-                            @if($page == $kegiatans->currentPage())
-                                <span class="page active">{{ $page }}</span>
+                        @foreach($rangeWithDots as $pageItem)
+                            @if($pageItem === '...')
+                                <span class="pg-dots">&hellip;</span>
+                            @elseif($pageItem == $current)
+                                <span class="pg-link active">{{ $pageItem }}</span>
                             @else
-                                <a href="{{ $url }}" class="page">{{ $page }}</a>
+                                <a href="{{ $penerimas->url($pageItem) }}" class="pg-link">{{ $pageItem }}</a>
                             @endif
                         @endforeach
 
-                        @if($kegiatans->hasMorePages())
-                            <a href="{{ $kegiatans->nextPageUrl() }}" class="page"><i class="fas fa-chevron-right"></i></a>
+                        @if($penerimas->hasMorePages())
+                            <a href="{{ $penerimas->nextPageUrl() }}" class="pg-link"><i class="fas fa-chevron-right"></i></a>
                         @else
-                            <span class="page disabled"><i class="fas fa-chevron-right"></i></span>
+                            <span class="pg-link disabled"><i class="fas fa-chevron-right"></i></span>
                         @endif
                     </div>
-                @endif
+                </div>
             </div>
         </div>
     </main>
 
-    <!-- PUPR Custom Modal Wajib Lokasi GPS -->
-    <div class="modal-overlay" id="modalWajibLokasi">
+    <!-- Modal GPS Wajib (Saat Petugas Mau Mulai Survei) -->
+    <div class="modal-overlay" id="modalGpsRequired">
         <div class="modal-box" style="max-width: 440px;">
-            <div class="modal-header" style="background: rgba(231, 76, 60, 0.08); border-bottom: 1px solid rgba(231, 76, 60, 0.18); padding:16px 20px;">
-                <h3 style="color: #e74c3c; display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px; font-weight: 800;">
-                    <i class="fas fa-location-crosshairs"></i> Akses Lokasi (GPS) Wajib Diaktifkan
+            <div class="modal-header" style="background: #fff3cd; border-bottom-color: #ffeeba;">
+                <h3 style="color: #856404; display: flex; align-items: center; gap: 10px; font-size: 16px;">
+                    <i class="fas fa-location-dot"></i> Akses GPS / Lokasi Wajib
                 </h3>
-            </div>
-            <div class="modal-body" style="padding: 24px 20px; text-align: center;">
-                <div style="width:64px;height:64px;border-radius:50%;background:rgba(231,76,60,0.12);color:#e74c3c;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px;">
-                    <i class="fas fa-location-slash"></i>
-                </div>
-                <h4 style="font-size:16px;font-weight:800;color:var(--primary-dark);margin-bottom:8px;">Izin GPS Perangkat Diperlukan!</h4>
-                <p style="font-size:13px;color:var(--text-muted);line-height:1.5;margin-bottom:16px;">
-                    Untuk melakukan survei pada kegiatan <strong id="modalNamaKegiatanText" style="color:var(--primary);">...</strong>, Anda <strong>wajib mengaktifkan &amp; memberikan izin akses lokasi GPS</strong> pada perangkat HP Anda.
-                </p>
-                <div style="background:rgba(255,184,0,0.12);border:1px solid rgba(255,184,0,0.3);border-radius:8px;padding:12px;font-size:12px;color:#9e7300;text-align:left;line-height:1.4;">
-                    <i class="fas fa-triangle-exclamation" style="margin-right:4px;"></i> <strong>Penting:</strong> Tanpa mengaktifkan lokasi GPS, Anda <strong>tidak dapat masuk atau mengisi form survei</strong> kegiatan tersebut.
-                </div>
-            </div>
-            <div class="modal-footer" style="padding: 16px 20px; border-top: 1px solid rgba(0, 40, 85, 0.08); display: flex; gap: 10px; justify-content: flex-end; background:var(--bg-body);">
-                <button type="button" class="btn btn-outline" onclick="closeWajibLokasiModal()" style="padding:10px 18px;border-radius:var(--radius-sm);font-weight:600;font-size:13px;">
-                    <i class="fas fa-xmark"></i> Batal (Tidak Bisa Survei)
+                <button class="close-btn" type="button" onclick="window.PuprModal.close('modalGpsRequired')">
+                    <i class="fas fa-times"></i>
                 </button>
-                <button type="button" class="btn btn-primary" onclick="retryGpsPermission()" style="padding:10px 20px;border-radius:var(--radius-sm);font-weight:700;background:var(--primary);color:#fff;font-size:13px;border:none;">
-                    <i class="fas fa-rotate"></i> Coba Lagi / Izinkan Lokasi
+            </div>
+
+            <div class="modal-body" style="padding: 24px; text-align: center;">
+                <div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(220, 53, 69, 0.1); color: #dc3545; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 16px;">
+                    <i class="fas fa-map-location-dot"></i>
+                </div>
+                <h4 style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">
+                    Izin Lokasi Belum Diaktifkan!
+                </h4>
+                <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0;">
+                    Sebagai Petugas Lapangan, Anda <strong>wajib mengaktifkan izin GPS / Lokasi</strong> pada perangkat/browser Anda untuk memastikan koordinat geotagging rumah calon penerima tercatat secara akurat saat survei.
+                </p>
+            </div>
+
+            <div class="modal-footer" style="padding: 16px 20px; background: var(--bg-body); border-top: 1px solid rgba(0, 40, 85, 0.06); display: flex; gap: 10px; justify-content: center;">
+                <button type="button" class="btn btn-outline" style="padding:10px 18px;" onclick="window.PuprModal.close('modalGpsRequired')">
+                    Batal
+                </button>
+                <button type="button" class="btn btn-primary" id="btnRetryGps" style="padding:10px 20px; font-weight:800;" onclick="retryLocationPermission()">
+                    <i class="fas fa-location-crosshairs"></i> Izinkan Lokasi &amp; Lanjutkan
                 </button>
             </div>
         </div>
@@ -199,86 +354,72 @@
 
 @push('scripts')
 <script>
-    let activeKegiatanId = null;
-    let activeNamaKegiatan = '';
+    let pendingSurveyUrl = null;
 
-    function startSurveyWithGps(kegiatanId, namaKegiatan) {
-        activeKegiatanId = kegiatanId;
-        activeNamaKegiatan = namaKegiatan;
+    function startSurveyWithGps(targetUrl) {
+        pendingSurveyUrl = targetUrl;
 
-        if (!navigator.geolocation) {
-            showWajibLokasiModal(namaKegiatan);
-            return;
+        // 1. Tampilkan Reusable Loading Overlay
+        if (window.PuprLoading) {
+            window.PuprLoading.show('Sedang Memuat Lokasi GPS...');
         }
 
-        if (window.PuprLoading) {
-            window.PuprLoading.show('Verifikasi & Mengambil Koordinat GPS Perangkat HP...');
+        if (!navigator.geolocation) {
+            if (window.PuprLoading) window.PuprLoading.hide();
+            alert("Perangkat atau browser Anda tidak mendukung fitur Geolocation/GPS.");
+            return;
         }
 
         navigator.geolocation.getCurrentPosition(
             function(position) {
-                const lat = position.coords.latitude.toFixed(6);
-                const lng = position.coords.longitude.toFixed(6);
-                const deviceType = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? 'Mobile Phone' : 'Desktop / Laptop';
-
-                // Kirim AJAX untuk mengupdate data lokasi GPS, IP & Device petugas di database users
-                fetch('{{ route("petugas.update-location") }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        latitude: lat,
-                        longitude: lng,
-                        device_type: deviceType
-                    })
-                })
-                .then(res => res.json())
-                .catch(err => console.log('Update location error:', err))
-                .finally(() => {
-                    if (window.PuprLoading) window.PuprLoading.hide();
-                    sessionStorage.setItem('survey_lat', lat);
-                    sessionStorage.setItem('survey_lng', lng);
-                    window.location.href = '/survey?kegiatan_id=' + kegiatanId + '&lat=' + lat + '&lng=' + lng;
-                });
+                if (window.PuprLoading) {
+                    window.PuprLoading.show('Lokasi Terdeteksi, Membuka Form Survei...');
+                }
+                window.location.href = targetUrl;
             },
             function(error) {
-                if (window.PuprLoading) window.PuprLoading.hide();
-                showWajibLokasiModal(namaKegiatan);
+                if (window.PuprLoading) {
+                    window.PuprLoading.hide();
+                }
+                if (window.PuprModal) {
+                    window.PuprModal.open('modalGpsRequired');
+                } else {
+                    alert("Silakan aktifkan lokasi jika mau melakukan survei!");
+                }
             },
-            {
-                enableHighAccuracy: true,
-                timeout: 12000,
-                maximumAge: 0
-            }
+            { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
         );
     }
 
-    function showWajibLokasiModal(namaKegiatan) {
-        document.getElementById('modalNamaKegiatanText').textContent = namaKegiatan || 'Kegiatan Lapangan';
-        if (window.PuprModal) {
-            window.PuprModal.open('modalWajibLokasi');
-        } else {
-            const overlay = document.getElementById('modalWajibLokasi');
-            if (overlay) overlay.classList.add('active');
-        }
-    }
+    function retryLocationPermission() {
+        if (window.PuprModal) window.PuprModal.close('modalGpsRequired');
+        if (window.PuprLoading) window.PuprLoading.show('Sedang Mendeteksi Ulang Lokasi GPS...');
 
-    function closeWajibLokasiModal() {
-        if (window.PuprModal) {
-            window.PuprModal.close('modalWajibLokasi');
-        } else {
-            const overlay = document.getElementById('modalWajibLokasi');
-            if (overlay) overlay.classList.remove('active');
+        if (!navigator.geolocation) {
+            if (window.PuprLoading) window.PuprLoading.hide();
+            alert("Perangkat tidak mendukung GPS.");
+            return;
         }
-    }
 
-    function retryGpsPermission() {
-        closeWajibLokasiModal();
-        if (activeKegiatanId) {
-            startSurveyWithGps(activeKegiatanId, activeNamaKegiatan);
-        }
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                if (window.PuprLoading) {
+                    window.PuprLoading.show('Lokasi Berhasil Didapat, Membuka Form...');
+                }
+                if (pendingSurveyUrl) {
+                    window.location.href = pendingSurveyUrl;
+                }
+            },
+            function(error) {
+                if (window.PuprLoading) {
+                    window.PuprLoading.hide();
+                }
+                if (window.PuprModal) {
+                    window.PuprModal.open('modalGpsRequired');
+                }
+            },
+            { enableHighAccuracy: true, timeout: 8000 }
+        );
     }
 </script>
 @endpush
