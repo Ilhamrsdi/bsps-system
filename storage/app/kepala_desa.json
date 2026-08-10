@@ -1,0 +1,1577 @@
+{
+  "AJUNG|||ROWOINDAH": {
+    "kecamatan": "AJUNG",
+    "desa": "ROWOINDAH",
+    "jabatan": "KEPALA DESA",
+    "nama": "RUDI HARTONO, SE",
+    "telp": "085102611141"
+  },
+  "AJUNG|||WIROWONGSO": {
+    "kecamatan": "AJUNG",
+    "desa": "WIROWONGSO",
+    "jabatan": "KEPALA DESA PAW",
+    "nama": "ADI PURNOMO",
+    "telp": "085103149999"
+  },
+  "AJUNG|||KLOMPANGAN": {
+    "kecamatan": "AJUNG",
+    "desa": "KLOMPANGAN",
+    "jabatan": "KEPALA DESA",
+    "nama": "DRS. MOHAMMAD SOFYAN",
+    "telp": "085230835017"
+  },
+  "AJUNG|||MANGARAN": {
+    "kecamatan": "AJUNG",
+    "desa": "MANGARAN",
+    "jabatan": "KEPALA DESA",
+    "nama": "H. SUKUR",
+    "telp": "081558023874"
+  },
+  "AJUNG|||SUKAMAKMUR": {
+    "kecamatan": "AJUNG",
+    "desa": "SUKAMAKMUR",
+    "jabatan": "KEPALA DESA",
+    "nama": "SOFYAN HADI CANDRA YAKUB",
+    "telp": "082230946008"
+  },
+  "AJUNG|||PANCAKARYA": {
+    "kecamatan": "AJUNG",
+    "desa": "PANCAKARYA",
+    "jabatan": "PJ.KEPALA DESA",
+    "nama": "MURKA'I",
+    "telp": "081232115292"
+  },
+  "AJUNG|||AJUNG": {
+    "kecamatan": "AJUNG",
+    "desa": "AJUNG",
+    "jabatan": "KEPALA DESA",
+    "nama": "SRI ALAM",
+    "telp": "082336936069"
+  },
+  "AMBULU|||TEGALSARI": {
+    "kecamatan": "AMBULU",
+    "desa": "TEGALSARI",
+    "jabatan": "KEPALA DESA",
+    "nama": "TRI ASTUTIK HANDAYANI",
+    "telp": "081334544948"
+  },
+  "AMBULU|||SABRANG": {
+    "kecamatan": "AMBULU",
+    "desa": "SABRANG",
+    "jabatan": "KEPALA DESA",
+    "nama": "ZUBAERI LUTFI",
+    "telp": "081249065993"
+  },
+  "AMBULU|||SUMBEREJO": {
+    "kecamatan": "AMBULU",
+    "desa": "SUMBEREJO",
+    "jabatan": "KEPALA DESA",
+    "nama": "RIONO HADI",
+    "telp": "081336502397"
+  },
+  "AMBULU|||AMBULU": {
+    "kecamatan": "AMBULU",
+    "desa": "AMBULU",
+    "jabatan": "PJ.KEPALA DESA",
+    "nama": "HANAS BAIHAKI,S.A.P",
+    "telp": "082132089766"
+  },
+  "AMBULU|||KARANGANYAR": {
+    "kecamatan": "AMBULU",
+    "desa": "KARANGANYAR",
+    "jabatan": "PJ.KEPALA DESA",
+    "nama": "JAKA PERMANA",
+    "telp": "081246545893"
+  },
+  "AMBULU|||ANDONGSARI": {
+    "kecamatan": "AMBULU",
+    "desa": "ANDONGSARI",
+    "jabatan": "KEPALA DESA",
+    "nama": "PRASISMAN",
+    "telp": "082229113606"
+  },
+  "AMBULU|||PONTANG": {
+    "kecamatan": "AMBULU",
+    "desa": "PONTANG",
+    "jabatan": "KEPALA DESA",
+    "nama": "SUGIHARNO,S.PD",
+    "telp": "082335027129"
+  },
+  "ARJASA|||CANDIJATI": {
+    "kecamatan": "ARJASA",
+    "desa": "CANDIJATI",
+    "jabatan": "KEPALA DESA",
+    "nama": "TOTOK HADIYONO",
+    "telp": "085331848393"
+  },
+  "ARJASA|||ARJASA": {
+    "kecamatan": "ARJASA",
+    "desa": "ARJASA",
+    "jabatan": "KEPALA DESA",
+    "nama": "WASI'A",
+    "telp": "082323414655"
+  },
+  "ARJASA|||BITING": {
+    "kecamatan": "ARJASA",
+    "desa": "BITING",
+    "jabatan": "KEPALA DESA",
+    "nama": "SUTRISNO",
+    "telp": "085236100342"
+  },
+  "ARJASA|||KEMUNINGLOR": {
+    "kecamatan": "ARJASA",
+    "desa": "KEMUNINGLOR",
+    "jabatan": "KEPALA DESA",
+    "nama": "BUDI HARYANTO",
+    "telp": "813366433337"
+  },
+  "ARJASA|||KAMAL": {
+    "kecamatan": "ARJASA",
+    "desa": "KAMAL",
+    "jabatan": "PJ.KEPALA DESA",
+    "nama": "IMAM DWI PRASETYO",
+    "telp": "082302505171"
+  },
+  "ARJASA|||DARSONO": {
+    "kecamatan": "ARJASA",
+    "desa": "DARSONO",
+    "jabatan": "KEPALA DESA",
+    "nama": "HOLIK",
+    "telp": "085334777667"
+  },
+  "BALUNG|||BALUNGLOR": {
+    "kecamatan": "BALUNG",
+    "desa": "BALUNG LOR",
+    "jabatan": "KEPALA DESA",
+    "nama": "IMAM MUSTOFA",
+    "telp": "082330494699"
+  },
+  "BALUNG|||TUTUL": {
+    "kecamatan": "BALUNG",
+    "desa": "TUTUL",
+    "jabatan": "KEPALA DESA",
+    "nama": "A BAIDOWI",
+    "telp": "081217481481"
+  },
+  "BALUNG|||BALUNGKIDUL": {
+    "kecamatan": "BALUNG",
+    "desa": "BALUNG KIDUL",
+    "jabatan": "PJ.KEPALA DESA",
+    "nama": "MOH. MISNARI, S.SOS",
+    "telp": "082143328467"
+  },
+  "BALUNG|||KARANGSEMANDING": {
+    "kecamatan": "BALUNG",
+    "desa": "KARANGSEMANDING",
+    "jabatan": "KEPALA DESA",
+    "nama": "FAUZI",
+    "telp": "085336180507"
+  },
+  "BALUNG|||KARANGDUREN": {
+    "kecamatan": "BALUNG",
+    "desa": "KARANGDUREN",
+    "jabatan": "KEPALA DESA",
+    "nama": "NURKHOLIK",
+    "telp": "085236340961"
+  },
+  "BALUNG|||CURAHLELE": {
+    "kecamatan": "BALUNG",
+    "desa": "CURAHLELE",
+    "jabatan": "KEPALA DESA",
+    "nama": "ABDUL HAMID",
+    "telp": "081 249 106 606"
+  },
+  "BALUNG|||GUMELAR": {
+    "kecamatan": "BALUNG",
+    "desa": "GUMELAR",
+    "jabatan": "KEPALA DESA",
+    "nama": "HERI MULYONO",
+    "telp": "081259098662"
+  },
+  "BALUNG|||BALUNGKULON": {
+    "kecamatan": "BALUNG",
+    "desa": "BALUNGKULON",
+    "jabatan": "KEPALA DESA",
+    "nama": "LANGGENG SUPRIYANTO",
+    "telp": "082168739642"
+  },
+  "BANGSALSARI|||GAMBIRONO": {
+    "kecamatan": "BANGSALSARI",
+    "desa": "GAMBIRONO",
+    "jabatan": "KEPALA DESA",
+    "nama": "BUDIYONO",
+    "telp": "082231929686"
+  },
+  "BANGSALSARI|||BADEAN": {
+    "kecamatan": "BANGSALSARI",
+    "desa": "BADEAN",
+    "jabatan": "KEPALA DESA",
+    "nama": "PURNANTO",
+    "telp": "081234707197"
+  },
+  "BANGSALSARI|||BANGSALSARI": {
+    "kecamatan": "BANGSALSARI",
+    "desa": "BANGSALSARI",
+    "jabatan": "KEPALA DESA",
+    "nama": "NUR KHOLIS",
+    "telp": "082331817779"
+  },
+  "BANGSALSARI|||BANJARSARI": {
+    "kecamatan": "BANGSALSARI",
+    "desa": "BANJARSARI",
+    "jabatan": "KEPALA DESA",
+    "nama": "NANING RONIANI",
+    "telp": "082234764299"
+  },
+  "BANGSALSARI|||CURAHKALONG": {
+    "kecamatan": "BANGSALSARI",
+    "desa": "CURAHKALONG",
+    "jabatan": "KEPALA DESA",
+    "nama": "H. ABDUL KADIR",
+    "telp": "0888 0579 3386"
+  },
+  "BANGSALSARI|||KARANGSONO": {
+    "kecamatan": "BANGSALSARI",
+    "desa": "KARANGSONO",
+    "jabatan": "KEPALA DESA",
+    "nama": "MOHAMAD AHRUL FATAH",
+    "telp": "082257086084"
+  },
+  "BANGSALSARI|||LANGKAP": {
+    "kecamatan": "BANGSALSARI",
+    "desa": "LANGKAP",
+    "jabatan": "KEPALA DESA",
+    "nama": "ANIS NURJANAH",
+    "telp": "081235178544"
+  },
+  "BANGSALSARI|||PETUNG": {
+    "kecamatan": "BANGSALSARI",
+    "desa": "PETUNG",
+    "jabatan": "KEPALA DESA",
+    "nama": "MUHAMMAD RIDWAN",
+    "telp": "082132660499"
+  },
+  "BANGSALSARI|||SUKOREJO": {
+    "kecamatan": "BANGSALSARI",
+    "desa": "SUKOREJO",
+    "jabatan": "KEPALA DESA",
+    "nama": "LULUK NOVITA",
+    "telp": "081250503888"
+  },
+  "BANGSALSARI|||TISNOGAMBAR": {
+    "kecamatan": "BANGSALSARI",
+    "desa": "TISNOGAMBAR",
+    "jabatan": "KEPALA DESA PAW",
+    "nama": "MUHARI",
+    "telp": "081235672603"
+  },
+  "BANGSALSARI|||TUGUSARI": {
+    "kecamatan": "BANGSALSARI",
+    "desa": "TUGUSARI",
+    "jabatan": "KEPALA DESA",
+    "nama": "AKHMAT KHOIRI, S.H",
+    "telp": "082 148 831 970"
+  },
+  "GUMUKMAS|||BAGOREJO": {
+    "kecamatan": "GUMUKMAS",
+    "desa": "BAGOREJO",
+    "jabatan": "KEPALA DESA",
+    "nama": "ATOK UROHMAN, S.S.",
+    "telp": "081223315999"
+  },
+  "GUMUKMAS|||GUMUKMAS": {
+    "kecamatan": "GUMUKMAS",
+    "desa": "GUMUKMAS",
+    "jabatan": "KEPALA DESA",
+    "nama": "RUDIYANTO",
+    "telp": "082229378797"
+  },
+  "GUMUKMAS|||KARANGREJO": {
+    "kecamatan": "GUMUKMAS",
+    "desa": "KARANGREJO",
+    "jabatan": "KEPALA DESA",
+    "nama": "ALFAN ALI FANANI",
+    "telp": "081249344586"
+  },
+  "GUMUKMAS|||KEPANJEN": {
+    "kecamatan": "GUMUKMAS",
+    "desa": "KEPANJEN",
+    "jabatan": "KEPALA DESA PAW",
+    "nama": "SUKAMID",
+    "telp": "082335049517"
+  },
+  "GUMUKMAS|||MAYANGAN": {
+    "kecamatan": "GUMUKMAS",
+    "desa": "MAYANGAN",
+    "jabatan": "KEPALA DESA",
+    "nama": "SUNOTO",
+    "telp": "085236643531"
+  },
+  "GUMUKMAS|||MENAMPU": {
+    "kecamatan": "GUMUKMAS",
+    "desa": "MENAMPU",
+    "jabatan": "KEPALA DESA",
+    "nama": "H.AAN RIFI'I",
+    "telp": "085258136344"
+  },
+  "GUMUKMAS|||PURWOASRI": {
+    "kecamatan": "GUMUKMAS",
+    "desa": "PURWOASRI",
+    "jabatan": "KEPALA DESA",
+    "nama": "SYAIFUL BAHRI",
+    "telp": "085733808682"
+  },
+  "GUMUKMAS|||TEMBOKREJO": {
+    "kecamatan": "GUMUKMAS",
+    "desa": "TEMBOKREJO",
+    "jabatan": "KEPALA DESA",
+    "nama": "H. SUYITNO",
+    "telp": "08124952171"
+  },
+  "JELBUK|||SUCOPANGEPOK": {
+    "kecamatan": "JELBUK",
+    "desa": "SUCOPANGEPOK",
+    "jabatan": "KEPALA DESA",
+    "nama": "ABD.RAHMAN",
+    "telp": "08113697966"
+  },
+  "JELBUK|||PANDUMAN": {
+    "kecamatan": "JELBUK",
+    "desa": "PANDUMAN",
+    "jabatan": "PJ.KEPALA DESA",
+    "nama": "NURUL HUDA",
+    "telp": "082338905647"
+  },
+  "JELBUK|||SUKOJEMBER": {
+    "kecamatan": "JELBUK",
+    "desa": "SUKOJEMBER",
+    "jabatan": "KEPALA DESA",
+    "nama": "KURNIADI",
+    "telp": "085235763644"
+  },
+  "JELBUK|||JELBUK": {
+    "kecamatan": "JELBUK",
+    "desa": "JELBUK",
+    "jabatan": "PJ.KEPALA DESA",
+    "nama": "HENDRO HANDOKO,S.S.T.",
+    "telp": "081330433007"
+  },
+  "JELBUK|||SUKOWIRYO": {
+    "kecamatan": "JELBUK",
+    "desa": "SUKOWIRYO",
+    "jabatan": "KEPALA DESA",
+    "nama": "SUKARNO",
+    "telp": "85236354008"
+  },
+  "JELBUK|||SUGERKIDUL": {
+    "kecamatan": "JELBUK",
+    "desa": "SUGER KIDUL",
+    "jabatan": "KEPALA DESA",
+    "nama": "AHMAD MUSEMIL",
+    "telp": "081238015151"
+  },
+  "JENGGAWAH|||KEMUNINGSARIKIDUL": {
+    "kecamatan": "JENGGAWAH",
+    "desa": "KEMUNINGSARI KIDUL",
+    "jabatan": "KEPALA DESA",
+    "nama": "HJ. DEWI KHOLIFAH",
+    "telp": "085233151698"
+  },
+  "JENGGAWAH|||WONOJATI": {
+    "kecamatan": "JENGGAWAH",
+    "desa": "WONOJATI",
+    "jabatan": "KEPALA DESA PAW",
+    "nama": "ABDURRAHMAN",
+    "telp": "082257842888"
+  },
+  "JENGGAWAH|||JENGGAWAH": {
+    "kecamatan": "JENGGAWAH",
+    "desa": "JENGGAWAH",
+    "jabatan": "KEPALA DESA",
+    "nama": "SUPARDI",
+    "telp": "082331992935"
+  },
+  "JENGGAWAH|||KERTONEGORO": {
+    "kecamatan": "JENGGAWAH",
+    "desa": "KERTONEGORO",
+    "jabatan": "KEPALA DESA",
+    "nama": "SITI MUNFARIDA",
+    "telp": "081228549325"
+  },
+  "JENGGAWAH|||SRUNI": {
+    "kecamatan": "JENGGAWAH",
+    "desa": "SRUNI",
+    "jabatan": "KEPALA DESA PAW",
+    "nama": "AFIFAH NUR HOTIMAH",
+    "telp": "085230777665"
+  },
+  "JENGGAWAH|||JATIMULYO": {
+    "kecamatan": "JENGGAWAH",
+    "desa": "JATIMULYO",
+    "jabatan": "KEPALA DESA",
+    "nama": "BUHARI",
+    "telp": "82330364498"
+  },
+  "JENGGAWAH|||CANGKRING": {
+    "kecamatan": "JENGGAWAH",
+    "desa": "CANGKRING",
+    "jabatan": "KEPALA DESA",
+    "nama": "HERU ALI WAHYUDI",
+    "telp": "085248234900"
+  },
+  "JENGGAWAH|||JATISARI": {
+    "kecamatan": "JENGGAWAH",
+    "desa": "JATISARI",
+    "jabatan": "KEPALA DESA",
+    "nama": "DRS. HARIS TURSINA, M.PD.",
+    "telp": "085258058182"
+  },
+  "JOMBANG|||JOMBANG": {
+    "kecamatan": "JOMBANG",
+    "desa": "JOMBANG",
+    "jabatan": "PJ.KEPALA DESA",
+    "nama": "SUPRI TEGUH SANTOSO,S.Sos",
+    "telp": "082142473834"
+  },
+  "JOMBANG|||WRINGINAGUNG": {
+    "kecamatan": "JOMBANG",
+    "desa": "WRINGIN AGUNG",
+    "jabatan": "KEPALA DESA PAW",
+    "nama": "SUTINAH",
+    "telp": "082132150095"
+  },
+  "JOMBANG|||NGAMPELREJO": {
+    "kecamatan": "JOMBANG",
+    "desa": "NGAMPELREJO",
+    "jabatan": "KEPALA DESA",
+    "nama": "NASYIHUDDIN",
+    "telp": "085755 053380"
+  },
+  "JOMBANG|||SARIMULYO": {
+    "kecamatan": "JOMBANG",
+    "desa": "SARIMULYO",
+    "jabatan": "KEPALA DESA",
+    "nama": "ERNAWATI",
+    "telp": "082131046834"
+  },
+  "JOMBANG|||PADOMASAN": {
+    "kecamatan": "JOMBANG",
+    "desa": "PADOMASAN",
+    "jabatan": "KEPALA DESA",
+    "nama": "TRIMANTO",
+    "telp": "081358395678"
+  },
+  "JOMBANG|||KETING": {
+    "kecamatan": "JOMBANG",
+    "desa": "KETING",
+    "jabatan": "PJ.KEPALA DESA",
+    "nama": "MARSUDI, S.PdD.,M.Pd.",
+    "telp": "087834543064"
+  },
+  "KALISAT|||KALISAT": {
+    "kecamatan": "KALISAT",
+    "desa": "KALISAT",
+    "jabatan": "KEPALA DESA",
+    "nama": "SUDI RAHARDJO",
+    "telp": "082132492424"
+  },
+  "KALISAT|||GLAGAHWERO": {
+    "kecamatan": "KALISAT",
+    "desa": "GLAGAHWERO",
+    "jabatan": "KEPALA DESA",
+    "nama": "ABDUL HALIM",
+    "telp": "082331836832"
+  },
+  "KALISAT|||PLALANGAN": {
+    "kecamatan": "KALISAT",
+    "desa": "PLALANGAN",
+    "jabatan": "KEPALA DESA",
+    "nama": "SOFYAN ZULKARNAIN MALIK",
+    "telp": "082140478613"
+  },
+  "KALISAT|||GAMBIRAN": {
+    "kecamatan": "KALISAT",
+    "desa": "GAMBIRAN",
+    "jabatan": "KEPALA DESA PAW",
+    "nama": "RAHMAT HIDAYAT",
+    "telp": "082111111382"
+  },
+  "KALISAT|||PATEMPURAN": {
+    "kecamatan": "KALISAT",
+    "desa": "PATEMPURAN",
+    "jabatan": "KEPALA DESA",
+    "nama": "AKHMAD SANUSI",
+    "telp": "082330613327"
+  },
+  "KALISAT|||SEBANEN": {
+    "kecamatan": "KALISAT",
+    "desa": "SEBANEN",
+    "jabatan": "KEPALA DESA",
+    "nama": "SAWADI LUKMAN HAKIM",
+    "telp": "081357598714"
+  },
+  "KALISAT|||SUMBERKALONG": {
+    "kecamatan": "KALISAT",
+    "desa": "SUMBERKALONG",
+    "jabatan": "KEPALA DESA",
+    "nama": "JOKO SISWOYO",
+    "telp": "085336966556"
+  },
+  "KALISAT|||AJUNG": {
+    "kecamatan": "KALISAT",
+    "desa": "AJUNG",
+    "jabatan": "KEPALA DESA PAW",
+    "nama": "SUKIYANTO",
+    "telp": "089682732866"
+  },
+  "KALISAT|||SUKORENO": {
+    "kecamatan": "KALISAT",
+    "desa": "SUKORENO",
+    "jabatan": "KEPALA DESA",
+    "nama": "WAWAN RUSMAWADI",
+    "telp": "082141010045"
+  },
+  "KALISAT|||SUMBERJERUK": {
+    "kecamatan": "KALISAT",
+    "desa": "SUMBERJERUK",
+    "jabatan": "KEPALA DESA",
+    "nama": "DRS. TOTOK SUDJIANTO",
+    "telp": "085236176362"
+  },
+  "KALISAT|||SUMBERKETEMPA": {
+    "kecamatan": "KALISAT",
+    "desa": "SUMBERKETEMPA",
+    "jabatan": "KEPALA DESA",
+    "nama": "ERTIN BUDI RAHAYU",
+    "telp": "0813 5871 6300"
+  },
+  "KALISAT|||GUMUKSARI": {
+    "kecamatan": "KALISAT",
+    "desa": "GUMUKSARI",
+    "jabatan": "KEPALA DESA",
+    "nama": "SUMIYATI",
+    "telp": "085236112000"
+  },
+  "KENCONG|||WONOREJO": {
+    "kecamatan": "KENCONG",
+    "desa": "WONOREJO",
+    "jabatan": "KEPALA DESA",
+    "nama": "SAMI'AN",
+    "telp": "082142094999"
+  },
+  "KENCONG|||CAKRU": {
+    "kecamatan": "KENCONG",
+    "desa": "CAKRU",
+    "jabatan": "KEPALA DESA",
+    "nama": "HENI INDARYANI",
+    "telp": "081359653803"
+  },
+  "KENCONG|||PASEBAN": {
+    "kecamatan": "KENCONG",
+    "desa": "PASEBAN",
+    "jabatan": "KEPALA DESA",
+    "nama": "SATUPAN",
+    "telp": "085236117639"
+  },
+  "KENCONG|||KRATON": {
+    "kecamatan": "KENCONG",
+    "desa": "KRATON",
+    "jabatan": "KEPALA DESA PAW",
+    "nama": "AGUS PRIANTO",
+    "telp": "082337476400"
+  },
+  "KENCONG|||KENCONG": {
+    "kecamatan": "KENCONG",
+    "desa": "KENCONG",
+    "jabatan": "PJ.KEPALA DESA",
+    "nama": "THOMAS HERU INDRA, K.SP.,M.M.",
+    "telp": "085851853154"
+  },
+  "LEDOKOMBO|||LEMBENGAN": {
+    "kecamatan": "LEDOKOMBO",
+    "desa": "LEMBENGAN",
+    "jabatan": "KEPALA DESA",
+    "nama": "MOHAMAD SOEFIJANDI SE MM",
+    "telp": "081 330 619 020"
+  },
+  "LEDOKOMBO|||SUREN": {
+    "kecamatan": "LEDOKOMBO",
+    "desa": "SUREN",
+    "jabatan": "KEPALA DESA",
+    "nama": "MOHAMAD TAHE",
+    "telp": "081252722703"
+  },
+  "LEDOKOMBO|||KARANGPAITON": {
+    "kecamatan": "LEDOKOMBO",
+    "desa": "KARANGPAITON",
+    "jabatan": "KEPALA DESA",
+    "nama": "PIPIT ARIS SUDARMONO, S.SOS",
+    "telp": "082335213999"
+  },
+  "LEDOKOMBO|||SUMBERANGET": {
+    "kecamatan": "LEDOKOMBO",
+    "desa": "SUMBERANGET",
+    "jabatan": "KEPALA DESA",
+    "nama": "H. ADRUN",
+    "telp": "0852-3406-3971"
+  },
+  "LEDOKOMBO|||SUKOGIDRI": {
+    "kecamatan": "LEDOKOMBO",
+    "desa": "SUKOGIDRI",
+    "jabatan": "KEPALA DESA",
+    "nama": "PURNOTO",
+    "telp": "082334333062"
+  },
+  "LEDOKOMBO|||LEDOKOMBO": {
+    "kecamatan": "LEDOKOMBO",
+    "desa": "LEDOKOMBO",
+    "jabatan": "KEPALA DESA",
+    "nama": "IPUNG WAHYUDI",
+    "telp": "085230731392"
+  },
+  "LEDOKOMBO|||SUMBERLESUNG": {
+    "kecamatan": "LEDOKOMBO",
+    "desa": "SUMBERLESUNG",
+    "jabatan": "KEPALA DESA",
+    "nama": "SETYO HARSOYO",
+    "telp": "082143938000"
+  },
+  "LEDOKOMBO|||SUMBERSALAK": {
+    "kecamatan": "LEDOKOMBO",
+    "desa": "SUMBERSALAK",
+    "jabatan": "KEPALA DESA",
+    "nama": "SURYONO",
+    "telp": "082334597931"
+  },
+  "LEDOKOMBO|||SLATENG": {
+    "kecamatan": "LEDOKOMBO",
+    "desa": "SLATENG",
+    "jabatan": "KEPALA DESA",
+    "nama": "M. MISU",
+    "telp": "81336008880"
+  },
+  "LEDOKOMBO|||SUMBERBULUS": {
+    "kecamatan": "LEDOKOMBO",
+    "desa": "SUMBERBULUS",
+    "jabatan": "KEPALA DESA",
+    "nama": "MUNTAHE",
+    "telp": "082351423133"
+  },
+  "MAYANG|||MRAWAN": {
+    "kecamatan": "MAYANG",
+    "desa": "MRAWAN",
+    "jabatan": "KEPALA DESA",
+    "nama": "SALIM",
+    "telp": "085100569660"
+  },
+  "MAYANG|||MAYANG": {
+    "kecamatan": "MAYANG",
+    "desa": "MAYANG",
+    "jabatan": "KEPALA DESA",
+    "nama": "ELI FEBRIYANTO A.MA",
+    "telp": "085235887775"
+  },
+  "MAYANG|||SEPUTIH": {
+    "kecamatan": "MAYANG",
+    "desa": "SEPUTIH",
+    "jabatan": "KEPALA DESA",
+    "nama": "SURYADI SANJAYA",
+    "telp": "085289553345"
+  },
+  "MAYANG|||TEGALWARU": {
+    "kecamatan": "MAYANG",
+    "desa": "TEGALWARU",
+    "jabatan": "KEPALA DESA",
+    "nama": "HARYANTO",
+    "telp": "085219460900"
+  },
+  "MAYANG|||TEGALREJO": {
+    "kecamatan": "MAYANG",
+    "desa": "TEGALREJO",
+    "jabatan": "KEPALA DESA",
+    "nama": "NUNUNG ADI KONTESA",
+    "telp": "085101866864"
+  },
+  "MAYANG|||SUMBERKEJAYAN": {
+    "kecamatan": "MAYANG",
+    "desa": "SUMBERKEJAYAN",
+    "jabatan": "KEPALA DESA",
+    "nama": "YASIN",
+    "telp": "082245798469"
+  },
+  "MAYANG|||SIDOMUKTI": {
+    "kecamatan": "MAYANG",
+    "desa": "SIDOMUKTI",
+    "jabatan": "KEPALA DESA",
+    "nama": "SUNARDI HADI P",
+    "telp": "085109790557"
+  },
+  "MUMBULSARI|||LENGKONG": {
+    "kecamatan": "MUMBULSARI",
+    "desa": "LENGKONG",
+    "jabatan": "KEPALA DESA",
+    "nama": "SUTARTILAH",
+    "telp": "081-259-397-683"
+  },
+  "MUMBULSARI|||TAMANSARI": {
+    "kecamatan": "MUMBULSARI",
+    "desa": "TAMANSARI",
+    "jabatan": "KEPALA DESA",
+    "nama": "SEGER SANTOSO TIO SIEN LIEN",
+    "telp": "082141848698"
+  },
+  "MUMBULSARI|||SUCO": {
+    "kecamatan": "MUMBULSARI",
+    "desa": "SUCO",
+    "jabatan": "KEPALA DESA",
+    "nama": "TAUFIK HIDAYAT",
+    "telp": "081336395508"
+  },
+  "MUMBULSARI|||LAMPEJI": {
+    "kecamatan": "MUMBULSARI",
+    "desa": "LAMPEJI",
+    "jabatan": "KEPALA DESA",
+    "nama": "ARY WAHYUDI",
+    "telp": "081231997359"
+  },
+  "MUMBULSARI|||MUMBULSARI": {
+    "kecamatan": "MUMBULSARI",
+    "desa": "MUMBULSARI",
+    "jabatan": "KEPALA DESA",
+    "nama": "MUHAMMAD ALI SOBRI",
+    "telp": "083162970357"
+  },
+  "MUMBULSARI|||KARANGKEDAWUNG": {
+    "kecamatan": "MUMBULSARI",
+    "desa": "KARANGKEDAWUNG",
+    "jabatan": "KEPALA DESA",
+    "nama": "SUPARTO",
+    "telp": "085100750164"
+  },
+  "MUMBULSARI|||KAWANGREJO": {
+    "kecamatan": "MUMBULSARI",
+    "desa": "KAWANGREJO",
+    "jabatan": "KEPALA DESA",
+    "nama": "BEBET BUDIANTO.SH",
+    "telp": "081333557627"
+  },
+  "PAKUSARI|||PATEMON": {
+    "kecamatan": "PAKUSARI",
+    "desa": "PATEMON",
+    "jabatan": "PJ.KEPALA DESA",
+    "nama": "MUJIONO,S.H.,M.M",
+    "telp": "082333931156"
+  },
+  "PAKUSARI|||BEDADUNG": {
+    "kecamatan": "PAKUSARI",
+    "desa": "BEDADUNG",
+    "jabatan": "KEPALA DESA",
+    "nama": "SARBINI",
+    "telp": "085232197504"
+  },
+  "PAKUSARI|||SUMBERPINANG": {
+    "kecamatan": "PAKUSARI",
+    "desa": "SUMBERPINANG",
+    "jabatan": "KEPALA DESA",
+    "nama": "MULYONO",
+    "telp": "085236876869"
+  },
+  "PAKUSARI|||SUBO": {
+    "kecamatan": "PAKUSARI",
+    "desa": "SUBO",
+    "jabatan": "KEPALA DESA PAW",
+    "nama": "FITRIYATUN NAVILAH",
+    "telp": "085749991414"
+  },
+  "PAKUSARI|||KERTOSARI": {
+    "kecamatan": "PAKUSARI",
+    "desa": "KERTOSARI",
+    "jabatan": "KEPALA DESA",
+    "nama": "BUDI WIJAYANTO",
+    "telp": "081330233817"
+  },
+  "PAKUSARI|||JATIAN": {
+    "kecamatan": "PAKUSARI",
+    "desa": "JATIAN",
+    "jabatan": "PJ.KEPALA DESA",
+    "nama": "DEWI NOVA WAHYUNI, S.ST.,M.Kes",
+    "telp": "085143404991"
+  },
+  "PAKUSARI|||PAKUSARI": {
+    "kecamatan": "PAKUSARI",
+    "desa": "PAKUSARI",
+    "jabatan": "KEPALA DESA",
+    "nama": "MISJO",
+    "telp": "085102607000"
+  },
+  "PANTI|||PAKIS": {
+    "kecamatan": "PANTI",
+    "desa": "PAKIS",
+    "jabatan": "KEPALA DESA",
+    "nama": "ZAENI",
+    "telp": "0823 3744 3276"
+  },
+  "PANTI|||KEMUNINGSARILOR": {
+    "kecamatan": "PANTI",
+    "desa": "KEMUNINGSARI LOR",
+    "jabatan": "KEPALA DESA",
+    "nama": "ABDUL WAQIK, S.PT.",
+    "telp": "082139553152"
+  },
+  "PANTI|||PANTI": {
+    "kecamatan": "PANTI",
+    "desa": "PANTI",
+    "jabatan": "KEPALA DESA",
+    "nama": "SUROSO",
+    "telp": "081336676259"
+  },
+  "PANTI|||GLAGAHWERO": {
+    "kecamatan": "PANTI",
+    "desa": "GLAGAHWERO",
+    "jabatan": "KEPALA DESA",
+    "nama": "SURYO",
+    "telp": "081249235494"
+  },
+  "PANTI|||SUCI": {
+    "kecamatan": "PANTI",
+    "desa": "SUCI",
+    "jabatan": "KEPALA DESA",
+    "nama": "AKHMAD SUYUTHI",
+    "telp": "085815575242"
+  },
+  "PANTI|||KEMIRI": {
+    "kecamatan": "PANTI",
+    "desa": "KEMIRI",
+    "jabatan": "KEPALA DESA",
+    "nama": "BAIDOWI, S.PD",
+    "telp": "082141472889"
+  },
+  "PANTI|||SERUT": {
+    "kecamatan": "PANTI",
+    "desa": "SERUT",
+    "jabatan": "KEPALA DESA",
+    "nama": "ABDUL ASIS",
+    "telp": "081232325302"
+  },
+  "PUGER|||JAMBEARUM": {
+    "kecamatan": "PUGER",
+    "desa": "JAMBEARUM",
+    "jabatan": "KEPALA DESA",
+    "nama": "IMRO'ATI",
+    "telp": "08133625772"
+  },
+  "PUGER|||WRINGINTELU": {
+    "kecamatan": "PUGER",
+    "desa": "WRINGINTELU",
+    "jabatan": "KEPALA DESA",
+    "nama": "MOHAMMAD SOLIHIN",
+    "telp": "082331112123"
+  },
+  "PUGER|||PUGERKULON": {
+    "kecamatan": "PUGER",
+    "desa": "PUGERKULON",
+    "jabatan": "KEPALA DESA",
+    "nama": "NURHASAN",
+    "telp": "08123482983"
+  },
+  "PUGER|||MOJOSARI": {
+    "kecamatan": "PUGER",
+    "desa": "MOJOSARI",
+    "jabatan": "KEPALA DESA",
+    "nama": "SUPARTI",
+    "telp": "082332659577"
+  },
+  "PUGER|||MLOKOREJO": {
+    "kecamatan": "PUGER",
+    "desa": "MLOKOREJO",
+    "jabatan": "KEPALA DESA",
+    "nama": "H.MAHFUDZ",
+    "telp": "082232426184"
+  },
+  "PUGER|||KASIYAN": {
+    "kecamatan": "PUGER",
+    "desa": "KASIYAN",
+    "jabatan": "KEPALA DESA PAW",
+    "nama": "HADI WISWOYO",
+    "telp": "081330568852"
+  },
+  "PUGER|||KASIYANTIMUR": {
+    "kecamatan": "PUGER",
+    "desa": "KASIYAN TIMUR",
+    "jabatan": "KEPALA DESA",
+    "nama": "HARIYANTO",
+    "telp": "085236017989"
+  },
+  "PUGER|||GRENDEN": {
+    "kecamatan": "PUGER",
+    "desa": "GRENDEN",
+    "jabatan": "KEPALA DESA",
+    "nama": "SUYONO",
+    "telp": "085236392709"
+  },
+  "PUGER|||BAGON": {
+    "kecamatan": "PUGER",
+    "desa": "BAGON",
+    "jabatan": "KEPALA DESA",
+    "nama": "AHMAD KHOLILI",
+    "telp": "0823 34023491"
+  },
+  "PUGER|||MOJOMULYO": {
+    "kecamatan": "PUGER",
+    "desa": "MOJOMULYO",
+    "jabatan": "KEPALA DESA",
+    "nama": "EDI PURWANTO",
+    "telp": "085232478459"
+  },
+  "PUGER|||PUGERWETAN": {
+    "kecamatan": "PUGER",
+    "desa": "PUGERWETAN",
+    "jabatan": "KEPALA DESA",
+    "nama": "INWAN NULLOH",
+    "telp": "082320070001"
+  },
+  "PUGER|||WONOSARI": {
+    "kecamatan": "PUGER",
+    "desa": "WONOSARI",
+    "jabatan": "KEPALA DESA",
+    "nama": "HADI PURNOMO",
+    "telp": "082337388886"
+  },
+  "RAMBIPUJI|||NOGOSARI": {
+    "kecamatan": "RAMBIPUJI",
+    "desa": "NOGOSARI",
+    "jabatan": "KEPALA DESA",
+    "nama": "ESA HOSADA S.H., M.KN",
+    "telp": "0811229227"
+  },
+  "RAMBIPUJI|||CURAHMALANG": {
+    "kecamatan": "RAMBIPUJI",
+    "desa": "CURAHMALANG",
+    "jabatan": "KEPALA DESA",
+    "nama": "SUTEJO",
+    "telp": "081358639992"
+  },
+  "RAMBIPUJI|||ROWOTAMTU": {
+    "kecamatan": "RAMBIPUJI",
+    "desa": "ROWOTAMTU",
+    "jabatan": "KEPALA DESA",
+    "nama": "JAINURI",
+    "telp": "085331515495"
+  },
+  "RAMBIPUJI|||KALIWINING": {
+    "kecamatan": "RAMBIPUJI",
+    "desa": "KALIWINING",
+    "jabatan": "KEPALA DESA",
+    "nama": "SAMSUL ARIFIN",
+    "telp": "081234551517"
+  },
+  "RAMBIPUJI|||PECORO": {
+    "kecamatan": "RAMBIPUJI",
+    "desa": "PECORO",
+    "jabatan": "KEPALA DESA",
+    "nama": "MUSTHOFA SHOBIR",
+    "telp": "082199463789"
+  },
+  "RAMBIPUJI|||RAMBIPUJI": {
+    "kecamatan": "RAMBIPUJI",
+    "desa": "RAMBIPUJI",
+    "jabatan": "KEPALA DESA",
+    "nama": "DWI DIYAH SETYORINI",
+    "telp": "081336521530"
+  },
+  "RAMBIPUJI|||GUGUT": {
+    "kecamatan": "RAMBIPUJI",
+    "desa": "GUGUT",
+    "jabatan": "KEPALA DESA",
+    "nama": "PUSRIYANTO",
+    "telp": "085233507072"
+  },
+  "RAMBIPUJI|||RAMBIGUNDAM": {
+    "kecamatan": "RAMBIPUJI",
+    "desa": "RAMBIGUNDAM",
+    "jabatan": "KEPALA DESA",
+    "nama": "MANGSUR",
+    "telp": "081330633415"
+  },
+  "SEMBORO|||PONDOKJOYO": {
+    "kecamatan": "SEMBORO",
+    "desa": "PONDOKJOYO",
+    "jabatan": "KEPALA DESA",
+    "nama": "DIDIK SAENULLA",
+    "telp": "082327036666"
+  },
+  "SEMBORO|||PONDOKDALEM": {
+    "kecamatan": "SEMBORO",
+    "desa": "PONDOKDALEM",
+    "jabatan": "KEPALA DESA",
+    "nama": "SUMARYONO",
+    "telp": "85735728859"
+  },
+  "SEMBORO|||REJOAGUNG": {
+    "kecamatan": "SEMBORO",
+    "desa": "REJOAGUNG",
+    "jabatan": "KEPALA DESA",
+    "nama": "GATOT SUSANTO",
+    "telp": "085238633038"
+  },
+  "SEMBORO|||SEMBORO": {
+    "kecamatan": "SEMBORO",
+    "desa": "SEMBORO",
+    "jabatan": "KEPALA DESA",
+    "nama": "ANTONI",
+    "telp": "081357121677"
+  },
+  "SEMBORO|||SIDOMEKAR": {
+    "kecamatan": "SEMBORO",
+    "desa": "SIDOMEKAR",
+    "jabatan": "PJ.KEPALA DESA",
+    "nama": "ACHMAD NURSALIM",
+    "telp": "085738133352"
+  },
+  "SEMBORO|||SIDOMULYO": {
+    "kecamatan": "SEMBORO",
+    "desa": "SIDOMULYO",
+    "jabatan": "KEPALA DESA",
+    "nama": "WASISO",
+    "telp": "082229757578"
+  },
+  "SILO|||SEMPOLAN": {
+    "kecamatan": "SILO",
+    "desa": "SEMPOLAN",
+    "jabatan": "KEPALA DESA",
+    "nama": "MOHAMMAD FADLI",
+    "telp": "085232111213"
+  },
+  "SILO|||SILO": {
+    "kecamatan": "SILO",
+    "desa": "SILO",
+    "jabatan": "KEPALA DESA",
+    "nama": "ARPA",
+    "telp": "081283839598"
+  },
+  "SILO|||SIDOMULYO": {
+    "kecamatan": "SILO",
+    "desa": "SIDOMULYO",
+    "jabatan": "KEPALA DESA",
+    "nama": "KAMILUDIN, S.KEP., NERS",
+    "telp": "085257238205"
+  },
+  "SILO|||SUMBERJATI": {
+    "kecamatan": "SILO",
+    "desa": "SUMBERJATI",
+    "jabatan": "KEPALA DESA",
+    "nama": "ANDRIYA SUWITO",
+    "telp": "082311414079"
+  },
+  "SILO|||GARAHAN": {
+    "kecamatan": "SILO",
+    "desa": "GARAHAN",
+    "jabatan": "KEPALA DESA",
+    "nama": "HOMAEDI",
+    "telp": "083837966976"
+  },
+  "SILO|||PACE": {
+    "kecamatan": "SILO",
+    "desa": "PACE",
+    "jabatan": "KEPALA DESA",
+    "nama": "MUHAMMAD FAROHAN",
+    "telp": "082333964038"
+  },
+  "SILO|||KARANGHARJO": {
+    "kecamatan": "SILO",
+    "desa": "KARANGHARJO",
+    "jabatan": "KEPALA DESA PAW",
+    "nama": "SAMHADI",
+    "telp": "085258841573"
+  },
+  "SILO|||HARJOMULYO": {
+    "kecamatan": "SILO",
+    "desa": "HARJOMULYO",
+    "jabatan": "KEPALA DESA",
+    "nama": "KARTONO",
+    "telp": "081217564022"
+  },
+  "SILO|||MULYOREJO": {
+    "kecamatan": "SILO",
+    "desa": "MULYOREJO",
+    "jabatan": "KEPALA DESA",
+    "nama": "ABD. AZIS",
+    "telp": "081358956270"
+  },
+  "SUKORAMBI|||KARANGPRING": {
+    "kecamatan": "SUKORAMBI",
+    "desa": "KARANGPRING",
+    "jabatan": "KEPALA DESA",
+    "nama": "AHMAD SAHRI, S.PD",
+    "telp": "085859818844"
+  },
+  "SUKORAMBI|||KLUNGKUNG": {
+    "kecamatan": "SUKORAMBI",
+    "desa": "KLUNGKUNG",
+    "jabatan": "KEPALA DESA",
+    "nama": "ABDUL GAFUR",
+    "telp": "081335539518"
+  },
+  "SUKORAMBI|||SUKORAMBI": {
+    "kecamatan": "SUKORAMBI",
+    "desa": "SUKORAMBI",
+    "jabatan": "KEPALA DESA",
+    "nama": "ABDUS SOIM",
+    "telp": "0812 3352 0771"
+  },
+  "SUKORAMBI|||JUBUNG": {
+    "kecamatan": "SUKORAMBI",
+    "desa": "JUBUNG",
+    "jabatan": "KEPALA DESA",
+    "nama": "BHISMA PERDANA",
+    "telp": "081336212123"
+  },
+  "SUKOWONO|||SUMBERWRINGIN": {
+    "kecamatan": "SUKOWONO",
+    "desa": "SUMBERWRINGIN",
+    "jabatan": "KEPALA DESA",
+    "nama": "FATHORROZI HERMAWAN",
+    "telp": "081336224132"
+  },
+  "SUKOWONO|||SUKOKERTO": {
+    "kecamatan": "SUKOWONO",
+    "desa": "SUKOKERTO",
+    "jabatan": "KEPALA DESA",
+    "nama": "MOHAMMAD ZAINI",
+    "telp": "085101826179"
+  },
+  "SUKOWONO|||SUMBERWARU": {
+    "kecamatan": "SUKOWONO",
+    "desa": "SUMBERWARU",
+    "jabatan": "KEPALA DESA",
+    "nama": "WAHYU ADI SUTRISNOPUTRO",
+    "telp": "0852-5891-1300"
+  },
+  "SUKOWONO|||SUKOWONO": {
+    "kecamatan": "SUKOWONO",
+    "desa": "SUKOWONO",
+    "jabatan": "KEPALA DESA",
+    "nama": "HORIFAH",
+    "telp": "085334333448"
+  },
+  "SUKOWONO|||BALETBARU": {
+    "kecamatan": "SUKOWONO",
+    "desa": "BALETBARU",
+    "jabatan": "KEPALA DESA",
+    "nama": "FAUZI CAHYO PURNOMO",
+    "telp": "0822-4160-5577"
+  },
+  "SUKOWONO|||SUKOREJO": {
+    "kecamatan": "SUKOWONO",
+    "desa": "SUKOREJO",
+    "jabatan": "KEPALA DESA",
+    "nama": "RUDIANTO",
+    "telp": "085101220000"
+  },
+  "SUKOWONO|||SUKOSARI": {
+    "kecamatan": "SUKOWONO",
+    "desa": "SUKOSARI",
+    "jabatan": "KEPALA DESA",
+    "nama": "AHMAD ROMADLON",
+    "telp": "085102897997"
+  },
+  "SUKOWONO|||ARJASA": {
+    "kecamatan": "SUKOWONO",
+    "desa": "ARJASA",
+    "jabatan": "KEPALA DESA",
+    "nama": "HAIRUDDIN",
+    "telp": "082236819999"
+  },
+  "SUKOWONO|||SUMBERDANTI": {
+    "kecamatan": "SUKOWONO",
+    "desa": "SUMBERDANTI",
+    "jabatan": "KEPALA DESA",
+    "nama": "MULYADI",
+    "telp": "085230262849"
+  },
+  "SUKOWONO|||POCANGAN": {
+    "kecamatan": "SUKOWONO",
+    "desa": "POCANGAN",
+    "jabatan": "PJ.KEPALA DESA",
+    "nama": "MUHAMMAD AMIN",
+    "telp": "085232008398"
+  },
+  "SUKOWONO|||DAWUHANMANGLI": {
+    "kecamatan": "SUKOWONO",
+    "desa": "DAWUHANMANGLI",
+    "jabatan": "PJ.KEPALA DESA",
+    "nama": "ANDRIK IRIWANTO",
+    "telp": "085230792991"
+  },
+  "SUKOWONO|||MOJOGEMI": {
+    "kecamatan": "SUKOWONO",
+    "desa": "MOJOGEMI",
+    "jabatan": "KEPALA DESA",
+    "nama": "MUHAMMAD ZAYNAL HAFIFI",
+    "telp": "085230597600"
+  },
+  "SUMBERBARU|||JAMINTORO": {
+    "kecamatan": "SUMBERBARU",
+    "desa": "JAMINTORO",
+    "jabatan": "KEPALA DESA",
+    "nama": "SHOHEB",
+    "telp": "081358788685"
+  },
+  "SUMBERBARU|||GELANG": {
+    "kecamatan": "SUMBERBARU",
+    "desa": "GELANG",
+    "jabatan": "KEPALA DESA",
+    "nama": "YUSRO",
+    "telp": "082336972678"
+  },
+  "SUMBERBARU|||JAMBESARI": {
+    "kecamatan": "SUMBERBARU",
+    "desa": "JAMBESARI",
+    "jabatan": "KEPALA DESA",
+    "nama": "MARSUTO",
+    "telp": "08534897229"
+  },
+  "SUMBERBARU|||JATIROTO": {
+    "kecamatan": "SUMBERBARU",
+    "desa": "JATIROTO",
+    "jabatan": "KEPALA DESA",
+    "nama": "MAT SALEH",
+    "telp": "081351974727"
+  },
+  "SUMBERBARU|||KARANGBAYAT": {
+    "kecamatan": "SUMBERBARU",
+    "desa": "KARANGBAYAT",
+    "jabatan": "KEPALA DESA",
+    "nama": "ABDULLAH H.MOH.AMIN",
+    "telp": "082336880409"
+  },
+  "SUMBERBARU|||PRINGGOWIRAWAN": {
+    "kecamatan": "SUMBERBARU",
+    "desa": "PRINGGOWIRAWAN",
+    "jabatan": "KEPALA DESA",
+    "nama": "ALIM",
+    "telp": "082331859467"
+  },
+  "SUMBERBARU|||ROWOTENGAH": {
+    "kecamatan": "SUMBERBARU",
+    "desa": "ROWOTENGAH",
+    "jabatan": "KEPALA DESA",
+    "nama": "DIDIK SUHADI",
+    "telp": "08155295553"
+  },
+  "SUMBERBARU|||SUMBERAGUNG": {
+    "kecamatan": "SUMBERBARU",
+    "desa": "SUMBERAGUNG",
+    "jabatan": "KEPALA DESA",
+    "nama": "TUGIRAN,S,SOS",
+    "telp": "85297046230"
+  },
+  "SUMBERBARU|||YOSORATI": {
+    "kecamatan": "SUMBERBARU",
+    "desa": "YOSORATI",
+    "jabatan": "KEPALA DESA",
+    "nama": "ABDUL HAMID",
+    "telp": "82142997346"
+  },
+  "SUMBERBARU|||KALIGLAGAH": {
+    "kecamatan": "SUMBERBARU",
+    "desa": "KALIGLAGAH",
+    "jabatan": "KEPALA DESA",
+    "nama": "MURNIAJI",
+    "telp": "82141906400"
+  },
+  "SUMBERJAMBE|||CUMEDAK": {
+    "kecamatan": "SUMBERJAMBE",
+    "desa": "CUMEDAK",
+    "jabatan": "KEPALA DESA",
+    "nama": "SUPARDI  TOFAN SANTOSO",
+    "telp": "082330224496"
+  },
+  "SUMBERJAMBE|||GUNUNGMALANG": {
+    "kecamatan": "SUMBERJAMBE",
+    "desa": "GUNUNGMALANG",
+    "jabatan": "KEPALA DESA",
+    "nama": "DJAMAL",
+    "telp": "81359747559"
+  },
+  "SUMBERJAMBE|||JAMBEARUM": {
+    "kecamatan": "SUMBERJAMBE",
+    "desa": "JAMBEARUM",
+    "jabatan": "KEPALA DESA",
+    "nama": "SUTIKNO",
+    "telp": "085646846595"
+  },
+  "SUMBERJAMBE|||PLEREAN": {
+    "kecamatan": "SUMBERJAMBE",
+    "desa": "PLEREAN",
+    "jabatan": "KEPALA DESA",
+    "nama": "MOCH. ALI MUCHLAS",
+    "telp": "082230842175"
+  },
+  "SUMBERJAMBE|||PRINGGODANI": {
+    "kecamatan": "SUMBERJAMBE",
+    "desa": "PRINGGODANI",
+    "jabatan": "KEPALA DESA",
+    "nama": "RUDY HARYANTO",
+    "telp": "085330162990"
+  },
+  "SUMBERJAMBE|||RANDUAGUNG": {
+    "kecamatan": "SUMBERJAMBE",
+    "desa": "RANDUAGUNG",
+    "jabatan": "KEPALA DESA",
+    "nama": "SUNARYO",
+    "telp": "85234443929"
+  },
+  "SUMBERJAMBE|||ROWOSARI": {
+    "kecamatan": "SUMBERJAMBE",
+    "desa": "ROWOSARI",
+    "jabatan": "KEPALA DESA",
+    "nama": "JAMILAH",
+    "telp": "085228502860"
+  },
+  "SUMBERJAMBE|||SUMBERJAMBE": {
+    "kecamatan": "SUMBERJAMBE",
+    "desa": "SUMBERJAMBE",
+    "jabatan": "KEPALA DESA",
+    "nama": "MUSAKKI",
+    "telp": "082143095203"
+  },
+  "SUMBERJAMBE|||SUMBERPAKEM": {
+    "kecamatan": "SUMBERJAMBE",
+    "desa": "SUMBERPAKEM",
+    "jabatan": "KEPALA DESA",
+    "nama": "SOFYAN EFENDI",
+    "telp": "085233602520"
+  },
+  "TANGGUL|||TANGGULKULON": {
+    "kecamatan": "TANGGUL",
+    "desa": "TANGGULKULON",
+    "jabatan": "KEPALA DESA",
+    "nama": "ARIFIN WAHYUONO, S.H.",
+    "telp": "085234098999"
+  },
+  "TANGGUL|||TANGGULWETAN": {
+    "kecamatan": "TANGGUL",
+    "desa": "TANGGULWETAN",
+    "jabatan": "PJ.KEPALA DESA",
+    "nama": "SAHIBUDIN,SAP.",
+    "telp": "082336778278"
+  },
+  "TANGGUL|||PATEMON": {
+    "kecamatan": "TANGGUL",
+    "desa": "PATEMON",
+    "jabatan": "KEPALA DESA",
+    "nama": "ARISMANTO",
+    "telp": "058236439075"
+  },
+  "TANGGUL|||DARUNGAN": {
+    "kecamatan": "TANGGUL",
+    "desa": "DARUNGAN",
+    "jabatan": "KEPALA DESA",
+    "nama": "ARAFIT",
+    "telp": "085336420862"
+  },
+  "TANGGUL|||MANGGISAN": {
+    "kecamatan": "TANGGUL",
+    "desa": "MANGGISAN",
+    "jabatan": "KEPALA DESA",
+    "nama": "MOHAMAD HOLILI",
+    "telp": "082330492929"
+  },
+  "TANGGUL|||KLATAKAN": {
+    "kecamatan": "TANGGUL",
+    "desa": "KLATAKAN",
+    "jabatan": "KEPALA DESA",
+    "nama": "ALI WAFA",
+    "telp": "081133363777"
+  },
+  "TANGGUL|||SELODAKON": {
+    "kecamatan": "TANGGUL",
+    "desa": "SELODAKON",
+    "jabatan": "PJ.KEPALA DESA",
+    "nama": "SURYANTO",
+    "telp": "082132898619"
+  },
+  "TANGGUL|||KRAMATSUKOHARJO": {
+    "kecamatan": "TANGGUL",
+    "desa": "KRAMAT SUKOHARJO",
+    "jabatan": "KEPALA DESA",
+    "nama": "DWI SISWANTO",
+    "telp": "082143150202"
+  },
+  "TEMPUREJO|||PONDOKREJO": {
+    "kecamatan": "TEMPUREJO",
+    "desa": "PONDOKREJO",
+    "jabatan": "KEPALA DESA",
+    "nama": "MISRIYANTO EFENDI",
+    "telp": "085204884833"
+  },
+  "TEMPUREJO|||TEMPUREJO": {
+    "kecamatan": "TEMPUREJO",
+    "desa": "TEMPUREJO",
+    "jabatan": "KEPALA DESA PAW",
+    "nama": "ABD. KHOLIQ, S. PD. I",
+    "telp": "85732387448"
+  },
+  "TEMPUREJO|||ANDONGREJO": {
+    "kecamatan": "TEMPUREJO",
+    "desa": "ANDONGREJO",
+    "jabatan": "PJ.KEPALA DESA",
+    "nama": "RAODA TAPPU",
+    "telp": "08213345282"
+  },
+  "TEMPUREJO|||CURAHNONGKO": {
+    "kecamatan": "TEMPUREJO",
+    "desa": "CURAHNONGKO",
+    "jabatan": "KEPALA DESA",
+    "nama": "ISMAIL NAWAWI",
+    "telp": "082331875999"
+  },
+  "TEMPUREJO|||CURAHTAKIR": {
+    "kecamatan": "TEMPUREJO",
+    "desa": "CURAHTAKIR",
+    "jabatan": "KEPALA DESA",
+    "nama": "BONARI UNTUNG",
+    "telp": "0858-5995-4737"
+  },
+  "TEMPUREJO|||SIDODADI": {
+    "kecamatan": "TEMPUREJO",
+    "desa": "SIDODADI",
+    "jabatan": "KEPALA DESA",
+    "nama": "SUYONO",
+    "telp": "085259300519"
+  },
+  "TEMPUREJO|||SANENREJO": {
+    "kecamatan": "TEMPUREJO",
+    "desa": "SANENREJO",
+    "jabatan": "KEPALA DESA",
+    "nama": "SUTIKNO",
+    "telp": "085704525898"
+  },
+  "TEMPUREJO|||WONOASRI": {
+    "kecamatan": "TEMPUREJO",
+    "desa": "WONOASRI",
+    "jabatan": "KEPALA DESA",
+    "nama": "MESERAN",
+    "telp": "081358234789"
+  },
+  "UMBULSARI|||GADINGREJO": {
+    "kecamatan": "UMBULSARI",
+    "desa": "GADINGREJO",
+    "jabatan": "KEPALA DESA",
+    "nama": "HERI WIDOYOKO",
+    "telp": "081253083554"
+  },
+  "UMBULSARI|||UMBULREJO": {
+    "kecamatan": "UMBULSARI",
+    "desa": "UMBULREJO",
+    "jabatan": "KEPALA DESA",
+    "nama": "MOH. SUHARI",
+    "telp": "082334233234"
+  },
+  "UMBULSARI|||UMBULSARI": {
+    "kecamatan": "UMBULSARI",
+    "desa": "UMBULSARI",
+    "jabatan": "KEPALA DESA",
+    "nama": "DEDI KASRIANTO",
+    "telp": "081217100202"
+  },
+  "UMBULSARI|||TANJUNGSARI": {
+    "kecamatan": "UMBULSARI",
+    "desa": "TANJUNGSARI",
+    "jabatan": "KEPALA DESA",
+    "nama": "SABUKTIYONO",
+    "telp": "082142576123"
+  },
+  "UMBULSARI|||TEGALWANGI": {
+    "kecamatan": "UMBULSARI",
+    "desa": "TEGALWANGI",
+    "jabatan": "KEPALA DESA",
+    "nama": "ANDI BUDI WIBOWO",
+    "telp": "085141061063"
+  },
+  "UMBULSARI|||PALERAN": {
+    "kecamatan": "UMBULSARI",
+    "desa": "PALERAN",
+    "jabatan": "KEPALA DESA",
+    "nama": "GUNAWAN",
+    "telp": "081335289299"
+  },
+  "UMBULSARI|||MUNDUREJO": {
+    "kecamatan": "UMBULSARI",
+    "desa": "MUNDUREJO",
+    "jabatan": "PJ.KEPALA DESA",
+    "nama": "MOHAMMAD IRFAN ALI WARDANA,S.E.",
+    "telp": "082132620024"
+  },
+  "UMBULSARI|||SUKORENO": {
+    "kecamatan": "UMBULSARI",
+    "desa": "SUKORENO",
+    "jabatan": "KEPALA DESA",
+    "nama": "ACHMAD CHOIRI",
+    "telp": "085790720531"
+  },
+  "UMBULSARI|||SIDOREJO": {
+    "kecamatan": "UMBULSARI",
+    "desa": "SIDOREJO",
+    "jabatan": "KEPALA DESA",
+    "nama": "SETYA KRISTINING ELYNA",
+    "telp": "082333913410"
+  },
+  "UMBULSARI|||GUNUNGSARI": {
+    "kecamatan": "UMBULSARI",
+    "desa": "GUNUNGSARI",
+    "jabatan": "KEPALA DESA",
+    "nama": "ABD. RAHMAN",
+    "telp": "081336033642"
+  },
+  "WULUHAN|||DUKUHDEMPOK": {
+    "kecamatan": "WULUHAN",
+    "desa": "DUKUHDEMPOK",
+    "jabatan": "KEPALA DESA",
+    "nama": "MIFTAHUL MUNIR, SH",
+    "telp": "081249948586"
+  },
+  "WULUHAN|||TANJUNGREJO": {
+    "kecamatan": "WULUHAN",
+    "desa": "TANJUNGREJO",
+    "jabatan": "KEPALA DESA",
+    "nama": "SUBONO",
+    "telp": "'081344711477"
+  },
+  "WULUHAN|||KESILIR": {
+    "kecamatan": "WULUHAN",
+    "desa": "KESILIR",
+    "jabatan": "KEPALA DESA",
+    "nama": "SUCIPTO",
+    "telp": "081249349899"
+  },
+  "WULUHAN|||GLUNDENGAN": {
+    "kecamatan": "WULUHAN",
+    "desa": "GLUNDENGAN",
+    "jabatan": "PJ.KEPALA DESA",
+    "nama": "PRAYOGO",
+    "telp": ""
+  },
+  "WULUHAN|||AMPEL": {
+    "kecamatan": "WULUHAN",
+    "desa": "AMPEL",
+    "jabatan": "KEPALA DESA",
+    "nama": "SHOLEH",
+    "telp": "082131533774"
+  },
+  "WULUHAN|||LOJEJER": {
+    "kecamatan": "WULUHAN",
+    "desa": "LOJEJER",
+    "jabatan": "KEPALA DESA",
+    "nama": "MOHAMAD SHOLEH,SH,M.SI",
+    "telp": "081281666555"
+  },
+  "WULUHAN|||TAMANSARI": {
+    "kecamatan": "WULUHAN",
+    "desa": "TAMANSARI",
+    "jabatan": "KEPALA DESA PAW",
+    "nama": "NUR HADI",
+    "telp": "085100636570"
+  }
+}
