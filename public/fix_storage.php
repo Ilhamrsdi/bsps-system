@@ -2,69 +2,44 @@
 
 header('Content-Type: text/plain');
 
-echo "=== DIAGNOSTIC & FIX STORAGE SYMLINK HOSTINGER ===\n\n";
+echo "=== FIXING HOSTINGER NGINX SYMLINK BLOCK ===\n\n";
 
 $baseDir = dirname(__DIR__);
-echo "Base Directory: $baseDir\n";
+$target = $baseDir . '/storage/app/public/uploads';
+$publicStorage = $baseDir . '/public/storage';
+$publicUploads = $publicStorage . '/uploads';
 
-$target = $baseDir . '/storage/app/public';
-echo "Target Folder (Real Uploads): $target\n";
-echo "Target Exists? " . (file_exists($target) ? "YES" : "NO") . "\n";
-
-if (!file_exists($target)) {
-    @mkdir($target, 0755, true);
-    echo "Created Target Folder: $target\n";
+// 1. Jika public/storage adalah symlink, hapus agar Nginx tidak nge-block 403 Forbidden
+if (is_link($publicStorage)) {
+    unlink($publicStorage);
+    echo "Unlinked symlink: $publicStorage\n";
 }
 
-$uploadsFolder = $target . '/uploads';
-if (!file_exists($uploadsFolder)) {
-    @mkdir($uploadsFolder, 0755, true);
-    echo "Created Uploads Folder: $uploadsFolder\n";
+// 2. Buat folder FISIK asli public/storage/uploads
+if (!file_exists($publicUploads)) {
+    mkdir($publicUploads, 0755, true);
+    echo "Created physical directory: $publicUploads\n";
 }
 
-// Set permissions
-@chmod($target, 0755);
-@chmod($uploadsFolder, 0755);
-
-// Check links
-$linkInPublic = $baseDir . '/public/storage';
-echo "\nChecking Link in public/storage: $linkInPublic\n";
-if (is_link($linkInPublic) || file_exists($linkInPublic)) {
-    echo "Existing Link Target: " . (is_link($linkInPublic) ? readlink($linkInPublic) : "Directory/File") . "\n";
-    @unlink($linkInPublic);
-}
-
-if (@symlink($target, $linkInPublic)) {
-    echo "SUCCESS: Created Absolute Symlink ($linkInPublic -> $target)\n";
-} else {
-    echo "FALLBACK: Copying files to physical folder...\n";
-    @mkdir($linkInPublic . '/uploads', 0755, true);
-}
-
-// Also check root/storage link if root is public_html
-$linkInRoot = $baseDir . '/storage';
-if (is_link($linkInRoot)) {
-    @unlink($linkInRoot);
-}
-
-// Check sample file
-$sampleFile = $uploadsFolder . '/foto_bagian_dalam_6a79b505cd5c3.jpg';
-echo "\nSample File ($sampleFile): " . (file_exists($sampleFile) ? "EXISTS" : "NOT FOUND") . "\n";
-
-if (file_exists($sampleFile)) {
-    @chmod($sampleFile, 0644);
-    echo "Sample File Permission set to 0644\n";
-} else {
-    $files = file_exists($uploadsFolder) ? scandir($uploadsFolder) : [];
-    echo "Files in $uploadsFolder: " . json_encode(array_values(array_diff($files, ['.', '..']))) . "\n";
-}
-
-// If public/storage is a real directory or symlink, ensure permissions on all files
-$publicUploads = $linkInPublic . '/uploads';
-if (file_exists($publicUploads)) {
-    foreach (glob($publicUploads . '/*') as $f) {
-        @chmod($f, 0644);
+// 3. Salin seluruh file foto dari storage/app/public/uploads ke public/storage/uploads
+if (file_exists($target)) {
+    $files = scandir($target);
+    $copied = 0;
+    foreach ($files as $f) {
+        if ($f !== '.' && $f !== '..') {
+            $src = $target . '/' . $f;
+            $dst = $publicUploads . '/' . $f;
+            if (is_file($src)) {
+                copy($src, $dst);
+                chmod($dst, 0644);
+                $copied++;
+            }
+        }
     }
+    echo "Successfully copied $copied files to physical folder public/storage/uploads!\n";
 }
 
-echo "\n=== FIX COMPLETED SUCCESSFULLY ===\n";
+@chmod($publicStorage, 0755);
+@chmod($publicUploads, 0755);
+
+echo "\n=== FIX COMPLETE: REAL PHYSICAL FOLDER ACTIVE & NGINX 403 BYPASSED! ===\n";
