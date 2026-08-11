@@ -1673,6 +1673,28 @@
 
             if (loadingEl) loadingEl.classList.add('active');
 
+            // Jika Perangkat Offline (Mode Blankspot)
+            if (!navigator.onLine) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    if (loadingEl) loadingEl.classList.remove('active');
+                    const urlInput = document.getElementById('url_' + field);
+                    const placeholder = document.getElementById('placeholder_' + field);
+                    const uploadedBox = document.getElementById('uploaded_' + field);
+                    const card = placeholder ? placeholder.closest('.camera-upload-card') : null;
+
+                    if (urlInput) urlInput.value = evt.target.result;
+                    if (placeholder) placeholder.style.display = 'none';
+                    if (uploadedBox) uploadedBox.style.display = 'flex';
+                    if (card) {
+                        card.classList.add('has-image');
+                        card.classList.remove('is-invalid-highlight');
+                    }
+                };
+                reader.readAsDataURL(file);
+                return;
+            }
+
             const formData = new FormData();
             formData.append('id', id);
             formData.append('field', field);
@@ -1743,6 +1765,25 @@
 
             const loadingEl = document.getElementById('loading_' + field);
             if (loadingEl) loadingEl.classList.add('active');
+
+            // Jika Perangkat Offline (Mode Blankspot)
+            if (!navigator.onLine) {
+                if (loadingEl) loadingEl.classList.remove('active');
+                const urlInput = document.getElementById('url_' + field);
+                const placeholder = document.getElementById('placeholder_' + field);
+                const uploadedBox = document.getElementById('uploaded_' + field);
+                const inputEl = document.getElementById('input_' + field);
+                const card = placeholder ? placeholder.closest('.camera-upload-card') : null;
+
+                if (urlInput) urlInput.value = '';
+                if (inputEl) inputEl.value = '';
+                if (placeholder) placeholder.style.display = 'flex';
+                if (uploadedBox) uploadedBox.style.display = 'none';
+                if (card) card.classList.remove('has-image');
+                pendingDeleteField = null;
+                pendingDeleteId = null;
+                return;
+            }
 
             fetch('{{ route("survey.delete-photo") }}', {
                 method: 'POST',
