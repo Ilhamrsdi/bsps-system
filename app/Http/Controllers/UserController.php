@@ -160,7 +160,7 @@ class UserController extends Controller
                     $no++,
                     $u->name,
                     $u->email,
-                    $u->plain_password ?: 'password123',
+                    $u->plain_password ?: 'password',
                     $u->kecamatan,
                     $u->jabatan,
                     ucfirst($u->status ?: 'aktif'),

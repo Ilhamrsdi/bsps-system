@@ -76,6 +76,26 @@
             margin-top: 2px;
         }
 
+        /* Stats Grid */
+        .stats-verval {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 992px) {
+            .stats-verval {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .stats-verval {
+                grid-template-columns: 1fr;
+            }
+        }
+
         /* Filter Section */
         .filter-section {
             background: var(--bg-card);
@@ -94,14 +114,22 @@
         .filter-left {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             flex: 1;
+            flex-wrap: wrap;
+            min-width: 280px;
+        }
+
+        .filter-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
             flex-wrap: wrap;
         }
 
         .search-input-wrap {
             position: relative;
-            min-width: 260px;
+            min-width: 220px;
             flex: 1;
         }
 
@@ -133,6 +161,71 @@
             font-size: 14px;
         }
 
+        .btn-kolektif-surat {
+            padding: 9.5px 14px;
+            font-size: 13px;
+            font-weight: 700;
+            background: #ffb800;
+            color: #002855;
+            text-decoration: none;
+            border-radius: var(--radius-sm);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .btn-kolektif-surat:hover {
+            background: #e6a600;
+            color: #002855;
+        }
+
+        .btn-kolektif-foto {
+            padding: 9.5px 14px;
+            font-size: 13px;
+            font-weight: 700;
+            background: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: var(--radius-sm);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .btn-kolektif-foto:hover {
+            background: #0056b3;
+            color: #fff;
+        }
+
+        .btn-reset-filter {
+            padding: 9.5px 14px;
+            font-size: 13px;
+            text-decoration: none;
+            border-radius: var(--radius-sm);
+            white-space: nowrap;
+        }
+
+        @media (max-width: 992px) {
+            .filter-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-left, .filter-actions {
+                width: 100%;
+            }
+            .filter-actions {
+                justify-content: flex-start;
+            }
+            .filter-actions .btn, .filter-actions .btn-kolektif-surat, .filter-actions .btn-kolektif-foto {
+                flex: 1;
+                justify-content: center;
+            }
+        }
+
         /* Table Container */
         .table-container-card {
             background: var(--bg-card);
@@ -140,6 +233,12 @@
             box-shadow: var(--shadow-sm);
             border: 1px solid rgba(0, 40, 85, 0.06);
             overflow: hidden;
+        }
+
+        .table-verval-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            width: 100%;
         }
 
         .table-header-bar {
@@ -606,18 +705,23 @@
                         </div>
                     </div>
                 </div>
+
+                {{-- Reset Button --}}
+                <a href="{{ url('/verval-data') }}" class="btn btn-outline btn-reset-filter" title="Reset Saringan">
+                    <i class="fas fa-redo"></i> Reset
+                </a>
             </div>
-            <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                <a href="{{ route('verval-data.surat-pernyataan-kolektif', request()->all()) }}" target="_blank" class="btn" style="padding:10px 16px;font-size:13px;font-weight:700;background:#ffb800;color:#002855;text-decoration:none;border-radius:var(--radius-sm);display:inline-flex;align-items:center;gap:6px;" title="Cetak Surat Pernyataan seluruh data hasil filter saat ini">
+
+            <div class="filter-actions">
+                <a href="{{ route('verval-data.surat-pernyataan-kolektif', request()->all()) }}" target="_blank" class="btn-kolektif-surat" title="Cetak Surat Pernyataan seluruh data hasil filter saat ini">
                     <i class="fas fa-file-signature"></i> Cetak Kolektif Surat Pernyataan
                 </a>
-                <a href="{{ url('/verval-data') }}" class="btn btn-outline"
-                    style="padding:10px 16px;font-size:13px;text-decoration:none;border-radius:var(--radius-sm);">
-                    <i class="fas fa-redo"></i> Reset
+                <a href="{{ route('verval-data.lampiran-foto-kolektif', request()->all()) }}" target="_blank" class="btn-kolektif-foto" title="Cetak Lampiran Foto seluruh data hasil filter saat ini">
+                    <i class="fas fa-file-image"></i> Cetak Kolektif Lampiran Foto
                 </a>
                 @if(!auth()->check() || !auth()->user()->isAdminKecamatan())
                 <a href="{{ url('/survey') }}" class="btn btn-primary"
-                    style="padding:10px 20px;font-size:13px;font-weight:700;background:var(--primary);color:#fff;text-decoration:none;border-radius:var(--radius-sm);display:inline-flex;align-items:center;gap:8px;">
+                    style="padding:9.5px 18px;font-size:13px;font-weight:700;background:var(--primary);color:#fff;text-decoration:none;border-radius:var(--radius-sm);display:inline-flex;align-items:center;gap:8px;white-space:nowrap;">
                     <i class="fas fa-plus"></i> Input Survei Baru
                 </a>
                 @endif
@@ -745,6 +849,9 @@
                                     <div class="action-btn-group" style="justify-content:center;">
                                         <a href="{{ route('verval-data.surat-pernyataan', $item->id) }}" target="_blank" class="btn-act print" style="background:rgba(255,184,0,0.15);color:#d69e00;" title="Cetak Surat Pernyataan Pemohon Ini">
                                             <i class="fas fa-file-signature"></i>
+                                        </a>
+                                        <a href="{{ route('verval-data.lampiran-foto', $item->id) }}" target="_blank" class="btn-act print" style="background:rgba(0,123,255,0.15);color:#007bff;" title="Cetak Lampiran Foto">
+                                            <i class="fas fa-file-image"></i>
                                         </a>
                                         <a href="{{ url('/survey/' . $item->id) }}" class="btn-act view" style="background:rgba(39,174,96,0.12);color:var(--success);" title="{{ auth()->check() && auth()->user()->isAdminKecamatan() ? 'Lihat Detail Data Verval (Read-Only)' : 'Buka Form Survei Lapangan & Lengkapi Data/Foto' }}">
                                             <i class="fas {{ auth()->check() && auth()->user()->isAdminKecamatan() ? 'fa-eye' : 'fa-clipboard-check' }}"></i>

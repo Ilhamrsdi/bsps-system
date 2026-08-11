@@ -1,12 +1,18 @@
 /**
- * Service Worker - BSPS Verval (Offline Mode PWA)
+ * Service Worker - BSPS Verval (Offline Blankspot & PWA Engine)
  * Dinas PUPR / BSPS Verval System
  */
 
-const CACHE_NAME = 'bsps-verval-cache-v1';
+const CACHE_NAME = 'bsps-verval-v2';
 
-// Daftar Aset Statis yang Langsung Disimpan ke Memori HP
-const PRECACHE_ASSETS = [
+const ASSETS_TO_CACHE = [
+    '/',
+    '/survey',
+    '/verval-data',
+    '/dashboard-kecamatan',
+    '/petugas/dashboard',
+    '/petugas/belum-survei',
+    '/petugas/sudah-survei',
     '/assets/css/app.css',
     '/assets/css/component.css',
     '/assets/css/modal.css',
@@ -22,27 +28,27 @@ const PRECACHE_ASSETS = [
     'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap'
 ];
 
-// 1. Install Event: Cache Seluruh Aset Statis Inti
+// 1. Install Event: Pre-cache App Shell & Assets
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            console.log('[PWA SW] Pre-caching static assets...');
-            return cache.addAll(PRECACHE_ASSETS).catch((err) => {
-                console.warn('[PWA SW] Pre-cache partial warning:', err);
+            console.log('[ServiceWorker] Caching app shell & assets for offline mode');
+            return cache.addAll(ASSETS_TO_CACHE).catch((err) => {
+                console.warn('[ServiceWorker] Caching partial warning:', err);
             });
         }).then(() => self.skipWaiting())
     );
 });
 
-// 2. Activate Event: Bersihkan Cache Lama Jika Ada Versi Baru
+// 2. Activate Event: Clean up old cache versions
 self.addEventListener('activate', (event) => {
     event.waitUntil(
-        caches.keys().then((cacheNames) => {
+        caches.keys().then((keyList) => {
             return Promise.all(
-                cacheNames.map((cache) => {
-                    if (cache !== CACHE_NAME) {
-                        console.log('[PWA SW] Clearing old cache:', cache);
-                        return caches.delete(cache);
+                keyList.map((key) => {
+                    if (key !== CACHE_NAME) {
+                        console.log('[ServiceWorker] Removing old cache:', key);
+                        return caches.delete(key);
                     }
                 })
             );
@@ -50,89 +56,73 @@ self.addEventListener('activate', (event) => {
     );
 });
 
-// 3. Fetch Event: Intercept Request untuk Akses Offline
+// 3. Fetch Event: Intercept Requests for Offline Capability
 self.addEventListener('fetch', (event) => {
-    const req = event.request;
+    if (event.request.method !== 'GET') return;
 
-    // Hanya tangani request GET (POST/PUT form submit tidak di-cache)
-    if (req.method !== 'GET') {
-        return;
-    }
+    const url = new URL(event.request.url);
 
-    const url = new URL(req.url);
+    // Strategy 1: Cache First for static assets (CSS, JS, Images, Fonts, CDNs) with ignoreSearch: true
+    const isStaticAsset = url.pathname.includes('/assets/') ||
+        url.pathname.endsWith('.css') ||
+        url.pathname.endsWith('.js') ||
+        url.pathname.endsWith('.jpg') ||
+        url.pathname.endsWith('.png') ||
+        url.pathname.endsWith('.svg') ||
+        url.pathname.endsWith('.json') ||
+        url.hostname.includes('cdnjs.cloudflare.com') ||
+        url.hostname.includes('fonts.googleapis.com') ||
+        url.hostname.includes('fonts.gstatic.com') ||
+        url.hostname.includes('jsdelivr.net');
 
-    // Strategi 1: Untuk Halaman HTML (Navigasi Antar Halaman)
-    // Mode: Network-First dengan Cache Fallback
-    if (req.mode === 'navigate' || req.headers.get('accept')?.includes('text/html')) {
+    if (isStaticAsset) {
         event.respondWith(
-            fetch(req)
-                .then((networkResponse) => {
-                    // Jika sukses online, simpan salinan halaman terbaru ke cache
+            caches.match(event.request, { ignoreSearch: true }).then((cachedResponse) => {
+                if (cachedResponse) {
+                    return cachedResponse;
+                }
+                return fetch(event.request).then((networkResponse) => {
                     if (networkResponse && networkResponse.status === 200) {
-                        const responseClone = networkResponse.clone();
+                        const responseToCache = networkResponse.clone();
                         caches.open(CACHE_NAME).then((cache) => {
-                            cache.put(req, responseClone);
+                            cache.put(event.request, responseToCache);
                         });
                     }
                     return networkResponse;
-                })
-                .catch(async () => {
-                    // Jika offline / sinyal putus, ambil langsung dari cache HP
-                    console.log('[PWA SW] Offline mode: loading page from cache:', req.url);
-                    const cachedResponse = await caches.match(req);
-                    if (cachedResponse) {
-                        return cachedResponse;
-                    }
-
-                    // Fallback jika halaman spesifik belum pernah dibuka, coba cari halaman terdekat
-                    const allCaches = await caches.open(CACHE_NAME);
-                    const matchedFallback = await allCaches.match('/petugas/dashboard') || await allCaches.match('/survey') || await allCaches.match('/');
-                    return matchedFallback || new Response(
-                        `<!DOCTYPE html>
-                        <html lang="id">
-                        <head>
-                            <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-                            <title>BSPS Verval - Mode Offline</title>
-                            <style>
-                                body { font-family: sans-serif; background: #002855; color: #fff; text-align: center; padding: 40px 20px; }
-                                .box { background: #fff; color: #333; max-width: 420px; margin: 40px auto; padding: 24px; border-radius: 12px; }
-                                .btn { background: #ffb800; color: #002855; padding: 10px 18px; border-radius: 6px; font-weight: bold; text-decoration: none; display: inline-block; margin-top: 14px; }
-                            </style>
-                        </head>
-                        <body>
-                            <div class="box">
-                                <h2>📡 Mode Offline Aktif</h2>
-                                <p>Perangkat Anda sedang tidak terhubung ke internet. Halaman yang pernah Anda buka sebelumnya tetap dapat diakses.</p>
-                                <a href="javascript:window.history.back()" class="btn">Kembali ke Halaman Sebelumnya</a>
-                            </div>
-                        </body></html>`,
-                        { headers: { 'Content-Type': 'text/html' } }
-                    );
-                })
+                }).catch(() => {
+                    // Ignore offline network error for static background fetches
+                });
+            })
         );
         return;
     }
 
-    // Strategi 2: Untuk Aset Statis (CSS, JS, Gambar, Font, Icon)
-    // Mode: Stale-While-Revalidate (Ambil cepat dari Cache, perbarui di background)
-    event.respondWith(
-        caches.match(req).then((cachedResponse) => {
-            const fetchPromise = fetch(req)
-                .then((networkResponse) => {
-                    if (networkResponse && networkResponse.status === 200) {
-                        const responseClone = networkResponse.clone();
+    // Strategy 2: Network First for HTML pages, fallback to cached HTML page when offline
+    if (event.request.mode === 'navigate' || event.request.headers.get('accept')?.includes('text/html')) {
+        event.respondWith(
+            fetch(event.request)
+                .then((response) => {
+                    if (response && response.status === 200) {
+                        const responseToCache = response.clone();
                         caches.open(CACHE_NAME).then((cache) => {
-                            cache.put(req, responseClone);
+                            cache.put(event.request, responseToCache);
                         });
                     }
-                    return networkResponse;
+                    return response;
                 })
-                .catch(() => {
-                    // Abaikan error fetch background jika offline
-                });
+                .catch(async () => {
+                    console.log('[ServiceWorker] Network failed, serving from cache for URL:', event.request.url);
+                    const cachedResponse = await caches.match(event.request, { ignoreSearch: true });
+                    if (cachedResponse) {
+                        return cachedResponse;
+                    }
 
-            // Kembalikan versi cache jika ada, jika belum ada tunggu network
-            return cachedResponse || fetchPromise;
-        })
-    );
+                    // Fallback to matched known shell pages
+                    const cache = await caches.open(CACHE_NAME);
+                    return await cache.match('/petugas/dashboard', { ignoreSearch: true }) ||
+                        await cache.match('/survey', { ignoreSearch: true }) ||
+                        await cache.match('/', { ignoreSearch: true });
+                })
+        );
+    }
 });

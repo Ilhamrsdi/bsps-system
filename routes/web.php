@@ -204,7 +204,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/verval-data', [VervalDataController::class, 'index'])->name('verval-data');
     Route::get('/data-verval', [VervalDataController::class, 'index'])->name('data-verval');
     Route::get('/verval-data/surat-pernyataan-kolektif', [VervalDataController::class, 'suratPernyataanKolektif'])->name('verval-data.surat-pernyataan-kolektif');
+    Route::get('/verval-data/lampiran-foto-kolektif', [VervalDataController::class, 'lampiranFotoKolektif'])->name('verval-data.lampiran-foto-kolektif');
     Route::get('/verval-data/{id}/surat-pernyataan', [VervalDataController::class, 'suratPernyataan'])->name('verval-data.surat-pernyataan');
+    Route::get('/verval-data/{id}/lampiran-foto', [VervalDataController::class, 'lampiranFoto'])->name('verval-data.lampiran-foto');
     Route::get('/data-verval/{id}/edit', function($id) { return redirect()->route('survey', ['id' => $id]); })->name('data-verval.edit');
     Route::put('/data-verval/{id}', [SurveyController::class, 'store'])->name('data-verval.update');
     Route::put('/data-verval/{id}/status', [VervalDataController::class, 'updateStatus'])->name('data-verval.update-status');
