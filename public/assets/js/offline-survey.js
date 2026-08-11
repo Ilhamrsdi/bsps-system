@@ -213,9 +213,13 @@ async function syncPendingSurveys() {
             }
 
             // Masukkan foto Base64 / Blob
-            for (const [photoKey, base64Val] of Object.entries(item.photos || {})) {
-                if (base64Val && base64Val.startsWith('data:image')) {
-                    const res = await fetch(base64Val);
+            for (const [photoKey, photoVal] of Object.entries(item.photos || {})) {
+                if (typeof photoVal === 'string' && photoVal.startsWith('data:image')) {
+                    const res = await fetch(photoVal);
+                    const blob = await res.blob();
+                    formData.append(photoKey, blob, `${photoKey}_${item.id}.jpg`);
+                } else if (photoVal && photoVal.dataUrl && photoVal.dataUrl.startsWith('data:image')) {
+                    const res = await fetch(photoVal.dataUrl);
                     const blob = await res.blob();
                     formData.append(photoKey, blob, `${photoKey}_${item.id}.jpg`);
                 }

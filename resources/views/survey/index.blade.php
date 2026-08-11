@@ -603,11 +603,7 @@
                         <div>
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">Foto / Scan KTP</label>
                             <div class="camera-upload-card {{ $vervalData->ktp ? 'has-image' : '' }}" id="card_ktp">
-                                <div class="camera-loading-overlay" id="loading_ktp">
-                                    <div class="camera-spinner"></div>
-                                    <span class="camera-loading-text">Menyimpan Foto...</span>
-                                </div>
-                                <input type="file" id="input_ktp" class="camera-file-input" accept="image/*" onchange="autoUploadPhoto(this, 'ktp', {{ $vervalData->id }})">
+                                <input type="file" id="input_ktp" name="ktp" class="camera-file-input" accept="image/*" onchange="previewPhoto(this, 'ktp')">
                                 <input type="hidden" id="url_ktp" value="{{ $vervalData->ktp ? url('/uploads/' . basename($vervalData->ktp)) : '' }}">
                                 
                                 {{-- State Kosong --}}
@@ -622,18 +618,18 @@
                                     </button>
                                 </div>
 
-                                {{-- State Tersimpan (Tanpa Thumbnail Preview, 2 Tombol Aksi) --}}
+                                {{-- State Tersimpan / Terpilih (2 Tombol Aksi) --}}
                                 <div class="camera-uploaded-box" id="uploaded_ktp" style="{{ $vervalData->ktp ? 'display:flex;' : 'display:none;' }}">
                                     <div class="camera-icon-bubble success">
                                         <i class="fas fa-check-circle"></i>
                                     </div>
                                     <div class="camera-upload-title">Berkas KTP</div>
-                                    <span class="camera-upload-badge"><i class="fas fa-file-image"></i> Foto Tersimpan</span>
+                                    <span class="camera-upload-badge"><i class="fas fa-file-image"></i> {{ $vervalData->ktp ? 'Foto Tersimpan' : 'Foto Terpilih' }}</span>
                                     <div class="camera-actions-box">
                                         <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('ktp')" title="Buka / Lihat Berkas KTP">
                                             <i class="fas fa-eye"></i> Lihat
                                         </button>
-                                        <button type="button" class="btn-photo-action delete" onclick="deletePhotoAjax('ktp', {{ $vervalData->id }})" title="Hapus Berkas KTP">
+                                        <button type="button" class="btn-photo-action delete" onclick="removePhoto('ktp')" title="Hapus / Ganti Berkas KTP">
                                             <i class="fas fa-trash-alt"></i> Hapus
                                         </button>
                                     </div>
@@ -645,11 +641,7 @@
                         <div>
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">Foto / Scan Kartu Keluarga (KK)</label>
                             <div class="camera-upload-card {{ $vervalData->kk ? 'has-image' : '' }}" id="card_kk">
-                                <div class="camera-loading-overlay" id="loading_kk">
-                                    <div class="camera-spinner"></div>
-                                    <span class="camera-loading-text">Menyimpan Foto...</span>
-                                </div>
-                                <input type="file" id="input_kk" class="camera-file-input" accept="image/*" onchange="autoUploadPhoto(this, 'kk', {{ $vervalData->id }})">
+                                <input type="file" id="input_kk" name="kk" class="camera-file-input" accept="image/*" onchange="previewPhoto(this, 'kk')">
                                 <input type="hidden" id="url_kk" value="{{ $vervalData->kk ? url('/uploads/' . basename($vervalData->kk)) : '' }}">
                                 
                                 {{-- State Kosong --}}
@@ -664,18 +656,18 @@
                                     </button>
                                 </div>
 
-                                {{-- State Tersimpan (Tanpa Thumbnail Preview, 2 Tombol Aksi) --}}
+                                {{-- State Tersimpan / Terpilih (2 Tombol Aksi) --}}
                                 <div class="camera-uploaded-box" id="uploaded_kk" style="{{ $vervalData->kk ? 'display:flex;' : 'display:none;' }}">
                                     <div class="camera-icon-bubble success">
                                         <i class="fas fa-check-circle"></i>
                                     </div>
                                     <div class="camera-upload-title">Berkas KK</div>
-                                    <span class="camera-upload-badge"><i class="fas fa-file-image"></i> Foto Tersimpan</span>
+                                    <span class="camera-upload-badge"><i class="fas fa-file-image"></i> {{ $vervalData->kk ? 'Foto Tersimpan' : 'Foto Terpilih' }}</span>
                                     <div class="camera-actions-box">
                                         <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('kk')" title="Buka / Lihat Berkas KK">
                                             <i class="fas fa-eye"></i> Lihat
                                         </button>
-                                        <button type="button" class="btn-photo-action delete" onclick="deletePhotoAjax('kk', {{ $vervalData->id }})" title="Hapus Berkas KK">
+                                        <button type="button" class="btn-photo-action delete" onclick="removePhoto('kk')" title="Hapus / Ganti Berkas KK">
                                             <i class="fas fa-trash-alt"></i> Hapus
                                         </button>
                                     </div>
@@ -687,11 +679,7 @@
                         <div>
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">Foto Sertipikat / Bukti Tanah</label>
                             <div class="camera-upload-card {{ $vervalData->sertifikat_tanah ? 'has-image' : '' }}" id="card_sertifikat_tanah">
-                                <div class="camera-loading-overlay" id="loading_sertifikat_tanah">
-                                    <div class="camera-spinner"></div>
-                                    <span class="camera-loading-text">Menyimpan Foto...</span>
-                                </div>
-                                <input type="file" id="input_sertifikat_tanah" class="camera-file-input" accept="image/*" onchange="autoUploadPhoto(this, 'sertifikat_tanah', {{ $vervalData->id }})">
+                                <input type="file" id="input_sertifikat_tanah" name="sertifikat_tanah" class="camera-file-input" accept="image/*" onchange="previewPhoto(this, 'sertifikat_tanah')">
                                 <input type="hidden" id="url_sertifikat_tanah" value="{{ $vervalData->sertifikat_tanah ? url('/uploads/' . basename($vervalData->sertifikat_tanah)) : '' }}">
                                 
                                 {{-- State Kosong --}}
@@ -706,18 +694,18 @@
                                     </button>
                                 </div>
 
-                                {{-- State Tersimpan (Tanpa Thumbnail Preview, 2 Tombol Aksi) --}}
+                                {{-- State Tersimpan / Terpilih (2 Tombol Aksi) --}}
                                 <div class="camera-uploaded-box" id="uploaded_sertifikat_tanah" style="{{ $vervalData->sertifikat_tanah ? 'display:flex;' : 'display:none;' }}">
                                     <div class="camera-icon-bubble success">
                                         <i class="fas fa-check-circle"></i>
                                     </div>
                                     <div class="camera-upload-title">Bukti Kepemilikan Lahan</div>
-                                    <span class="camera-upload-badge"><i class="fas fa-file-image"></i> Foto Tersimpan</span>
+                                    <span class="camera-upload-badge"><i class="fas fa-file-image"></i> {{ $vervalData->sertifikat_tanah ? 'Foto Tersimpan' : 'Foto Terpilih' }}</span>
                                     <div class="camera-actions-box">
                                         <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('sertifikat_tanah')" title="Buka / Lihat Bukti Lahan">
                                             <i class="fas fa-eye"></i> Lihat
                                         </button>
-                                        <button type="button" class="btn-photo-action delete" onclick="deletePhotoAjax('sertifikat_tanah', {{ $vervalData->id }})" title="Hapus Bukti Lahan">
+                                        <button type="button" class="btn-photo-action delete" onclick="removePhoto('sertifikat_tanah')" title="Hapus / Ganti Bukti Lahan">
                                             <i class="fas fa-trash-alt"></i> Hapus
                                         </button>
                                     </div>
@@ -929,11 +917,7 @@
                         <div>
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">1. Tampak Depan</label>
                             <div class="camera-upload-card {{ $vervalData->foto_sudut_depan ? 'has-image' : '' }}" id="card_foto_sudut_depan">
-                                <div class="camera-loading-overlay" id="loading_foto_sudut_depan">
-                                    <div class="camera-spinner"></div>
-                                    <span class="camera-loading-text">Menyimpan Foto...</span>
-                                </div>
-                                <input type="file" id="input_foto_sudut_depan" class="camera-file-input" accept="image/*" onchange="autoUploadPhoto(this, 'foto_sudut_depan', {{ $vervalData->id }})">
+                                <input type="file" id="input_foto_sudut_depan" name="foto_sudut_depan" class="camera-file-input" accept="image/*" onchange="previewPhoto(this, 'foto_sudut_depan')">
                                 <input type="hidden" id="url_foto_sudut_depan" value="{{ $vervalData->foto_sudut_depan ? url('/uploads/' . basename($vervalData->foto_sudut_depan)) : '' }}">
                                 
                                 {{-- State Kosong --}}
@@ -948,18 +932,18 @@
                                     </button>
                                 </div>
 
-                                {{-- State Tersimpan (Tanpa Thumbnail Preview, 2 Tombol Aksi) --}}
+                                {{-- State Tersimpan / Terpilih (2 Tombol Aksi) --}}
                                 <div class="camera-uploaded-box" id="uploaded_foto_sudut_depan" style="{{ $vervalData->foto_sudut_depan ? 'display:flex;' : 'display:none;' }}">
                                     <div class="camera-icon-bubble success">
                                         <i class="fas fa-check-circle"></i>
                                     </div>
                                     <div class="camera-upload-title">Tampak Depan</div>
-                                    <span class="camera-upload-badge"><i class="fas fa-file-image"></i> Foto Tersimpan</span>
+                                    <span class="camera-upload-badge"><i class="fas fa-file-image"></i> {{ $vervalData->foto_sudut_depan ? 'Foto Tersimpan' : 'Foto Terpilih' }}</span>
                                     <div class="camera-actions-box">
                                         <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('foto_sudut_depan')" title="Buka / Lihat Foto Tampak Depan">
                                             <i class="fas fa-eye"></i> Lihat
                                         </button>
-                                        <button type="button" class="btn-photo-action delete" onclick="deletePhotoAjax('foto_sudut_depan', {{ $vervalData->id }})" title="Hapus Foto Tampak Depan">
+                                        <button type="button" class="btn-photo-action delete" onclick="removePhoto('foto_sudut_depan')" title="Hapus / Ganti Foto Tampak Depan">
                                             <i class="fas fa-trash-alt"></i> Hapus
                                         </button>
                                     </div>
@@ -971,11 +955,7 @@
                         <div>
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">2. Tampak Belakang</label>
                             <div class="camera-upload-card {{ $vervalData->foto_sudut_belakang ? 'has-image' : '' }}" id="card_foto_sudut_belakang">
-                                <div class="camera-loading-overlay" id="loading_foto_sudut_belakang">
-                                    <div class="camera-spinner"></div>
-                                    <span class="camera-loading-text">Menyimpan Foto...</span>
-                                </div>
-                                <input type="file" id="input_foto_sudut_belakang" class="camera-file-input" accept="image/*" onchange="autoUploadPhoto(this, 'foto_sudut_belakang', {{ $vervalData->id }})">
+                                <input type="file" id="input_foto_sudut_belakang" name="foto_sudut_belakang" class="camera-file-input" accept="image/*" onchange="previewPhoto(this, 'foto_sudut_belakang')">
                                 <input type="hidden" id="url_foto_sudut_belakang" value="{{ $vervalData->foto_sudut_belakang ? url('/uploads/' . basename($vervalData->foto_sudut_belakang)) : '' }}">
                                 
                                 {{-- State Kosong --}}
@@ -990,18 +970,18 @@
                                     </button>
                                 </div>
 
-                                {{-- State Tersimpan (Tanpa Thumbnail Preview, 2 Tombol Aksi) --}}
+                                {{-- State Tersimpan / Terpilih (2 Tombol Aksi) --}}
                                 <div class="camera-uploaded-box" id="uploaded_foto_sudut_belakang" style="{{ $vervalData->foto_sudut_belakang ? 'display:flex;' : 'display:none;' }}">
                                     <div class="camera-icon-bubble success">
                                         <i class="fas fa-check-circle"></i>
                                     </div>
                                     <div class="camera-upload-title">Tampak Belakang</div>
-                                    <span class="camera-upload-badge"><i class="fas fa-file-image"></i> Foto Tersimpan</span>
+                                    <span class="camera-upload-badge"><i class="fas fa-file-image"></i> {{ $vervalData->foto_sudut_belakang ? 'Foto Tersimpan' : 'Foto Terpilih' }}</span>
                                     <div class="camera-actions-box">
                                         <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('foto_sudut_belakang')" title="Buka / Lihat Foto Tampak Belakang">
                                             <i class="fas fa-eye"></i> Lihat
                                         </button>
-                                        <button type="button" class="btn-photo-action delete" onclick="deletePhotoAjax('foto_sudut_belakang', {{ $vervalData->id }})" title="Hapus Foto Tampak Belakang">
+                                        <button type="button" class="btn-photo-action delete" onclick="removePhoto('foto_sudut_belakang')" title="Hapus / Ganti Foto Tampak Belakang">
                                             <i class="fas fa-trash-alt"></i> Hapus
                                         </button>
                                     </div>
@@ -1013,11 +993,7 @@
                         <div>
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">3. Bagian Dalam / Interior</label>
                             <div class="camera-upload-card {{ $vervalData->foto_bagian_dalam ? 'has-image' : '' }}" id="card_foto_bagian_dalam">
-                                <div class="camera-loading-overlay" id="loading_foto_bagian_dalam">
-                                    <div class="camera-spinner"></div>
-                                    <span class="camera-loading-text">Menyimpan Foto...</span>
-                                </div>
-                                <input type="file" id="input_foto_bagian_dalam" class="camera-file-input" accept="image/*" onchange="autoUploadPhoto(this, 'foto_bagian_dalam', {{ $vervalData->id }})">
+                                <input type="file" id="input_foto_bagian_dalam" name="foto_bagian_dalam" class="camera-file-input" accept="image/*" onchange="previewPhoto(this, 'foto_bagian_dalam')">
                                 <input type="hidden" id="url_foto_bagian_dalam" value="{{ $vervalData->foto_bagian_dalam ? url('/uploads/' . basename($vervalData->foto_bagian_dalam)) : '' }}">
                                 
                                 {{-- State Kosong --}}
@@ -1032,18 +1008,18 @@
                                     </button>
                                 </div>
 
-                                {{-- State Tersimpan (Tanpa Thumbnail Preview, 2 Tombol Aksi) --}}
+                                {{-- State Tersimpan / Terpilih (2 Tombol Aksi) --}}
                                 <div class="camera-uploaded-box" id="uploaded_foto_bagian_dalam" style="{{ $vervalData->foto_bagian_dalam ? 'display:flex;' : 'display:none;' }}">
                                     <div class="camera-icon-bubble success">
                                         <i class="fas fa-check-circle"></i>
                                     </div>
                                     <div class="camera-upload-title">Bagian Dalam / Interior</div>
-                                    <span class="camera-upload-badge"><i class="fas fa-file-image"></i> Foto Tersimpan</span>
+                                    <span class="camera-upload-badge"><i class="fas fa-file-image"></i> {{ $vervalData->foto_bagian_dalam ? 'Foto Tersimpan' : 'Foto Terpilih' }}</span>
                                     <div class="camera-actions-box">
                                         <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('foto_bagian_dalam')" title="Buka / Lihat Foto Bagian Dalam">
                                             <i class="fas fa-eye"></i> Lihat
                                         </button>
-                                        <button type="button" class="btn-photo-action delete" onclick="deletePhotoAjax('foto_bagian_dalam', {{ $vervalData->id }})" title="Hapus Foto Bagian Dalam">
+                                        <button type="button" class="btn-photo-action delete" onclick="removePhoto('foto_bagian_dalam')" title="Hapus / Ganti Foto Bagian Dalam">
                                             <i class="fas fa-trash-alt"></i> Hapus
                                         </button>
                                     </div>
@@ -1055,11 +1031,7 @@
                         <div>
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">4. Samping Kiri</label>
                             <div class="camera-upload-card {{ $vervalData->foto_sudut_kiri ? 'has-image' : '' }}" id="card_foto_sudut_kiri">
-                                <div class="camera-loading-overlay" id="loading_foto_sudut_kiri">
-                                    <div class="camera-spinner"></div>
-                                    <span class="camera-loading-text">Menyimpan Foto...</span>
-                                </div>
-                                <input type="file" id="input_foto_sudut_kiri" class="camera-file-input" accept="image/*" onchange="autoUploadPhoto(this, 'foto_sudut_kiri', {{ $vervalData->id }})">
+                                <input type="file" id="input_foto_sudut_kiri" name="foto_sudut_kiri" class="camera-file-input" accept="image/*" onchange="previewPhoto(this, 'foto_sudut_kiri')">
                                 <input type="hidden" id="url_foto_sudut_kiri" value="{{ $vervalData->foto_sudut_kiri ? url('/uploads/' . basename($vervalData->foto_sudut_kiri)) : '' }}">
                                 
                                 {{-- State Kosong --}}
@@ -1074,18 +1046,18 @@
                                     </button>
                                 </div>
 
-                                {{-- State Tersimpan (Tanpa Thumbnail Preview, 2 Tombol Aksi) --}}
+                                {{-- State Tersimpan / Terpilih (2 Tombol Aksi) --}}
                                 <div class="camera-uploaded-box" id="uploaded_foto_sudut_kiri" style="{{ $vervalData->foto_sudut_kiri ? 'display:flex;' : 'display:none;' }}">
                                     <div class="camera-icon-bubble success">
                                         <i class="fas fa-check-circle"></i>
                                     </div>
                                     <div class="camera-upload-title">Samping Kiri</div>
-                                    <span class="camera-upload-badge"><i class="fas fa-file-image"></i> Foto Tersimpan</span>
+                                    <span class="camera-upload-badge"><i class="fas fa-file-image"></i> {{ $vervalData->foto_sudut_kiri ? 'Foto Tersimpan' : 'Foto Terpilih' }}</span>
                                     <div class="camera-actions-box">
                                         <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('foto_sudut_kiri')" title="Buka / Lihat Foto Samping Kiri">
                                             <i class="fas fa-eye"></i> Lihat
                                         </button>
-                                        <button type="button" class="btn-photo-action delete" onclick="deletePhotoAjax('foto_sudut_kiri', {{ $vervalData->id }})" title="Hapus Foto Samping Kiri">
+                                        <button type="button" class="btn-photo-action delete" onclick="removePhoto('foto_sudut_kiri')" title="Hapus / Ganti Foto Samping Kiri">
                                             <i class="fas fa-trash-alt"></i> Hapus
                                         </button>
                                     </div>
@@ -1097,11 +1069,7 @@
                         <div>
                             <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">5. Samping Kanan</label>
                             <div class="camera-upload-card {{ $vervalData->foto_sudut_kanan ? 'has-image' : '' }}" id="card_foto_sudut_kanan">
-                                <div class="camera-loading-overlay" id="loading_foto_sudut_kanan">
-                                    <div class="camera-spinner"></div>
-                                    <span class="camera-loading-text">Menyimpan Foto...</span>
-                                </div>
-                                <input type="file" id="input_foto_sudut_kanan" class="camera-file-input" accept="image/*" onchange="autoUploadPhoto(this, 'foto_sudut_kanan', {{ $vervalData->id }})">
+                                <input type="file" id="input_foto_sudut_kanan" name="foto_sudut_kanan" class="camera-file-input" accept="image/*" onchange="previewPhoto(this, 'foto_sudut_kanan')">
                                 <input type="hidden" id="url_foto_sudut_kanan" value="{{ $vervalData->foto_sudut_kanan ? url('/uploads/' . basename($vervalData->foto_sudut_kanan)) : '' }}">
                                 
                                 {{-- State Kosong --}}
@@ -1116,18 +1084,18 @@
                                     </button>
                                 </div>
 
-                                {{-- State Tersimpan (Tanpa Thumbnail Preview, 2 Tombol Aksi) --}}
+                                {{-- State Tersimpan / Terpilih (2 Tombol Aksi) --}}
                                 <div class="camera-uploaded-box" id="uploaded_foto_sudut_kanan" style="{{ $vervalData->foto_sudut_kanan ? 'display:flex;' : 'display:none;' }}">
                                     <div class="camera-icon-bubble success">
                                         <i class="fas fa-check-circle"></i>
                                     </div>
                                     <div class="camera-upload-title">Samping Kanan</div>
-                                    <span class="camera-upload-badge"><i class="fas fa-file-image"></i> Foto Tersimpan</span>
+                                    <span class="camera-upload-badge"><i class="fas fa-file-image"></i> {{ $vervalData->foto_sudut_kanan ? 'Foto Tersimpan' : 'Foto Terpilih' }}</span>
                                     <div class="camera-actions-box">
                                         <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('foto_sudut_kanan')" title="Buka / Lihat Foto Samping Kanan">
                                             <i class="fas fa-eye"></i> Lihat
                                         </button>
-                                        <button type="button" class="btn-photo-action delete" onclick="deletePhotoAjax('foto_sudut_kanan', {{ $vervalData->id }})" title="Hapus Foto Samping Kanan">
+                                        <button type="button" class="btn-photo-action delete" onclick="removePhoto('foto_sudut_kanan')" title="Hapus / Ganti Foto Samping Kanan">
                                             <i class="fas fa-trash-alt"></i> Hapus
                                         </button>
                                     </div>
@@ -1610,12 +1578,17 @@
                 if (window.BspsOffline && window.BspsOffline.saveSurveyToIndexedDB) {
                     window.BspsOffline.saveSurveyToIndexedDB(surveyData).then(() => {
                         if (window.PuprLoading) window.PuprLoading.hide();
-                        if (window.PuprModal) {
-                            window.PuprModal.open('modalSurveyOfflineSaved');
-                        } else {
-                            window.location.href = '{{ route("petugas.sudah-survei") }}';
+                        if (window.BspsOffline && window.BspsOffline.showPuprToast) {
+                            window.BspsOffline.showPuprToast('Data survei & foto berhasil disimpan di HP (Offline)!', 'success');
                         }
+                        setTimeout(() => {
+                            window.location.href = '{{ route("petugas.sudah-survei") }}';
+                        }, 800);
                     });
+                } else {
+                    if (window.PuprLoading) window.PuprLoading.hide();
+                    alert('Data survei berhasil disimpan di HP!');
+                    window.location.href = '{{ route("petugas.sudah-survei") }}';
                 }
                 return false;
             }
@@ -1746,195 +1719,60 @@
             if (input) input.click();
         }
 
-        // Auto Upload Photo via Ajax (Instant Save + Loading Animation)
-        function autoUploadPhoto(input, field, id) {
+        // Pratinjau Foto Lokal Instan (Tanpa AJAX, Tanpa Auto-Save yang Mengunci Server)
+        function previewPhoto(input, field) {
             if (!input.files || !input.files[0]) return;
-
             const file = input.files[0];
-            const loadingEl = document.getElementById('loading_' + field);
 
-            if (loadingEl) loadingEl.classList.add('active');
+            const placeholder = document.getElementById('placeholder_' + field);
+            const uploadedBox = document.getElementById('uploaded_' + field);
+            const card = placeholder ? placeholder.closest('.camera-upload-card') : null;
+            const urlInput = document.getElementById('url_' + field);
 
-            // Jika Perangkat Offline (Mode Blankspot) - Kompresi Otomatis ke Base64
-            if (!navigator.onLine) {
-                if (window.BspsOffline && window.BspsOffline.compressPhoto) {
-                    window.BspsOffline.compressPhoto(file).then(comp => {
-                        if (loadingEl) loadingEl.classList.remove('active');
-                        const urlInput = document.getElementById('url_' + field);
-                        const placeholder = document.getElementById('placeholder_' + field);
-                        const uploadedBox = document.getElementById('uploaded_' + field);
-                        const card = placeholder ? placeholder.closest('.camera-upload-card') : null;
-
-                        if (urlInput && comp) urlInput.value = comp.base64;
-                        if (placeholder) placeholder.style.display = 'none';
-                        if (uploadedBox) uploadedBox.style.display = 'flex';
-                        if (card) {
-                            card.classList.add('has-image');
-                            card.classList.remove('is-invalid-highlight');
-                            const badge = card.querySelector('.camera-upload-badge');
-                            if (badge && comp) {
-                                badge.innerHTML = `<i class="fas fa-file-image"></i> Foto Tersimpan (${Math.round(comp.compSize/1024)} KB)`;
-                            }
-                        }
-                    });
-                } else {
-                    const reader = new FileReader();
-                    reader.onload = function(evt) {
-                        if (loadingEl) loadingEl.classList.remove('active');
-                        const urlInput = document.getElementById('url_' + field);
-                        const placeholder = document.getElementById('placeholder_' + field);
-                        const uploadedBox = document.getElementById('uploaded_' + field);
-                        const card = placeholder ? placeholder.closest('.camera-upload-card') : null;
-
-                        if (urlInput) urlInput.value = evt.target.result;
-                        if (placeholder) placeholder.style.display = 'none';
-                        if (uploadedBox) uploadedBox.style.display = 'flex';
-                        if (card) {
-                            card.classList.add('has-image');
-                            card.classList.remove('is-invalid-highlight');
-                        }
-                    };
-                    reader.readAsDataURL(file);
-                }
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('id', id);
-            formData.append('field', field);
-            formData.append('photo', file);
-            formData.append('_token', '{{ csrf_token() }}');
-
-            fetch('{{ route("survey.upload-photo") }}', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (loadingEl) loadingEl.classList.remove('active');
-
-                if (data.status === 'success') {
-                    const urlInput = document.getElementById('url_' + field);
-                    const placeholder = document.getElementById('placeholder_' + field);
-                    const uploadedBox = document.getElementById('uploaded_' + field);
-                    const card = placeholder ? placeholder.closest('.camera-upload-card') : null;
-
-                    if (urlInput) urlInput.value = data.url;
-                    if (placeholder) placeholder.style.display = 'none';
-                    if (uploadedBox) uploadedBox.style.display = 'flex';
-                    if (card) {
-                        card.classList.add('has-image');
-                        card.classList.remove('is-invalid-highlight');
+            // Baca via FileReader lokal di HP (0.001 detik)
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                if (urlInput) urlInput.value = e.target.result;
+                if (placeholder) placeholder.style.display = 'none';
+                if (uploadedBox) uploadedBox.style.display = 'flex';
+                if (card) {
+                    card.classList.add('has-image');
+                    card.classList.remove('is-invalid-highlight');
+                    const badge = card.querySelector('.camera-upload-badge');
+                    if (badge) {
+                        const sizeKb = Math.round(file.size / 1024);
+                        badge.innerHTML = `<i class="fas fa-check-circle"></i> Foto Terpilih (${sizeKb} KB)`;
                     }
-                } else {
-                    alert(data.message || 'Gagal mengunggah foto. Silakan coba lagi.');
                 }
-            })
-            .catch(error => {
-                if (loadingEl) loadingEl.classList.remove('active');
-                console.error('Upload error:', error);
-                alert('Terjadi kesalahan koneksi saat mengunggah foto.');
-            });
+            };
+            reader.readAsDataURL(file);
         }
 
-        let pendingDeleteField = null;
-        let pendingDeleteId = null;
+        // Hapus / Ganti Foto Terpilih
+        function removePhoto(field) {
+            const input = document.getElementById('input_' + field);
+            const urlInput = document.getElementById('url_' + field);
+            const placeholder = document.getElementById('placeholder_' + field);
+            const uploadedBox = document.getElementById('uploaded_' + field);
+            const card = placeholder ? placeholder.closest('.camera-upload-card') : null;
 
-        // Buka Modal Konfirmasi Hapus Foto
-        function deletePhotoAjax(field, id) {
-            pendingDeleteField = field;
-            pendingDeleteId = id;
-            if (window.PuprModal) {
-                window.PuprModal.open('deletePhotoConfirmModal');
-            } else {
-                if (confirm('Apakah Anda yakin ingin menghapus foto ini?')) {
-                    executeDeletePhotoAjax();
-                }
-            }
+            if (input) input.value = '';
+            if (urlInput) urlInput.value = '';
+            if (placeholder) placeholder.style.display = 'flex';
+            if (uploadedBox) uploadedBox.style.display = 'none';
+            if (card) card.classList.remove('has-image');
         }
 
-        // Eksekusi Hapus Foto via AJAX setelah Konfirmasi Modal
-        function executeDeletePhotoAjax() {
-            if (!pendingDeleteField || !pendingDeleteId) return;
-
-            const field = pendingDeleteField;
-            const id = pendingDeleteId;
-
-            if (window.PuprModal) {
-                window.PuprModal.close('deletePhotoConfirmModal');
-            }
-
-            const loadingEl = document.getElementById('loading_' + field);
-            if (loadingEl) loadingEl.classList.add('active');
-
-            // Jika Perangkat Offline (Mode Blankspot)
-            if (!navigator.onLine) {
-                if (loadingEl) loadingEl.classList.remove('active');
-                const urlInput = document.getElementById('url_' + field);
-                const placeholder = document.getElementById('placeholder_' + field);
-                const uploadedBox = document.getElementById('uploaded_' + field);
-                const inputEl = document.getElementById('input_' + field);
-                const card = placeholder ? placeholder.closest('.camera-upload-card') : null;
-
-                if (urlInput) urlInput.value = '';
-                if (inputEl) inputEl.value = '';
-                if (placeholder) placeholder.style.display = 'flex';
-                if (uploadedBox) uploadedBox.style.display = 'none';
-                if (card) card.classList.remove('has-image');
-                pendingDeleteField = null;
-                pendingDeleteId = null;
-                return;
-            }
-
-            fetch('{{ route("survey.delete-photo") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify({ id: id, field: field })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (loadingEl) loadingEl.classList.remove('active');
-
-                if (data.status === 'success') {
-                    const urlInput = document.getElementById('url_' + field);
-                    const placeholder = document.getElementById('placeholder_' + field);
-                    const uploadedBox = document.getElementById('uploaded_' + field);
-                    const inputEl = document.getElementById('input_' + field);
-                    const card = placeholder ? placeholder.closest('.camera-upload-card') : null;
-
-                    if (urlInput) urlInput.value = '';
-                    if (inputEl) inputEl.value = '';
-                    if (placeholder) placeholder.style.display = 'flex';
-                    if (uploadedBox) uploadedBox.style.display = 'none';
-                    if (card) card.classList.remove('has-image');
-                } else {
-                    alert(data.message || 'Gagal menghapus foto.');
-                }
-
-                pendingDeleteField = null;
-                pendingDeleteId = null;
-            })
-            .catch(error => {
-                if (loadingEl) loadingEl.classList.remove('active');
-                console.error('Delete error:', error);
-                alert('Terjadi kesalahan koneksi saat menghapus foto.');
-                pendingDeleteField = null;
-                pendingDeleteId = null;
-            });
-        }
-
-        // Open Photo in New Browser Tab
+        // Buka Foto di Tab Baru
         function openPhotoNewTab(field) {
             const urlInput = document.getElementById('url_' + field);
             if (urlInput && urlInput.value) {
-                window.open(urlInput.value, '_blank');
+                if (urlInput.value.startsWith('data:image')) {
+                    const win = window.open();
+                    win.document.write('<iframe src="' + urlInput.value  + '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>');
+                } else {
+                    window.open(urlInput.value, '_blank');
+                }
             } else {
                 alert('Foto belum tersedia.');
             }
@@ -2061,58 +1899,6 @@
                 });
             });
 
-            // Offline Form Submit Interceptor (Khusus Area Blankspot)
-            const surveyForm = document.querySelector('form[action*="/survey"]') || document.querySelector('form');
-            if (surveyForm) {
-                surveyForm.addEventListener('submit', function(e) {
-                    if (!navigator.onLine) {
-                        e.preventDefault();
-
-                        const fields = {};
-                        const formData = new FormData(surveyForm);
-                        formData.forEach((val, key) => {
-                            if (typeof val === 'string') {
-                                fields[key] = val;
-                            }
-                        });
-
-                        const photos = {};
-                        const photoFields = ['ktp', 'kk', 'sertifikat_tanah', 'foto_sudut_depan', 'foto_sudut_belakang', 'foto_bagian_dalam', 'foto_sudut_kiri', 'foto_sudut_kanan'];
-                        
-                        let photoPromises = photoFields.map(field => {
-                            const input = document.getElementById('input_' + field) || document.querySelector(`input[name="${field}"]`);
-                            if (input && input.files && input.files[0]) {
-                                const file = input.files[0];
-                                return new Promise(resolve => {
-                                    const reader = new FileReader();
-                                    reader.onload = function(evt) {
-                                        photos[field] = { name: file.name, dataUrl: evt.target.result };
-                                        resolve();
-                                    };
-                                    reader.readAsDataURL(file);
-                                });
-                            }
-                            return Promise.resolve();
-                        });
-
-                        Promise.all(photoPromises).then(() => {
-                            const recipientId = '{{ $vervalData->id ?? "" }}';
-                            const recipientName = '{{ $vervalData->nama ?? "Calon Penerima" }}';
-
-                            window.BspsOfflineManager.saveOfflineSurvey({
-                                recipientId: recipientId,
-                                recipientName: recipientName,
-                                actionUrl: surveyForm.action,
-                                fields: fields,
-                                photos: photos,
-                                savedAt: new Date().toISOString()
-                            }).then(() => {
-                                alert('🟢 BERHASIL SIMPAN OFFLINE!\n\nData survei & foto untuk ' + recipientName + ' telah tersimpan di memori HP Anda (Area Blankspot).\n\nData akan dikirim otomatis ke server begitu HP kembali terhubung ke sinyal internet.');
-                            });
-                        });
-                    }
-                });
-            }
         });
 
         @if(auth()->check() && auth()->user()->isAdminKecamatan())
@@ -2125,228 +1911,5 @@
             });
         });
         @endif
-    </script>
-
-    <!-- PWA Service Worker & IndexedDB Offline Sync Manager (Khusus Blankspot) -->
-    <script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-            navigator.serviceWorker.register('/sw.js').then(function(reg) {
-                console.log('[PWA] ServiceWorker registered scope:', reg.scope);
-            }).catch(function(err) {
-                console.warn('[PWA] ServiceWorker failed:', err);
-            });
-        });
-    }
-
-    window.BspsOfflineManager = (function() {
-        const DB_NAME = 'BspsOfflineDB';
-        const DB_VERSION = 1;
-        const STORE_NAME = 'offline_surveys';
-        let db = null;
-
-        function initDB() {
-            return new Promise((resolve, reject) => {
-                if (db) return resolve(db);
-                const request = indexedDB.open(DB_NAME, DB_VERSION);
-                request.onupgradeneeded = function(e) {
-                    const dbInst = e.target.result;
-                    if (!dbInst.objectStoreNames.contains(STORE_NAME)) {
-                        dbInst.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
-                    }
-                };
-                request.onsuccess = function(e) {
-                    db = e.target.result;
-                    resolve(db);
-                };
-                request.onerror = function(e) {
-                    console.error('[IndexedDB] Error initializing DB:', e);
-                    reject(e);
-                };
-            });
-        }
-
-        function saveOfflineSurvey(surveyData) {
-            return initDB().then(dbInst => {
-                return new Promise((resolve, reject) => {
-                    const tx = dbInst.transaction(STORE_NAME, 'readwrite');
-                    const store = tx.objectStore(STORE_NAME);
-                    const req = store.add(surveyData);
-                    req.onsuccess = function() {
-                        updateUIStatus();
-                        resolve(req.result);
-                    };
-                    req.onerror = function(e) {
-                        reject(e);
-                    };
-                });
-            });
-        }
-
-        function getOfflineSurveys() {
-            return initDB().then(dbInst => {
-                return new Promise((resolve, reject) => {
-                    const tx = dbInst.transaction(STORE_NAME, 'readonly');
-                    const store = tx.objectStore(STORE_NAME);
-                    const req = store.getAll();
-                    req.onsuccess = function() {
-                        resolve(req.result || []);
-                    };
-                    req.onerror = function(e) {
-                        reject(e);
-                    };
-                });
-            });
-        }
-
-        function deleteOfflineSurvey(id) {
-            return initDB().then(dbInst => {
-                return new Promise((resolve, reject) => {
-                    const tx = dbInst.transaction(STORE_NAME, 'readwrite');
-                    const store = tx.objectStore(STORE_NAME);
-                    const req = store.delete(id);
-                    req.onsuccess = function() {
-                        updateUIStatus();
-                        resolve();
-                    };
-                    req.onerror = function(e) {
-                        reject(e);
-                    };
-                });
-            });
-        }
-
-        function updateNetworkStatusUI() {
-            const isOnline = navigator.onLine;
-            const banner = document.getElementById('offlineSyncBanner');
-            const icon = document.getElementById('networkStatusIcon');
-            const title = document.getElementById('networkStatusTitle');
-            const sub = document.getElementById('networkStatusSub');
-
-            if (!isOnline) {
-                if (banner) banner.style.borderLeftColor = '#eab308';
-                if (icon) {
-                    icon.style.background = 'rgba(234, 179, 8, 0.16)';
-                    icon.style.color = '#eab308';
-                    icon.innerHTML = '<i class="fas fa-triangle-exclamation"></i>';
-                }
-                if (title) title.textContent = 'Mode Tanpa Sinyal (Offline)';
-                if (sub) sub.textContent = 'Koneksi terputus. Data survei & foto otomatis tersimpan di HP.';
-            } else {
-                if (banner) banner.style.borderLeftColor = '#22c55e';
-                if (icon) {
-                    icon.style.background = 'rgba(34, 197, 94, 0.16)';
-                    icon.style.color = '#22c55e';
-                    icon.innerHTML = '<i class="fas fa-wifi"></i>';
-                }
-                if (title) title.textContent = 'Mode Terhubung (Online)';
-                if (sub) sub.textContent = 'Koneksi lancar. Data survei dikirim langsung ke server.';
-            }
-        }
-
-        function syncNow() {
-            if (!navigator.onLine) {
-                alert('Perangkat masih dalam kondisi offline (blankspot). Hubungkan ke sinyal internet/Wi-Fi untuk mensinkronkan.');
-                return;
-            }
-
-            const syncBtn = document.getElementById('btnSyncOffline');
-            if (syncBtn) {
-                syncBtn.disabled = true;
-                syncBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengunggah...';
-            }
-
-            getOfflineSurveys().then(items => {
-                if (items.length === 0) {
-                    if (syncBtn) {
-                        syncBtn.disabled = false;
-                        syncBtn.innerHTML = '<i class="fas fa-rotate"></i> Sinkronkan Sekarang';
-                    }
-                    updateUIStatus();
-                    return;
-                }
-
-                let completed = 0;
-                let total = items.length;
-
-                items.forEach(item => {
-                    const formData = new FormData();
-                    for (let key in item.fields) {
-                        formData.append(key, item.fields[key]);
-                    }
-                    // Append photos
-                    for (let field in item.photos) {
-                        if (item.photos[field] && item.photos[field].dataUrl) {
-                            const blob = dataURLtoBlob(item.photos[field].dataUrl);
-                            formData.append(field, blob, item.photos[field].name || (field + '.jpg'));
-                        }
-                    }
-                    formData.append('_token', '{{ csrf_token() }}');
-
-                    fetch(item.actionUrl || ('/survey/' + item.recipientId), {
-                        method: 'POST',
-                        headers: { 'X-Requested-With': 'XMLHttpRequest' },
-                        body: formData
-                    })
-                    .then(res => {
-                        deleteOfflineSurvey(item.id).then(() => {
-                            completed++;
-                            if (completed >= total) {
-                                alert('Berhasil! Seluruh ' + total + ' data survei offline telah tersinkronisasi ke server.');
-                                if (syncBtn) {
-                                    syncBtn.disabled = false;
-                                    syncBtn.innerHTML = '<i class="fas fa-rotate"></i> Sinkronkan Sekarang';
-                                }
-                                updateUIStatus();
-                                window.location.reload();
-                            }
-                        });
-                    })
-                    .catch(err => {
-                        console.error('[Sync Error]', err);
-                        completed++;
-                        if (completed >= total) {
-                            if (syncBtn) {
-                                syncBtn.disabled = false;
-                                syncBtn.innerHTML = '<i class="fas fa-rotate"></i> Sinkronkan Sekarang';
-                            }
-                            updateUIStatus();
-                        }
-                    });
-                });
-            });
-        }
-
-        function dataURLtoBlob(dataurl) {
-            const arr = dataurl.split(',');
-            const mime = arr[0].match(/:(.*?);/)[1];
-            const bstr = atob(arr[1]);
-            let n = bstr.length;
-            const u8arr = new Uint8Array(n);
-            while (n--) {
-                u8arr[n] = bstr.charCodeAt(n);
-            }
-            return new Blob([u8arr], { type: mime });
-        }
-
-        window.addEventListener('online', function() {
-            updateNetworkStatusUI();
-        });
-
-        window.addEventListener('offline', function() {
-            updateNetworkStatusUI();
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            updateNetworkStatusUI();
-        });
-
-        return {
-            saveOfflineSurvey,
-            getOfflineSurveys,
-            deleteOfflineSurvey,
-            updateNetworkStatusUI
-        };
-    })();
     </script>
 @endpush
