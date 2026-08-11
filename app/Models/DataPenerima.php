@@ -38,7 +38,8 @@ class DataPenerima extends Model
         // Berkas Dokumen Administrasi
         'ktp',
         'kk',
-        'sertifikat_tanah',
+        // 'sertifikat_tanah' => Opsional (tidak wajib)
+        'surat_pernyataan',
     ];
 
     /**

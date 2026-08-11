@@ -677,7 +677,7 @@
 
                         {{-- Upload Sertifikat Tanah --}}
                         <div>
-                            <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">Foto Sertipikat / Bukti Tanah</label>
+                            <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">Foto Sertipikat / Bukti Tanah <span style="font-size:11.5px; color:#64748b; font-weight:normal;">(Opsional)</span></label>
                             <div class="camera-upload-card {{ $vervalData->sertifikat_tanah ? 'has-image' : '' }}" id="card_sertifikat_tanah">
                                 <input type="file" id="input_sertifikat_tanah" name="sertifikat_tanah" class="camera-file-input" accept="image/*" onchange="previewPhoto(this, 'sertifikat_tanah')">
                                 <input type="hidden" id="url_sertifikat_tanah" value="{{ $vervalData->sertifikat_tanah ? url('/uploads/' . basename($vervalData->sertifikat_tanah)) : '' }}">
@@ -706,6 +706,44 @@
                                             <i class="fas fa-eye"></i> Lihat
                                         </button>
                                         <button type="button" class="btn-photo-action delete" onclick="removePhoto('sertifikat_tanah')" title="Hapus / Ganti Bukti Lahan">
+                                            <i class="fas fa-trash-alt"></i> Hapus
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Upload Surat Pernyataan --}}
+                        <div>
+                            <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">Foto / PDF Surat Pernyataan</label>
+                            <div class="camera-upload-card {{ $vervalData->surat_pernyataan ? 'has-image' : '' }}" id="card_surat_pernyataan">
+                                <input type="file" id="input_surat_pernyataan" name="surat_pernyataan" class="camera-file-input" accept="image/*,application/pdf" onchange="previewPhoto(this, 'surat_pernyataan')">
+                                <input type="hidden" id="url_surat_pernyataan" value="{{ $vervalData->surat_pernyataan ? url('/uploads/' . basename($vervalData->surat_pernyataan)) : '' }}">
+                                
+                                {{-- State Kosong --}}
+                                <div class="camera-placeholder-box" id="placeholder_surat_pernyataan" style="{{ $vervalData->surat_pernyataan ? 'display:none;' : 'display:flex;' }}">
+                                    <div class="camera-icon-bubble">
+                                        <i class="fas fa-file-signature"></i>
+                                    </div>
+                                    <div class="camera-upload-title">Unggah Surat Pernyataan</div>
+                                    <div class="camera-upload-sub">Foto (JPG/PNG) atau Berkas PDF</div>
+                                    <button type="button" class="camera-upload-btn-fake" onclick="triggerPhotoInput('input_surat_pernyataan')">
+                                        <i class="fas fa-file-arrow-up"></i> Ambil / Pilih File
+                                    </button>
+                                </div>
+
+                                {{-- State Tersimpan / Terpilih (2 Tombol Aksi) --}}
+                                <div class="camera-uploaded-box" id="uploaded_surat_pernyataan" style="{{ $vervalData->surat_pernyataan ? 'display:flex;' : 'display:none;' }}">
+                                    <div class="camera-icon-bubble success">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <div class="camera-upload-title">Surat Pernyataan</div>
+                                    <span class="camera-upload-badge"><i class="fas fa-file-lines"></i> {{ $vervalData->surat_pernyataan ? 'Berkas Tersimpan' : 'Berkas Terpilih' }}</span>
+                                    <div class="camera-actions-box">
+                                        <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('surat_pernyataan')" title="Buka / Lihat Surat Pernyataan">
+                                            <i class="fas fa-eye"></i> Lihat
+                                        </button>
+                                        <button type="button" class="btn-photo-action delete" onclick="removePhoto('surat_pernyataan')" title="Hapus / Ganti Surat Pernyataan">
                                             <i class="fas fa-trash-alt"></i> Hapus
                                         </button>
                                     </div>
@@ -1407,9 +1445,10 @@
                         </h5>
                         @php
                             $dokumens = [
-                                'ktp'              => ['label' => 'Foto / Scan KTP',         'icon' => 'fa-id-card'],
+                                'ktp'              => ['label' => 'Foto / Scan KTP',               'icon' => 'fa-id-card'],
                                 'kk'               => ['label' => 'Foto / Scan Kartu Keluarga (KK)', 'icon' => 'fa-users-rectangle'],
-                                'sertifikat_tanah' => ['label' => 'Foto Sertipikat / Bukti Tanah',  'icon' => 'fa-file-contract'],
+                                'surat_pernyataan' => ['label' => 'Foto / PDF Surat Pernyataan',      'icon' => 'fa-file-signature'],
+                                'sertifikat_tanah' => ['label' => 'Bukti Tanah (Opsional)',            'icon' => 'fa-file-contract'],
                             ];
                         @endphp
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px;">
@@ -1609,9 +1648,9 @@
             const cardKk = document.getElementById('card_kk');
             if (!urlKk || !urlKk.value.trim()) registerMissing('2. Berkas & Dokumen Administrasi', 'Foto / Scan Kartu Keluarga', cardKk);
 
-            const urlSertifikat = document.getElementById('url_sertifikat_tanah');
-            const cardSertifikat = document.getElementById('card_sertifikat_tanah');
-            if (!urlSertifikat || !urlSertifikat.value.trim()) registerMissing('2. Berkas & Dokumen Administrasi', 'Foto Sertipikat / Bukti Tanah', cardSertifikat);
+            const urlSurat = document.getElementById('url_surat_pernyataan');
+            const cardSurat = document.getElementById('card_surat_pernyataan');
+            if (!urlSurat || !urlSurat.value.trim()) registerMissing('2. Berkas & Dokumen Administrasi', 'Foto / PDF Surat Pernyataan', cardSurat);
 
             const jenisKepemilikan = document.getElementById('inputKepemilikan');
             const ddKepemilikan = document.getElementById('ddKepemilikanWrapper');
@@ -1702,7 +1741,7 @@
                 const formData = new FormData(form);
                 const fields = {};
                 for (const [k, v] of formData.entries()) {
-                    if (!k.startsWith('foto_') && k !== 'ktp' && k !== 'kk' && k !== 'sertifikat_tanah') {
+                    if (!k.startsWith('foto_') && k !== 'ktp' && k !== 'kk' && k !== 'sertifikat_tanah' && k !== 'surat_pernyataan') {
                         fields[k] = v;
                     }
                 }
@@ -1710,6 +1749,7 @@
                 const photos = {
                     'ktp': document.getElementById('url_ktp')?.value || '',
                     'kk': document.getElementById('url_kk')?.value || '',
+                    'surat_pernyataan': document.getElementById('url_surat_pernyataan')?.value || '',
                     'sertifikat_tanah': document.getElementById('url_sertifikat_tanah')?.value || '',
                     'foto_sudut_depan': document.getElementById('url_foto_sudut_depan')?.value || '',
                     'foto_sudut_belakang': document.getElementById('url_foto_sudut_belakang')?.value || '',

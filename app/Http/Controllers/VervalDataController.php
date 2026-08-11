@@ -326,6 +326,7 @@ class VervalDataController extends Controller
             'ktp' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
             'kk' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
             'sertifikat_tanah' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'surat_pernyataan' => 'nullable|mimes:jpeg,png,jpg,webp,pdf|max:10240',
             'jenis_kepemilikan_lahan' => 'nullable|string',
             'foto_sudut_depan' => 'nullable|image|max:5120',
             'foto_sudut_belakang' => 'nullable|image|max:5120',
@@ -334,10 +335,10 @@ class VervalDataController extends Controller
             'foto_sudut_kanan' => 'nullable|image|max:5120',
         ]);
 
-        $data = $request->except(['ktp', 'kk', 'sertifikat_tanah', 'foto_sudut_depan', 'foto_sudut_belakang', 'foto_bagian_dalam', 'foto_sudut_kiri', 'foto_sudut_kanan', '_token', '_method']);
+        $data = $request->except(['ktp', 'kk', 'sertifikat_tanah', 'surat_pernyataan', 'foto_sudut_depan', 'foto_sudut_belakang', 'foto_bagian_dalam', 'foto_sudut_kiri', 'foto_sudut_kanan', '_token', '_method']);
 
         // Handle file uploads with auto compression
-        $fileFields = ['ktp', 'kk', 'sertifikat_tanah', 'foto_sudut_depan', 'foto_sudut_belakang', 'foto_bagian_dalam', 'foto_sudut_kiri', 'foto_sudut_kanan'];
+        $fileFields = ['ktp', 'kk', 'sertifikat_tanah', 'surat_pernyataan', 'foto_sudut_depan', 'foto_sudut_belakang', 'foto_bagian_dalam', 'foto_sudut_kiri', 'foto_sudut_kanan'];
         
         $uploadPath = public_path('uploads');
         if (!file_exists($uploadPath)) {
