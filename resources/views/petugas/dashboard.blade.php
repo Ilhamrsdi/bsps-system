@@ -8,12 +8,12 @@
 <style>
     /* Hero Banner Petugas */
     .welcome-card {
-        background: linear-gradient(135deg, #002855 0%, #001835 100%);
+        background: linear-gradient(135deg, #001835 0%, #002855 50%, #004080 100%);
         color: #ffffff;
-        border-radius: 14px;
-        padding: 22px 28px;
+        border-radius: 16px;
+        padding: 24px 30px;
         margin-bottom: 24px;
-        box-shadow: 0 10px 24px rgba(0, 40, 85, 0.18);
+        box-shadow: 0 10px 28px rgba(0, 40, 85, 0.22);
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -21,22 +21,37 @@
         border-left: 6px solid #ffb800;
         width: 100%;
         box-sizing: border-box;
-        flex-wrap: wrap;
+        position: relative;
+        overflow: hidden;
     }
-    .welcome-text { flex: 1; min-width: 260px; }
-    .welcome-text h2 { font-size: 20px; font-weight: 800; margin-bottom: 4px; color:#fff; }
-    .welcome-text p  { font-size: 13.5px; opacity: 0.9; margin: 0; color:rgba(255,255,255,0.85); }
+    .welcome-card::after {
+        content: '';
+        position: absolute;
+        right: -30px;
+        top: -30px;
+        width: 220px;
+        height: 220px;
+        background: radial-gradient(circle, rgba(255, 184, 0, 0.14) 0%, rgba(255, 184, 0, 0) 70%);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+    .welcome-text { flex: 1; min-width: 260px; z-index: 1; }
+    .welcome-text h2 { font-size: 22px; font-weight: 800; margin-bottom: 6px; color: #ffffff; letter-spacing: -0.2px; }
+    .welcome-text p  { font-size: 13.5px; opacity: 0.92; margin: 0; color: rgba(255,255,255,0.9); line-height: 1.5; }
     .welcome-actions {
         display: flex;
         align-items: center;
         gap: 10px;
         flex-shrink: 0;
         flex-wrap: wrap;
+        z-index: 1;
     }
-    @media (max-width: 1280px) {
+    @media (max-width: 1024px) {
         .welcome-card {
             flex-direction: column;
             align-items: flex-start;
+            gap: 16px;
+            padding: 20px 24px;
         }
         .welcome-actions {
             width: 100%;
@@ -44,56 +59,59 @@
         }
     }
 
-    /* Stats Grid Responsive Auto-Fit */
+    /* Stats Grid Responsive 5-Column System */
     .stats-grid-petugas {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 14px;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 16px;
         margin-bottom: 24px;
         width: 100%;
         box-sizing: border-box;
     }
-    @media (max-width: 1100px) {
+    @media (max-width: 1280px) {
         .stats-grid-petugas {
             grid-template-columns: repeat(3, 1fr);
         }
     }
-    @media (max-width: 768px) {
+    @media (max-width: 840px) {
         .stats-grid-petugas {
             grid-template-columns: repeat(2, 1fr);
         }
     }
-    @media (max-width: 480px) {
+    @media (max-width: 520px) {
         .stats-grid-petugas {
             grid-template-columns: 1fr;
+            gap: 12px;
         }
     }
 
     .stat-card-petugas {
         background: var(--bg-card);
-        border-radius: 12px;
-        padding: 16px 18px;
+        border-radius: 14px;
+        padding: 18px 20px;
         box-shadow: var(--shadow-sm);
         border: 1px solid rgba(0, 40, 85, 0.08);
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 14px;
         text-decoration: none;
         color: inherit;
-        transition: all 0.2s ease;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         min-width: 0;
         box-sizing: border-box;
+        position: relative;
+        overflow: hidden;
     }
     .stat-card-petugas:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(0, 40, 85, 0.12);
+        transform: translateY(-4px);
+        box-shadow: 0 10px 24px rgba(0, 40, 85, 0.14);
         border-color: var(--primary);
     }
     .stat-card-petugas .stat-icon {
-        width: 42px; height: 42px;
-        border-radius: 10px;
+        width: 48px; height: 48px;
+        border-radius: 12px;
         display: flex; align-items: center; justify-content: center;
-        font-size: 18px; flex-shrink: 0;
+        font-size: 20px; flex-shrink: 0;
     }
     .stat-card-petugas .stat-icon.blue   { background: rgba(0,40,85,0.08);   color: var(--primary); }
     .stat-card-petugas .stat-icon.orange { background: rgba(255,184,0,0.15); color: #d69e00; }
@@ -102,16 +120,16 @@
     .stat-card-petugas .stat-icon.purple { background: rgba(142,68,173,0.12); color: #7e22ce; }
     
     .stat-card-petugas .stat-info { flex: 1; min-width: 0; }
-    .stat-card-petugas .stat-value { font-size: 22px; font-weight: 800; line-height: 1.1; color: var(--primary-dark); }
+    .stat-card-petugas .stat-value { font-size: 24px; font-weight: 800; line-height: 1.1; color: var(--primary-dark); }
     .stat-card-petugas .stat-label {
-        font-size: 11.5px; color: var(--text-muted); font-weight: 600; margin-top: 3px; line-height: 1.25;
-        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 4px; line-height: 1.35;
+        white-space: normal; word-break: break-word;
     }
 
     /* Chart Grid Section */
     .petugas-charts-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        grid-template-columns: repeat(3, 1fr);
         gap: 20px;
         margin-bottom: 24px;
         width: 100%;
@@ -187,18 +205,20 @@
     .search-input-wrap input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,40,85,0.08); background: var(--bg-card); }
     .search-input-wrap i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 14px; }
 
-    /* Table Container */
+    /* Table Container Card */
     .table-container-card {
         background: var(--bg-card);
         border-radius: var(--radius);
         box-shadow: var(--shadow-sm);
         border: 1px solid rgba(0, 40, 85, 0.06);
         overflow: hidden;
+        margin-bottom: 24px;
     }
     .table-header-bar {
         padding: 18px 24px;
         border-bottom: 1px solid rgba(0,40,85,0.06);
         display: flex; align-items: center; justify-content: space-between; gap: 12px;
+        flex-wrap: wrap;
     }
     .table-header-bar h3 { font-size: 15px; font-weight: 800; color: var(--primary-dark); display: flex; align-items: center; gap: 8px; margin: 0; }
 
@@ -270,18 +290,6 @@
     .pg-link.disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
     .pg-dots { display: inline-flex; align-items: center; justify-content: center; min-width: 30px; height: 36px; font-size: 14px; font-weight: 700; color: var(--text-muted); letter-spacing: 2px; }
 
-    /* Jump to Page Form */
-    .jump-page-form { display: inline-flex; align-items: center; gap: 6px; margin-left: 12px; }
-    .jump-page-input {
-        width: 54px; height: 36px; text-align: center;
-        border-radius: 8px; border: 1px solid rgba(0, 40, 85, 0.16);
-        background: var(--bg-body); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;
-    }
-    .jump-page-btn {
-        height: 36px; padding: 0 12px; border-radius: 8px;
-        background: var(--primary); color: #fff; border: none; font-size: 12px; font-weight: 700; cursor: pointer;
-    }
-
     .table-petugas-wrapper {
         width: 100%;
         overflow-x: auto;
@@ -300,7 +308,7 @@
         white-space: nowrap;
     }
 
-    @media (max-width: 992px) {
+    @media (max-width: 1100px) {
         .petugas-charts-grid { grid-template-columns: 1fr; }
     }
 
@@ -311,7 +319,10 @@
             gap: 16px;
             padding: 20px;
         }
-        .welcome-card .btn {
+        .welcome-actions {
+            width: 100%;
+        }
+        .welcome-actions .btn {
             width: 100%;
             justify-content: center;
         }
@@ -329,7 +340,6 @@
     }
 
     @media (max-width: 576px) {
-        .stats-grid-petugas { grid-template-columns: 1fr; gap: 10px; }
         .stat-card-petugas { padding: 14px 16px; gap: 12px; border-radius: 12px; }
         .stat-card-petugas .stat-icon { width: 42px; height: 42px; font-size: 18px; border-radius: 10px; }
         .stat-card-petugas .stat-value { font-size: 20px; }
@@ -385,13 +395,13 @@
                 </p>
             </div>
             <div class="welcome-actions">
-                <button type="button" class="btn" style="background:#22c55e;color:#fff;font-weight:800;padding:10px 16px;border-radius:8px;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 14px rgba(34,197,94,0.35);" onclick="window.PuprModal.open('modalTambahUsulan')" title="Tambah Usulan Calon Penerima Baru di Desa {{ $user->desa ?: '-' }}">
+                <button type="button" class="btn" style="background:#22c55e;color:#fff;font-weight:800;padding:10.5px 18px;border-radius:8px;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 14px rgba(34,197,94,0.35);" onclick="window.PuprModal.open('modalTambahUsulan')" title="Tambah Usulan Calon Penerima Baru di Desa {{ $user->desa ?: '-' }}">
                     <i class="fas fa-plus-circle"></i> Tambah Usulan
                 </button>
-                <a href="{{ route('verval-data.surat-pernyataan-kolektif', array_merge(['desa' => $user->desa], request()->all())) }}" target="_blank" class="btn" style="background:#ffb800;color:#002855;font-weight:800;padding:10px 16px;border-radius:8px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(0,0,0,0.15);" title="Cetak Surat Pernyataan secara kolektif untuk Desa {{ $user->desa ?: '-' }}">
+                <a href="{{ route('verval-data.surat-pernyataan-kolektif', array_merge(['desa' => $user->desa], request()->all())) }}" target="_blank" class="btn" style="background:#ffb800;color:#002855;font-weight:800;padding:10.5px 18px;border-radius:8px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 12px rgba(255,184,0,0.3);" title="Cetak Surat Pernyataan secara kolektif untuk Desa {{ $user->desa ?: '-' }}">
                     <i class="fas fa-file-signature"></i> Cetak Kolektif
                 </a>
-                <a href="{{ url('/petugas/belum-survei') }}" class="btn" style="background:rgba(255,255,255,0.15);color:#fff;font-weight:700;padding:10px 16px;border-radius:8px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,0.3);">
+                <a href="{{ url('/petugas/belum-survei') }}" class="btn" style="background:#ffffff;color:#002855;font-weight:800;padding:10.5px 18px;border-radius:8px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 14px rgba(0,0,0,0.18);border:none;">
                     <i class="fas fa-clipboard-question"></i> Belum Survei
                 </a>
             </div>
@@ -529,6 +539,7 @@
         </form>
 
         {{-- Tabel Data Calon Penerima Desa --}}
+        <div class="table-container-card">
             <div class="table-header-bar">
                 <h3><i class="fas fa-clipboard-list"></i> Daftar Calon Penerima BSPS — Desa {{ $user->desa ?: '-' }}</h3>
                 <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
