@@ -29,10 +29,21 @@ class SurveyController extends Controller
         }
 
         // List ringkas untuk quick search / dropdown pilih calon penerima
-        $allPenerimas = DataPenerima::select('id', 'nama', 'no_ktp', 'desa_kelurahan', 'kecamatan')
-            ->orderBy('nama', 'asc')
-            ->limit(100)
-            ->get();
+        $penerimaQuery = DataPenerima::select('id', 'nama', 'no_ktp', 'desa_kelurahan', 'kecamatan');
+        if (Auth::check()) {
+            $user = Auth::user();
+            if ($user->isAdminKecamatan()) {
+                $penerimaQuery->where('kecamatan', $user->kecamatan);
+            } elseif ($user->isPetugas()) {
+                if ($user->kecamatan) {
+                    $penerimaQuery->where('kecamatan', $user->kecamatan);
+                }
+                if ($user->desa) {
+                    $penerimaQuery->where('desa_kelurahan', $user->desa);
+                }
+            }
+        }
+        $allPenerimas = $penerimaQuery->orderBy('nama', 'asc')->limit(100)->get();
 
         return view('survey.index', compact('vervalData', 'allPenerimas'));
     }

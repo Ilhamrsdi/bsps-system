@@ -35,8 +35,16 @@ class PencocokanDataController extends Controller
             });
         }
 
+        // Pengaturan jumlah data per halaman (15, 50, 100, 500, atau 'all')
+        $perPageParam = $request->get('per_page', '15');
+        if ($perPageParam === 'all') {
+            $perPage = 100000;
+        } else {
+            $perPage = max(1, (int) $perPageParam);
+        }
+
         // Ambil data lokal paginated
-        $penerimas = $query->orderBy('id', 'asc')->paginate(15)->withQueryString();
+        $penerimas = $query->orderBy('id', 'asc')->paginate($perPage)->withQueryString();
 
         // Kumpulkan semua NIK dari item halaman ini untuk di-lookup batch ke Dataguse
         $niks = $penerimas->pluck('no_ktp')->map(fn($v) => trim($v))->filter()->unique()->values()->toArray();
@@ -84,6 +92,7 @@ class PencocokanDataController extends Controller
             // Ekstrak atribut Dataguse dengan fallback yang fleksibel
             $dgNama    = trim($dp->nama ?? '');
             $dgAlamat  = trim($dp->alamat ?? '');
+            $dgDusun   = trim($dp->dusun ?? $dp->dukuh ?? $dp->kampung ?? '');
             $dgDesa    = trim($dp->desa_kelurahan ?? $dp->kelurahan ?? $dp->desa ?? '');
             $dgKec     = trim($dp->kecamatan ?? '');
             $dgKab     = trim($dp->kabupaten ?? $dp->kabupaten_kota ?? '');
@@ -96,6 +105,7 @@ class PencocokanDataController extends Controller
                 'nik'            => $dp->nomor_induk_kependudukan ?? $item->no_ktp,
                 'nama'           => $dgNama,
                 'alamat'         => $dgAlamat,
+                'dusun'          => $dgDusun,
                 'desa_kelurahan' => $dgDesa,
                 'kecamatan'      => $dgKec,
                 'kabupaten_kota' => $dgKab,
@@ -107,21 +117,45 @@ class PencocokanDataController extends Controller
                 'jenis_kelamin'  => $dp->jenis_kelamin ?? '',
             ];
 
-            // Cek perbedaan (case-insensitive & whitespace-trimmed)
+            // Cek perbedaan (cerdas & fleksibel)
             $diffs = [];
-            if ($dgNama && strcasecmp(trim($item->nama), $dgNama) !== 0) {
+            
+            // 1. Nama
+            if ($dgNama && $this->cleanStr($item->nama) !== $this->cleanStr($dgNama)) {
                 $diffs['nama'] = true;
             }
-            if ($dgAlamat && strcasecmp(trim($item->alamat ?? ''), $dgAlamat) !== 0) {
-                $diffs['alamat'] = true;
+            
+            // 2. Alamat (mengabaikan suffix RT/RW jika basis alamat cocok)
+            if ($dgAlamat) {
+                $cleanLokalAlamat = $this->cleanAlamat($item->alamat);
+                $cleanDgAlamat    = $this->cleanAlamat($dgAlamat);
+                if ($cleanLokalAlamat !== $cleanDgAlamat && !str_contains($cleanDgAlamat, $cleanLokalAlamat) && !str_contains($cleanLokalAlamat, $cleanDgAlamat)) {
+                    $diffs['alamat'] = true;
+                }
             }
-            if ($dgDesa && strcasecmp(trim($item->desa_kelurahan ?? ''), $dgDesa) !== 0) {
+            
+            // 3. Dusun (jika lokal kosong tetapi alamat lokal mengandung nama dusun Dataguse, jangan anggap beda)
+            if ($dgDusun) {
+                $cleanLokalDusun  = $this->cleanStr($item->dusun);
+                $cleanDgDusun     = $this->cleanStr($dgDusun);
+                $cleanLokalAlamat = $this->cleanStr($item->alamat);
+                if ($cleanLokalDusun !== $cleanDgDusun && !str_contains($cleanLokalAlamat, $cleanDgDusun)) {
+                    $diffs['dusun'] = true;
+                }
+            }
+            
+            // 4. Desa / Kelurahan
+            if ($dgDesa && $this->cleanStr($item->desa_kelurahan) !== $this->cleanStr($dgDesa)) {
                 $diffs['desa_kelurahan'] = true;
             }
-            if ($dgKec && strcasecmp(trim($item->kecamatan ?? ''), $dgKec) !== 0) {
+            
+            // 5. Kecamatan
+            if ($dgKec && $this->cleanStr($item->kecamatan) !== $this->cleanStr($dgKec)) {
                 $diffs['kecamatan'] = true;
             }
-            if ($dgKab && strcasecmp(trim($item->kabupaten_kota ?? ''), $dgKab) !== 0) {
+            
+            // 6. Kabupaten / Kota (mengabaikan prefiks "KAB." vs "Kabupaten")
+            if ($dgKab && $this->cleanKab($item->kabupaten_kota) !== $this->cleanKab($dgKab)) {
                 $diffs['kabupaten_kota'] = true;
             }
 
@@ -147,14 +181,34 @@ class PencocokanDataController extends Controller
             $penerimas->setCollection($filteredItems);
         }
 
+        // Base query untuk statistik akumulasi keseluruhan database
+        $baseStatQuery = DataPenerima::query();
+        if ($user && $user->isAdminKecamatan()) {
+            $baseStatQuery->where('kecamatan', $user->kecamatan);
+        }
+
+        $overallTotal = (clone $baseStatQuery)->count();
+        $overallCocok = (clone $baseStatQuery)->where('dg_status', 'cocok')->count();
+        $overallBeda = (clone $baseStatQuery)->where('dg_status', 'beda')->count();
+        $overallTidak = (clone $baseStatQuery)->where('dg_status', 'tidak_ditemukan')->count();
+
+        // Fallback jika belum terpopulasi / un-evaluated
+        if ($overallCocok === 0 && $overallBeda === 0 && $overallTidak === 0) {
+            $overallCocok = $totalCocok;
+            $overallBeda  = $totalBeda;
+            $overallTidak = $totalTidakDitemukan;
+        }
+
         $stats = [
-            'total'           => $penerimas->total(),
-            'cocok'           => $totalCocok,
-            'beda'            => $totalBeda,
-            'tidak_ditemukan' => $totalTidakDitemukan,
+            'total'           => $overallTotal,
+            'cocok'           => $overallCocok,
+            'beda'            => $overallBeda,
+            'tidak_ditemukan' => $overallTidak,
+            'page_count'      => $penerimas->count(),
+            'per_page'        => $perPageParam,
         ];
 
-        return view('pencocokan_data.index', compact('penerimas', 'stats', 'search', 'statusFilter', 'dataguseConnected'));
+        return view('pencocokan_data.index', compact('penerimas', 'stats', 'search', 'statusFilter', 'perPageParam', 'dataguseConnected'));
     }
 
     /**
@@ -185,7 +239,9 @@ class PencocokanDataController extends Controller
                 ], 404);
             }
 
-            $updateData = [];
+            $updateData = [
+                'dg_status' => 'cocok'
+            ];
 
             if (!empty($dp->nama)) {
                 $updateData['nama'] = $dp->nama;
@@ -193,6 +249,33 @@ class PencocokanDataController extends Controller
             if (!empty($dp->alamat)) {
                 $updateData['alamat'] = $dp->alamat;
             }
+            $dgDusun = $dp->dusun ?? $dp->dukuh ?? $dp->kampung ?? null;
+            if (!empty($dgDusun)) {
+                $updateData['dusun'] = $dgDusun;
+            }
+
+            // Ekstrak & Penyesuaian RT / RW
+            $rt = trim($dp->rt ?? '');
+            $rw = trim($dp->rw ?? '');
+            if (!$rt || !$rw) {
+                $searchStr = $dp->alamat ?? '';
+                if (!$rt && preg_match('/(?:rt|r\.t)\.?\s*0*(\d+)/i', $searchStr, $mRt)) $rt = $mRt[1];
+                if (!$rw && preg_match('/(?:rw|r\.w)\.?\s*0*(\d+)/i', $searchStr, $mRw)) $rw = $mRw[1];
+            }
+            if ($rt) $updateData['rt'] = $rt;
+            if ($rw) $updateData['rw'] = $rw;
+
+            // Gabungkan RT/RW ke alamat lokal jika belum memiliki label RT
+            $currentAlamat = trim($penerima->alamat ?? '');
+            if (($rt || $rw) && !preg_match('/rt\s*\d+/i', $currentAlamat)) {
+                $rtLabel = $rt ? "RT" . str_pad($rt, 3, '0', STR_PAD_LEFT) : "";
+                $rwLabel = $rw ? "RW" . str_pad($rw, 3, '0', STR_PAD_LEFT) : "";
+                $rtrwTag = trim("{$rtLabel} {$rwLabel}");
+                if ($rtrwTag) {
+                    $updateData['alamat'] = $currentAlamat ? "{$currentAlamat} {$rtrwTag}" : $rtrwTag;
+                }
+            }
+
             $dgDesa = $dp->desa_kelurahan ?? $dp->kelurahan ?? $dp->desa ?? null;
             if (!empty($dgDesa)) {
                 $updateData['desa_kelurahan'] = $dgDesa;
@@ -213,13 +296,8 @@ class PencocokanDataController extends Controller
             if (!empty($dp->tanggal_lahir)) {
                 $updateData['tanggal_lahir'] = $dp->tanggal_lahir;
             }
-            if (!empty($dp->pekerjaan)) {
-                $updateData['penghasilan'] = $penerima->penghasilan; // Tetap simpan penghasilan
-            }
 
-            if (!empty($updateData)) {
-                $penerima->update($updateData);
-            }
+            $penerima->update($updateData);
 
             return response()->json([
                 'success' => true,
@@ -264,10 +342,37 @@ class PencocokanDataController extends Controller
                 $nik = trim($penerima->no_ktp);
                 if (isset($pendudukRows[$nik])) {
                     $dp = $pendudukRows[$nik];
-                    $updateData = [];
+                    $updateData = [
+                        'dg_status' => 'cocok'
+                    ];
 
                     if (!empty($dp->nama))           $updateData['nama'] = $dp->nama;
                     if (!empty($dp->alamat))         $updateData['alamat'] = $dp->alamat;
+                    $dgDusun = $dp->dusun ?? $dp->dukuh ?? $dp->kampung ?? null;
+                    if (!empty($dgDusun))            $updateData['dusun'] = $dgDusun;
+
+                    // Ekstrak & Penyesuaian RT / RW
+                    $rt = trim($dp->rt ?? '');
+                    $rw = trim($dp->rw ?? '');
+                    if (!$rt || !$rw) {
+                        $searchStr = $dp->alamat ?? '';
+                        if (!$rt && preg_match('/(?:rt|r\.t)\.?\s*0*(\d+)/i', $searchStr, $mRt)) $rt = $mRt[1];
+                        if (!$rw && preg_match('/(?:rw|r\.w)\.?\s*0*(\d+)/i', $searchStr, $mRw)) $rw = $mRw[1];
+                    }
+                    if ($rt) $updateData['rt'] = $rt;
+                    if ($rw) $updateData['rw'] = $rw;
+
+                    // Gabungkan RT/RW ke alamat lokal jika belum memiliki label RT
+                    $currentAlamat = trim($penerima->alamat ?? '');
+                    if (($rt || $rw) && !preg_match('/rt\s*\d+/i', $currentAlamat)) {
+                        $rtLabel = $rt ? "RT" . str_pad($rt, 3, '0', STR_PAD_LEFT) : "";
+                        $rwLabel = $rw ? "RW" . str_pad($rw, 3, '0', STR_PAD_LEFT) : "";
+                        $rtrwTag = trim("{$rtLabel} {$rwLabel}");
+                        if ($rtrwTag) {
+                            $updateData['alamat'] = $currentAlamat ? "{$currentAlamat} {$rtrwTag}" : $rtrwTag;
+                        }
+                    }
+
                     $dgDesa = $dp->desa_kelurahan ?? $dp->kelurahan ?? $dp->desa ?? null;
                     if (!empty($dgDesa))             $updateData['desa_kelurahan'] = $dgDesa;
                     if (!empty($dp->kecamatan))      $updateData['kecamatan'] = $dp->kecamatan;
@@ -277,10 +382,8 @@ class PencocokanDataController extends Controller
                     if (!empty($dp->tempat_lahir))   $updateData['tempat_lahir'] = $dp->tempat_lahir;
                     if (!empty($dp->tanggal_lahir))  $updateData['tanggal_lahir'] = $dp->tanggal_lahir;
 
-                    if (!empty($updateData)) {
-                        $penerima->update($updateData);
-                        $updatedCount++;
-                    }
+                    $penerima->update($updateData);
+                    $updatedCount++;
                 }
             }
 
@@ -295,5 +398,29 @@ class PencocokanDataController extends Controller
                 'message' => 'Gagal sync batch: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Helper normalisasi string untuk pembandingan fleksibel
+     */
+    private function cleanStr(?string $str): string
+    {
+        if (!$str) return '';
+        $s = mb_strtolower(trim($str));
+        return preg_replace('/\s+/', ' ', $s);
+    }
+
+    private function cleanKab(?string $str): string
+    {
+        $s = $this->cleanStr($str);
+        $s = preg_replace('/^(kab\.|kabupaten|kota)\s+/i', '', $s);
+        return trim($s);
+    }
+
+    private function cleanAlamat(?string $str): string
+    {
+        $s = $this->cleanStr($str);
+        $s = preg_replace('/(\(|\,)?\s*rt\s*\d+.*$/i', '', $s);
+        return trim($s);
     }
 }

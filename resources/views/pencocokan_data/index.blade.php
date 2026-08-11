@@ -209,6 +209,15 @@
                            style="width:100%;padding:9px 12px 9px 36px;border-radius:8px;border:1px solid rgba(0,40,85,0.15);font-size:13px;outline:none;box-sizing:border-box;">
                 </div>
 
+                {{-- Per Page / Jumlah Tampilan Dropdown --}}
+                <select name="per_page" onchange="this.form.submit()" style="padding:9px 14px;border-radius:8px;border:1px solid rgba(0,40,85,0.15);font-size:13px;font-weight:600;outline:none;background:#fff;cursor:pointer;">
+                    <option value="15" {{ ($perPageParam ?? '15') == '15' ? 'selected' : '' }}>📄 15 Data / Hal</option>
+                    <option value="50" {{ ($perPageParam ?? '') == '50' ? 'selected' : '' }}>📄 50 Data / Hal</option>
+                    <option value="100" {{ ($perPageParam ?? '') == '100' ? 'selected' : '' }}>📄 100 Data / Hal</option>
+                    <option value="500" {{ ($perPageParam ?? '') == '500' ? 'selected' : '' }}>📄 500 Data / Hal</option>
+                    <option value="all" {{ ($perPageParam ?? '') == 'all' ? 'selected' : '' }}>🌐 Semua Data (Full Stat)</option>
+                </select>
+
                 {{-- Status Filter --}}
                 <select name="status" onchange="this.form.submit()" style="padding:9px 14px;border-radius:8px;border:1px solid rgba(0,40,85,0.15);font-size:13px;font-weight:600;outline:none;background:#fff;cursor:pointer;">
                     <option value="all" {{ $statusFilter === 'all' ? 'selected' : '' }}>Semua Status Match</option>
@@ -220,7 +229,7 @@
                 <button type="submit" class="btn btn-primary" style="padding:9px 16px;font-size:13px;font-weight:700;">
                     <i class="fas fa-filter"></i> Saring
                 </button>
-                @if(!empty($search) || $statusFilter !== 'all')
+                @if(!empty($search) || $statusFilter !== 'all' || ($perPageParam ?? '15') !== '15')
                     <a href="{{ url('/pencocokan-data') }}" class="btn btn-outline" style="padding:9px 14px;font-size:13px;">Reset</a>
                 @endif
             </form>
@@ -280,9 +289,12 @@
                                         <div class="cell-data-sub">
                                             <i class="fas fa-location-dot" style="color:var(--primary);font-size:11px;"></i>
                                             {{ $item->alamat ?: '-' }},
+                                            @if($item->dusun)
+                                                Dusun: <strong>{{ $item->dusun }}</strong>,
+                                            @endif
                                             Desa/Kel: <strong>{{ $item->desa_kelurahan ?: '-' }}</strong>,
                                             Kec: <strong>{{ $item->kecamatan ?: '-' }}</strong>,
-                                            Kab: <strong>{{ $item->kabupaten_kota ?: 'Banyuwangi' }}</strong>
+                                            Kab: <strong>{{ $item->kabupaten_kota ?: 'Jember' }}</strong>
                                         </div>
                                         @if($item->tempat_lahir || $item->tanggal_lahir)
                                             <div style="font-size:11.5px;color:var(--text-muted);margin-top:4px;">
@@ -312,9 +324,12 @@
                                                 @if($dg->rt_rw)
                                                     <span style="font-weight:700;color:var(--primary);">({{ $dg->rt_rw }})</span>,
                                                 @endif
+                                                @if($dg->dusun)
+                                                    Dusun: <strong class="{{ isset($diffs['dusun']) ? 'diff-highlight' : '' }}">{{ $dg->dusun }}</strong>,
+                                                @endif
                                                 Desa/Kel: <strong class="{{ isset($diffs['desa_kelurahan']) ? 'diff-highlight' : '' }}">{{ $dg->desa_kelurahan ?: '-' }}</strong>,
                                                 Kec: <strong class="{{ isset($diffs['kecamatan']) ? 'diff-highlight' : '' }}">{{ $dg->kecamatan ?: '-' }}</strong>,
-                                                Kab: <strong class="{{ isset($diffs['kabupaten_kota']) ? 'diff-highlight' : '' }}">{{ $dg->kabupaten_kota ?: 'Banyuwangi' }}</strong>
+                                                Kab: <strong class="{{ isset($diffs['kabupaten_kota']) ? 'diff-highlight' : '' }}">{{ $dg->kabupaten_kota ?: 'Jember' }}</strong>
                                             </div>
                                             @if($dg->tempat_lahir || $dg->tanggal_lahir)
                                                 <div style="font-size:11.5px;color:var(--text-muted);margin-top:4px;">
