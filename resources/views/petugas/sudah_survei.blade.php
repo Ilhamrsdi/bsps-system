@@ -612,10 +612,22 @@
                 }
                 
                 // [Bypass Offline] Jika perangkat offline & bukan penolakan izin (PERMISSION_DENIED == 1)
-                if (error.code !== 1 && !navigator.onLine) {
-                    console.warn('[Offline] GPS gagal namun diizinkan lanjut karena mode offline aktif.');
-                    if (window.PuprModal) window.PuprModal.close('modalGpsRequired');
-                    window.location.href = targetUrl;
+                if (error.code !== 1) {
+                    const doBypass = () => {
+                        console.warn('[Offline] GPS gagal namun diizinkan lanjut karena mode offline aktif.');
+                        if (window.PuprModal) window.PuprModal.close('modalGpsRequired');
+                        window.location.href = targetUrl;
+                    };
+                    if (!navigator.onLine) {
+                        doBypass();
+                        return;
+                    }
+                    fetch(window.location.href, { method: 'HEAD', cache: 'no-cache' })
+                        .then(() => {
+                            if (window.PuprModal) window.PuprModal.open('modalGpsRequired');
+                            else alert("Silakan aktifkan lokasi (GPS) jika mau melakukan survei!");
+                        })
+                        .catch(() => doBypass());
                     return;
                 }
 
@@ -654,10 +666,21 @@
                 }
 
                 // [Bypass Offline] Jika perangkat offline & bukan penolakan izin (PERMISSION_DENIED == 1)
-                if (error.code !== 1 && !navigator.onLine) {
-                    console.warn('[Offline] GPS gagal namun diizinkan lanjut karena mode offline aktif.');
-                    if (window.PuprModal) window.PuprModal.close('modalGpsRequired');
-                    if (pendingSurveyUrl) window.location.href = pendingSurveyUrl;
+                if (error.code !== 1) {
+                    const doBypass = () => {
+                        console.warn('[Offline] GPS gagal namun diizinkan lanjut karena mode offline aktif.');
+                        if (window.PuprModal) window.PuprModal.close('modalGpsRequired');
+                        if (pendingSurveyUrl) window.location.href = pendingSurveyUrl;
+                    };
+                    if (!navigator.onLine) {
+                        doBypass();
+                        return;
+                    }
+                    fetch(window.location.href, { method: 'HEAD', cache: 'no-cache' })
+                        .then(() => {
+                            if (window.PuprModal) window.PuprModal.open('modalGpsRequired');
+                        })
+                        .catch(() => doBypass());
                     return;
                 }
 
