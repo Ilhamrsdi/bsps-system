@@ -3,7 +3,7 @@
  * Dinas PUPR / BSPS Verval System
  */
 
-const CACHE_NAME = 'bsps-verval-v3';
+const CACHE_NAME = 'bsps-verval-v4';
 
 // Aset Statis Inti yang Wajib Di-cache
 const STATIC_ASSETS = [
@@ -28,12 +28,12 @@ self.addEventListener('install', (event) => {
     self.skipWaiting();
     event.waitUntil(
         caches.open(CACHE_NAME).then(async (cache) => {
-            console.log('[ServiceWorker v3] Pre-caching static assets...');
+            console.log('[ServiceWorker v4] Pre-caching static assets...');
             for (const asset of STATIC_ASSETS) {
                 try {
                     await cache.add(asset);
                 } catch (err) {
-                    console.warn('[ServiceWorker v3] Gagal pre-cache asset:', asset, err);
+                    console.warn('[ServiceWorker v4] Gagal pre-cache asset:', asset, err);
                 }
             }
         })
@@ -47,7 +47,7 @@ self.addEventListener('activate', (event) => {
             return Promise.all(
                 keyList.map((key) => {
                     if (key !== CACHE_NAME) {
-                        console.log('[ServiceWorker v3] Menghapus cache lama:', key);
+                        console.log('[ServiceWorker v4] Menghapus cache lama:', key);
                         return caches.delete(key);
                     }
                 })
@@ -101,9 +101,14 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Strategi 2: Halaman Web HTML (Navigasi Antar Halaman)
+    // Strategi 2: Halaman Web HTML (Navigasi & Offline Nav Interceptor)
     // Mode: Network First dengan Auto-Cache & Offline Fallback (Anti Dinosaurus)
-    if (event.request.mode === 'navigate' || event.request.headers.get('accept')?.includes('text/html')) {
+    // Juga menangani fetch() dari Offline Navigation Interceptor (mode: 'same-origin')
+    const acceptHeader = event.request.headers.get('accept') || '';
+    const isHtmlRequest = event.request.mode === 'navigate' || acceptHeader.includes('text/html');
+
+    if (isHtmlRequest) {
+        console.log('[ServiceWorker v4] HTML request intercepted:', event.request.url, '| mode:', event.request.mode);
         event.respondWith(
             fetch(event.request)
                 .then((networkResponse) => {
@@ -118,7 +123,7 @@ self.addEventListener('fetch', (event) => {
                     return networkResponse;
                 })
                 .catch(async () => {
-                    console.log('[ServiceWorker v3] Offline terdeteksi, memuat dari cache:', event.request.url);
+                    console.log('[ServiceWorker v4] Offline terdeteksi, memuat dari cache:', event.request.url);
                     
                     // 1. Coba cari halaman persis yang diminta di cache
                     const matchedDirect = await caches.match(event.request, { ignoreSearch: true });
