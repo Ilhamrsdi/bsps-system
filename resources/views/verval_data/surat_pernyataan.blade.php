@@ -246,7 +246,7 @@
             <span>Cetak Surat Pernyataan BSPS (Total: {{ count($items) }} Dokumen)</span>
         </div>
         <div class="btn-group">
-            <a href="javascript:history.back()" class="btn-back">
+            <a href="{{ url()->previous() !== url()->current() ? url()->previous() : route('data-verval') }}" onclick="handleKembali(event)" class="btn-back">
                 <i class="fas fa-arrow-left"></i> Kembali
             </a>
             <button onclick="window.print()" class="btn-print">
@@ -254,6 +254,19 @@
             </button>
         </div>
     </div>
+
+    <script>
+        function handleKembali(e) {
+            e.preventDefault();
+            if (document.referrer && document.referrer !== window.location.href) {
+                window.history.back();
+            } else if (window.opener || window.history.length <= 1) {
+                window.close();
+            } else {
+                window.location.href = "{{ url()->previous() !== url()->current() ? url()->previous() : route('data-verval') }}";
+            }
+        }
+    </script>
 
     @foreach($items as $item)
         @php
