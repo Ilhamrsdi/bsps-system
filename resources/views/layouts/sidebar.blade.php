@@ -35,8 +35,8 @@
                         });
                     }
                 });
-                $countSudah = (clone $penerimaQuery)->whereNotNull('foto_sudut_depan')->count();
-                $countBelum = (clone $penerimaQuery)->whereNull('foto_sudut_depan')->count();
+                $countSudah = (clone $penerimaQuery)->sudahSurvei()->count();
+                $countBelum = (clone $penerimaQuery)->belumSurvei()->count();
             @endphp
             <div class="menu-label" style="margin-top:16px;">Workspace Petugas</div>
             <a class="menu-item {{ Request::is('petugas/belum-survei*') ? 'active' : '' }}" href="{{ url('/petugas/belum-survei') }}">

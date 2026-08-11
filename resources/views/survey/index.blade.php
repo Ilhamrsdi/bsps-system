@@ -677,7 +677,7 @@
 
                         {{-- Upload Sertifikat Tanah --}}
                         <div>
-                            <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">Foto Sertipikat / Bukti Tanah</label>
+                            <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">Foto Sertipikat / Bukti Tanah <span style="font-size:11.5px; color:#64748b; font-weight:normal;">(Opsional)</span></label>
                             <div class="camera-upload-card {{ $vervalData->sertifikat_tanah ? 'has-image' : '' }}" id="card_sertifikat_tanah">
                                 <input type="file" id="input_sertifikat_tanah" name="sertifikat_tanah" class="camera-file-input" accept="image/*" onchange="previewPhoto(this, 'sertifikat_tanah')">
                                 <input type="hidden" id="url_sertifikat_tanah" value="{{ $vervalData->sertifikat_tanah ? url('/uploads/' . basename($vervalData->sertifikat_tanah)) : '' }}">
@@ -706,6 +706,44 @@
                                             <i class="fas fa-eye"></i> Lihat
                                         </button>
                                         <button type="button" class="btn-photo-action delete" onclick="removePhoto('sertifikat_tanah')" title="Hapus / Ganti Bukti Lahan">
+                                            <i class="fas fa-trash-alt"></i> Hapus
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Upload Surat Pernyataan --}}
+                        <div>
+                            <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">Foto / PDF Surat Pernyataan</label>
+                            <div class="camera-upload-card {{ $vervalData->surat_pernyataan ? 'has-image' : '' }}" id="card_surat_pernyataan">
+                                <input type="file" id="input_surat_pernyataan" name="surat_pernyataan" class="camera-file-input" accept="image/*,application/pdf" onchange="previewPhoto(this, 'surat_pernyataan')">
+                                <input type="hidden" id="url_surat_pernyataan" value="{{ $vervalData->surat_pernyataan ? url('/uploads/' . basename($vervalData->surat_pernyataan)) : '' }}">
+                                
+                                {{-- State Kosong --}}
+                                <div class="camera-placeholder-box" id="placeholder_surat_pernyataan" style="{{ $vervalData->surat_pernyataan ? 'display:none;' : 'display:flex;' }}">
+                                    <div class="camera-icon-bubble">
+                                        <i class="fas fa-file-signature"></i>
+                                    </div>
+                                    <div class="camera-upload-title">Unggah Surat Pernyataan</div>
+                                    <div class="camera-upload-sub">Foto (JPG/PNG) atau Berkas PDF</div>
+                                    <button type="button" class="camera-upload-btn-fake" onclick="triggerPhotoInput('input_surat_pernyataan')">
+                                        <i class="fas fa-file-arrow-up"></i> Ambil / Pilih File
+                                    </button>
+                                </div>
+
+                                {{-- State Tersimpan / Terpilih (2 Tombol Aksi) --}}
+                                <div class="camera-uploaded-box" id="uploaded_surat_pernyataan" style="{{ $vervalData->surat_pernyataan ? 'display:flex;' : 'display:none;' }}">
+                                    <div class="camera-icon-bubble success">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <div class="camera-upload-title">Surat Pernyataan</div>
+                                    <span class="camera-upload-badge"><i class="fas fa-file-lines"></i> {{ $vervalData->surat_pernyataan ? 'Berkas Tersimpan' : 'Berkas Terpilih' }}</span>
+                                    <div class="camera-actions-box">
+                                        <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('surat_pernyataan')" title="Buka / Lihat Surat Pernyataan">
+                                            <i class="fas fa-eye"></i> Lihat
+                                        </button>
+                                        <button type="button" class="btn-photo-action delete" onclick="removePhoto('surat_pernyataan')" title="Hapus / Ganti Surat Pernyataan">
                                             <i class="fas fa-trash-alt"></i> Hapus
                                         </button>
                                     </div>
@@ -1329,7 +1367,160 @@
                                 <strong>{{ $vervalData->penghasilan ?: 'Belum Diisi' }}</strong>
                             </div>
                         </div>
+    
+                    <!-- 4. Status Kelengkapan Survei -->
+                    @php
+                        $fieldsWajib = \App\Models\DataPenerima::$fieldWajibSurvei;
+                        $totalWajib  = count($fieldsWajib);
+                        $totalIsi    = collect($fieldsWajib)->filter(fn($f) => !empty($vervalData->{$f}))->count();
+                        $pctSurvei   = $totalWajib > 0 ? round(($totalIsi / $totalWajib) * 100) : 0;
+                        $isSudah     = $totalIsi >= $totalWajib;
+                    @endphp
+                    <div style="margin-bottom: 20px; margin-top: 4px;">
+                        <div style="background: {{ $isSudah ? 'linear-gradient(135deg,#f0fdf4,#dcfce7)' : 'linear-gradient(135deg,#fffbeb,#fef3c7)' }}; border: 1.5px solid {{ $isSudah ? '#86efac' : '#fcd34d' }}; border-radius: 12px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="width: 36px; height: 36px; border-radius: 50%; background: {{ $isSudah ? 'rgba(34,197,94,0.18)' : 'rgba(245,158,11,0.18)' }}; color: {{ $isSudah ? '#16a34a' : '#b45309' }}; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;">
+                                    <i class="fas {{ $isSudah ? 'fa-circle-check' : 'fa-circle-exclamation' }}"></i>
+                                </div>
+                                <div>
+                                    <div style="font-size: 13px; font-weight: 800; color: {{ $isSudah ? '#15803d' : '#92400e' }};">
+                                        {{ $isSudah ? 'Survei Lengkap' : 'Survei Belum Lengkap' }}
+                                    </div>
+                                    <div style="font-size: 11.5px; color: {{ $isSudah ? '#166534' : '#b45309' }}; margin-top: 1px;">
+                                        {{ $totalIsi }} / {{ $totalWajib }} field wajib telah diisi
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px; min-width: 160px; flex: 1;">
+                                <div style="flex: 1; height: 8px; background: rgba(0,0,0,0.08); border-radius: 10px; overflow: hidden;">
+                                    <div style="height: 100%; width: {{ $pctSurvei }}%; background: {{ $isSudah ? '#22c55e' : '#f59e0b' }}; border-radius: 10px; transition: width 0.5s;"></div>
+                                </div>
+                                <span style="font-size: 13px; font-weight: 800; color: {{ $isSudah ? '#15803d' : '#92400e' }}; min-width: 38px; text-align: right;">{{ $pctSurvei }}%</span>
+                            </div>
+                        </div>
                     </div>
+
+                    <!-- 5. Indikator Kelayakan RTLH -->
+                    <div style="margin-bottom: 20px;">
+                        <h5 style="font-size: 13.5px; font-weight: 800; color: var(--primary); margin: 0 0 12px 0; border-bottom: 2px solid rgba(0,40,85,0.08); padding-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-list-check"></i> Indikator Kelayakan RTLH
+                        </h5>
+                        @php
+                            $indikators = [
+                                'indikator_lantai'      => 'Lantai Keramik',
+                                'indikator_pondasi'     => 'Pondasi Bangunan',
+                                'indikator_dinding'     => 'Dinding Bata / Tembok',
+                                'indikator_struktur'    => 'Struktur Bangunan (Sloof, Kolom, Ring Balok)',
+                                'indikator_atap'        => 'Penutup Atap Genteng',
+                                'indikator_penghasilan' => 'Penghasilan Kurang dari UMK',
+                            ];
+                        @endphp
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            @foreach($indikators as $field => $label)
+                                @php $val = $vervalData->{$field}; @endphp
+                                <div style="display: flex; align-items: center; justify-content: space-between; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 9px 14px; gap: 10px;">
+                                    <span style="font-size: 13px; font-weight: 600; color: #334155; flex: 1;">{{ $label }}</span>
+                                    @if($val === 'ada')
+                                        <span style="font-size: 11.5px; font-weight: 800; padding: 3px 12px; border-radius: 20px; background: rgba(34,197,94,0.14); color: #15803d; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;">
+                                            <i class="fas fa-check-circle"></i> Ada
+                                        </span>
+                                    @elseif($val === 'tidak_ada')
+                                        <span style="font-size: 11.5px; font-weight: 800; padding: 3px 12px; border-radius: 20px; background: rgba(239,68,68,0.12); color: #dc2626; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;">
+                                            <i class="fas fa-times-circle"></i> Tidak Ada
+                                        </span>
+                                    @else
+                                        <span style="font-size: 11.5px; font-weight: 700; padding: 3px 12px; border-radius: 20px; background: rgba(0,0,0,0.06); color: #94a3b8; white-space: nowrap;">
+                                            <i class="fas fa-minus"></i> Belum Diisi
+                                        </span>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <!-- 6. Berkas Dokumen Administrasi -->
+                    <div style="margin-bottom: 20px;">
+                        <h5 style="font-size: 13.5px; font-weight: 800; color: var(--primary); margin: 0 0 12px 0; border-bottom: 2px solid rgba(0,40,85,0.08); padding-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-file-invoice"></i> Berkas Dokumen Administrasi
+                        </h5>
+                        @php
+                            $dokumens = [
+                                'ktp'              => ['label' => 'Foto / Scan KTP',               'icon' => 'fa-id-card'],
+                                'kk'               => ['label' => 'Foto / Scan Kartu Keluarga (KK)', 'icon' => 'fa-users-rectangle'],
+                                'surat_pernyataan' => ['label' => 'Foto / PDF Surat Pernyataan',      'icon' => 'fa-file-signature'],
+                                'sertifikat_tanah' => ['label' => 'Bukti Tanah (Opsional)',            'icon' => 'fa-file-contract'],
+                            ];
+                        @endphp
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px;">
+                            @foreach($dokumens as $field => $meta)
+                                @php $fileVal = $vervalData->{$field}; @endphp
+                                <div style="background: #f8fafc; border: 1px solid {{ $fileVal ? '#86efac' : '#e2e8f0' }}; border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; align-items: flex-start;">
+                                    <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
+                                        <div style="width: 30px; height: 30px; border-radius: 8px; background: {{ $fileVal ? 'rgba(34,197,94,0.14)' : 'rgba(0,40,85,0.07)' }}; color: {{ $fileVal ? '#16a34a' : '#94a3b8' }}; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;">
+                                            <i class="fas {{ $meta['icon'] }}"></i>
+                                        </div>
+                                        <span style="font-size: 12px; font-weight: 700; color: #334155; flex: 1; line-height: 1.3;">{{ $meta['label'] }}</span>
+                                    </div>
+                                    @if($fileVal)
+                                        <div style="display: flex; align-items: center; gap: 6px; margin-top: 2px;">
+                                            <span style="font-size: 11px; font-weight: 800; color: #15803d; background: rgba(34,197,94,0.12); padding: 2px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 4px;">
+                                                <i class="fas fa-check"></i> Tersimpan
+                                            </span>
+                                            <a href="{{ url('/uploads/' . basename($fileVal)) }}" target="_blank" style="font-size: 11px; font-weight: 700; color: var(--primary); text-decoration: none; display: inline-flex; align-items: center; gap: 3px;">
+                                                <i class="fas fa-eye"></i> Lihat
+                                            </a>
+                                        </div>
+                                    @else
+                                        <span style="font-size: 11px; font-weight: 700; color: #94a3b8; background: rgba(0,0,0,0.05); padding: 2px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 4px;">
+                                            <i class="fas fa-xmark"></i> Belum Diupload
+                                        </span>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <!-- 7. Foto Fisik Rumah -->
+                    <div>
+                        <h5 style="font-size: 13.5px; font-weight: 800; color: var(--primary); margin: 0 0 12px 0; border-bottom: 2px solid rgba(0,40,85,0.08); padding-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-camera-retro"></i> Foto Fisik Rumah
+                        </h5>
+                        @php
+                            $fotos = [
+                                'foto_sudut_depan'    => '1. Tampak Depan',
+                                'foto_sudut_belakang' => '2. Tampak Belakang',
+                                'foto_bagian_dalam'   => '3. Bagian Dalam / Interior',
+                                'foto_sudut_kiri'     => '4. Samping Kiri',
+                                'foto_sudut_kanan'    => '5. Samping Kanan',
+                            ];
+                            $totalFoto = collect($fotos)->filter(fn($l, $f) => !empty($vervalData->{$f}))->count();
+                        @endphp
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                            <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;">{{ $totalFoto }} / {{ count($fotos) }} foto telah diupload</span>
+                            <span style="font-size: 11.5px; font-weight: 800; padding: 3px 12px; border-radius: 20px; background: {{ $totalFoto === count($fotos) ? 'rgba(34,197,94,0.14)' : 'rgba(245,158,11,0.15)' }}; color: {{ $totalFoto === count($fotos) ? '#15803d' : '#b45309' }};">
+                                {{ $totalFoto === count($fotos) ? 'Lengkap' : 'Belum Lengkap' }}
+                            </span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
+                            @foreach($fotos as $field => $label)
+                                @php $fotoVal = $vervalData->{$field}; @endphp
+                                <div style="background: {{ $fotoVal ? '#f0fdf4' : '#f8fafc' }}; border: 1px solid {{ $fotoVal ? '#86efac' : '#e2e8f0' }}; border-radius: 10px; padding: 12px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                                    <div style="width: 44px; height: 44px; border-radius: 50%; background: {{ $fotoVal ? 'rgba(34,197,94,0.18)' : 'rgba(0,0,0,0.06)' }}; color: {{ $fotoVal ? '#16a34a' : '#94a3b8' }}; display: flex; align-items: center; justify-content: center; font-size: 20px;">
+                                        <i class="fas {{ $fotoVal ? 'fa-image' : 'fa-camera' }}"></i>
+                                    </div>
+                                    <span style="font-size: 11.5px; font-weight: 700; color: #334155; line-height: 1.3;">{{ $label }}</span>
+                                    @if($fotoVal)
+                                        <a href="{{ url('/uploads/' . basename($fotoVal)) }}" target="_blank" style="font-size: 11px; font-weight: 800; color: #15803d; text-decoration: none; background: rgba(34,197,94,0.12); padding: 3px 12px; border-radius: 20px; display: inline-flex; align-items: center; gap: 4px;">
+                                            <i class="fas fa-eye"></i> Lihat Foto
+                                        </a>
+                                    @else
+                                        <span style="font-size: 11px; font-weight: 700; color: #94a3b8;">Belum Diupload</span>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
                 </div>
 
                 <div class="modal-footer" style="padding: 14px 22px; background: #f8fafc; border-top: 1px solid rgba(0, 40, 85, 0.06); display: flex; justify-content: flex-end;">
@@ -1457,9 +1648,9 @@
             const cardKk = document.getElementById('card_kk');
             if (!urlKk || !urlKk.value.trim()) registerMissing('2. Berkas & Dokumen Administrasi', 'Foto / Scan Kartu Keluarga', cardKk);
 
-            const urlSertifikat = document.getElementById('url_sertifikat_tanah');
-            const cardSertifikat = document.getElementById('card_sertifikat_tanah');
-            if (!urlSertifikat || !urlSertifikat.value.trim()) registerMissing('2. Berkas & Dokumen Administrasi', 'Foto Sertipikat / Bukti Tanah', cardSertifikat);
+            const urlSurat = document.getElementById('url_surat_pernyataan');
+            const cardSurat = document.getElementById('card_surat_pernyataan');
+            if (!urlSurat || !urlSurat.value.trim()) registerMissing('2. Berkas & Dokumen Administrasi', 'Foto / PDF Surat Pernyataan', cardSurat);
 
             const jenisKepemilikan = document.getElementById('inputKepemilikan');
             const ddKepemilikan = document.getElementById('ddKepemilikanWrapper');
@@ -1550,7 +1741,7 @@
                 const formData = new FormData(form);
                 const fields = {};
                 for (const [k, v] of formData.entries()) {
-                    if (!k.startsWith('foto_') && k !== 'ktp' && k !== 'kk' && k !== 'sertifikat_tanah') {
+                    if (!k.startsWith('foto_') && k !== 'ktp' && k !== 'kk' && k !== 'sertifikat_tanah' && k !== 'surat_pernyataan') {
                         fields[k] = v;
                     }
                 }
@@ -1558,6 +1749,7 @@
                 const photos = {
                     'ktp': document.getElementById('url_ktp')?.value || '',
                     'kk': document.getElementById('url_kk')?.value || '',
+                    'surat_pernyataan': document.getElementById('url_surat_pernyataan')?.value || '',
                     'sertifikat_tanah': document.getElementById('url_sertifikat_tanah')?.value || '',
                     'foto_sudut_depan': document.getElementById('url_foto_sudut_depan')?.value || '',
                     'foto_sudut_belakang': document.getElementById('url_foto_sudut_belakang')?.value || '',

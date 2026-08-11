@@ -78,6 +78,7 @@ class SurveyController extends Controller
             'ktp'                     => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
             'kk'                      => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
             'sertifikat_tanah'        => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'surat_pernyataan'        => 'nullable|mimes:jpeg,png,jpg,webp,pdf|max:10240',
             'foto_sudut_depan'        => 'nullable|image|max:5120',
             'foto_sudut_belakang'     => 'nullable|image|max:5120',
             'foto_bagian_dalam'       => 'nullable|image|max:5120',
@@ -93,7 +94,8 @@ class SurveyController extends Controller
         $photoLabels = [
             'ktp'                 => 'Foto / Scan KTP',
             'kk'                  => 'Foto / Scan Kartu Keluarga',
-            'sertifikat_tanah'    => 'Foto Sertipikat / Bukti Tanah',
+            // sertifikat_tanah: opsional, tidak wajib
+            'surat_pernyataan'    => 'Foto / Scan Surat Pernyataan',
             'foto_sudut_depan'    => 'Foto Fisik: Tampak Depan',
             'foto_sudut_belakang' => 'Foto Fisik: Tampak Belakang',
             'foto_bagian_dalam'   => 'Foto Fisik: Bagian Dalam / Interior',
@@ -114,7 +116,7 @@ class SurveyController extends Controller
         }
 
         $data = $request->except([
-            'ktp', 'kk', 'sertifikat_tanah',
+            'ktp', 'kk', 'sertifikat_tanah', 'surat_pernyataan',
             'foto_sudut_depan', 'foto_sudut_belakang', 'foto_bagian_dalam',
             'foto_sudut_kiri', 'foto_sudut_kanan',
             '_token', '_method', 'id'
@@ -145,7 +147,7 @@ class SurveyController extends Controller
 
         // Upload berkas dengan auto compression (jika GD/Intervention terpasang)
         $fileFields = [
-            'ktp', 'kk', 'sertifikat_tanah',
+            'ktp', 'kk', 'sertifikat_tanah', 'surat_pernyataan',
             'foto_sudut_depan', 'foto_sudut_belakang', 'foto_bagian_dalam',
             'foto_sudut_kiri', 'foto_sudut_kanan'
         ];
@@ -165,7 +167,13 @@ class SurveyController extends Controller
                 $file = $request->file($field);
 
                 try {
-                    if (class_exists(\Intervention\Image\ImageManager::class)) {
+                    // PDF: simpan langsung tanpa kompresi gambar
+                    if (strtolower($file->getClientOriginalExtension()) === 'pdf') {
+                        $filename = uniqid($field . '_') . '.pdf';
+                        $file->move($uploadPath, $filename);
+                        @chmod($uploadPath . '/' . $filename, 0644);
+                        @copy($uploadPath . '/' . $filename, $storageBackup . '/' . $filename);
+                    } elseif (class_exists(\Intervention\Image\ImageManager::class)) {
                         $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
                         $image = $manager->decodePath($file->getRealPath());
                         $image->scaleDown(1200);
@@ -219,8 +227,8 @@ class SurveyController extends Controller
 
         $request->validate([
             'id'    => 'required|exists:data_penerimas,id',
-            'field' => 'required|in:ktp,kk,sertifikat_tanah,foto_sudut_depan,foto_sudut_belakang,foto_bagian_dalam,foto_sudut_kiri,foto_sudut_kanan',
-            'photo' => 'required|image|max:10240',
+            'field' => 'required|in:ktp,kk,sertifikat_tanah,surat_pernyataan,foto_sudut_depan,foto_sudut_belakang,foto_bagian_dalam,foto_sudut_kiri,foto_sudut_kanan',
+            'photo' => 'required|mimes:jpeg,png,jpg,webp,pdf|max:10240',
         ]);
 
         $vervalData = DataPenerima::findOrFail($request->id);
@@ -299,7 +307,7 @@ class SurveyController extends Controller
 
         $request->validate([
             'id'    => 'required|exists:data_penerimas,id',
-            'field' => 'required|in:ktp,kk,sertifikat_tanah,foto_sudut_depan,foto_sudut_belakang,foto_bagian_dalam,foto_sudut_kiri,foto_sudut_kanan',
+            'field' => 'required|in:ktp,kk,sertifikat_tanah,surat_pernyataan,foto_sudut_depan,foto_sudut_belakang,foto_bagian_dalam,foto_sudut_kiri,foto_sudut_kanan',
         ]);
 
         $vervalData = DataPenerima::findOrFail($request->id);

@@ -32,8 +32,8 @@ class DashboardKecamatanController extends Controller
         // 1. Kartu Ringkasan Utama
         $totalPenerima = (clone $query)->count();
         $totalDesa = (clone $query)->whereNotNull('desa_kelurahan')->distinct('desa_kelurahan')->count('desa_kelurahan');
-        $totalSudahSurvei = (clone $query)->whereNotNull('foto_sudut_depan')->count();
-        $totalBelumSurvei = (clone $query)->whereNull('foto_sudut_depan')->count();
+        $totalSudahSurvei = (clone $query)->sudahSurvei()->count();
+        $totalBelumSurvei = (clone $query)->belumSurvei()->count();
         $progressPercent = $totalPenerima > 0 ? round(($totalSudahSurvei / $totalPenerima) * 100, 1) : 0;
 
         // 2. Breakdown Desil (Backlog 1 vs Backlog 2)
@@ -44,8 +44,8 @@ class DashboardKecamatanController extends Controller
         $desaStats = DataPenerima::selectRaw('
                 desa_kelurahan,
                 COUNT(*) as total,
-                SUM(CASE WHEN foto_sudut_depan IS NOT NULL THEN 1 ELSE 0 END) as sudah_survei,
-                SUM(CASE WHEN foto_sudut_depan IS NULL THEN 1 ELSE 0 END) as belum_survei,
+                SUM(CASE WHEN foto_sudut_depan IS NOT NULL AND foto_sudut_belakang IS NOT NULL AND foto_bagian_dalam IS NOT NULL AND foto_sudut_kiri IS NOT NULL AND foto_sudut_kanan IS NOT NULL AND ktp IS NOT NULL AND kk IS NOT NULL AND surat_pernyataan IS NOT NULL AND tempat_lahir IS NOT NULL AND tanggal_lahir IS NOT NULL AND luas_tanah IS NOT NULL AND telah_ditempati_selama IS NOT NULL AND status_tanah IS NOT NULL AND indikator_lantai IS NOT NULL AND indikator_pondasi IS NOT NULL AND indikator_dinding IS NOT NULL AND indikator_struktur IS NOT NULL AND indikator_atap IS NOT NULL AND indikator_penghasilan IS NOT NULL THEN 1 ELSE 0 END) as sudah_survei,
+                SUM(CASE WHEN foto_sudut_depan IS NULL OR foto_sudut_belakang IS NULL OR foto_bagian_dalam IS NULL OR foto_sudut_kiri IS NULL OR foto_sudut_kanan IS NULL OR ktp IS NULL OR kk IS NULL OR surat_pernyataan IS NULL OR tempat_lahir IS NULL OR tanggal_lahir IS NULL OR luas_tanah IS NULL OR telah_ditempati_selama IS NULL OR status_tanah IS NULL OR indikator_lantai IS NULL OR indikator_pondasi IS NULL OR indikator_dinding IS NULL OR indikator_struktur IS NULL OR indikator_atap IS NULL OR indikator_penghasilan IS NULL THEN 1 ELSE 0 END) as belum_survei,
                 SUM(CASE WHEN pengelompokan_desil LIKE "%Backlog 1%" THEN 1 ELSE 0 END) as backlog_1,
                 SUM(CASE WHEN pengelompokan_desil LIKE "%Backlog 2%" THEN 1 ELSE 0 END) as backlog_2
             ')
