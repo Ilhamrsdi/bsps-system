@@ -228,6 +228,7 @@ Route::middleware(['auth'])->group(function () {
 
         // User Management
         Route::get('/user', [UserController::class, 'index'])->name('user');
+        Route::get('/user/export-admin-kecamatan', [UserController::class, 'exportAdminKecamatan'])->name('user.export-admin-kecamatan');
         Route::post('/user', [UserController::class, 'store'])->name('user.store');
         Route::put('/user/{id}', [UserController::class, 'update'])->name('user.update');
         Route::delete('/user/{id}', [UserController::class, 'destroy'])->name('user.destroy');

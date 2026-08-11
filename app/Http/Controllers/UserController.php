@@ -127,6 +127,30 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $user->delete();
 
-        return redirect()->back()->with('success', 'Petugas survei berhasil dihapus dari database!');
+        return redirect()->back()->with('success', 'Petugas survei berhasil dihapus dari sistem!');
+    }
+
+    /**
+     * Download Excel / CSV Akun Admin Kecamatan
+     */
+    public function exportAdminKecamatan()
+    {
+        $filename = 'Akun_Admin_Kecamatan_BSPS.xls';
+        $path = public_path($filename);
+
+        if (!file_exists($path)) {
+            $users = User::where('role', 'admin_kecamatan')->orderBy('kecamatan', 'asc')->get();
+            $html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><style>th { background-color: #002855; color: #ffffff; font-weight: bold; text-align: center; border: 1px solid #000000; padding: 8px; } td { border: 1px solid #cccccc; padding: 6px 10px; font-family: Arial; font-size: 11pt; } .center { text-align: center; } .bold { font-weight: bold; }</style></head><body><h2>DAFTAR AKUN ADMIN KECAMATAN BSPS KABUPATEN JEMBER</h2><table><thead><tr><th>No</th><th>Nama Akun</th><th>Email / Username Login</th><th>Password</th><th>Kecamatan</th><th>Jabatan</th><th>Status Akun</th></tr></thead><tbody>';
+            $no = 1;
+            foreach ($users as $u) {
+                $html .= '<tr><td class="center">' . $no++ . '</td><td class="bold">' . htmlspecialchars($u->name) . '</td><td>' . htmlspecialchars($u->email) . '</td><td class="center bold">password123</td><td class="center bold">' . htmlspecialchars($u->kecamatan) . '</td><td>' . htmlspecialchars($u->jabatan) . '</td><td class="center">' . htmlspecialchars(ucfirst($u->status)) . '</td></tr>';
+            }
+            $html .= '</tbody></table></body></html>';
+            file_put_contents($path, $html);
+        }
+
+        return response()->download($path, 'Daftar_Akun_Admin_Kecamatan_BSPS.xls', [
+            'Content-Type' => 'application/vnd.ms-excel',
+        ]);
     }
 }

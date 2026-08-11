@@ -426,6 +426,9 @@
             </div>
 
             <div style="display:flex;gap:10px;align-items:center;">
+                <a href="{{ route('user.export-admin-kecamatan') }}" class="btn btn-primary" style="padding:10px 16px;background:var(--primary);color:#fff;text-decoration:none;border-radius:var(--radius-sm);font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:6px;" title="Download File Excel Kredensial Akun Admin Kecamatan">
+                    <i class="fas fa-file-excel"></i> Export Excel Admin Kec.
+                </a>
                 <a href="{{ url('/user') }}" class="btn btn-outline" style="padding:10px 16px;border:1px solid rgba(0,40,85,0.15);text-decoration:none;color:var(--text-secondary);border-radius:var(--radius-sm);font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:6px;">
                     <i class="fas fa-redo"></i> Reset
                 </a>
