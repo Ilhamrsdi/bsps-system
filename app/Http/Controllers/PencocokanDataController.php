@@ -239,7 +239,9 @@ class PencocokanDataController extends Controller
                 ], 404);
             }
 
-            $updateData = [];
+            $updateData = [
+                'dg_status' => 'cocok'
+            ];
 
             if (!empty($dp->nama)) {
                 $updateData['nama'] = $dp->nama;
@@ -251,6 +253,29 @@ class PencocokanDataController extends Controller
             if (!empty($dgDusun)) {
                 $updateData['dusun'] = $dgDusun;
             }
+
+            // Ekstrak & Penyesuaian RT / RW
+            $rt = trim($dp->rt ?? '');
+            $rw = trim($dp->rw ?? '');
+            if (!$rt || !$rw) {
+                $searchStr = $dp->alamat ?? '';
+                if (!$rt && preg_match('/(?:rt|r\.t)\.?\s*0*(\d+)/i', $searchStr, $mRt)) $rt = $mRt[1];
+                if (!$rw && preg_match('/(?:rw|r\.w)\.?\s*0*(\d+)/i', $searchStr, $mRw)) $rw = $mRw[1];
+            }
+            if ($rt) $updateData['rt'] = $rt;
+            if ($rw) $updateData['rw'] = $rw;
+
+            // Gabungkan RT/RW ke alamat lokal jika belum memiliki label RT
+            $currentAlamat = trim($penerima->alamat ?? '');
+            if (($rt || $rw) && !preg_match('/rt\s*\d+/i', $currentAlamat)) {
+                $rtLabel = $rt ? "RT" . str_pad($rt, 3, '0', STR_PAD_LEFT) : "";
+                $rwLabel = $rw ? "RW" . str_pad($rw, 3, '0', STR_PAD_LEFT) : "";
+                $rtrwTag = trim("{$rtLabel} {$rwLabel}");
+                if ($rtrwTag) {
+                    $updateData['alamat'] = $currentAlamat ? "{$currentAlamat} {$rtrwTag}" : $rtrwTag;
+                }
+            }
+
             $dgDesa = $dp->desa_kelurahan ?? $dp->kelurahan ?? $dp->desa ?? null;
             if (!empty($dgDesa)) {
                 $updateData['desa_kelurahan'] = $dgDesa;
@@ -271,13 +296,8 @@ class PencocokanDataController extends Controller
             if (!empty($dp->tanggal_lahir)) {
                 $updateData['tanggal_lahir'] = $dp->tanggal_lahir;
             }
-            if (!empty($dp->pekerjaan)) {
-                $updateData['penghasilan'] = $penerima->penghasilan; // Tetap simpan penghasilan
-            }
 
-            if (!empty($updateData)) {
-                $penerima->update($updateData);
-            }
+            $penerima->update($updateData);
 
             return response()->json([
                 'success' => true,
@@ -322,12 +342,37 @@ class PencocokanDataController extends Controller
                 $nik = trim($penerima->no_ktp);
                 if (isset($pendudukRows[$nik])) {
                     $dp = $pendudukRows[$nik];
-                    $updateData = [];
+                    $updateData = [
+                        'dg_status' => 'cocok'
+                    ];
 
                     if (!empty($dp->nama))           $updateData['nama'] = $dp->nama;
                     if (!empty($dp->alamat))         $updateData['alamat'] = $dp->alamat;
                     $dgDusun = $dp->dusun ?? $dp->dukuh ?? $dp->kampung ?? null;
                     if (!empty($dgDusun))            $updateData['dusun'] = $dgDusun;
+
+                    // Ekstrak & Penyesuaian RT / RW
+                    $rt = trim($dp->rt ?? '');
+                    $rw = trim($dp->rw ?? '');
+                    if (!$rt || !$rw) {
+                        $searchStr = $dp->alamat ?? '';
+                        if (!$rt && preg_match('/(?:rt|r\.t)\.?\s*0*(\d+)/i', $searchStr, $mRt)) $rt = $mRt[1];
+                        if (!$rw && preg_match('/(?:rw|r\.w)\.?\s*0*(\d+)/i', $searchStr, $mRw)) $rw = $mRw[1];
+                    }
+                    if ($rt) $updateData['rt'] = $rt;
+                    if ($rw) $updateData['rw'] = $rw;
+
+                    // Gabungkan RT/RW ke alamat lokal jika belum memiliki label RT
+                    $currentAlamat = trim($penerima->alamat ?? '');
+                    if (($rt || $rw) && !preg_match('/rt\s*\d+/i', $currentAlamat)) {
+                        $rtLabel = $rt ? "RT" . str_pad($rt, 3, '0', STR_PAD_LEFT) : "";
+                        $rwLabel = $rw ? "RW" . str_pad($rw, 3, '0', STR_PAD_LEFT) : "";
+                        $rtrwTag = trim("{$rtLabel} {$rwLabel}");
+                        if ($rtrwTag) {
+                            $updateData['alamat'] = $currentAlamat ? "{$currentAlamat} {$rtrwTag}" : $rtrwTag;
+                        }
+                    }
+
                     $dgDesa = $dp->desa_kelurahan ?? $dp->kelurahan ?? $dp->desa ?? null;
                     if (!empty($dgDesa))             $updateData['desa_kelurahan'] = $dgDesa;
                     if (!empty($dp->kecamatan))      $updateData['kecamatan'] = $dp->kecamatan;
@@ -337,10 +382,8 @@ class PencocokanDataController extends Controller
                     if (!empty($dp->tempat_lahir))   $updateData['tempat_lahir'] = $dp->tempat_lahir;
                     if (!empty($dp->tanggal_lahir))  $updateData['tanggal_lahir'] = $dp->tanggal_lahir;
 
-                    if (!empty($updateData)) {
-                        $penerima->update($updateData);
-                        $updatedCount++;
-                    }
+                    $penerima->update($updateData);
+                    $updatedCount++;
                 }
             }
 
