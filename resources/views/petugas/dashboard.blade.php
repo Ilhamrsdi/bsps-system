@@ -598,9 +598,12 @@
                 </p>
             </div>
 
-            <div class="modal-footer" style="padding: 16px 20px; background: var(--bg-body); border-top: 1px solid rgba(0, 40, 85, 0.06); display: flex; justify-content: center;">
-                <button type="button" class="btn btn-primary" onclick="retryLocationPermission()">
-                    <i class="fas fa-sync-alt"></i> Coba Deteksi Lokasi
+            <div class="modal-footer" style="padding: 16px 20px; background: var(--bg-body); border-top: 1px solid rgba(0, 40, 85, 0.06); display: flex; gap: 10px; justify-content: center;">
+                <button type="button" class="btn btn-outline" style="padding:10px 18px;" onclick="window.PuprModal.close('modalGpsRequired')">
+                    Batal
+                </button>
+                <button type="button" class="btn btn-primary" id="btnRetryGps" style="padding:10px 20px; font-weight:800;" onclick="retryLocationPermission()">
+                    <i class="fas fa-location-crosshairs"></i> Izinkan Lokasi &amp; Lanjutkan
                 </button>
             </div>
         </div>
@@ -697,25 +700,40 @@
 @endsection
 
 @push('scripts')
-<!-- Chart.js CDN -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Local Chart.js -->
+<script src="{{ asset('assets/js/chart.js') }}"></script>
 
 <script>
     let pendingSurveyUrl = null;
     let currentVervalId = null;
     let currentTargetSurveyUrl = null;
 
+    // Delegated click event untuk tombol trigger modal status
+    document.addEventListener('click', function (e) {
+        const btn = e.target.closest('.btn-trigger-status-modal');
+        if (btn) {
+            e.preventDefault();
+            const id = btn.getAttribute('data-id');
+            const nama = btn.getAttribute('data-nama');
+            const nik = btn.getAttribute('data-nik');
+            const alamat = btn.getAttribute('data-alamat');
+            const status = btn.getAttribute('data-status');
+            const url = btn.getAttribute('data-url');
+
+            openStatusVerificationModal(id, nama, nik, alamat, status, url);
+        }
+    });
     function openStatusVerificationModal(id, nama, nik, alamat, currentStatus, surveyUrl) {
         currentVervalId = id;
         currentTargetSurveyUrl = surveyUrl;
 
-        const namaEl = document.getElementById('statusModalNama');
-        const nikEl = document.getElementById('statusModalNik');
-        const alamatEl = document.getElementById('statusModalAlamat');
+        const elNama = document.getElementById('statusModalNama');
+        const elNik = document.getElementById('statusModalNik');
+        const elAlamat = document.getElementById('statusModalAlamat');
 
-        if (namaEl) namaEl.textContent = nama || '-';
-        if (nikEl) nikEl.textContent = nik || '-';
-        if (alamatEl) alamatEl.textContent = alamat || '-';
+        if (elNama) elNama.textContent = nama || '-';
+        if (elNik) elNik.textContent = nik || '-';
+        if (elAlamat) elAlamat.textContent = alamat || '-';
 
         const statusToSelect = (currentStatus && ['ditemukan', 'meninggal', 'pindah', 'tidak diketahui'].includes(currentStatus)) ? currentStatus : 'ditemukan';
         const radio = document.querySelector(`input[name="modal_verval_status"][value="${statusToSelect}"]`);
@@ -858,21 +876,9 @@
         );
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
-        document.addEventListener('click', function (e) {
-            const btn = e.target.closest('.btn-trigger-status-modal');
-            if (btn) {
-                e.preventDefault();
-                const id = btn.getAttribute('data-id');
-                const nama = btn.getAttribute('data-nama');
-                const nik = btn.getAttribute('data-nik');
-                const alamat = btn.getAttribute('data-alamat');
-                const status = btn.getAttribute('data-status');
-                const url = btn.getAttribute('data-url');
-
-                openStatusVerificationModal(id, nama, nik, alamat, status, url);
-            }
-        });
+    // Inisialisasi Chart.js
+    function initPetugasCharts() {
+        if (typeof Chart === 'undefined') return;
 
         // 1. Chart Progress Survei (Donut)
         const ctxProgress = document.getElementById('chartProgressSurvei');
@@ -975,6 +981,12 @@
                 }
             });
         }
-    });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initPetugasCharts);
+    } else {
+        initPetugasCharts();
+    }
 </script>
 @endpush
