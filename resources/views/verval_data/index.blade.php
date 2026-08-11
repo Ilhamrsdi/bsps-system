@@ -381,7 +381,24 @@
         .table-verval-wrapper {
             width: 100%;
             overflow-x: auto;
+            overflow-y: visible;
             -webkit-overflow-scrolling: touch;
+        }
+
+        /* Pastikan td kolom status tidak clip dropdown menu */
+        .table-verval-wrapper td.td-status-cell {
+            overflow: visible;
+            position: relative;
+        }
+
+        /* Dropdown di dalam tabel — munculkan ke atas agar tidak mepet bawah */
+        .table-verval-wrapper .pupr-dropdown-wrapper {
+            position: static;
+        }
+
+        .table-verval-wrapper .pupr-dropdown-menu {
+            position: fixed;
+            z-index: 9999;
         }
 
         .table-container-card table {
@@ -678,7 +695,7 @@
                                         {{ $item->pengelompokan_desil ?: 'Desil 1-4' }}
                                     </span>
                                 </td>
-                                <td style="padding:14px 18px;text-align:center;">
+                                <td style="padding:14px 18px;text-align:center;" class="td-status-cell">
                                     @php
                                         $currentStatus = $item->status ?? 'ditemukan';
                                         $statusColors = [
@@ -695,16 +712,33 @@
                                             {{ $currentStatus }}
                                         </span>
                                     @else
-                                        <select class="form-select status-select" data-id="{{ $item->id }}"
-                                            style="background-color: {{ $bgColor }}; color: {{ $textColor }}; font-weight: bold; border: none; border-radius: 20px; padding: 4px 12px; font-size: 11px; width: 120px; text-align: center; cursor: pointer; outline: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                                            <option value="ditemukan" {{ $currentStatus == 'ditemukan' ? 'selected' : '' }}
-                                                style="background: #fff; color: #000;">Ditemukan</option>
-                                            <option value="meninggal" {{ $currentStatus == 'meninggal' ? 'selected' : '' }}
-                                                style="background: #fff; color: #000;">Meninggal</option>
-                                            <option value="pindah" {{ $currentStatus == 'pindah' ? 'selected' : '' }}
-                                                style="background: #fff; color: #000;">Pindah</option>
-                                            <option value="tidak diketahui" {{ $currentStatus == 'tidak diketahui' ? 'selected' : '' }} style="background: #fff; color: #000;">Tidak Diketahui</option>
-                                        </select>
+                                        @php
+                                            $statusLabels = [
+                                                'ditemukan'       => 'Ditemukan',
+                                                'meninggal'       => 'Meninggal',
+                                                'pindah'          => 'Pindah',
+                                                'tidak diketahui' => 'Tidak Diketahui',
+                                            ];
+                                            $ddId     = 'ddStatus_' . $item->id;
+                                            $ddBtnId  = 'ddStatusBtn_' . $item->id;
+                                        @endphp
+                                        <div class="pupr-dropdown-wrapper" id="{{ $ddId }}" style="min-width:150px;">
+                                            <button type="button" class="pupr-dropdown-toggle" id="{{ $ddBtnId }}" onclick="window.PuprDropdown.toggle(document.getElementById('{{ $ddId }}'))">
+                                                <i class="fas fa-circle" style="font-size:8px;color:{{ $bgColor }};"></i>
+                                                <span class="selected-label" style="text-transform:capitalize;">{{ $statusLabels[$currentStatus] ?? ucfirst($currentStatus) }}</span>
+                                                <i class="fas fa-chevron-down" style="font-size:10px;opacity:0.5;"></i>
+                                            </button>
+                                            <div class="pupr-dropdown-menu" style="min-width:170px;">
+                                                <div class="pupr-dropdown-item {{ $currentStatus === 'ditemukan' ? 'active' : '' }}"
+                                                     onclick="updateVervalStatus({{ $item->id }}, 'ditemukan', 'Ditemukan', '{{ $ddId }}')"><i class="fas fa-circle" style="font-size:8px;color:#28a745;"></i> Ditemukan</div>
+                                                <div class="pupr-dropdown-item {{ $currentStatus === 'meninggal' ? 'active' : '' }}"
+                                                     onclick="updateVervalStatus({{ $item->id }}, 'meninggal', 'Meninggal', '{{ $ddId }}')"><i class="fas fa-circle" style="font-size:8px;color:#343a40;"></i> Meninggal</div>
+                                                <div class="pupr-dropdown-item {{ $currentStatus === 'pindah' ? 'active' : '' }}"
+                                                     onclick="updateVervalStatus({{ $item->id }}, 'pindah', 'Pindah', '{{ $ddId }}')"><i class="fas fa-circle" style="font-size:8px;color:#ffc107;"></i> Pindah</div>
+                                                <div class="pupr-dropdown-item {{ $currentStatus === 'tidak diketahui' ? 'active' : '' }}"
+                                                     onclick="updateVervalStatus({{ $item->id }}, 'tidak diketahui', 'Tidak Diketahui', '{{ $ddId }}')"><i class="fas fa-circle" style="font-size:8px;color:#dc3545;"></i> Tidak Diketahui</div>
+                                            </div>
+                                        </div>
                                     @endif
                                 </td>
                                 <td style="padding:14px 18px;text-align:center;">
@@ -873,46 +907,76 @@
         }
 
         document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('.status-select').forEach(function (select) {
-                select.addEventListener('change', function () {
-                    var id = this.getAttribute('data-id');
-                    var status = this.value;
-                    var selectElement = this;
+            // Auto-posisi dropdown menu (position:fixed) agar muncul tepat di bawah toggle button
+            document.addEventListener('click', function (e) {
+                const toggle = e.target.closest('.td-status-cell .pupr-dropdown-toggle');
+                if (!toggle) return;
 
-                    var colors = {
-                        'ditemukan': '#28a745',
-                        'meninggal': '#343a40',
-                        'pindah': '#ffc107',
-                        'tidak diketahui': '#dc3545'
-                    };
+                const wrapper = toggle.closest('.pupr-dropdown-wrapper');
+                if (!wrapper) return;
 
-                    selectElement.style.backgroundColor = colors[status];
-                    selectElement.style.color = (status === 'pindah') ? '#000' : '#fff';
+                const menu = wrapper.querySelector('.pupr-dropdown-menu');
+                if (!menu) return;
 
-                    // Send AJAX
-                    fetch("{{ url('/data-verval') }}/" + id + "/status", {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify({ status: status })
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (!data.success) {
-                                showToast('Gagal memperbarui status', 'error');
-                            } else {
-                                showToast('Status berhasil diperbarui', 'success');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            showToast('Terjadi kesalahan saat memperbarui status', 'error');
-                        });
-                });
-            });
+                // Posisi berdasarkan toggle button
+                const rect = toggle.getBoundingClientRect();
+                menu.style.top  = (rect.bottom + 6) + 'px';
+                menu.style.left = rect.left + 'px';
+                menu.style.right = 'auto';
+            }, true);
         });
+
+        const statusIconColors = {
+            'ditemukan'      : '#28a745',
+            'meninggal'      : '#343a40',
+            'pindah'         : '#ffc107',
+            'tidak diketahui': '#dc3545'
+        };
+
+        function updateVervalStatus(id, status, label, wrapperId) {
+            const wrapper = document.getElementById(wrapperId);
+
+            if (wrapper) {
+                const lbl = wrapper.querySelector('.selected-label');
+                if (lbl) lbl.textContent = label;
+
+                const iconDot = wrapper.querySelector('.pupr-dropdown-toggle .fa-circle');
+                if (iconDot) iconDot.style.color = statusIconColors[status] || '#28a745';
+
+                wrapper.querySelectorAll('.pupr-dropdown-item').forEach(i => i.classList.remove('active'));
+                const activeItem = [...wrapper.querySelectorAll('.pupr-dropdown-item')]
+                    .find(i => i.textContent.trim().toLowerCase().includes(status.toLowerCase()));
+                if (activeItem) activeItem.classList.add('active');
+
+                window.PuprDropdown.closeAll();
+            }
+
+            // AJAX update ke server
+            if (window.PuprLoading) window.PuprLoading.show('Memperbarui status...');
+
+            fetch(`{{ url('/data-verval') }}/${id}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ status: status })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (window.PuprLoading) window.PuprLoading.hide();
+                if (data.success) {
+                    showToast('Status berhasil diperbarui ke "' + label + '"', 'success');
+                } else {
+                    showToast('Gagal memperbarui status', 'error');
+                }
+            })
+            .catch(err => {
+                if (window.PuprLoading) window.PuprLoading.hide();
+                console.error(err);
+                showToast('Terjadi kesalahan koneksi', 'error');
+            });
+        }
     </script>
 @endpush

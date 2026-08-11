@@ -152,8 +152,10 @@
 @endpush
 
 @section('content')
-<main class="main-content">
-    <div class="content-wrapper">
+    <!-- Navbar Component -->
+    @include('layouts.navbar')
+
+    <main class="dashboard-content">
 
         {{-- Connection Warning --}}
         @if(!$dataguseConnected)
@@ -425,8 +427,7 @@
                 </div>
             </div>
         </div>
-    </div>
-</main>
+    </main>
 @endsection
 
 @push('scripts')
