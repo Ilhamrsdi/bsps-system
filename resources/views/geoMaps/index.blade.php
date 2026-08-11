@@ -443,7 +443,7 @@
                     const icon = createMarkerIcon(item.color, item.type);
                     const imgHtml = item.foto
                         ? `<a href="${item.foto}" target="_blank" style="display:block;margin:6px 0;">
-                               <img src="${item.foto}" style="width:100%;height:90px;object-fit:cover;border-radius:6px;cursor:pointer;" title="Klik untuk lihat foto asli" />
+                               <img src="${item.foto}" style="width:100%;height:110px;object-fit:cover;border-radius:6px;cursor:pointer;border:1px solid rgba(0,0,0,0.1);" title="Klik untuk lihat foto asli" onerror="this.onerror=null;this.style.display='none';" />
                            </a>`
                         : '';
 

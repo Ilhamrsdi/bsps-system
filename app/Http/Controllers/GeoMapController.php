@@ -61,9 +61,18 @@ class GeoMapController extends Controller
 
             $petugasNama = $item->petugas ? $item->petugas->name : 'Petugas Lapangan';
 
-            $fotoUrl = $item->foto_sudut_depan
-                ? asset('storage/' . $item->foto_sudut_depan)
-                : null;
+            $photoPath = $item->foto_sudut_depan ?: $item->ktp;
+            $fotoUrl = null;
+            if ($photoPath) {
+                $cleanPath = ltrim($photoPath, '/');
+                if (str_starts_with($cleanPath, 'http://') || str_starts_with($cleanPath, 'https://')) {
+                    $fotoUrl = $cleanPath;
+                } elseif (str_starts_with($cleanPath, 'uploads/') || str_starts_with($cleanPath, 'storage/')) {
+                    $fotoUrl = asset($cleanPath);
+                } else {
+                    $fotoUrl = asset('uploads/' . $cleanPath);
+                }
+            }
 
             return [
                 'id'          => 'penerima_' . $item->id,
