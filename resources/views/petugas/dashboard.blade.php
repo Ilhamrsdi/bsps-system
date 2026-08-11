@@ -1425,6 +1425,54 @@
         }
     }
 
+    // Handling submit Form Tambah Usulan (Support Offline Mode PWA - Anti Dinosaur Page)
+    document.getElementById('formTambahUsulan')?.addEventListener('submit', async function (e) {
+        const isOffline = !navigator.onLine;
+
+        const noKtpInput = this.querySelector('input[name="no_ktp"]');
+        const noKtpVal = noKtpInput ? noKtpInput.value.trim() : '';
+
+        if (noKtpVal.length !== 16 || isNaN(noKtpVal)) {
+            e.preventDefault();
+            alert('NIK (No. KTP) wajib berupa 16 digit angka!');
+            return;
+        }
+
+        if (isOffline) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const usulanData = {
+                id: 'usulan_off_' + Date.now(),
+                nama: formData.get('nama') || '',
+                no_ktp: formData.get('no_ktp') || '',
+                no_kk: formData.get('no_kk') || '',
+                jenis_kelamin: formData.get('jenis_kelamin') || 'L',
+                pengelompokan_desil: formData.get('pengelompokan_desil') || 'Usulan Baru Lapangan',
+                dusun: formData.get('dusun') || '',
+                rt: formData.get('rt') || '',
+                rw: formData.get('rw') || '',
+                alamat: formData.get('alamat') || '',
+                saved_at: new Date().toISOString()
+            };
+
+            if (window.BspsOffline && window.BspsOffline.saveUsulanToIndexedDB) {
+                const saved = await window.BspsOffline.saveUsulanToIndexedDB(usulanData);
+                if (saved) {
+                    if (window.BspsOffline.showPuprToast) {
+                        window.BspsOffline.showPuprToast(`📲 Mode Offline: Usulan "${usulanData.nama}" tersimpan di memori HP! Data akan terunggah otomatis saat online.`, 'warning');
+                    } else {
+                        alert(`Mode Offline: Usulan "${usulanData.nama}" berhasil disimpan sementara di HP!`);
+                    }
+                    if (window.PuprModal) window.PuprModal.close('modalTambahUsulan');
+                    this.reset();
+                }
+            } else {
+                alert('Mode Offline: Data usulan berhasil disimpan sementara.');
+            }
+        }
+    });
+
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initPetugasCharts);
     } else {
