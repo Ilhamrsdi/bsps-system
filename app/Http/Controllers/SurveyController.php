@@ -48,7 +48,7 @@ class SurveyController extends Controller
         $request->validate([
             'tempat_lahir'            => 'required|string|max:255',
             'tanggal_lahir'           => 'required|date',
-            'penghasilan'             => 'required|string|max:255',
+            'penghasilan'             => 'nullable|string|max:255',
             'luas_tanah'              => 'required|string|max:255',
             'telah_ditempati_selama'  => 'required|string|max:255',
             'status_tanah'            => 'required|string|max:255',

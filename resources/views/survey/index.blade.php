@@ -524,7 +524,7 @@
                                 value="{{ old('tanggal_lahir', $vervalData->tanggal_lahir) }}">
                         </div>
                         <div class="form-group">
-                            <label>Penghasilan Per Bulan</label>
+                            <label>Penghasilan Per Bulan <span style="font-size:11.5px; color:#64748b; font-weight:normal;">(Opsional)</span></label>
                             <input type="text" name="penghasilan" class="form-control"
                                 value="{{ old('penghasilan', $vervalData->penghasilan) }}" placeholder="Contoh: Rp 1.500.000">
                         </div>
@@ -1414,8 +1414,7 @@
             const tglLahir = document.querySelector('input[name="tanggal_lahir"]');
             if (!tglLahir || !tglLahir.value.trim()) registerMissing('1. Data Tambahan & Kelaikan Hunian', 'Tanggal Lahir', tglLahir);
 
-            const penghasilan = document.querySelector('input[name="penghasilan"]');
-            if (!penghasilan || !penghasilan.value.trim()) registerMissing('1. Data Tambahan & Kelaikan Hunian', 'Penghasilan Per Bulan', penghasilan);
+            // Penghasilan per bulan bersifat opsional (dapat dikosongi)
 
             const luasTanah = document.querySelector('input[name="luas_tanah"]');
             if (!luasTanah || !luasTanah.value.trim()) registerMissing('1. Data Tambahan & Kelaikan Hunian', 'Luas Tanah', luasTanah);
