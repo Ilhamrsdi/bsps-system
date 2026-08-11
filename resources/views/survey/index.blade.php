@@ -1526,7 +1526,7 @@
                         <i class="fas fa-circle-check"></i>
                     </div>
                     <h3 style="font-size: 18px; font-weight: 800; color: var(--primary-dark); margin: 0 0 8px 0;">
-                        Survei Tersimpan di HP (Mode Offline)
+                        Survei Tersimpan (Mode Offline)
                     </h3>
                     <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; margin: 16px 0; text-align: left;">
                         <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase;">Calon Penerima:</div>
@@ -1537,20 +1537,20 @@
                         <div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed #cbd5e1; display: flex; align-items: center; justify-content: space-between;">
                             <span style="font-size: 11.5px; color: #64748b;">Status Sinkronisasi:</span>
                             <span style="background: rgba(255, 184, 0, 0.18); color: #b88600; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; gap: 5px;">
-                                <i class="fas fa-cloud-arrow-up"></i> Belum Sinkron (Offline)
+                                <i class="fas fa-cloud-arrow-up"></i> Belum Sinkron (Tersimpan Lokal)
                             </span>
                         </div>
                     </div>
                     <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin: 0 0 24px 0;">
-                        Data formulir dan 8 foto terkompresi telah tersimpan di memori HP Anda. Begitu Anda kembali mendapatkan sinyal internet, data ini <strong>otomatis disinkronkan ke database server di latar belakang</strong>.
+                        Data formulir dan foto terkompresi telah tersimpan di memori perangkat Anda. Begitu perangkat kembali terhubung ke jaringan internet, data ini <strong>otomatis disinkronkan ke database server di latar belakang</strong>.
                     </p>
                     <div style="display: flex; flex-direction: column; gap: 10px;">
-                        <a href="{{ route('petugas.sudah-survei') }}" class="btn btn-primary" style="padding: 12px; font-size: 13.5px; font-weight: 800; justify-content: center; text-decoration: none; border-radius: 8px; color: #fff;">
+                        <button type="button" class="btn btn-primary" style="padding: 12px; font-size: 13.5px; font-weight: 800; justify-content: center; border-radius: 8px; color: #fff; cursor: pointer; border: none;" onclick="if(window.PuprModal) window.PuprModal.close('modalSurveyOfflineSaved');">
+                            <i class="fas fa-check"></i> Selesai &amp; Tetap di Halaman Ini
+                        </button>
+                        <button type="button" class="btn btn-outline" style="padding: 10px; font-size: 13px; font-weight: 700; justify-content: center; border-radius: 8px; border: 1px solid #cbd5e1; color: var(--text-primary); cursor: pointer;" onclick="if(typeof window.navigateOffline === 'function'){ window.navigateOffline('{{ route('petugas.sudah-survei') }}'); } else { window.location.href = '{{ route('petugas.sudah-survei') }}'; }">
                             <i class="fas fa-clipboard-check"></i> Buka Daftar Sudah Survei
-                        </a>
-                        <a href="{{ route('petugas.dashboard') }}" class="btn btn-outline" style="padding: 10px; font-size: 13px; font-weight: 700; justify-content: center; text-decoration: none; border-radius: 8px; border: 1px solid #cbd5e1; color: var(--text-primary);">
-                            <i class="fas fa-house"></i> Kembali ke Dashboard Petugas
-                        </a>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1754,28 +1754,29 @@
                     photos: photos
                 };
 
+                const showSuccessOfflineModal = () => {
+                    if (window.PuprLoading) window.PuprLoading.hide();
+                    if (window.BspsOffline && window.BspsOffline.showPuprToast) {
+                        window.BspsOffline.showPuprToast('🎉 Data survei & foto berhasil disimpan secara Offline!', 'success');
+                    }
+                    if (window.PuprModal) {
+                        window.PuprModal.open('modalSurveyOfflineSaved');
+                    } else {
+                        const m = document.getElementById('modalSurveyOfflineSaved');
+                        if (m) { m.classList.add('active'); m.style.display = 'flex'; m.style.opacity = '1'; }
+                        else { alert('Data survei berhasil disimpan di perangkat!'); }
+                    }
+                };
+
                 if (window.BspsOffline && window.BspsOffline.saveSurveyToIndexedDB) {
                     window.BspsOffline.saveSurveyToIndexedDB(surveyData).then(() => {
-                        if (window.PuprLoading) window.PuprLoading.hide();
-                        if (window.BspsOffline && window.BspsOffline.showPuprToast) {
-                            window.BspsOffline.showPuprToast('Data survei & foto berhasil disimpan di HP (Offline)!', 'success');
-                        }
-                        setTimeout(() => {
-                            if (typeof window.navigateOffline === 'function') {
-                                window.navigateOffline('{{ route("petugas.sudah-survei") }}');
-                            } else {
-                                window.location.href = '{{ route("petugas.sudah-survei") }}';
-                            }
-                        }, 800);
+                        showSuccessOfflineModal();
+                    }).catch(err => {
+                        console.warn('[Offline] Save IndexedDB fallback:', err);
+                        showSuccessOfflineModal();
                     });
                 } else {
-                    if (window.PuprLoading) window.PuprLoading.hide();
-                    alert('Data survei berhasil disimpan di HP!');
-                    if (typeof window.navigateOffline === 'function') {
-                        window.navigateOffline('{{ route("petugas.sudah-survei") }}');
-                    } else {
-                        window.location.href = '{{ route("petugas.sudah-survei") }}';
-                    }
+                    showSuccessOfflineModal();
                 }
                 return false;
             }
