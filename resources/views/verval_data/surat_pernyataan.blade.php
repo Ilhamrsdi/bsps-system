@@ -246,7 +246,7 @@
             <span>Cetak Surat Pernyataan BSPS (Total: {{ count($items) }} Dokumen)</span>
         </div>
         <div class="btn-group">
-            <a href="{{ url()->previous() !== url()->current() ? url()->previous() : route('data-verval') }}" onclick="handleKembali(event)" class="btn-back">
+            <a href="{{ route('data-verval') }}" onclick="return handleKembali(event);" class="btn-back">
                 <i class="fas fa-arrow-left"></i> Kembali
             </a>
             <button onclick="window.print()" class="btn-print">
@@ -257,14 +257,31 @@
 
     <script>
         function handleKembali(e) {
-            e.preventDefault();
-            if (document.referrer && document.referrer !== window.location.href) {
-                window.history.back();
-            } else if (window.opener || window.history.length <= 1) {
+            if (e) e.preventDefault();
+
+            // 1. Jika dibeli/dibuka di tab baru (window.opener atau history.length <= 1)
+            if (window.opener || window.history.length <= 1) {
                 window.close();
-            } else {
-                window.location.href = "{{ url()->previous() !== url()->current() ? url()->previous() : route('data-verval') }}";
+                // Jika browser memblokir window.close(), lakukan redirect
+                setTimeout(function() {
+                    if (document.referrer && document.referrer !== window.location.href) {
+                        window.location.href = document.referrer;
+                    } else {
+                        window.location.href = "{{ route('data-verval') }}";
+                    }
+                }, 150);
+                return false;
             }
+
+            // 2. Jika navigasi di tab yang sama (history > 1)
+            if (window.history.length > 1) {
+                window.history.back();
+                return false;
+            }
+
+            // 3. Fallback
+            window.location.href = document.referrer || "{{ route('data-verval') }}";
+            return false;
         }
     </script>
 
