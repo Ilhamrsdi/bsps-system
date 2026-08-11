@@ -86,6 +86,18 @@ class VervalDataController extends Controller
     }
 
     /**
+     * Cetak Lampiran Foto untuk 1 Penerima
+     */
+    public function lampiranFoto($id)
+    {
+        $item = DataPenerima::findOrFail($id);
+        $items = $this->attachKadesInfo(collect([$item]));
+        $items = $this->enrichFromDataguse($items);
+
+        return view('verval_data.lampiran_foto', compact('items'));
+    }
+
+    /**
      * Cetak Surat Pernyataan secara Kolektif (Batch Print per Filter/Desa/Kecamatan)
      */
     public function suratPernyataanKolektif(Request $request)
@@ -138,10 +150,73 @@ class VervalDataController extends Controller
             $query->whereNull('foto_sudut_depan');
         }
 
-        $items = $this->attachKadesInfo($query->get());
+        $paginator = $query->paginate(50)->withQueryString();
+        $items = collect($paginator->items());
+        $items = $this->attachKadesInfo($items);
         $items = $this->enrichFromDataguse($items);
 
-        return view('verval_data.surat_pernyataan', compact('items'));
+        return view('verval_data.surat_pernyataan', compact('items', 'paginator'));
+    }
+
+    /**
+     * Cetak Lampiran Foto secara Kolektif (Batch Print per Filter/Desa/Kecamatan)
+     */
+    public function lampiranFotoKolektif(Request $request)
+    {
+        $user = Auth::user();
+        $search = $request->get('search');
+        $kecamatan = $request->get('kecamatan', 'all');
+        $desa = $request->get('desa', 'all');
+        $desil = $request->get('desil', 'all');
+        $statusFilter = $request->get('status', 'all');
+
+        $query = DataPenerima::query();
+
+        if ($user && $user->isAdminKecamatan()) {
+            $query->where('kecamatan', $user->kecamatan);
+        } elseif ($user && $user->isPetugas()) {
+            $petugasId   = $user->id;
+            $petugasDesa = $user->desa;
+            $query->where(function ($q) use ($petugasId, $petugasDesa) {
+                $q->where('user_id', $petugasId);
+                if ($petugasDesa) {
+                    $q->orWhere('desa_kelurahan', $petugasDesa);
+                }
+            });
+        } elseif ($desa && $desa !== 'all') {
+            $query->where('desa_kelurahan', $desa);
+        }
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                  ->orWhere('no_ktp', 'like', "%{$search}%")
+                  ->orWhere('no_kk', 'like', "%{$search}%")
+                  ->orWhere('alamat', 'like', "%{$search}%")
+                  ->orWhere('desa_kelurahan', 'like', "%{$search}%");
+            });
+        }
+
+        if ($kecamatan && $kecamatan !== 'all') {
+            $query->where('kecamatan', $kecamatan);
+        }
+
+        if ($desil && $desil !== 'all') {
+            $query->where('pengelompokan_desil', 'like', "%{$desil}%");
+        }
+
+        if ($statusFilter === 'sudah') {
+            $query->whereNotNull('foto_sudut_depan');
+        } elseif ($statusFilter === 'belum') {
+            $query->whereNull('foto_sudut_depan');
+        }
+
+        $paginator = $query->paginate(50)->withQueryString();
+        $items = collect($paginator->items());
+        $items = $this->attachKadesInfo($items);
+        $items = $this->enrichFromDataguse($items);
+
+        return view('verval_data.lampiran_foto', compact('items', 'paginator'));
     }
 
     /**

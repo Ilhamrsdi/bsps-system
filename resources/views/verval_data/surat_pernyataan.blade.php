@@ -451,165 +451,22 @@
             </div>
         </div>
 
-        <!-- HALAMAN 2: LAMPIRAN FOTO -->
-        <div class="page-container">
-            <div class="surat-header" style="margin-bottom: 20px;">
-                <h3 style="text-decoration: none;">LAMPIRAN FOTO SURAT PERNYATAAN MENEMPATI RUMAH TIDAK LAYAK HUNI DAN TANAH</h3>
-            </div>
 
-            <table class="identitas-table" style="margin-left: 0;">
-                <tr>
-                    <td class="col-label" style="width: 240px;">Nama</td>
-                    <td class="col-colon">:</td>
-                    <td><strong>{{ strtoupper($item->nama) }}</strong></td>
-                </tr>
-                <tr>
-                    <td class="col-label">Nomor Induk Kependudukan (NIK)</td>
-                    <td class="col-colon">:</td>
-                    <td>{{ $item->no_ktp ?: '..................................................' }}</td>
-                </tr>
-                <tr>
-                    <td class="col-label">tempat, tanggal lahir</td>
-                    <td class="col-colon">:</td>
-                    <td>{{ $ttl }}</td>
-                </tr>
-           
-          
-                <tr>
-                    <td class="col-label">alamat</td>
-                    <td class="col-colon">:</td>
-                    <td>{{ $item->alamat ?: '..................................................' }}</td>
-                </tr>
-            </table>
-
-            <div style="text-align: center; font-weight: bold; margin-top: 18px; margin-bottom: 12px; font-size: 11pt; line-height: 1.3;">
-                FOTO KOMPONEN YANG TIDAK MEMENUHI ATAU TIDAK TERPENUHI SALAH SATU PERSYARATAN RUMAH LAYAK HUNI
-            </div>
-
-            <!-- TABEL FOTO KOMPONEN (3 KOLOM) -->
-            <table class="lampiran-table">
-                <tr>
-                    <!-- Kolom 1 -->
-                    <td style="width: 33.33%; text-align: center;">
-                        <div style="min-height: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                            @if($item->foto_bagian_dalam)
-                                <img src="{{ asset($item->foto_bagian_dalam) }}" style="max-width: 100%; max-height: 100px; object-fit: contain; margin-bottom: 4px;">
-                            @endif
-                            <div class="photo-placeholder-text">
-                                (Foto komponen rumah)<br>
-                                (Keselamatan bangunan)
-                            </div>
-                        </div>
-                        <div style="text-align: left; font-size: 9pt; line-height: 1.25; margin-top: 8px;">
-                            Keselamatan bangunan:<br>
-                            <table style="width: 100%; border: none; margin-top: 2px; font-size: 9pt; line-height: 1.25;">
-                                <tr style="border: none;">
-                                    <td style="width: 15px; border: none; padding: 0; vertical-align: top;">a.</td>
-                                    <td style="border: none; padding: 0;">struktur bangunan;</td>
-                                </tr>
-                                <tr style="border: none;">
-                                    <td style="border: none; padding: 0; vertical-align: top;">b.</td>
-                                    <td style="border: none; padding: 0;">bahan penutup atap;<br>dan/atau</td>
-                                </tr>
-                                <tr style="border: none;">
-                                    <td style="border: none; padding: 0; vertical-align: top;">c.</td>
-                                    <td style="border: none; padding: 0;">dinding bangunan.</td>
-                                </tr>
-                            </table>
-                        </div>
-                    </td>
-
-                    <!-- Kolom 2 -->
-                    <td style="width: 33.33%; text-align: center; vertical-align: middle;">
-                        <div style="min-height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                            @if($item->foto_sudut_kanan)
-                                <img src="{{ asset($item->foto_sudut_kanan) }}" style="max-width: 100%; max-height: 120px; object-fit: contain; margin-bottom: 4px;">
-                            @endif
-                            <div class="photo-placeholder-text">
-                                (Foto komponen rumah)<br>
-                                (Keselamatan bangunan)
-                            </div>
-                        </div>
-                    </td>
-
-                    <!-- Kolom 3 -->
-                    <td style="width: 33.33%; text-align: center;">
-                        <div style="min-height: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                            @if($item->foto_sudut_kiri)
-                                <img src="{{ asset($item->foto_sudut_kiri) }}" style="max-width: 100%; max-height: 100px; object-fit: contain; margin-bottom: 4px;">
-                            @endif
-                            <div class="photo-placeholder-text">
-                                (Foto komponen rumah)<br>
-                                (Kesehatan penghuni)
-                            </div>
-                        </div>
-                        <div style="text-align: left; font-size: 9pt; line-height: 1.25; margin-top: 8px;">
-                            Kesehatan penghuni:<br>
-                            <table style="width: 100%; border: none; margin-top: 2px; font-size: 9pt; line-height: 1.25;">
-                                <tr style="border: none;">
-                                    <td style="width: 15px; border: none; padding: 0; vertical-align: top;">a.</td>
-                                    <td style="border: none; padding: 0;">sarana pencahayaan;</td>
-                                </tr>
-                                <tr style="border: none;">
-                                    <td style="border: none; padding: 0; vertical-align: top;">b.</td>
-                                    <td style="border: none; padding: 0;">penghawaan; dan/atau</td>
-                                </tr>
-                                <tr style="border: none;">
-                                    <td style="border: none; padding: 0; vertical-align: top;">c.</td>
-                                    <td style="border: none; padding: 0;">ketersediaan sarana utilitas bangunan (sarana MCK)</td>
-                                </tr>
-                            </table>
-                        </div>
-                    </td>
-                </tr>
-            </table>
-
-            <!-- TABEL TAMPAK RUMAH (2x2 GRID) -->
-            <table class="lampiran-table" style="margin-top: 15px;">
-                <tr>
-                    <td style="width: 50%; text-align: center; vertical-align: middle; height: 115px;">
-                        @if($item->foto_sudut_depan)
-                            <img src="{{ asset($item->foto_sudut_depan) }}" style="max-width: 100%; max-height: 95px; object-fit: contain; margin-bottom: 4px;"><br>
-                        @endif
-                        <span style="font-style: italic;">Tampak depan rumah</span>
-                    </td>
-                    <td style="width: 50%; text-align: center; vertical-align: middle; height: 115px;">
-                        @if($item->foto_sudut_belakang)
-                            <img src="{{ asset($item->foto_sudut_belakang) }}" style="max-width: 100%; max-height: 95px; object-fit: contain; margin-bottom: 4px;"><br>
-                        @endif
-                        <span style="font-style: italic;">Tampak belakang rumah</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="width: 50%; text-align: center; vertical-align: middle; height: 115px;">
-                        @if($item->foto_sudut_kiri || $item->foto_sudut_kanan)
-                            <img src="{{ asset($item->foto_sudut_kiri ?: $item->foto_sudut_kanan) }}" style="max-width: 100%; max-height: 95px; object-fit: contain; margin-bottom: 4px;"><br>
-                        @endif
-                        <span style="font-style: italic;">Tampak Samping Rumah</span>
-                    </td>
-                    <td style="width: 50%; text-align: center; vertical-align: middle; height: 115px;">
-                        @if($item->foto_bagian_dalam)
-                            <img src="{{ asset($item->foto_bagian_dalam) }}" style="max-width: 100%; max-height: 95px; object-fit: contain; margin-bottom: 4px;"><br>
-                        @endif
-                        <span style="font-style: italic;">Sisi lain dari foto di atas/MCK</span>
-                    </td>
-                </tr>
-            </table>
-
-            <!-- TANDA TANGAN PENGUSUL -->
-            <div class="signature-section" style="margin-top: 25px;">
-                <div style="float: right; width: 250px; text-align: center;">
-                    <div class="sig-title">{{ $kotaCetak }}, {{ $tglCetak }}</div>
-                    <div class="sig-title">Yang mengusulkan,</div>
-                    <div class="sig-space" style="height: 45px;"></div>
-                    <div class="sig-note">tanda tangan</div>
-                    <div class="sig-space" style="height: 15px;"></div>
-                    <div class="sig-name">{{ strtoupper($item->nama) }}</div>
-                </div>
-                <div style="clear: both;"></div>
-            </div>
-        </div>
     @endforeach
+
+    @if(isset($paginator) && $paginator->hasPages())
+        <div class="no-print-pagination" style="text-align: center; padding: 20px; background: #fff; margin-top: 20px; border-top: 1px solid #eee;">
+            <style>
+                @media print { .no-print-pagination { display: none !important; } }
+                .pagination { display: inline-flex; list-style: none; padding: 0; margin: 0; gap: 5px; }
+                .pagination li { display: inline; }
+                .pagination li a, .pagination li span { padding: 8px 12px; border: 1px solid #ddd; background: #fff; color: #333; text-decoration: none; border-radius: 4px; }
+                .pagination li.active span { background: #002855; color: #fff; border-color: #002855; }
+                .pagination li.disabled span { color: #aaa; background: #f9f9f9; }
+            </style>
+            {{ $paginator->links('pagination::bootstrap-4') }}
+        </div>
+    @endif
 
 </body>
 </html>
