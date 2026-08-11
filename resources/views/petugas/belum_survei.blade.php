@@ -217,7 +217,7 @@
                     </thead>
                     <tbody>
                         @forelse($penerimas as $index => $item)
-                            <tr style="border-bottom:1px solid rgba(0,40,85,0.06);font-size:13px;">
+                            <tr data-id="{{ $item->id }}" style="border-bottom:1px solid rgba(0,40,85,0.06);font-size:13px;">
                                 <td style="padding:14px 18px;font-weight:700;color:var(--text-muted);">
                                     {{ $penerimas->firstItem() + $index }}
                                 </td>
@@ -629,7 +629,42 @@
                 }
             });
         }
+
+        // Cek data yang sudah disurvei di HP
+        updateBelumSurveiOfflineState();
     });
+
+    /**
+     * Tandai baris yang sudah disurvei di HP dalam mode offline
+     */
+    async function updateBelumSurveiOfflineState() {
+        if (!window.BspsOffline) return;
+        const pendingList = await window.BspsOffline.getAllPendingSurveys();
+        if (!pendingList || pendingList.length === 0) return;
+
+        pendingList.forEach((item) => {
+            const row = document.querySelector(`.table-petugas-wrapper tbody tr[data-id="${item.id}"]`);
+            if (row) {
+                const statusCell = row.querySelector('td:nth-last-child(2)');
+                const actionCell = row.querySelector('td:last-child');
+
+                if (statusCell) {
+                    statusCell.innerHTML = `
+                        <span style="background:rgba(255,184,0,0.18);color:#b88600;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800;display:inline-flex;align-items:center;gap:5px;">
+                            <i class="fas fa-mobile-screen"></i> Disurvei di HP
+                        </span>
+                    `;
+                }
+                if (actionCell) {
+                    actionCell.innerHTML = `
+                        <a href="/petugas/sudah-survei" class="btn btn-outline" style="padding:6px 12px;font-size:11.5px;font-weight:700;border-radius:6px;text-decoration:none;border:1px solid #ffb800;color:#b88600;display:inline-flex;align-items:center;gap:4px;">
+                            <i class="fas fa-clipboard-check"></i> Lihat di Sudah Survei
+                        </a>
+                    `;
+                }
+            }
+        });
+    }
 
     function startSurveyWithGps(targetUrl) {
         pendingSurveyUrl = targetUrl;
