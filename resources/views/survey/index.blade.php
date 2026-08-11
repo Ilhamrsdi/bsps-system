@@ -462,19 +462,6 @@
 
     <main class="dashboard-content dashboard-content-public">
         <div class="survey-container">
-            <!-- Status Koneksi Online / Offline Banner -->
-            <div id="offlineSyncBanner" style="background:linear-gradient(135deg, #1e293b 0%, #0f172a 100%);color:#fff;border-radius:12px;padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:14px;box-shadow:0 4px 16px rgba(0,0,0,0.12);border-left:5px solid #22c55e;transition:all 0.3s ease;">
-                <div style="display:flex;align-items:center;gap:12px;">
-                    <div id="networkStatusIcon" style="width:36px;height:36px;border-radius:50%;background:rgba(34,197,94,0.16);color:#22c55e;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">
-                        <i class="fas fa-wifi"></i>
-                    </div>
-                    <div>
-                        <div id="networkStatusTitle" style="font-weight:800;font-size:13.5px;color:#fff;">Mode Terhubung (Online)</div>
-                        <div id="networkStatusSub" style="font-size:12px;color:rgba(255,255,255,0.75);">Koneksi lancar. Data survei dikirim langsung ke server.</div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Recipient Quick Header Bar -->
             <div class="recipient-selector-bar">
                 <div>
@@ -1793,6 +1780,11 @@
                 return false;
             }
 
+            // JIKA ONLINE: Tampilkan indikator loading pengiriman data
+            if (window.PuprLoading) {
+                window.PuprLoading.show('Mengirim Hasil Survei & Mengunggah Foto...');
+            }
+
             return true;
         }
 
@@ -1919,7 +1911,7 @@
             if (input) input.click();
         }
 
-        // Pratinjau Foto Lokal Instan (Tanpa AJAX, Tanpa Auto-Save yang Mengunci Server)
+        // Pratinjau Foto Lokal Instan dengan Auto-Compression Canvas API (Laptop & HP)
         function previewPhoto(input, field) {
             if (!input.files || !input.files[0]) return;
             const file = input.files[0];
@@ -1929,21 +1921,81 @@
             const card = placeholder ? placeholder.closest('.camera-upload-card') : null;
             const urlInput = document.getElementById('url_' + field);
 
-            // Baca via FileReader lokal di HP (0.001 detik)
+            // Jika file PDF / Non-Gambar: tampilkan info tanpa kompresi canvas
+            if (!file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    if (urlInput) urlInput.value = e.target.result;
+                    if (placeholder) placeholder.style.display = 'none';
+                    if (uploadedBox) uploadedBox.style.display = 'flex';
+                    if (card) {
+                        card.classList.add('has-image');
+                        card.classList.remove('is-invalid-highlight');
+                        const badge = card.querySelector('.camera-upload-badge');
+                        if (badge) {
+                            const sizeKb = Math.round(file.size / 1024);
+                            badge.innerHTML = `<i class="fas fa-check-circle"></i> Berkas Terpilih (${sizeKb} KB)`;
+                        }
+                    }
+                };
+                reader.readAsDataURL(file);
+                return;
+            }
+
+            // Kompresi Otomatis Foto di Sisi Klien (Canvas API -> Maks 1280px / 150-300 KB)
+            const origSize = file.size;
             const reader = new FileReader();
             reader.onload = function(e) {
-                if (urlInput) urlInput.value = e.target.result;
-                if (placeholder) placeholder.style.display = 'none';
-                if (uploadedBox) uploadedBox.style.display = 'flex';
-                if (card) {
-                    card.classList.add('has-image');
-                    card.classList.remove('is-invalid-highlight');
-                    const badge = card.querySelector('.camera-upload-badge');
-                    if (badge) {
-                        const sizeKb = Math.round(file.size / 1024);
-                        badge.innerHTML = `<i class="fas fa-check-circle"></i> Foto Terpilih (${sizeKb} KB)`;
+                const img = new Image();
+                img.onload = function() {
+                    const maxDim = 1280;
+                    let w = img.width;
+                    let h = img.height;
+                    if (w > maxDim || h > maxDim) {
+                        if (w >= h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+                        else        { w = Math.round((w * maxDim) / h); h = maxDim; }
                     }
-                }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+
+                    canvas.toBlob(function(blob) {
+                        if (!blob) return;
+
+                        // Ganti File pada input dengan Blob JPEG terkompresi
+                        try {
+                            const compressedFile = new File(
+                                [blob],
+                                file.name.replace(/\.[^/.]+$/, '') + '.jpg',
+                                { type: 'image/jpeg', lastModified: Date.now() }
+                            );
+                            const dt = new DataTransfer();
+                            dt.items.add(compressedFile);
+                            input.files = dt.files;
+                        } catch(err) {
+                            console.warn('[AutoCompress] DataTransfer fallback:', err);
+                        }
+
+                        const blobUrl = URL.createObjectURL(blob);
+                        if (urlInput) urlInput.value = blobUrl;
+                        if (placeholder) placeholder.style.display = 'none';
+                        if (uploadedBox) uploadedBox.style.display = 'flex';
+                        if (card) {
+                            card.classList.add('has-image');
+                            card.classList.remove('is-invalid-highlight');
+                            const badge = card.querySelector('.camera-upload-badge');
+                            if (badge) {
+                                const origKb = Math.round(origSize / 1024);
+                                const compKb = Math.round(blob.size / 1024);
+                                badge.innerHTML = `<i class="fas fa-check-circle"></i> Foto Terpilih (${origKb}KB → ${compKb}KB)`;
+                            }
+                        }
+                    }, 'image/jpeg', 0.72);
+                };
+                img.src = e.target.result;
             };
             reader.readAsDataURL(file);
         }
