@@ -221,7 +221,7 @@
                     </thead>
                     <tbody>
                         @forelse($penerimas as $index => $item)
-                            <tr style="border-bottom:1px solid rgba(0,40,85,0.06);font-size:13px;">
+                            <tr data-id="{{ $item->id }}" style="border-bottom:1px solid rgba(0,40,85,0.06);font-size:13px;">
                                 <td style="padding:14px 18px;font-weight:700;color:var(--text-muted);">
                                     {{ $penerimas->firstItem() + $index }}
                                 </td>
@@ -427,7 +427,85 @@
                 }
             });
         }
+
+        // Muat data survei tertunda dari IndexedDB lokal HP
+        loadOfflinePendingSurveys();
     });
+
+    /**
+     * Muat dan tampilkan baris survei yang tersimpan di HP ke tabel Sudah Survei
+     */
+    async function loadOfflinePendingSurveys() {
+        if (!window.BspsOffline) return;
+        const pendingList = await window.BspsOffline.getAllPendingSurveys();
+        if (!pendingList || pendingList.length === 0) return;
+
+        const tbody = document.querySelector('.table-petugas-wrapper tbody');
+        if (!tbody) return;
+
+        const emptyRow = tbody.querySelector('td[colspan]');
+        if (emptyRow) emptyRow.closest('tr').remove();
+
+        pendingList.forEach((item) => {
+            const existingRow = tbody.querySelector(`tr[data-id="${item.id}"]`);
+            if (existingRow) {
+                const statusCell = existingRow.querySelector('.badge-status-sudah');
+                if (statusCell) {
+                    statusCell.outerHTML = `
+                        <span class="badge-status-pending-sync" id="syncStatus_${item.id}" style="background:rgba(255,184,0,0.18);color:#b88600;padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:800;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 6px rgba(255,184,0,0.2);">
+                            <i class="fas fa-cloud-arrow-up fa-bounce" style="font-size:12px;"></i> Belum Sinkron (Offline)
+                        </span>
+                    `;
+                }
+            } else {
+                const tr = document.createElement('tr');
+                tr.setAttribute('data-id', item.id);
+                tr.style.cssText = 'border-bottom:1px solid rgba(0,40,85,0.06);font-size:13px;background:rgba(255,184,0,0.04);transition:all 0.15s ease;';
+
+                const samplePhoto = item.photos?.foto_sudut_depan || item.photos?.ktp || '';
+                const photoHtml = samplePhoto
+                    ? `<img src="${samplePhoto}" class="thumb-survey-mini" style="border:2px solid #ffb800;" alt="Foto Offline">`
+                    : `<div style="width:44px;height:44px;border-radius:6px;background:#eee;display:flex;align-items:center;justify-content:center;margin:0 auto;color:#999;font-size:16px;"><i class="fas fa-image"></i></div>`;
+
+                tr.innerHTML = `
+                    <td style="padding:14px 18px;font-weight:700;color:#b88600;">
+                        <i class="fas fa-clock" style="font-size:11px;"></i> Baru
+                    </td>
+                    <td style="padding:14px 18px;text-align:center;">
+                        ${photoHtml}
+                    </td>
+                    <td style="padding:14px 18px;">
+                        <div style="font-weight:800;color:var(--primary-dark);">${item.nama || '-'}</div>
+                        <div style="font-size:11px;color:#b88600;font-weight:700;margin-top:2px;">
+                            <i class="fas fa-mobile-screen"></i> Tersimpan di Memori HP
+                        </div>
+                    </td>
+                    <td style="padding:14px 18px;text-align:center;">
+                        <span class="badge-gender l">-</span>
+                    </td>
+                    <td style="padding:14px 18px;">
+                        <div style="font-family:monospace;font-weight:700;color:var(--text-primary);">NIK: ${item.nik || '-'}</div>
+                    </td>
+                    <td style="padding:14px 18px;color:var(--text-secondary);">
+                        ${item.desa || '-'}
+                    </td>
+                    <td style="padding:14px 18px;text-align:center;">
+                        <span class="badge-status-pending-sync" id="syncStatus_${item.id}" style="background:rgba(255,184,0,0.18);color:#b88600;padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:800;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 6px rgba(255,184,0,0.2);">
+                            <i class="fas fa-cloud-arrow-up fa-bounce" style="font-size:12px;"></i> Belum Sinkron (Offline)
+                        </span>
+                    </td>
+                    <td style="padding:14px 18px;text-align:center;">
+                        <div style="display:flex;gap:6px;justify-content:center;">
+                            <button type="button" class="btn-act edit" title="Edit Hasil Survei" onclick="startSurveyWithGps('/survey/${item.id}')">
+                                <i class="fas fa-pen-to-square"></i> Edit
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.prepend(tr);
+            }
+        });
+    }
 
     function startSurveyWithGps(targetUrl) {
         pendingSurveyUrl = targetUrl;

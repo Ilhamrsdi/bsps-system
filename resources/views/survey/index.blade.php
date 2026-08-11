@@ -462,7 +462,7 @@
 
     <main class="dashboard-content dashboard-content-public">
         <div class="survey-container">
-            <!-- Offline Blankspot Sync Bar & Status Banner -->
+            <!-- Status Koneksi Online / Offline Banner -->
             <div id="offlineSyncBanner" style="background:linear-gradient(135deg, #1e293b 0%, #0f172a 100%);color:#fff;border-radius:12px;padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:14px;box-shadow:0 4px 16px rgba(0,0,0,0.12);border-left:5px solid #22c55e;transition:all 0.3s ease;">
                 <div style="display:flex;align-items:center;gap:12px;">
                     <div id="networkStatusIcon" style="width:36px;height:36px;border-radius:50%;background:rgba(34,197,94,0.16);color:#22c55e;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">
@@ -470,16 +470,8 @@
                     </div>
                     <div>
                         <div id="networkStatusTitle" style="font-weight:800;font-size:13.5px;color:#fff;">Mode Terhubung (Online)</div>
-                        <div id="networkStatusSub" style="font-size:12px;color:rgba(255,255,255,0.75);">Koneksi lancar. Data survei &amp; foto dikirim langsung ke server.</div>
+                        <div id="networkStatusSub" style="font-size:12px;color:rgba(255,255,255,0.75);">Koneksi lancar. Data survei dikirim langsung ke server.</div>
                     </div>
-                </div>
-                <div id="offlineQueueBox" style="display:none;align-items:center;gap:10px;">
-                    <span id="offlineCountBadge" style="background:#eab308;color:#000;font-weight:900;font-size:12px;padding:4px 10px;border-radius:20px;">
-                        0 Draf Offline
-                    </span>
-                    <button type="button" id="btnSyncOffline" onclick="window.BspsOfflineManager.syncNow()" style="background:#22c55e;color:#fff;border:none;padding:7px 14px;border-radius:6px;font-weight:800;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(34,197,94,0.3);">
-                        <i class="fas fa-rotate"></i> Sinkronkan Sekarang
-                    </button>
                 </div>
             </div>
 
@@ -1379,6 +1371,44 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal Sukses Simpan Offline (PUPR Style) -->
+        <div class="modal-overlay" id="modalSurveyOfflineSaved">
+            <div class="modal-box" style="max-width: 480px; text-align: center;">
+                <div class="modal-body" style="padding: 32px 24px;">
+                    <div style="width: 70px; height: 70px; border-radius: 50%; background: rgba(39, 174, 96, 0.12); color: #16a34a; display: inline-flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 16px auto;">
+                        <i class="fas fa-circle-check"></i>
+                    </div>
+                    <h3 style="font-size: 18px; font-weight: 800; color: var(--primary-dark); margin: 0 0 8px 0;">
+                        Survei Tersimpan di HP (Mode Offline)
+                    </h3>
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; margin: 16px 0; text-align: left;">
+                        <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase;">Calon Penerima:</div>
+                        <div style="font-size: 15px; font-weight: 800; color: var(--primary-dark); margin-top: 2px;">{{ $vervalData->nama }}</div>
+                        <div style="display: flex; gap: 12px; margin-top: 6px; font-size: 12px; color: #475569;">
+                            <span><i class="fas fa-id-card" style="color:var(--primary);"></i> NIK: <strong>{{ $vervalData->no_ktp }}</strong></span>
+                        </div>
+                        <div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed #cbd5e1; display: flex; align-items: center; justify-content: space-between;">
+                            <span style="font-size: 11.5px; color: #64748b;">Status Sinkronisasi:</span>
+                            <span style="background: rgba(255, 184, 0, 0.18); color: #b88600; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; gap: 5px;">
+                                <i class="fas fa-cloud-arrow-up"></i> Belum Sinkron (Offline)
+                            </span>
+                        </div>
+                    </div>
+                    <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin: 0 0 24px 0;">
+                        Data formulir dan 8 foto terkompresi telah tersimpan di memori HP Anda. Begitu Anda kembali mendapatkan sinyal internet, data ini <strong>otomatis disinkronkan ke database server di latar belakang</strong>.
+                    </p>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <a href="{{ route('petugas.sudah-survei') }}" class="btn btn-primary" style="padding: 12px; font-size: 13.5px; font-weight: 800; justify-content: center; text-decoration: none; border-radius: 8px; color: #fff;">
+                            <i class="fas fa-clipboard-check"></i> Buka Daftar Sudah Survei
+                        </a>
+                        <a href="{{ route('petugas.dashboard') }}" class="btn btn-outline" style="padding: 10px; font-size: 13px; font-weight: 700; justify-content: center; text-decoration: none; border-radius: 8px; border: 1px solid #cbd5e1; color: var(--text-primary);">
+                            <i class="fas fa-house"></i> Kembali ke Dashboard Petugas
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 @endsection
 
@@ -1541,6 +1571,55 @@
                 return false;
             }
 
+            // JIKA SEDANG OFFLINE (SIMPAN KE MEMORI HP / INDEXEDDB)
+            if (!navigator.onLine) {
+                if (e) e.preventDefault();
+                if (window.PuprLoading) {
+                    window.PuprLoading.show('Menyimpan Data Survei ke Memori HP...');
+                }
+
+                const form = document.getElementById('surveyForm');
+                const formData = new FormData(form);
+                const fields = {};
+                for (const [k, v] of formData.entries()) {
+                    if (!k.startsWith('foto_') && k !== 'ktp' && k !== 'kk' && k !== 'sertifikat_tanah') {
+                        fields[k] = v;
+                    }
+                }
+
+                const photos = {
+                    'ktp': document.getElementById('url_ktp')?.value || '',
+                    'kk': document.getElementById('url_kk')?.value || '',
+                    'sertifikat_tanah': document.getElementById('url_sertifikat_tanah')?.value || '',
+                    'foto_sudut_depan': document.getElementById('url_foto_sudut_depan')?.value || '',
+                    'foto_sudut_belakang': document.getElementById('url_foto_sudut_belakang')?.value || '',
+                    'foto_bagian_dalam': document.getElementById('url_foto_bagian_dalam')?.value || '',
+                    'foto_sudut_kiri': document.getElementById('url_foto_sudut_kiri')?.value || '',
+                    'foto_sudut_kanan': document.getElementById('url_foto_sudut_kanan')?.value || '',
+                };
+
+                const surveyData = {
+                    id: {{ $vervalData->id }},
+                    nama: '{{ addslashes($vervalData->nama) }}',
+                    nik: '{{ addslashes($vervalData->no_ktp) }}',
+                    desa: '{{ addslashes($vervalData->desa_kelurahan) }}',
+                    fields: fields,
+                    photos: photos
+                };
+
+                if (window.BspsOffline && window.BspsOffline.saveSurveyToIndexedDB) {
+                    window.BspsOffline.saveSurveyToIndexedDB(surveyData).then(() => {
+                        if (window.PuprLoading) window.PuprLoading.hide();
+                        if (window.PuprModal) {
+                            window.PuprModal.open('modalSurveyOfflineSaved');
+                        } else {
+                            window.location.href = '{{ route("petugas.sudah-survei") }}';
+                        }
+                    });
+                }
+                return false;
+            }
+
             return true;
         }
 
@@ -1676,25 +1755,47 @@
 
             if (loadingEl) loadingEl.classList.add('active');
 
-            // Jika Perangkat Offline (Mode Blankspot)
+            // Jika Perangkat Offline (Mode Blankspot) - Kompresi Otomatis ke Base64
             if (!navigator.onLine) {
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    if (loadingEl) loadingEl.classList.remove('active');
-                    const urlInput = document.getElementById('url_' + field);
-                    const placeholder = document.getElementById('placeholder_' + field);
-                    const uploadedBox = document.getElementById('uploaded_' + field);
-                    const card = placeholder ? placeholder.closest('.camera-upload-card') : null;
+                if (window.BspsOffline && window.BspsOffline.compressPhoto) {
+                    window.BspsOffline.compressPhoto(file).then(comp => {
+                        if (loadingEl) loadingEl.classList.remove('active');
+                        const urlInput = document.getElementById('url_' + field);
+                        const placeholder = document.getElementById('placeholder_' + field);
+                        const uploadedBox = document.getElementById('uploaded_' + field);
+                        const card = placeholder ? placeholder.closest('.camera-upload-card') : null;
 
-                    if (urlInput) urlInput.value = evt.target.result;
-                    if (placeholder) placeholder.style.display = 'none';
-                    if (uploadedBox) uploadedBox.style.display = 'flex';
-                    if (card) {
-                        card.classList.add('has-image');
-                        card.classList.remove('is-invalid-highlight');
-                    }
-                };
-                reader.readAsDataURL(file);
+                        if (urlInput && comp) urlInput.value = comp.base64;
+                        if (placeholder) placeholder.style.display = 'none';
+                        if (uploadedBox) uploadedBox.style.display = 'flex';
+                        if (card) {
+                            card.classList.add('has-image');
+                            card.classList.remove('is-invalid-highlight');
+                            const badge = card.querySelector('.camera-upload-badge');
+                            if (badge && comp) {
+                                badge.innerHTML = `<i class="fas fa-file-image"></i> Foto Tersimpan (${Math.round(comp.compSize/1024)} KB)`;
+                            }
+                        }
+                    });
+                } else {
+                    const reader = new FileReader();
+                    reader.onload = function(evt) {
+                        if (loadingEl) loadingEl.classList.remove('active');
+                        const urlInput = document.getElementById('url_' + field);
+                        const placeholder = document.getElementById('placeholder_' + field);
+                        const uploadedBox = document.getElementById('uploaded_' + field);
+                        const card = placeholder ? placeholder.closest('.camera-upload-card') : null;
+
+                        if (urlInput) urlInput.value = evt.target.result;
+                        if (placeholder) placeholder.style.display = 'none';
+                        if (uploadedBox) uploadedBox.style.display = 'flex';
+                        if (card) {
+                            card.classList.add('has-image');
+                            card.classList.remove('is-invalid-highlight');
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
                 return;
             }
 
@@ -2115,46 +2216,32 @@
             });
         }
 
-        function updateUIStatus() {
+        function updateNetworkStatusUI() {
+            const isOnline = navigator.onLine;
             const banner = document.getElementById('offlineSyncBanner');
             const icon = document.getElementById('networkStatusIcon');
             const title = document.getElementById('networkStatusTitle');
             const sub = document.getElementById('networkStatusSub');
-            const queueBox = document.getElementById('offlineQueueBox');
-            const countBadge = document.getElementById('offlineCountBadge');
 
-            const isOnline = navigator.onLine;
-
-            getOfflineSurveys().then(items => {
-                const count = items.length;
-
-                if (!isOnline) {
-                    if (banner) banner.style.borderLeftColor = '#eab308';
-                    if (icon) {
-                        icon.style.background = 'rgba(234, 179, 8, 0.16)';
-                        icon.style.color = '#eab308';
-                        icon.innerHTML = '<i class="fas fa-triangle-exclamation"></i>';
-                    }
-                    if (title) title.textContent = 'Mode Blankspot (Offline)';
-                    if (sub) sub.textContent = 'Sinyal terputus. Hasil survei & foto akan otomatis tersimpan di memori HP Anda.';
-                } else {
-                    if (banner) banner.style.borderLeftColor = '#22c55e';
-                    if (icon) {
-                        icon.style.background = 'rgba(34, 197, 94, 0.16)';
-                        icon.style.color = '#22c55e';
-                        icon.innerHTML = '<i class="fas fa-wifi"></i>';
-                    }
-                    if (title) title.textContent = 'Mode Terhubung (Online)';
-                    if (sub) sub.textContent = count > 0 ? 'Terdapat draf offline tersimpan. Klik tombol untuk mengunggah ke server.' : 'Koneksi lancar. Data survei dikirim langsung ke server.';
+            if (!isOnline) {
+                if (banner) banner.style.borderLeftColor = '#eab308';
+                if (icon) {
+                    icon.style.background = 'rgba(234, 179, 8, 0.16)';
+                    icon.style.color = '#eab308';
+                    icon.innerHTML = '<i class="fas fa-triangle-exclamation"></i>';
                 }
-
-                if (count > 0) {
-                    if (queueBox) queueBox.style.display = 'flex';
-                    if (countBadge) countBadge.textContent = count + ' Draf Offline';
-                } else {
-                    if (queueBox) queueBox.style.display = 'none';
+                if (title) title.textContent = 'Mode Tanpa Sinyal (Offline)';
+                if (sub) sub.textContent = 'Koneksi terputus. Data survei & foto otomatis tersimpan di HP.';
+            } else {
+                if (banner) banner.style.borderLeftColor = '#22c55e';
+                if (icon) {
+                    icon.style.background = 'rgba(34, 197, 94, 0.16)';
+                    icon.style.color = '#22c55e';
+                    icon.innerHTML = '<i class="fas fa-wifi"></i>';
                 }
-            });
+                if (title) title.textContent = 'Mode Terhubung (Online)';
+                if (sub) sub.textContent = 'Koneksi lancar. Data survei dikirim langsung ke server.';
+            }
         }
 
         function syncNow() {
@@ -2243,24 +2330,22 @@
         }
 
         window.addEventListener('online', function() {
-            updateUIStatus();
-            syncNow();
+            updateNetworkStatusUI();
         });
 
         window.addEventListener('offline', function() {
-            updateUIStatus();
+            updateNetworkStatusUI();
         });
 
         document.addEventListener('DOMContentLoaded', function() {
-            updateUIStatus();
+            updateNetworkStatusUI();
         });
 
         return {
             saveOfflineSurvey,
             getOfflineSurveys,
             deleteOfflineSurvey,
-            updateUIStatus,
-            syncNow
+            updateNetworkStatusUI
         };
     })();
     </script>

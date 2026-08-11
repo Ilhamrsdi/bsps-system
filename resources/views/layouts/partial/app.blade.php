@@ -17,6 +17,8 @@
     <!-- Favicon Logo PUPR -->
     <link rel="icon" href="{{ asset('logo.jpg') }}" type="image/jpeg" />
 
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <!-- PWA Manifest & Mobile Capability -->
     <link rel="manifest" href="{{ asset('manifest.json') }}" />
     <meta name="theme-color" content="#002855" />
@@ -95,7 +97,7 @@
                 <button type="button" class="btn btn-outline btn-modal-cancel" style="flex: 1; justify-content: center;" onclick="window.PuprModal.close('modalLogoutConfirmation')">
                     <i class="fas fa-xmark"></i> Batal
                 </button>
-                <form action="{{ url('/logout') }}" method="POST" style="flex: 1; margin: 0;">
+                <form action="{{ url('/logout') }}" method="POST" style="flex: 1; margin: 0;" onsubmit="if(!navigator.onLine){ alert('Tidak dapat logout saat Mode Offline. Anda harus terhubung ke internet untuk mengakhiri sesi akun.'); return false; }">
                     @csrf
                     <button type="submit" class="btn btn-danger btn-modal-logout" style="width: 100%; justify-content: center;">
                         <i class="fas fa-sign-out-alt"></i> Ya, Keluar
@@ -108,6 +110,9 @@
     <!-- Page Specific Scripts -->
     @stack('scripts')
     @yield('scripts')
+
+    <!-- PWA Offline Survey Engine & IndexedDB Auto-Sync -->
+    <script src="{{ asset('assets/js/offline-survey.js') }}?v={{ time() }}"></script>
 
     <!-- PWA Service Worker Registration & Realtime Offline Detector -->
     <script>
