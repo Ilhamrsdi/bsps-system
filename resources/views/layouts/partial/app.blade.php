@@ -118,15 +118,139 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js').then(function(reg) {
+                navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' }).then(function(reg) {
                     console.log('[PWA] Service Worker aktif:', reg.scope);
+
+                    // Force update SW jika ada versi baru
+                    reg.update();
                 }).catch(function(err) {
                     console.warn('[PWA] Service Worker gagal didaftarkan:', err);
                 });
             });
         }
 
-        // Indikator Status Koneksi Online / Offline Mengambang
+        // ============================================================
+        // OFFLINE NAVIGATION INTERCEPTOR (Anti DNS_PROBE Desktop)
+        // ============================================================
+        // Saat offline, Chrome Desktop langsung gagal di DNS sebelum
+        // Service Worker bisa intercept. Solusi: intercept klik link
+        // secara client-side, gunakan fetch() API (yang TETAP melewati
+        // Service Worker), lalu render halaman dari cache.
+        // ============================================================
+        document.addEventListener('click', function(e) {
+            // Hanya aktif saat offline
+            if (navigator.onLine) return;
+
+            // Cari elemen <a> terdekat yang diklik
+            var link = e.target.closest('a[href]');
+            if (!link) return;
+
+            var href = link.getAttribute('href');
+            if (!href) return;
+
+            // Abaikan link javascript:, #anchor, mailto:, tel:, blob:, data:
+            if (href.startsWith('javascript:') || href.startsWith('#') ||
+                href.startsWith('mailto:') || href.startsWith('tel:') ||
+                href.startsWith('blob:') || href.startsWith('data:')) {
+                return;
+            }
+
+            // Abaikan link yang membuka tab baru (target=_blank)
+            if (link.target === '_blank') {
+                e.preventDefault();
+                alert('Tidak dapat membuka tab baru saat Mode Offline.');
+                return;
+            }
+
+            // Abaikan link ke domain eksternal
+            try {
+                var linkUrl = new URL(href, window.location.origin);
+                if (linkUrl.origin !== window.location.origin) {
+                    e.preventDefault();
+                    alert('Link ke situs eksternal tidak tersedia saat Mode Offline.');
+                    return;
+                }
+                href = linkUrl.href; // normalize ke URL penuh
+            } catch(err) {
+                return; // biarkan browser handle jika URL tidak valid
+            }
+
+            // Intercept navigasi!
+            e.preventDefault();
+            console.log('[Offline Nav] Intercepting navigation to:', href);
+
+            // Tampilkan loading indicator
+            if (window.PuprLoading) {
+                window.PuprLoading.show('Memuat halaman dari cache offline...');
+            }
+
+            // Gunakan fetch() API — ini TETAP melewati Service Worker
+            // meskipun adapter jaringan (Wi-Fi) mati total
+            fetch(href, {
+                headers: { 'Accept': 'text/html' },
+                cache: 'only-if-cached',
+                mode: 'same-origin'
+            })
+            .then(function(response) {
+                if (!response || !response.ok) {
+                    // Coba lagi tanpa cache restriction
+                    return fetch(href, { headers: { 'Accept': 'text/html' } });
+                }
+                return response;
+            })
+            .then(function(response) {
+                if (!response || !response.ok) {
+                    throw new Error('Halaman tidak ditemukan di cache offline.');
+                }
+                return response.text();
+            })
+            .then(function(html) {
+                // Berhasil! Ganti konten halaman dengan HTML dari cache
+                document.open();
+                document.write(html);
+                document.close();
+
+                // Update URL bar tanpa reload
+                try {
+                    window.history.pushState({ offlinePage: true }, '', href);
+                } catch(e) {
+                    // Abaikan error pushState
+                }
+
+                console.log('[Offline Nav] Halaman berhasil dimuat dari cache:', href);
+            })
+            .catch(function(err) {
+                console.warn('[Offline Nav] Gagal memuat halaman:', err);
+                if (window.PuprLoading) window.PuprLoading.hide();
+                alert('Halaman "' + href + '" tidak tersedia secara offline.\n\nPastikan Anda sudah pernah membuka halaman ini saat online agar ter-cache oleh Service Worker.');
+            });
+        }, true); // capture phase agar dijalankan lebih dulu
+
+        // Handle tombol Back browser saat offline
+        window.addEventListener('popstate', function(e) {
+            if (!navigator.onLine && e.state && e.state.offlinePage) {
+                // Coba muat halaman sebelumnya dari cache
+                fetch(window.location.href, {
+                    headers: { 'Accept': 'text/html' },
+                    cache: 'only-if-cached',
+                    mode: 'same-origin'
+                })
+                .then(function(r) { return r.ok ? r : fetch(window.location.href); })
+                .then(function(r) { return r.text(); })
+                .then(function(html) {
+                    document.open();
+                    document.write(html);
+                    document.close();
+                })
+                .catch(function() {
+                    // Biarkan browser handle
+                });
+            }
+        });
+
+        // ============================================================
+        // INDIKATOR STATUS KONEKSI ONLINE / OFFLINE MENGAMBANG
+        // ============================================================
         function updateOnlineStatusUI() {
             let badge = document.getElementById('offlineStatusBadge');
             if (!navigator.onLine) {
@@ -134,7 +258,7 @@
                     badge = document.createElement('div');
                     badge.id = 'offlineStatusBadge';
                     badge.style.cssText = 'position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:99999;background:#b91c1c;color:#ffffff;padding:6px 16px;border-radius:30px;font-size:12px;font-weight:800;display:flex;align-items:center;gap:8px;box-shadow:0 6px 18px rgba(0,0,0,0.25);letter-spacing:0.3px;';
-                    badge.innerHTML = '<i class="fas fa-wifi" style="font-size:11px;opacity:0.8;"></i> <span>Mode Offline (Akses Lokal HP)</span>';
+                    badge.innerHTML = '<i class="fas fa-wifi" style="font-size:11px;opacity:0.8;"></i> <span>Mode Offline (Akses Lokal)</span>';
                     document.body.appendChild(badge);
                 }
             } else {

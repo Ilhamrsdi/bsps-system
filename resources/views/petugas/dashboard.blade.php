@@ -1246,10 +1246,19 @@
                 if (window.PuprLoading) {
                     window.PuprLoading.hide();
                 }
+
+                // [Bypass Offline] Jika perangkat offline & bukan penolakan izin (PERMISSION_DENIED == 1)
+                if (error.code !== 1 && !navigator.onLine) {
+                    console.warn('[Offline] GPS gagal namun diizinkan lanjut karena mode offline aktif.');
+                    if (window.PuprModal) window.PuprModal.close('modalGpsRequired');
+                    window.location.href = targetUrl;
+                    return;
+                }
+
                 if (window.PuprModal) {
                     window.PuprModal.open('modalGpsRequired');
                 } else {
-                    alert("Silakan aktifkan lokasi jika mau melakukan survei!");
+                    alert("Silakan aktifkan lokasi (GPS) jika mau melakukan survei!");
                 }
             },
             { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 }
@@ -1279,6 +1288,15 @@
                 if (window.PuprLoading) {
                     window.PuprLoading.hide();
                 }
+
+                // [Bypass Offline] Jika perangkat offline & bukan penolakan izin (PERMISSION_DENIED == 1)
+                if (error.code !== 1 && !navigator.onLine) {
+                    console.warn('[Offline] GPS gagal namun diizinkan lanjut karena mode offline aktif.');
+                    if (window.PuprModal) window.PuprModal.close('modalGpsRequired');
+                    if (pendingSurveyUrl) window.location.href = pendingSurveyUrl;
+                    return;
+                }
+
                 if (window.PuprModal) {
                     window.PuprModal.open('modalGpsRequired');
                 }
