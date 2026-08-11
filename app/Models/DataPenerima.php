@@ -48,7 +48,10 @@ class DataPenerima extends Model
     public function scopeSudahSurvei($query)
     {
         foreach (self::$fieldWajibSurvei as $field) {
-            $query->whereNotNull($field)->where($field, '!=', '');
+            $query->whereNotNull($field);
+            if ($field !== 'tanggal_lahir') {
+                $query->where($field, '!=', '');
+            }
         }
         return $query;
     }
@@ -61,7 +64,10 @@ class DataPenerima extends Model
         $fields = self::$fieldWajibSurvei;
         return $query->where(function ($q) use ($fields) {
             foreach ($fields as $field) {
-                $q->orWhereNull($field)->orWhere($field, '=', '');
+                $q->orWhereNull($field);
+                if ($field !== 'tanggal_lahir') {
+                    $q->orWhere($field, '=', '');
+                }
             }
         });
     }

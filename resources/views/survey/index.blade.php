@@ -1717,57 +1717,57 @@
                 return false;
             }
 
-            // JIKA SEDANG OFFLINE (SIMPAN KE MEMORI HP / INDEXEDDB)
-            if (!navigator.onLine) {
-                if (e) e.preventDefault();
+            // CEK KONEKSI & SIMPAN (ONLINE / OFFLINE)
+            if (e) e.preventDefault();
+
+            const form = document.getElementById('surveyForm');
+            const formData = new FormData(form);
+            const fields = {};
+            for (const [k, v] of formData.entries()) {
+                if (!k.startsWith('foto_') && k !== 'ktp' && k !== 'kk' && k !== 'sertifikat_tanah' && k !== 'surat_pernyataan') {
+                    fields[k] = v;
+                }
+            }
+
+            const photos = {
+                'ktp': document.getElementById('url_ktp')?.value || '',
+                'kk': document.getElementById('url_kk')?.value || '',
+                'surat_pernyataan': document.getElementById('url_surat_pernyataan')?.value || '',
+                'sertifikat_tanah': document.getElementById('url_sertifikat_tanah')?.value || '',
+                'foto_sudut_depan': document.getElementById('url_foto_sudut_depan')?.value || '',
+                'foto_sudut_belakang': document.getElementById('url_foto_sudut_belakang')?.value || '',
+                'foto_bagian_dalam': document.getElementById('url_foto_bagian_dalam')?.value || '',
+                'foto_sudut_kiri': document.getElementById('url_foto_sudut_kiri')?.value || '',
+                'foto_sudut_kanan': document.getElementById('url_foto_sudut_kanan')?.value || '',
+            };
+
+            const surveyData = {
+                id: {{ $vervalData->id }},
+                nama: '{{ addslashes($vervalData->nama) }}',
+                nik: '{{ addslashes($vervalData->no_ktp) }}',
+                desa: '{{ addslashes($vervalData->desa_kelurahan) }}',
+                fields: fields,
+                photos: photos
+            };
+
+            const showSuccessOfflineModal = () => {
+                if (window.PuprLoading) window.PuprLoading.hide();
+                if (window.BspsOffline && window.BspsOffline.showPuprToast) {
+                    window.BspsOffline.showPuprToast('🎉 Data survei & foto berhasil disimpan secara Offline!', 'success');
+                }
+                if (window.PuprModal) {
+                    window.PuprModal.open('modalSurveyOfflineSaved');
+                } else {
+                    const m = document.getElementById('modalSurveyOfflineSaved');
+                    if (m) { m.classList.add('active'); m.style.display = 'flex'; m.style.opacity = '1'; }
+                    else { alert('Data survei berhasil disimpan di perangkat!'); }
+                }
+            };
+
+            const doOfflineSave = () => {
                 if (window.PuprLoading) {
                     window.PuprLoading.show('Menyimpan Data Survei ke Memori HP...');
                 }
-
-                const form = document.getElementById('surveyForm');
-                const formData = new FormData(form);
-                const fields = {};
-                for (const [k, v] of formData.entries()) {
-                    if (!k.startsWith('foto_') && k !== 'ktp' && k !== 'kk' && k !== 'sertifikat_tanah' && k !== 'surat_pernyataan') {
-                        fields[k] = v;
-                    }
-                }
-
-                const photos = {
-                    'ktp': document.getElementById('url_ktp')?.value || '',
-                    'kk': document.getElementById('url_kk')?.value || '',
-                    'surat_pernyataan': document.getElementById('url_surat_pernyataan')?.value || '',
-                    'sertifikat_tanah': document.getElementById('url_sertifikat_tanah')?.value || '',
-                    'foto_sudut_depan': document.getElementById('url_foto_sudut_depan')?.value || '',
-                    'foto_sudut_belakang': document.getElementById('url_foto_sudut_belakang')?.value || '',
-                    'foto_bagian_dalam': document.getElementById('url_foto_bagian_dalam')?.value || '',
-                    'foto_sudut_kiri': document.getElementById('url_foto_sudut_kiri')?.value || '',
-                    'foto_sudut_kanan': document.getElementById('url_foto_sudut_kanan')?.value || '',
-                };
-
-                const surveyData = {
-                    id: {{ $vervalData->id }},
-                    nama: '{{ addslashes($vervalData->nama) }}',
-                    nik: '{{ addslashes($vervalData->no_ktp) }}',
-                    desa: '{{ addslashes($vervalData->desa_kelurahan) }}',
-                    fields: fields,
-                    photos: photos
-                };
-
-                const showSuccessOfflineModal = () => {
-                    if (window.PuprLoading) window.PuprLoading.hide();
-                    if (window.BspsOffline && window.BspsOffline.showPuprToast) {
-                        window.BspsOffline.showPuprToast('🎉 Data survei & foto berhasil disimpan secara Offline!', 'success');
-                    }
-                    if (window.PuprModal) {
-                        window.PuprModal.open('modalSurveyOfflineSaved');
-                    } else {
-                        const m = document.getElementById('modalSurveyOfflineSaved');
-                        if (m) { m.classList.add('active'); m.style.display = 'flex'; m.style.opacity = '1'; }
-                        else { alert('Data survei berhasil disimpan di perangkat!'); }
-                    }
-                };
-
                 if (window.BspsOffline && window.BspsOffline.saveSurveyToIndexedDB) {
                     window.BspsOffline.saveSurveyToIndexedDB(surveyData).then(() => {
                         showSuccessOfflineModal();
@@ -1778,15 +1778,35 @@
                 } else {
                     showSuccessOfflineModal();
                 }
+            };
+
+            if (window.PuprLoading) {
+                window.PuprLoading.show('Memeriksa Koneksi...');
+            }
+
+            // Jika OS / Browser sudah pasti mendeteksi offline
+            if (!navigator.onLine) {
+                doOfflineSave();
                 return false;
             }
 
-            // JIKA ONLINE: Tampilkan indikator loading pengiriman data
-            if (window.PuprLoading) {
-                window.PuprLoading.show('Mengirim Hasil Survei & Mengunggah Foto...');
-            }
+            // Untuk Desktop: Terkadang terhubung LAN tapi tidak ada Internet (navigator.onLine = true)
+            // Lakukan ping sederhana untuk mendeteksi ERR_INTERNET_DISCONNECTED
+            fetch(window.location.href, { method: 'HEAD', cache: 'no-cache' })
+                .then(() => {
+                    // Benar-benar online, submit form normal
+                    if (window.PuprLoading) {
+                        window.PuprLoading.show('Mengirim Hasil Survei & Mengunggah Foto...');
+                    }
+                    form.submit();
+                })
+                .catch(err => {
+                    // Deteksi Offline / Disconnected saat fetch gagal
+                    console.warn('[Network] Deteksi Offline, pindah ke mode lokal:', err);
+                    doOfflineSave();
+                });
 
-            return true;
+            return false;
         }
 
         // Fokus ke Elemen Pertama yang Masih Kosong
