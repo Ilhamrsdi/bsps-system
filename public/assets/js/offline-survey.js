@@ -93,7 +93,7 @@ async function saveSurveyToIndexedDB(surveyData) {
             const store = tx.objectStore(STORE_NAME);
             surveyData.saved_at = new Date().toISOString();
             surveyData.sync_status = 'pending';
-            
+
             store.put(surveyData);
 
             tx.oncomplete = function () {
@@ -197,13 +197,14 @@ async function syncPendingSurveys() {
     if (pendingList.length === 0) return;
 
     isSyncing = true;
+    
     let successCount = 0;
 
     for (const item of pendingList) {
         try {
             const formData = new FormData();
             formData.append('_token', document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '');
-            
+
             // Masukkan data field teks
             for (const [key, val] of Object.entries(item.fields || {})) {
                 if (val !== null && val !== undefined) {
