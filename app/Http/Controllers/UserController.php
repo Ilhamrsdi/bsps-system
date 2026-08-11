@@ -82,6 +82,7 @@ class UserController extends Controller
             'password' => 'required|string|min:6',
         ]);
 
+        $validated['plain_password'] = $validated['password'];
         $validated['password'] = Hash::make($validated['password']);
 
         User::create($validated);
@@ -109,6 +110,7 @@ class UserController extends Controller
         ]);
 
         if ($request->filled('password')) {
+            $validated['plain_password'] = $request->password;
             $validated['password'] = Hash::make($request->password);
         } else {
             unset($validated['password']);
@@ -135,22 +137,38 @@ class UserController extends Controller
      */
     public function exportAdminKecamatan()
     {
-        $filename = 'Akun_Admin_Kecamatan_BSPS.xls';
-        $path = public_path($filename);
+        $users = User::where('role', 'admin_kecamatan')->orderBy('kecamatan', 'asc')->get();
 
-        if (!file_exists($path)) {
-            $users = User::where('role', 'admin_kecamatan')->orderBy('kecamatan', 'asc')->get();
-            $html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><style>th { background-color: #002855; color: #ffffff; font-weight: bold; text-align: center; border: 1px solid #000000; padding: 8px; } td { border: 1px solid #cccccc; padding: 6px 10px; font-family: Arial; font-size: 11pt; } .center { text-align: center; } .bold { font-weight: bold; }</style></head><body><h2>DAFTAR AKUN ADMIN KECAMATAN BSPS KABUPATEN JEMBER</h2><table><thead><tr><th>No</th><th>Nama Akun</th><th>Email / Username Login</th><th>Password</th><th>Kecamatan</th><th>Jabatan</th><th>Status Akun</th></tr></thead><tbody>';
+        $headers = [
+            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="Daftar_Akun_Admin_Kecamatan_BSPS.csv"',
+            'Pragma'              => 'no-cache',
+            'Cache-Control'       => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires'             => '0',
+        ];
+
+        $callback = function () use ($users) {
+            $file = fopen('php://output', 'w');
+            // Write UTF-8 BOM for Microsoft Excel compatibility
+            fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+            fputcsv($file, ['No', 'Nama Akun', 'Email / Username Login', 'Password', 'Kecamatan', 'Jabatan', 'Status Akun']);
+
             $no = 1;
             foreach ($users as $u) {
-                $html .= '<tr><td class="center">' . $no++ . '</td><td class="bold">' . htmlspecialchars($u->name) . '</td><td>' . htmlspecialchars($u->email) . '</td><td class="center bold">password123</td><td class="center bold">' . htmlspecialchars($u->kecamatan) . '</td><td>' . htmlspecialchars($u->jabatan) . '</td><td class="center">' . htmlspecialchars(ucfirst($u->status)) . '</td></tr>';
+                fputcsv($file, [
+                    $no++,
+                    $u->name,
+                    $u->email,
+                    $u->plain_password ?: 'password123',
+                    $u->kecamatan,
+                    $u->jabatan,
+                    ucfirst($u->status ?: 'aktif'),
+                ]);
             }
-            $html .= '</tbody></table></body></html>';
-            file_put_contents($path, $html);
-        }
+            fclose($file);
+        };
 
-        return response()->download($path, 'Daftar_Akun_Admin_Kecamatan_BSPS.xls', [
-            'Content-Type' => 'application/vnd.ms-excel',
-        ]);
+        return response()->streamDownload($callback, 'Daftar_Akun_Admin_Kecamatan_BSPS.csv', $headers);
     }
 }

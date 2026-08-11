@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'plain_password',
         'nip',
         'jabatan',
         'kecamatan',
