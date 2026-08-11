@@ -854,6 +854,39 @@
 @push('scripts')
     <script>
         /**
+         * Client-Side Filter: Menyaring baris tabel langsung di browser saat Mode Offline
+         */
+        function filterTableClientSide() {
+            const searchVal = (document.querySelector('input[name="search"]')?.value || '').toLowerCase().trim();
+            const kecVal = (document.getElementById('hiddenKecamatan')?.value || 'all').toLowerCase().trim();
+            const desilVal = (document.getElementById('hiddenDesil')?.value || 'all').toLowerCase().trim();
+
+            const rows = document.querySelectorAll('.table-verval-wrapper tbody tr');
+            let visibleCount = 0;
+
+            rows.forEach(function(row) {
+                if (row.querySelector('td[colspan]')) return;
+
+                const rowText = row.innerText.toLowerCase();
+                const kecCell = row.children[6]?.innerText.toLowerCase() || '';
+                const desilCell = row.children[7]?.innerText.toLowerCase() || '';
+
+                const matchSearch = !searchVal || rowText.includes(searchVal);
+                const matchKec = kecVal === 'all' || kecCell.includes(kecVal);
+                const matchDesil = desilVal === 'all' || desilCell.includes(desilVal);
+
+                if (matchSearch && matchKec && matchDesil) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            showToast(`Mode Offline: Menampilkan ${visibleCount} data yang cocok`, 'success');
+        }
+
+        /**
          * Helper: Pilih item di custom pupr-dropdown dan submit form
          */
         function selectDropdown(hiddenInputId, wrapperId, value, label, formId) {
@@ -868,9 +901,20 @@
                 wrapper.classList.remove('active');
             }
 
+            // Jika sedang offline, saring tabel langsung di browser tanpa memanggil server
+            if (!navigator.onLine) {
+                filterTableClientSide();
+                return;
+            }
+
             if (formId) {
                 const form = document.getElementById(formId);
-                if (form) form.submit();
+                if (form) {
+                    if (window.PuprLoading) {
+                        window.PuprLoading.show('Menyaring Data Verval...');
+                    }
+                    form.submit();
+                }
             }
         }
 
@@ -907,7 +951,50 @@
         }
 
         document.addEventListener('DOMContentLoaded', function () {
-            // Auto-posisi dropdown menu (position:fixed) agar muncul tepat di bawah toggle button
+            // 1. Pencarian & Filter: Offline client-side filter vs Online server submit
+            const filterForm = document.getElementById('filterFormVerval');
+            if (filterForm) {
+                filterForm.addEventListener('submit', function(e) {
+                    if (!navigator.onLine) {
+                        e.preventDefault();
+                        filterTableClientSide();
+                        return;
+                    }
+                    if (window.PuprLoading) {
+                        window.PuprLoading.show('Mencari & Memuat Data Verval...');
+                    }
+                });
+            }
+
+            const searchInput = document.querySelector('input[name="search"]');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    if (!navigator.onLine) {
+                        filterTableClientSide();
+                    }
+                });
+            }
+
+            // 2. Loading overlay saat klik tombol halaman (Pagination)
+            document.querySelectorAll('.pg-link:not(.disabled):not(.active)').forEach(function(link) {
+                link.addEventListener('click', function() {
+                    if (window.PuprLoading) {
+                        window.PuprLoading.show('Memuat Halaman Data...');
+                    }
+                });
+            });
+
+            // 3. Loading overlay saat form lompat halaman
+            const jumpForm = document.querySelector('.jump-page-form');
+            if (jumpForm) {
+                jumpForm.addEventListener('submit', function() {
+                    if (window.PuprLoading) {
+                        window.PuprLoading.show('Membuka Halaman...');
+                    }
+                });
+            }
+
+            // 4. Auto-posisi dropdown menu (position:fixed) agar muncul tepat di bawah toggle button
             document.addEventListener('click', function (e) {
                 const toggle = e.target.closest('.td-status-cell .pupr-dropdown-toggle');
                 if (!toggle) return;

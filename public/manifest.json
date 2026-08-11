@@ -1,0 +1,25 @@
+{
+  "name": "BSPS Verval - Sistem Informasi Verifikasi & Validasi",
+  "short_name": "BSPS Verval",
+  "description": "Sistem Informasi Verifikasi & Validasi Bantuan Stimulan Perumahan Swadaya (BSPS)",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#002855",
+  "theme_color": "#002855",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}
