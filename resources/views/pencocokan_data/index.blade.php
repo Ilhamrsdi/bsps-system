@@ -181,21 +181,36 @@
                 <div class="stat-icon green"><i class="fas fa-check-double"></i></div>
                 <div class="stat-info">
                     <div class="stat-value" style="color:#15803d;">{{ number_format($stats['cocok'], 0, ',', '.') }}</div>
-                    <div class="stat-label">Cocok Sempurna (Match)</div>
+                    <div class="stat-label">
+                        Cocok Sempurna (Match)
+                        <span style="display:block;font-size:11px;font-weight:600;color:var(--text-muted);margin-top:2px;">
+                            @if($stats['is_all']) (Seluruh Data) @else (dari {{ $stats['page_count'] }} Data Hal. Ini) @endif
+                        </span>
+                    </div>
                 </div>
             </div>
             <div class="stat-card-pencocokan">
                 <div class="stat-icon orange"><i class="fas fa-triangle-exclamation"></i></div>
                 <div class="stat-info">
                     <div class="stat-value" style="color:#d97706;">{{ number_format($stats['beda'], 0, ',', '.') }}</div>
-                    <div class="stat-label">Perlu Di-sync (Beda Data)</div>
+                    <div class="stat-label">
+                        Perlu Di-sync (Beda Data)
+                        <span style="display:block;font-size:11px;font-weight:600;color:var(--text-muted);margin-top:2px;">
+                            @if($stats['is_all']) (Seluruh Data) @else (dari {{ $stats['page_count'] }} Data Hal. Ini) @endif
+                        </span>
+                    </div>
                 </div>
             </div>
             <div class="stat-card-pencocokan">
                 <div class="stat-icon red"><i class="fas fa-user-xmark"></i></div>
                 <div class="stat-info">
                     <div class="stat-value" style="color:#ef4444;">{{ number_format($stats['tidak_ditemukan'], 0, ',', '.') }}</div>
-                    <div class="stat-label">Tidak Ditemukan di Dataguse</div>
+                    <div class="stat-label">
+                        Tidak Ditemukan
+                        <span style="display:block;font-size:11px;font-weight:600;color:var(--text-muted);margin-top:2px;">
+                            @if($stats['is_all']) (Seluruh Data) @else (dari {{ $stats['page_count'] }} Data Hal. Ini) @endif
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -209,6 +224,15 @@
                            style="width:100%;padding:9px 12px 9px 36px;border-radius:8px;border:1px solid rgba(0,40,85,0.15);font-size:13px;outline:none;box-sizing:border-box;">
                 </div>
 
+                {{-- Per Page / Jumlah Tampilan Dropdown --}}
+                <select name="per_page" onchange="this.form.submit()" style="padding:9px 14px;border-radius:8px;border:1px solid rgba(0,40,85,0.15);font-size:13px;font-weight:600;outline:none;background:#fff;cursor:pointer;">
+                    <option value="15" {{ ($perPageParam ?? '15') == '15' ? 'selected' : '' }}>📄 15 Data / Hal</option>
+                    <option value="50" {{ ($perPageParam ?? '') == '50' ? 'selected' : '' }}>📄 50 Data / Hal</option>
+                    <option value="100" {{ ($perPageParam ?? '') == '100' ? 'selected' : '' }}>📄 100 Data / Hal</option>
+                    <option value="500" {{ ($perPageParam ?? '') == '500' ? 'selected' : '' }}>📄 500 Data / Hal</option>
+                    <option value="all" {{ ($perPageParam ?? '') == 'all' ? 'selected' : '' }}>🌐 Semua Data (Full Stat)</option>
+                </select>
+
                 {{-- Status Filter --}}
                 <select name="status" onchange="this.form.submit()" style="padding:9px 14px;border-radius:8px;border:1px solid rgba(0,40,85,0.15);font-size:13px;font-weight:600;outline:none;background:#fff;cursor:pointer;">
                     <option value="all" {{ $statusFilter === 'all' ? 'selected' : '' }}>Semua Status Match</option>
@@ -220,7 +244,7 @@
                 <button type="submit" class="btn btn-primary" style="padding:9px 16px;font-size:13px;font-weight:700;">
                     <i class="fas fa-filter"></i> Saring
                 </button>
-                @if(!empty($search) || $statusFilter !== 'all')
+                @if(!empty($search) || $statusFilter !== 'all' || ($perPageParam ?? '15') !== '15')
                     <a href="{{ url('/pencocokan-data') }}" class="btn btn-outline" style="padding:9px 14px;font-size:13px;">Reset</a>
                 @endif
             </form>

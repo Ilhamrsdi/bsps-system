@@ -35,8 +35,16 @@ class PencocokanDataController extends Controller
             });
         }
 
+        // Pengaturan jumlah data per halaman (15, 50, 100, 500, atau 'all')
+        $perPageParam = $request->get('per_page', '15');
+        if ($perPageParam === 'all') {
+            $perPage = 100000;
+        } else {
+            $perPage = max(1, (int) $perPageParam);
+        }
+
         // Ambil data lokal paginated
-        $penerimas = $query->orderBy('id', 'asc')->paginate(15)->withQueryString();
+        $penerimas = $query->orderBy('id', 'asc')->paginate($perPage)->withQueryString();
 
         // Kumpulkan semua NIK dari item halaman ini untuk di-lookup batch ke Dataguse
         $niks = $penerimas->pluck('no_ktp')->map(fn($v) => trim($v))->filter()->unique()->values()->toArray();
@@ -175,12 +183,15 @@ class PencocokanDataController extends Controller
 
         $stats = [
             'total'           => $penerimas->total(),
+            'page_count'      => $penerimas->count(),
             'cocok'           => $totalCocok,
             'beda'            => $totalBeda,
             'tidak_ditemukan' => $totalTidakDitemukan,
+            'is_all'          => ($perPageParam === 'all' || $penerimas->total() <= $penerimas->count()),
+            'per_page'        => $perPageParam,
         ];
 
-        return view('pencocokan_data.index', compact('penerimas', 'stats', 'search', 'statusFilter', 'dataguseConnected'));
+        return view('pencocokan_data.index', compact('penerimas', 'stats', 'search', 'statusFilter', 'perPageParam', 'dataguseConnected'));
     }
 
     /**
