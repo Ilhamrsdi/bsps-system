@@ -176,6 +176,41 @@
             <span>Tugas Belum Survei (Desa {{ $user->desa ?: '-' }})</span>
         </div>
 
+        {{-- Alert Success & Error Banners --}}
+        @if(session('success'))
+            <div class="alert alert-success" style="background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;border-radius:12px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:14px;box-shadow:0 4px 16px rgba(34,197,94,0.12);animation:fadeIn 0.4s ease;">
+                <div style="width:36px;height:36px;border-radius:50%;background:rgba(34,197,94,0.18);color:#22c55e;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">
+                    <i class="fas fa-circle-check"></i>
+                </div>
+                <div style="font-weight:700;font-size:14px;line-height:1.4;">{{ session('success') }}</div>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="alert alert-danger" style="background:#fef2f2;border:1px solid #fecaca;color:#991b1b;border-radius:12px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:14px;box-shadow:0 4px 16px rgba(239,68,68,0.12);animation:fadeIn 0.4s ease;">
+                <div style="width:36px;height:36px;border-radius:50%;background:rgba(239,68,68,0.18);color:#ef4444;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">
+                    <i class="fas fa-triangle-exclamation"></i>
+                </div>
+                <div style="font-weight:700;font-size:14px;line-height:1.4;">{{ session('error') }}</div>
+            </div>
+        @endif
+
+        @if($errors->any())
+            <div class="alert alert-danger" style="background:#fef2f2;border:1px solid #fecaca;color:#991b1b;border-radius:12px;padding:16px 20px;margin-bottom:20px;box-shadow:0 4px 16px rgba(239,68,68,0.12);animation:fadeIn 0.4s ease;">
+                <div style="display:flex;align-items:center;gap:14px;margin-bottom:6px;">
+                    <div style="width:36px;height:36px;border-radius:50%;background:rgba(239,68,68,0.18);color:#ef4444;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">
+                        <i class="fas fa-triangle-exclamation"></i>
+                    </div>
+                    <div style="font-weight:800;font-size:14px;">Gagal Menyimpan Usulan Baru:</div>
+                </div>
+                <ul style="margin:0 0 0 50px;padding:0;font-size:13px;font-weight:600;line-height:1.5;">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         {{-- Filter & Search --}}
         <form action="{{ route('petugas.belum-survei') }}" method="GET" class="filter-section" id="filterFormPetugasBelum">
             <div class="search-input-wrap">
