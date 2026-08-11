@@ -576,7 +576,7 @@
                                                 <div style="font-size:12.5px;color:var(--primary-dark);font-weight:800;">{{ $item->petugas->name }}</div>
                                                 <div style="font-size:11px;color:var(--text-muted);font-weight:500;">{{ $item->petugas->email }}</div>
                                                 <div style="font-size:10.5px;color:#27ae60;font-weight:700;font-family:monospace;margin-top:2px;">
-                                                    <i class="fas fa-key" style="font-size:9px;"></i> Pass: {{ $item->petugas->plain_password ?: 'password' }}
+                                                    <i class="fas fa-key" style="font-size:9px;"></i> Pass: {{ $item->petugas->plain_password ?: 'password123' }}
                                                 </div>
                                             </div>
                                         </div>

@@ -103,5 +103,17 @@
     @stack('scripts')
     @yield('scripts')
 
+    <!-- PWA Service Worker Global Registration for Offline Blankspot Support -->
+    <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/sw.js').then(function(reg) {
+                console.log('[PWA] ServiceWorker registered with scope:', reg.scope);
+            }).catch(function(err) {
+                console.warn('[PWA] ServiceWorker registration failed:', err);
+            });
+        });
+    }
+    </script>
 </body>
 </html>
