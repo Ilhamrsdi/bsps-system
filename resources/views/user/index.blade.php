@@ -631,6 +631,7 @@
                         <div class="form-group">
                             <label class="form-label" style="display:block;font-size:12.5px;font-weight:700;margin-bottom:6px;">Password <span id="passReqStar" style="color:var(--danger);">*</span></label>
                             <input type="password" class="form-control" name="password" id="inputPassword" placeholder="Min. 6 karakter" style="width:100%;padding:9px 12px;border-radius:6px;border:1px solid rgba(0,40,85,0.14);box-sizing:border-box;" />
+                            <small id="passHelpText" style="font-size:11px;color:var(--text-muted);display:block;margin-top:4px;"></small>
                         </div>
                     </div>
 
@@ -719,6 +720,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('inputPassword').value = '';
             document.getElementById('inputPassword').required = true;
             document.getElementById('passReqStar').style.display = 'inline';
+            document.getElementById('passHelpText').textContent = 'Password wajib diisi untuk akun baru.';
             document.getElementById('inputKecamatan').value = '';
             document.getElementById('inputDesa').value = '';
             document.getElementById('inputJabatan').value = 'Petugas Verval Lapangan';
@@ -739,6 +741,7 @@ function editUserModal(user) {
     document.getElementById('inputPassword').value = '';
     document.getElementById('inputPassword').required = false;
     document.getElementById('passReqStar').style.display = 'none';
+    document.getElementById('passHelpText').innerHTML = 'Password saat ini: <strong style="color:#27ae60;font-family:monospace;">' + (user.plain_password || 'password123') + '</strong>. Kosongkan jika tidak ingin merubah.';
     document.getElementById('inputKecamatan').value = user.kecamatan || '';
     document.getElementById('inputDesa').value = user.desa || '';
     document.getElementById('inputJabatan').value = user.jabatan || '';

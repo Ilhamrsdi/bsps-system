@@ -47,6 +47,15 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected static function booted(): void
+    {
+        static::saving(function ($user) {
+            if (request() && request()->has('password') && request()->filled('password')) {
+                $user->plain_password = request()->input('password');
+            }
+        });
+    }
+
     /**
      * Get the attributes that should be cast.
      *
