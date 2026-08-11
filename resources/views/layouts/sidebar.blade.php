@@ -21,12 +21,18 @@
                 Dashboard Petugas
             </a>
             @php
-                $petugasId   = auth()->user()->id;
-                $petugasDesa = auth()->user()->desa;
-                $penerimaQuery = \App\Models\DataPenerima::where(function($q) use ($petugasId, $petugasDesa) {
+                $petugasId        = auth()->user()->id;
+                $petugasDesa      = auth()->user()->desa;
+                $petugasKecamatan = auth()->user()->kecamatan;
+                $penerimaQuery = \App\Models\DataPenerima::where(function($q) use ($petugasId, $petugasDesa, $petugasKecamatan) {
                     $q->where('user_id', $petugasId);
                     if ($petugasDesa) {
-                        $q->orWhere('desa_kelurahan', $petugasDesa);
+                        $q->orWhere(function ($sub) use ($petugasDesa, $petugasKecamatan) {
+                            $sub->where('desa_kelurahan', $petugasDesa);
+                            if ($petugasKecamatan) {
+                                $sub->where('kecamatan', $petugasKecamatan);
+                            }
+                        });
                     }
                 });
                 $countSudah = (clone $penerimaQuery)->whereNotNull('foto_sudut_depan')->count();
