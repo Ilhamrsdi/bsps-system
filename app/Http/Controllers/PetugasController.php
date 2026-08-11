@@ -14,13 +14,19 @@ class PetugasController extends Controller
     private function getPetugasQuery()
     {
         $user = Auth::user();
-        $petugasId   = $user->id;
-        $petugasDesa = $user->desa;
+        $petugasId        = $user->id;
+        $petugasDesa      = $user->desa;
+        $petugasKecamatan = $user->kecamatan;
 
-        return DataPenerima::where(function ($q) use ($petugasId, $petugasDesa) {
+        return DataPenerima::where(function ($q) use ($petugasId, $petugasDesa, $petugasKecamatan) {
             $q->where('user_id', $petugasId);
             if ($petugasDesa) {
-                $q->orWhere('desa_kelurahan', $petugasDesa);
+                $q->orWhere(function ($sub) use ($petugasDesa, $petugasKecamatan) {
+                    $sub->where('desa_kelurahan', $petugasDesa);
+                    if ($petugasKecamatan) {
+                        $sub->where('kecamatan', $petugasKecamatan);
+                    }
+                });
             }
         });
     }
