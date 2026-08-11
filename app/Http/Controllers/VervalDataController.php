@@ -114,12 +114,18 @@ class VervalDataController extends Controller
         if ($user && $user->isAdminKecamatan()) {
             $query->where('kecamatan', $user->kecamatan);
         } elseif ($user && $user->isPetugas()) {
-            $petugasId   = $user->id;
-            $petugasDesa = $user->desa;
-            $query->where(function ($q) use ($petugasId, $petugasDesa) {
+            $petugasId        = $user->id;
+            $petugasDesa      = $user->desa;
+            $petugasKecamatan = $user->kecamatan;
+            $query->where(function ($q) use ($petugasId, $petugasDesa, $petugasKecamatan) {
                 $q->where('user_id', $petugasId);
                 if ($petugasDesa) {
-                    $q->orWhere('desa_kelurahan', $petugasDesa);
+                    $q->orWhere(function ($sub) use ($petugasDesa, $petugasKecamatan) {
+                        $sub->where('desa_kelurahan', $petugasDesa);
+                        if ($petugasKecamatan) {
+                            $sub->where('kecamatan', $petugasKecamatan);
+                        }
+                    });
                 }
             });
         } elseif ($desa && $desa !== 'all') {
@@ -175,12 +181,18 @@ class VervalDataController extends Controller
         if ($user && $user->isAdminKecamatan()) {
             $query->where('kecamatan', $user->kecamatan);
         } elseif ($user && $user->isPetugas()) {
-            $petugasId   = $user->id;
-            $petugasDesa = $user->desa;
-            $query->where(function ($q) use ($petugasId, $petugasDesa) {
+            $petugasId        = $user->id;
+            $petugasDesa      = $user->desa;
+            $petugasKecamatan = $user->kecamatan;
+            $query->where(function ($q) use ($petugasId, $petugasDesa, $petugasKecamatan) {
                 $q->where('user_id', $petugasId);
                 if ($petugasDesa) {
-                    $q->orWhere('desa_kelurahan', $petugasDesa);
+                    $q->orWhere(function ($sub) use ($petugasDesa, $petugasKecamatan) {
+                        $sub->where('desa_kelurahan', $petugasDesa);
+                        if ($petugasKecamatan) {
+                            $sub->where('kecamatan', $petugasKecamatan);
+                        }
+                    });
                 }
             });
         } elseif ($desa && $desa !== 'all') {
