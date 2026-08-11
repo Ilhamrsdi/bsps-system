@@ -472,6 +472,9 @@
                                         <div>
                                             <div style="font-weight:800;color:var(--primary-dark);">{{ $item->name }}</div>
                                             <div style="font-size:12px;color:var(--text-muted);font-family:monospace;margin-top:2px;">{{ $item->email }}</div>
+                                            <div style="font-size:11px;color:#27ae60;font-weight:700;font-family:monospace;margin-top:3px;background:rgba(39,174,96,0.1);padding:2px 8px;border-radius:4px;display:inline-flex;align-items:center;gap:4px;">
+                                                <i class="fas fa-key" style="font-size:10px;"></i> Pass: {{ $item->plain_password ?: 'password123' }}
+                                            </div>
                                         </div>
                                     </div>
                                 </td>

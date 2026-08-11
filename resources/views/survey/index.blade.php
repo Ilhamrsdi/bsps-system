@@ -225,8 +225,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
             width: 100%;
+            margin-top: 4px;
         }
 
         .btn-photo-action {
@@ -234,15 +235,17 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
-            padding: 8px 10px;
+            gap: 4px;
+            padding: 5px 8px;
             border-radius: 6px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
+            white-space: nowrap;
             border: 1px solid transparent;
             cursor: pointer;
             transition: all 0.2s;
             text-decoration: none;
+            line-height: 1.2;
         }
 
         .btn-photo-action.view {
@@ -614,10 +617,10 @@
                                     <div class="camera-upload-title">Berkas KTP</div>
                                     <span class="camera-upload-badge"><i class="fas fa-file-image"></i> Foto Tersimpan</span>
                                     <div class="camera-actions-box">
-                                        <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('ktp')">
-                                            <i class="fas fa-arrow-up-right-from-square"></i> Lihat Foto
+                                        <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('ktp')" title="Buka / Lihat Berkas KTP">
+                                            <i class="fas fa-eye"></i> Lihat
                                         </button>
-                                        <button type="button" class="btn-photo-action delete" onclick="deletePhotoAjax('ktp', {{ $vervalData->id }})">
+                                        <button type="button" class="btn-photo-action delete" onclick="deletePhotoAjax('ktp', {{ $vervalData->id }})" title="Hapus Berkas KTP">
                                             <i class="fas fa-trash-alt"></i> Hapus
                                         </button>
                                     </div>
@@ -656,10 +659,10 @@
                                     <div class="camera-upload-title">Berkas KK</div>
                                     <span class="camera-upload-badge"><i class="fas fa-file-image"></i> Foto Tersimpan</span>
                                     <div class="camera-actions-box">
-                                        <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('kk')">
-                                            <i class="fas fa-arrow-up-right-from-square"></i> Lihat Foto
+                                        <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('kk')" title="Buka / Lihat Berkas KK">
+                                            <i class="fas fa-eye"></i> Lihat
                                         </button>
-                                        <button type="button" class="btn-photo-action delete" onclick="deletePhotoAjax('kk', {{ $vervalData->id }})">
+                                        <button type="button" class="btn-photo-action delete" onclick="deletePhotoAjax('kk', {{ $vervalData->id }})" title="Hapus Berkas KK">
                                             <i class="fas fa-trash-alt"></i> Hapus
                                         </button>
                                     </div>
@@ -698,10 +701,10 @@
                                     <div class="camera-upload-title">Bukti Kepemilikan Lahan</div>
                                     <span class="camera-upload-badge"><i class="fas fa-file-image"></i> Foto Tersimpan</span>
                                     <div class="camera-actions-box">
-                                        <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('sertifikat_tanah')">
-                                            <i class="fas fa-arrow-up-right-from-square"></i> Lihat Foto
+                                        <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('sertifikat_tanah')" title="Buka / Lihat Bukti Lahan">
+                                            <i class="fas fa-eye"></i> Lihat
                                         </button>
-                                        <button type="button" class="btn-photo-action delete" onclick="deletePhotoAjax('sertifikat_tanah', {{ $vervalData->id }})">
+                                        <button type="button" class="btn-photo-action delete" onclick="deletePhotoAjax('sertifikat_tanah', {{ $vervalData->id }})" title="Hapus Bukti Lahan">
                                             <i class="fas fa-trash-alt"></i> Hapus
                                         </button>
                                     </div>
@@ -940,10 +943,10 @@
                                     <div class="camera-upload-title">Tampak Depan</div>
                                     <span class="camera-upload-badge"><i class="fas fa-file-image"></i> Foto Tersimpan</span>
                                     <div class="camera-actions-box">
-                                        <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('foto_sudut_depan')">
-                                            <i class="fas fa-arrow-up-right-from-square"></i> Lihat Foto
+                                        <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('foto_sudut_depan')" title="Buka / Lihat Foto Tampak Depan">
+                                            <i class="fas fa-eye"></i> Lihat
                                         </button>
-                                        <button type="button" class="btn-photo-action delete" onclick="deletePhotoAjax('foto_sudut_depan', {{ $vervalData->id }})">
+                                        <button type="button" class="btn-photo-action delete" onclick="deletePhotoAjax('foto_sudut_depan', {{ $vervalData->id }})" title="Hapus Foto Tampak Depan">
                                             <i class="fas fa-trash-alt"></i> Hapus
                                         </button>
                                     </div>
@@ -982,10 +985,10 @@
                                     <div class="camera-upload-title">Tampak Belakang</div>
                                     <span class="camera-upload-badge"><i class="fas fa-file-image"></i> Foto Tersimpan</span>
                                     <div class="camera-actions-box">
-                                        <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('foto_sudut_belakang')">
-                                            <i class="fas fa-arrow-up-right-from-square"></i> Lihat Foto
+                                        <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('foto_sudut_belakang')" title="Buka / Lihat Foto Tampak Belakang">
+                                            <i class="fas fa-eye"></i> Lihat
                                         </button>
-                                        <button type="button" class="btn-photo-action delete" onclick="deletePhotoAjax('foto_sudut_belakang', {{ $vervalData->id }})">
+                                        <button type="button" class="btn-photo-action delete" onclick="deletePhotoAjax('foto_sudut_belakang', {{ $vervalData->id }})" title="Hapus Foto Tampak Belakang">
                                             <i class="fas fa-trash-alt"></i> Hapus
                                         </button>
                                     </div>
@@ -1024,10 +1027,10 @@
                                     <div class="camera-upload-title">Bagian Dalam / Interior</div>
                                     <span class="camera-upload-badge"><i class="fas fa-file-image"></i> Foto Tersimpan</span>
                                     <div class="camera-actions-box">
-                                        <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('foto_bagian_dalam')">
-                                            <i class="fas fa-arrow-up-right-from-square"></i> Lihat Foto
+                                        <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('foto_bagian_dalam')" title="Buka / Lihat Foto Bagian Dalam">
+                                            <i class="fas fa-eye"></i> Lihat
                                         </button>
-                                        <button type="button" class="btn-photo-action delete" onclick="deletePhotoAjax('foto_bagian_dalam', {{ $vervalData->id }})">
+                                        <button type="button" class="btn-photo-action delete" onclick="deletePhotoAjax('foto_bagian_dalam', {{ $vervalData->id }})" title="Hapus Foto Bagian Dalam">
                                             <i class="fas fa-trash-alt"></i> Hapus
                                         </button>
                                     </div>
@@ -1066,10 +1069,10 @@
                                     <div class="camera-upload-title">Samping Kiri</div>
                                     <span class="camera-upload-badge"><i class="fas fa-file-image"></i> Foto Tersimpan</span>
                                     <div class="camera-actions-box">
-                                        <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('foto_sudut_kiri')">
-                                            <i class="fas fa-arrow-up-right-from-square"></i> Lihat Foto
+                                        <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('foto_sudut_kiri')" title="Buka / Lihat Foto Samping Kiri">
+                                            <i class="fas fa-eye"></i> Lihat
                                         </button>
-                                        <button type="button" class="btn-photo-action delete" onclick="deletePhotoAjax('foto_sudut_kiri', {{ $vervalData->id }})">
+                                        <button type="button" class="btn-photo-action delete" onclick="deletePhotoAjax('foto_sudut_kiri', {{ $vervalData->id }})" title="Hapus Foto Samping Kiri">
                                             <i class="fas fa-trash-alt"></i> Hapus
                                         </button>
                                     </div>
@@ -1108,10 +1111,10 @@
                                     <div class="camera-upload-title">Samping Kanan</div>
                                     <span class="camera-upload-badge"><i class="fas fa-file-image"></i> Foto Tersimpan</span>
                                     <div class="camera-actions-box">
-                                        <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('foto_sudut_kanan')">
-                                            <i class="fas fa-arrow-up-right-from-square"></i> Lihat Foto
+                                        <button type="button" class="btn-photo-action view" onclick="openPhotoNewTab('foto_sudut_kanan')" title="Buka / Lihat Foto Samping Kanan">
+                                            <i class="fas fa-eye"></i> Lihat
                                         </button>
-                                        <button type="button" class="btn-photo-action delete" onclick="deletePhotoAjax('foto_sudut_kanan', {{ $vervalData->id }})">
+                                        <button type="button" class="btn-photo-action delete" onclick="deletePhotoAjax('foto_sudut_kanan', {{ $vervalData->id }})" title="Hapus Foto Samping Kanan">
                                             <i class="fas fa-trash-alt"></i> Hapus
                                         </button>
                                     </div>

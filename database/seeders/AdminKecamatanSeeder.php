@@ -33,9 +33,10 @@ class AdminKecamatanSeeder extends Seeder
             User::updateOrCreate(
                 ['email' => $email],
                 [
-                    'name'      => $name,
-                    'password'  => Hash::make('password123'),
-                    'role'      => 'admin_kecamatan',
+                    'name'           => $name,
+                    'password'       => Hash::make('password123'),
+                    'plain_password' => 'password123',
+                    'role'           => 'admin_kecamatan',
                     'kecamatan' => strtoupper($k),
                     'jabatan'   => 'Admin Kecamatan ' . ucwords(strtolower($k)),
                     'status'    => 'aktif',

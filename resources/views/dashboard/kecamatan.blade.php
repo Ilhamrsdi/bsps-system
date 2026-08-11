@@ -300,7 +300,10 @@
 @endpush
 
 @section('content')
-<div class="dashboard-kecamatan-container">
+    <!-- Navbar Component -->
+    @include('layouts.navbar')
+
+    <main class="dashboard-content">
 
     <!-- Header & Filter Bar Kecamatan -->
     <div class="filter-bar-kecamatan">
@@ -315,16 +318,27 @@
         </div>
 
         @if(auth()->check() && auth()->user()->isAdmin())
-            <!-- Dropdown Filter Kecamatan Khusus Super Admin -->
-            <form action="{{ route('dashboard.kecamatan') }}" method="GET" style="display:flex;align-items:center;gap:10px;">
-                <label style="font-size:13px;font-weight:700;color:var(--text-muted);">Pilih Kecamatan:</label>
-                <select name="kecamatan" onchange="this.form.submit()" style="padding:8px 14px;border-radius:8px;border:1px solid rgba(0,40,85,0.18);font-size:13px;font-weight:700;color:var(--primary-dark);background:var(--bg-body);">
-                    @foreach($listKecamatan as $kec)
-                        <option value="{{ $kec }}" {{ $kecamatanSelected === $kec ? 'selected' : '' }}>
-                            Kec. {{ ucwords(strtolower($kec)) }}
-                        </option>
-                    @endforeach
-                </select>
+            <!-- Custom Dropdown Filter Kecamatan Khusus Super Admin -->
+            <form action="{{ route('dashboard.kecamatan') }}" method="GET" id="formFilterKecamatan" style="display:flex;align-items:center;gap:10px;">
+                <input type="hidden" name="kecamatan" id="hiddenKecamatanFilter" value="{{ $kecamatanSelected }}" />
+                <label style="font-size:13px;font-weight:700;color:var(--text-muted);white-space:nowrap;">Pilih Kecamatan:</label>
+                <div class="pupr-dropdown-wrapper" id="ddKecamatanMonitorWrapper" style="min-width:220px;">
+                    <button type="button" class="pupr-dropdown-toggle" onclick="window.PuprDropdown.toggle(document.getElementById('ddKecamatanMonitorWrapper'))">
+                        <i class="fas fa-building-flag" style="font-size:12px;opacity:0.6;"></i>
+                        <span class="selected-label">
+                            Kec. {{ ucwords(strtolower($kecamatanSelected)) }}
+                        </span>
+                        <i class="fas fa-chevron-down" style="font-size:10px;opacity:0.5;"></i>
+                    </button>
+                    <div class="pupr-dropdown-menu" style="min-width:220px;max-height:320px;overflow-y:auto;">
+                        @foreach($listKecamatan as $kec)
+                        <div class="pupr-dropdown-item {{ $kecamatanSelected === $kec ? 'active' : '' }}"
+                             onclick="selectDropdown('hiddenKecamatanFilter', 'ddKecamatanMonitorWrapper', '{{ $kec }}', 'Kec. {{ ucwords(strtolower($kec)) }}', 'formFilterKecamatan')">
+                            <i class="fas fa-map-pin" style="font-size:11px;opacity:0.4;"></i> Kec. {{ ucwords(strtolower($kec)) }}
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
             </form>
         @else
             <div style="font-size:12px;font-weight:700;padding:6px 14px;border-radius:20px;background:rgba(0,40,85,0.08);color:var(--primary-dark);">
@@ -436,6 +450,12 @@
                                 <div class="petugas-sub-text">
                                     <i class="fas fa-location-dot" style="color:var(--primary);margin-right:3px;"></i>
                                     {{ $ptg->desa ?: 'Semua Desa' }}
+                                </div>
+                                <div style="font-size:11.5px;color:var(--text-muted);font-family:monospace;margin-top:4px;">
+                                    <i class="fas fa-envelope" style="color:var(--primary);font-size:10px;margin-right:3px;"></i> {{ $ptg->email }}
+                                </div>
+                                <div style="font-size:11px;color:#27ae60;font-weight:700;font-family:monospace;margin-top:3px;background:rgba(39,174,96,0.1);padding:2px 8px;border-radius:6px;display:inline-block;">
+                                    <i class="fas fa-key" style="font-size:9px;margin-right:3px;"></i> Password: {{ $ptg->plain_password ?: 'password' }}
                                 </div>
                             </div>
                         </div>
@@ -555,7 +575,7 @@
         </div>
     </div>
 
-</div>
+    </main>
 @endsection
 
 @push('scripts')
