@@ -182,15 +182,23 @@
                 <i class="fas fa-search"></i>
                 <input type="text" name="search" value="{{ $search }}" placeholder="Cari nama calon penerima yang belum disurvei, NIK, atau alamat..." />
             </div>
+            <a href="{{ route('verval-data.surat-pernyataan-kolektif', array_merge(['desa' => $user->desa, 'status' => 'belum'], request()->all())) }}" target="_blank" class="btn" style="padding:10px 16px;font-size:13px;font-weight:700;background:#ffb800;color:#002855;text-decoration:none;border-radius:var(--radius-sm);display:inline-flex;align-items:center;gap:6px;" title="Cetak Surat Pernyataan Kolektif untuk warga yang belum disurvei di Desa {{ $user->desa ?: '-' }}">
+                <i class="fas fa-file-signature"></i> Cetak Kolektif (Belum Survei)
+            </a>
         </form>
 
         {{-- Tabel Data Belum Di-survei --}}
         <div class="table-container-card">
             <div class="table-header-bar">
                 <h3><i class="fas fa-clock"></i> Daftar Calon Penerima Belum Di-survei — Desa {{ $user->desa ?: '-' }}</h3>
-                <span style="font-size:12.5px;color:var(--text-muted);font-weight:600;">
-                    Menampilkan {{ $penerimas->firstItem() ?? 0 }} - {{ $penerimas->lastItem() ?? 0 }} dari {{ number_format($penerimas->total(), 0, ',', '.') }} calon penerima
-                </span>
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                    <a href="{{ route('verval-data.surat-pernyataan-kolektif', array_merge(['desa' => $user->desa, 'status' => 'belum'], request()->all())) }}" target="_blank" class="btn" style="padding:8px 14px;font-size:12.5px;font-weight:800;background:#ffb800;color:#002855;text-decoration:none;border-radius:var(--radius-sm);display:inline-flex;align-items:center;gap:6px;">
+                        <i class="fas fa-print"></i> Cetak Kolektif
+                    </a>
+                    <span style="font-size:12.5px;color:var(--text-muted);font-weight:600;">
+                        Menampilkan {{ $penerimas->firstItem() ?? 0 }} - {{ $penerimas->lastItem() ?? 0 }} dari {{ number_format($penerimas->total(), 0, ',', '.') }} calon penerima
+                    </span>
+                </div>
             </div>
 
             <div class="table-petugas-wrapper">
