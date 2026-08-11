@@ -109,24 +109,45 @@ class PencocokanDataController extends Controller
                 'jenis_kelamin'  => $dp->jenis_kelamin ?? '',
             ];
 
-            // Cek perbedaan (case-insensitive & whitespace-trimmed)
+            // Cek perbedaan (cerdas & fleksibel)
             $diffs = [];
-            if ($dgNama && strcasecmp(trim($item->nama), $dgNama) !== 0) {
+            
+            // 1. Nama
+            if ($dgNama && $this->cleanStr($item->nama) !== $this->cleanStr($dgNama)) {
                 $diffs['nama'] = true;
             }
-            if ($dgAlamat && strcasecmp(trim($item->alamat ?? ''), $dgAlamat) !== 0) {
-                $diffs['alamat'] = true;
+            
+            // 2. Alamat (mengabaikan suffix RT/RW jika basis alamat cocok)
+            if ($dgAlamat) {
+                $cleanLokalAlamat = $this->cleanAlamat($item->alamat);
+                $cleanDgAlamat    = $this->cleanAlamat($dgAlamat);
+                if ($cleanLokalAlamat !== $cleanDgAlamat && !str_contains($cleanDgAlamat, $cleanLokalAlamat) && !str_contains($cleanLokalAlamat, $cleanDgAlamat)) {
+                    $diffs['alamat'] = true;
+                }
             }
-            if ($dgDusun && strcasecmp(trim($item->dusun ?? ''), $dgDusun) !== 0) {
-                $diffs['dusun'] = true;
+            
+            // 3. Dusun (jika lokal kosong tetapi alamat lokal mengandung nama dusun Dataguse, jangan anggap beda)
+            if ($dgDusun) {
+                $cleanLokalDusun  = $this->cleanStr($item->dusun);
+                $cleanDgDusun     = $this->cleanStr($dgDusun);
+                $cleanLokalAlamat = $this->cleanStr($item->alamat);
+                if ($cleanLokalDusun !== $cleanDgDusun && !str_contains($cleanLokalAlamat, $cleanDgDusun)) {
+                    $diffs['dusun'] = true;
+                }
             }
-            if ($dgDesa && strcasecmp(trim($item->desa_kelurahan ?? ''), $dgDesa) !== 0) {
+            
+            // 4. Desa / Kelurahan
+            if ($dgDesa && $this->cleanStr($item->desa_kelurahan) !== $this->cleanStr($dgDesa)) {
                 $diffs['desa_kelurahan'] = true;
             }
-            if ($dgKec && strcasecmp(trim($item->kecamatan ?? ''), $dgKec) !== 0) {
+            
+            // 5. Kecamatan
+            if ($dgKec && $this->cleanStr($item->kecamatan) !== $this->cleanStr($dgKec)) {
                 $diffs['kecamatan'] = true;
             }
-            if ($dgKab && strcasecmp(trim($item->kabupaten_kota ?? ''), $dgKab) !== 0) {
+            
+            // 6. Kabupaten / Kota (mengabaikan prefiks "KAB." vs "Kabupaten")
+            if ($dgKab && $this->cleanKab($item->kabupaten_kota) !== $this->cleanKab($dgKab)) {
                 $diffs['kabupaten_kota'] = true;
             }
 
@@ -306,5 +327,29 @@ class PencocokanDataController extends Controller
                 'message' => 'Gagal sync batch: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Helper normalisasi string untuk pembandingan fleksibel
+     */
+    private function cleanStr(?string $str): string
+    {
+        if (!$str) return '';
+        $s = mb_strtolower(trim($str));
+        return preg_replace('/\s+/', ' ', $s);
+    }
+
+    private function cleanKab(?string $str): string
+    {
+        $s = $this->cleanStr($str);
+        $s = preg_replace('/^(kab\.|kabupaten|kota)\s+/i', '', $s);
+        return trim($s);
+    }
+
+    private function cleanAlamat(?string $str): string
+    {
+        $s = $this->cleanStr($str);
+        $s = preg_replace('/(\(|\,)?\s*rt\s*\d+.*$/i', '', $s);
+        return trim($s);
     }
 }
