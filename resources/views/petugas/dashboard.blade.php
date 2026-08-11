@@ -598,6 +598,14 @@
                 </p>
             </div>
 
+            <div class="modal-footer" style="padding: 16px 20px; background: var(--bg-body); border-top: 1px solid rgba(0, 40, 85, 0.06); display: flex; justify-content: center;">
+                <button type="button" class="btn btn-primary" onclick="retryLocationPermission()">
+                    <i class="fas fa-sync-alt"></i> Coba Deteksi Lokasi
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal Verifikasi Status Keberadaan Wajib Sebelum Survei -->
     <div class="modal-overlay" id="modalStatusVerification">
         <div class="modal-box" style="max-width: 480px;">
@@ -697,30 +705,17 @@
     let currentVervalId = null;
     let currentTargetSurveyUrl = null;
 
-    // Bind click event langsung — script ini berada di @push('scripts') yang sudah di-render
-    // setelah DOM selesai, sehingga DOMContentLoaded sudah terlewat dan wrapper-nya tidak diperlukan
-    document.addEventListener('click', function (e) {
-        const btn = e.target.closest('.btn-trigger-status-modal');
-        if (btn) {
-            e.preventDefault();
-            const id = btn.getAttribute('data-id');
-            const nama = btn.getAttribute('data-nama');
-            const nik = btn.getAttribute('data-nik');
-            const alamat = btn.getAttribute('data-alamat');
-            const status = btn.getAttribute('data-status');
-            const url = btn.getAttribute('data-url');
-
-            openStatusVerificationModal(id, nama, nik, alamat, status, url);
-        }
-    });
-
     function openStatusVerificationModal(id, nama, nik, alamat, currentStatus, surveyUrl) {
         currentVervalId = id;
         currentTargetSurveyUrl = surveyUrl;
 
-        document.getElementById('statusModalNama').textContent = nama || '-';
-        document.getElementById('statusModalNik').textContent = nik || '-';
-        document.getElementById('statusModalAlamat').textContent = alamat || '-';
+        const namaEl = document.getElementById('statusModalNama');
+        const nikEl = document.getElementById('statusModalNik');
+        const alamatEl = document.getElementById('statusModalAlamat');
+
+        if (namaEl) namaEl.textContent = nama || '-';
+        if (nikEl) nikEl.textContent = nik || '-';
+        if (alamatEl) alamatEl.textContent = alamat || '-';
 
         const statusToSelect = (currentStatus && ['ditemukan', 'meninggal', 'pindah', 'tidak diketahui'].includes(currentStatus)) ? currentStatus : 'ditemukan';
         const radio = document.querySelector(`input[name="modal_verval_status"][value="${statusToSelect}"]`);
@@ -798,13 +793,9 @@
         });
     }
 
-    /**
-     * Intercept Mulai Survei — Loading Overlay & Wajibkan GPS Geolocation Aktif
-     */
     function startSurveyWithGps(targetUrl) {
         pendingSurveyUrl = targetUrl;
 
-        // 1. Tampilkan Reusable Loading Overlay
         if (window.PuprLoading) {
             window.PuprLoading.show('Sedang Memuat Lokasi GPS...');
         }
@@ -815,17 +806,14 @@
             return;
         }
 
-        // 2. Request Geolocation Position
         navigator.geolocation.getCurrentPosition(
             function(position) {
-                // GPS Berhasil Didapat -> Update status loading & pindah ke form survei
                 if (window.PuprLoading) {
                     window.PuprLoading.show('Lokasi Terdeteksi, Membuka Form Survei...');
                 }
                 window.location.href = targetUrl;
             },
             function(error) {
-                // GPS Gagal / Ditolak / Dimatikan -> Tutup loading & buka modal peringatan GPS
                 if (window.PuprLoading) {
                     window.PuprLoading.hide();
                 }
@@ -835,11 +823,7 @@
                     alert("Silakan aktifkan lokasi jika mau melakukan survei!");
                 }
             },
-            {
-                enableHighAccuracy: true,
-                timeout: 8000,
-                maximumAge: 0
-            }
+            { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
         );
     }
 
@@ -875,6 +859,21 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('click', function (e) {
+            const btn = e.target.closest('.btn-trigger-status-modal');
+            if (btn) {
+                e.preventDefault();
+                const id = btn.getAttribute('data-id');
+                const nama = btn.getAttribute('data-nama');
+                const nik = btn.getAttribute('data-nik');
+                const alamat = btn.getAttribute('data-alamat');
+                const status = btn.getAttribute('data-status');
+                const url = btn.getAttribute('data-url');
+
+                openStatusVerificationModal(id, nama, nik, alamat, status, url);
+            }
+        });
+
         // 1. Chart Progress Survei (Donut)
         const ctxProgress = document.getElementById('chartProgressSurvei');
         if (ctxProgress) {
