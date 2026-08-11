@@ -209,6 +209,12 @@ class PetugasController extends Controller
         // Cek duplikasi NIK di database
         $existing = DataPenerima::where('no_ktp', $noKtp)->first();
         if ($existing) {
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "NIK {$noKtp} sudah terdaftar dalam sistem atas nama {$existing->nama} (Desa {$existing->desa_kelurahan})."
+                ], 422);
+            }
             return redirect()->back()->withInput()->with('error', "NIK {$noKtp} sudah terdaftar dalam sistem atas nama {$existing->nama} (Desa {$existing->desa_kelurahan}).");
         }
 
@@ -242,10 +248,18 @@ class PetugasController extends Controller
             'status'              => 'Usulan Petugas',
         ]);
 
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Calon penerima '{$penerima->nama}' (NIK: {$noKtp}) berhasil diusulkan ke Desa {$user->desa}!",
+                'data'    => $penerima
+            ]);
+        }
+
         if ($request->has('survei_sekarang')) {
             return redirect()->route('survey', ['id' => $penerima->id])->with('success', "Calon penerima '{$penerima->nama}' berhasil ditambahkan! Silakan lengkapi data survei & foto.");
         }
 
-        return redirect()->back()->with('success', "Calon penerima '{$penerima->nama}' (NIK: {$noKtp}) berhasil diusulkan ke Desa {$user->desa}!");
+        return redirect()->route('petugas.belum-survei')->with('success', "Calon penerima '{$penerima->nama}' (NIK: {$noKtp}) berhasil diusulkan ke Desa {$user->desa}! Data telah tersimpan di daftar Belum Survei.");
     }
 }

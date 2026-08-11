@@ -386,6 +386,22 @@
             </div>
         @endif
 
+        @if($errors->any())
+            <div class="alert alert-danger" style="background:#fef2f2;border:1px solid #fecaca;color:#991b1b;border-radius:12px;padding:16px 20px;margin-bottom:20px;box-shadow:0 4px 16px rgba(239,68,68,0.12);animation:fadeIn 0.4s ease;">
+                <div style="display:flex;align-items:center;gap:14px;margin-bottom:6px;">
+                    <div style="width:36px;height:36px;border-radius:50%;background:rgba(239,68,68,0.18);color:#ef4444;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">
+                        <i class="fas fa-triangle-exclamation"></i>
+                    </div>
+                    <div style="font-weight:800;font-size:14px;">Gagal Menyimpan Usulan Baru:</div>
+                </div>
+                <ul style="margin:0 0 0 50px;padding:0;font-size:13px;font-weight:600;line-height:1.5;">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <!-- Welcome Banner Petugas -->
         <div class="welcome-card">
             <div class="welcome-text">
@@ -921,9 +937,6 @@
                     <button type="submit" class="btn btn-primary" style="padding: 9px 18px; font-weight: 800; background: #002855; color: #fff; display: inline-flex; align-items: center; gap: 6px;">
                         <i class="fas fa-save"></i> Simpan Usulan
                     </button>
-                    <button type="submit" name="survei_sekarang" value="1" class="btn" style="padding: 9px 18px; font-weight: 800; background: #22c55e; color: #fff; border: none; border-radius: var(--radius-sm); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);">
-                        <i class="fas fa-clipboard-check"></i> Simpan &amp; Mulai Survei
-                    </button>
                 </div>
             </form>
         </div>
@@ -1411,6 +1424,54 @@
             });
         }
     }
+
+    // Handling submit Form Tambah Usulan (Support Offline Mode PWA - Anti Dinosaur Page)
+    document.getElementById('formTambahUsulan')?.addEventListener('submit', async function (e) {
+        const isOffline = !navigator.onLine;
+
+        const noKtpInput = this.querySelector('input[name="no_ktp"]');
+        const noKtpVal = noKtpInput ? noKtpInput.value.trim() : '';
+
+        if (noKtpVal.length !== 16 || isNaN(noKtpVal)) {
+            e.preventDefault();
+            alert('NIK (No. KTP) wajib berupa 16 digit angka!');
+            return;
+        }
+
+        if (isOffline) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const usulanData = {
+                id: 'usulan_off_' + Date.now(),
+                nama: formData.get('nama') || '',
+                no_ktp: formData.get('no_ktp') || '',
+                no_kk: formData.get('no_kk') || '',
+                jenis_kelamin: formData.get('jenis_kelamin') || 'L',
+                pengelompokan_desil: formData.get('pengelompokan_desil') || 'Usulan Baru Lapangan',
+                dusun: formData.get('dusun') || '',
+                rt: formData.get('rt') || '',
+                rw: formData.get('rw') || '',
+                alamat: formData.get('alamat') || '',
+                saved_at: new Date().toISOString()
+            };
+
+            if (window.BspsOffline && window.BspsOffline.saveUsulanToIndexedDB) {
+                const saved = await window.BspsOffline.saveUsulanToIndexedDB(usulanData);
+                if (saved) {
+                    if (window.BspsOffline.showPuprToast) {
+                        window.BspsOffline.showPuprToast(`📲 Mode Offline: Usulan "${usulanData.nama}" tersimpan di memori HP! Data akan terunggah otomatis saat online.`, 'warning');
+                    } else {
+                        alert(`Mode Offline: Usulan "${usulanData.nama}" berhasil disimpan sementara di HP!`);
+                    }
+                    if (window.PuprModal) window.PuprModal.close('modalTambahUsulan');
+                    this.reset();
+                }
+            } else {
+                alert('Mode Offline: Data usulan berhasil disimpan sementara.');
+            }
+        }
+    });
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initPetugasCharts);

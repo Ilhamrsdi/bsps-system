@@ -5,8 +5,9 @@
  */
 
 const DB_NAME = 'BSPS_OFFLINE_DB';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE_NAME = 'offline_surveys';
+const STORE_USULAN = 'offline_usulan';
 
 // 1. Inisialisasi Database Lokal IndexedDB di HP
 function openOfflineDB() {
@@ -17,6 +18,9 @@ function openOfflineDB() {
             const db = e.target.result;
             if (!db.objectStoreNames.contains(STORE_NAME)) {
                 db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+            }
+            if (!db.objectStoreNames.contains(STORE_USULAN)) {
+                db.createObjectStore(STORE_USULAN, { keyPath: 'id' });
             }
         };
 
@@ -258,16 +262,146 @@ async function syncPendingSurveys() {
     }
 }
 
+// 9. Simpan Data Usulan Baru ke IndexedDB (Saat Mode Offline)
+async function saveUsulanToIndexedDB(usulanData) {
+    try {
+        const db = await openOfflineDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_USULAN, 'readwrite');
+            const store = tx.objectStore(STORE_USULAN);
+            usulanData.saved_at = new Date().toISOString();
+            usulanData.sync_status = 'pending';
+
+            store.put(usulanData);
+
+            tx.oncomplete = function () {
+                console.log('[IndexedDB] Sukses menyimpan usulan baru offline NIK:', usulanData.no_ktp);
+                resolve(true);
+            };
+
+            tx.onerror = function (e) {
+                console.error('[IndexedDB] Gagal menyimpan usulan baru:', e);
+                reject(e);
+            };
+        });
+    } catch (err) {
+        console.error('[IndexedDB] Exception saveUsulan:', err);
+        return false;
+    }
+}
+
+// 10. Ambil Semua Usulan Baru Tertunda di IndexedDB
+async function getAllPendingUsulan() {
+    try {
+        const db = await openOfflineDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_USULAN, 'readonly');
+            const store = tx.objectStore(STORE_USULAN);
+            const request = store.getAll();
+
+            request.onsuccess = function () {
+                resolve(request.result || []);
+            };
+            request.onerror = reject;
+        });
+    } catch (err) {
+        return [];
+    }
+}
+
+// 11. Hapus Usulan dari IndexedDB setelah Sukses Diunggah
+async function removeUsulanFromIndexedDB(id) {
+    try {
+        const db = await openOfflineDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_USULAN, 'readwrite');
+            const store = tx.objectStore(STORE_USULAN);
+            store.delete(id);
+
+            tx.oncomplete = function () {
+                resolve(true);
+            };
+            tx.onerror = reject;
+        });
+    } catch (err) {
+        return false;
+    }
+}
+
+// 12. Sync Usulan Baru ke Server saat Terhubung Kembali
+let isUsulanSyncing = false;
+async function syncPendingUsulan() {
+    if (!navigator.onLine || isUsulanSyncing) return;
+
+    const pendingList = await getAllPendingUsulan();
+    if (pendingList.length === 0) return;
+
+    isUsulanSyncing = true;
+    let successCount = 0;
+
+    for (const item of pendingList) {
+        try {
+            const formData = new FormData();
+            formData.append('_token', document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '');
+            formData.append('nama', item.nama || '');
+            formData.append('no_ktp', item.no_ktp || '');
+            formData.append('no_kk', item.no_kk || '');
+            formData.append('jenis_kelamin', item.jenis_kelamin || 'L');
+            formData.append('pengelompokan_desil', item.pengelompokan_desil || 'Usulan Baru Lapangan');
+            formData.append('dusun', item.dusun || '');
+            formData.append('rt', item.rt || '');
+            formData.append('rw', item.rw || '');
+            formData.append('alamat', item.alamat || '');
+
+            const response = await fetch('/petugas/usulkan-penerima', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const resData = await response.json().catch(() => ({ success: true }));
+                if (resData.success !== false) {
+                    await removeUsulanFromIndexedDB(item.id);
+                    successCount++;
+                }
+            } else if (response.status === 422) {
+                const errData = await response.json().catch(() => ({}));
+                console.warn('[Sync Usulan] Duplikat NIK atau Gagal Validasi:', item.no_ktp, errData);
+                await removeUsulanFromIndexedDB(item.id);
+            }
+        } catch (err) {
+            console.error('[Sync Usulan] Gagal mengunggah usulan NIK:', item.no_ktp, err);
+        }
+    }
+
+    isUsulanSyncing = false;
+
+    if (successCount > 0) {
+        showPuprToast(`🎉 ${successCount} usulan baru offline berhasil tersinkron ke server!`, 'success');
+        setTimeout(() => window.location.reload(), 1500);
+    }
+}
+
 // Event Listeners Auto-Sync
 window.addEventListener('online', function () {
     console.log('[PWA] Terhubung ke internet, memulai auto-sync di latar belakang...');
-    setTimeout(syncPendingSurveys, 1200);
+    setTimeout(() => {
+        syncPendingSurveys();
+        syncPendingUsulan();
+    }, 1200);
 });
 
 document.addEventListener('DOMContentLoaded', function () {
     updatePendingBadgeUI();
     if (navigator.onLine) {
-        setTimeout(syncPendingSurveys, 2500);
+        setTimeout(() => {
+            syncPendingSurveys();
+            syncPendingUsulan();
+        }, 2500);
     }
 });
 
@@ -278,6 +412,10 @@ window.BspsOffline = {
     getAllPendingSurveys,
     removeSurveyFromIndexedDB,
     syncPendingSurveys,
+    saveUsulanToIndexedDB,
+    getAllPendingUsulan,
+    removeUsulanFromIndexedDB,
+    syncPendingUsulan,
     updatePendingBadgeUI,
     showPuprToast
 };

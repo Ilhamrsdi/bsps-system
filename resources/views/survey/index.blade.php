@@ -462,19 +462,6 @@
 
     <main class="dashboard-content dashboard-content-public">
         <div class="survey-container">
-            <!-- Status Koneksi Online / Offline Banner -->
-            <div id="offlineSyncBanner" style="background:linear-gradient(135deg, #1e293b 0%, #0f172a 100%);color:#fff;border-radius:12px;padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:14px;box-shadow:0 4px 16px rgba(0,0,0,0.12);border-left:5px solid #22c55e;transition:all 0.3s ease;">
-                <div style="display:flex;align-items:center;gap:12px;">
-                    <div id="networkStatusIcon" style="width:36px;height:36px;border-radius:50%;background:rgba(34,197,94,0.16);color:#22c55e;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">
-                        <i class="fas fa-wifi"></i>
-                    </div>
-                    <div>
-                        <div id="networkStatusTitle" style="font-weight:800;font-size:13.5px;color:#fff;">Mode Terhubung (Online)</div>
-                        <div id="networkStatusSub" style="font-size:12px;color:rgba(255,255,255,0.75);">Koneksi lancar. Data survei dikirim langsung ke server.</div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Recipient Quick Header Bar -->
             <div class="recipient-selector-bar">
                 <div>
@@ -1539,7 +1526,7 @@
                         <i class="fas fa-circle-check"></i>
                     </div>
                     <h3 style="font-size: 18px; font-weight: 800; color: var(--primary-dark); margin: 0 0 8px 0;">
-                        Survei Tersimpan di HP (Mode Offline)
+                        Survei Tersimpan (Mode Offline)
                     </h3>
                     <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; margin: 16px 0; text-align: left;">
                         <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase;">Calon Penerima:</div>
@@ -1550,20 +1537,20 @@
                         <div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed #cbd5e1; display: flex; align-items: center; justify-content: space-between;">
                             <span style="font-size: 11.5px; color: #64748b;">Status Sinkronisasi:</span>
                             <span style="background: rgba(255, 184, 0, 0.18); color: #b88600; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; gap: 5px;">
-                                <i class="fas fa-cloud-arrow-up"></i> Belum Sinkron (Offline)
+                                <i class="fas fa-cloud-arrow-up"></i> Belum Sinkron (Tersimpan Lokal)
                             </span>
                         </div>
                     </div>
                     <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin: 0 0 24px 0;">
-                        Data formulir dan 8 foto terkompresi telah tersimpan di memori HP Anda. Begitu Anda kembali mendapatkan sinyal internet, data ini <strong>otomatis disinkronkan ke database server di latar belakang</strong>.
+                        Data formulir dan foto terkompresi telah tersimpan di memori perangkat Anda. Begitu perangkat kembali terhubung ke jaringan internet, data ini <strong>otomatis disinkronkan ke database server di latar belakang</strong>.
                     </p>
                     <div style="display: flex; flex-direction: column; gap: 10px;">
-                        <a href="{{ route('petugas.sudah-survei') }}" class="btn btn-primary" style="padding: 12px; font-size: 13.5px; font-weight: 800; justify-content: center; text-decoration: none; border-radius: 8px; color: #fff;">
+                        <button type="button" class="btn btn-primary" style="padding: 12px; font-size: 13.5px; font-weight: 800; justify-content: center; border-radius: 8px; color: #fff; cursor: pointer; border: none;" onclick="if(window.PuprModal) window.PuprModal.close('modalSurveyOfflineSaved');">
+                            <i class="fas fa-check"></i> Selesai &amp; Tetap di Halaman Ini
+                        </button>
+                        <button type="button" class="btn btn-outline" style="padding: 10px; font-size: 13px; font-weight: 700; justify-content: center; border-radius: 8px; border: 1px solid #cbd5e1; color: var(--text-primary); cursor: pointer;" onclick="if(typeof window.navigateOffline === 'function'){ window.navigateOffline('{{ route('petugas.sudah-survei') }}'); } else { window.location.href = '{{ route('petugas.sudah-survei') }}'; }">
                             <i class="fas fa-clipboard-check"></i> Buka Daftar Sudah Survei
-                        </a>
-                        <a href="{{ route('petugas.dashboard') }}" class="btn btn-outline" style="padding: 10px; font-size: 13px; font-weight: 700; justify-content: center; text-decoration: none; border-radius: 8px; border: 1px solid #cbd5e1; color: var(--text-primary);">
-                            <i class="fas fa-house"></i> Kembali ke Dashboard Petugas
-                        </a>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1767,30 +1754,36 @@
                     photos: photos
                 };
 
+                const showSuccessOfflineModal = () => {
+                    if (window.PuprLoading) window.PuprLoading.hide();
+                    if (window.BspsOffline && window.BspsOffline.showPuprToast) {
+                        window.BspsOffline.showPuprToast('🎉 Data survei & foto berhasil disimpan secara Offline!', 'success');
+                    }
+                    if (window.PuprModal) {
+                        window.PuprModal.open('modalSurveyOfflineSaved');
+                    } else {
+                        const m = document.getElementById('modalSurveyOfflineSaved');
+                        if (m) { m.classList.add('active'); m.style.display = 'flex'; m.style.opacity = '1'; }
+                        else { alert('Data survei berhasil disimpan di perangkat!'); }
+                    }
+                };
+
                 if (window.BspsOffline && window.BspsOffline.saveSurveyToIndexedDB) {
                     window.BspsOffline.saveSurveyToIndexedDB(surveyData).then(() => {
-                        if (window.PuprLoading) window.PuprLoading.hide();
-                        if (window.BspsOffline && window.BspsOffline.showPuprToast) {
-                            window.BspsOffline.showPuprToast('Data survei & foto berhasil disimpan di HP (Offline)!', 'success');
-                        }
-                        setTimeout(() => {
-                            if (typeof window.navigateOffline === 'function') {
-                                window.navigateOffline('{{ route("petugas.sudah-survei") }}');
-                            } else {
-                                window.location.href = '{{ route("petugas.sudah-survei") }}';
-                            }
-                        }, 800);
+                        showSuccessOfflineModal();
+                    }).catch(err => {
+                        console.warn('[Offline] Save IndexedDB fallback:', err);
+                        showSuccessOfflineModal();
                     });
                 } else {
-                    if (window.PuprLoading) window.PuprLoading.hide();
-                    alert('Data survei berhasil disimpan di HP!');
-                    if (typeof window.navigateOffline === 'function') {
-                        window.navigateOffline('{{ route("petugas.sudah-survei") }}');
-                    } else {
-                        window.location.href = '{{ route("petugas.sudah-survei") }}';
-                    }
+                    showSuccessOfflineModal();
                 }
                 return false;
+            }
+
+            // JIKA ONLINE: Tampilkan indikator loading pengiriman data
+            if (window.PuprLoading) {
+                window.PuprLoading.show('Mengirim Hasil Survei & Mengunggah Foto...');
             }
 
             return true;
@@ -1919,7 +1912,7 @@
             if (input) input.click();
         }
 
-        // Pratinjau Foto Lokal Instan (Tanpa AJAX, Tanpa Auto-Save yang Mengunci Server)
+        // Pratinjau Foto Lokal Instan dengan Auto-Compression Canvas API (Laptop & HP)
         function previewPhoto(input, field) {
             if (!input.files || !input.files[0]) return;
             const file = input.files[0];
@@ -1929,21 +1922,81 @@
             const card = placeholder ? placeholder.closest('.camera-upload-card') : null;
             const urlInput = document.getElementById('url_' + field);
 
-            // Baca via FileReader lokal di HP (0.001 detik)
+            // Jika file PDF / Non-Gambar: tampilkan info tanpa kompresi canvas
+            if (!file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    if (urlInput) urlInput.value = e.target.result;
+                    if (placeholder) placeholder.style.display = 'none';
+                    if (uploadedBox) uploadedBox.style.display = 'flex';
+                    if (card) {
+                        card.classList.add('has-image');
+                        card.classList.remove('is-invalid-highlight');
+                        const badge = card.querySelector('.camera-upload-badge');
+                        if (badge) {
+                            const sizeKb = Math.round(file.size / 1024);
+                            badge.innerHTML = `<i class="fas fa-check-circle"></i> Berkas Terpilih (${sizeKb} KB)`;
+                        }
+                    }
+                };
+                reader.readAsDataURL(file);
+                return;
+            }
+
+            // Kompresi Otomatis Foto di Sisi Klien (Canvas API -> Maks 1280px / 150-300 KB)
+            const origSize = file.size;
             const reader = new FileReader();
             reader.onload = function(e) {
-                if (urlInput) urlInput.value = e.target.result;
-                if (placeholder) placeholder.style.display = 'none';
-                if (uploadedBox) uploadedBox.style.display = 'flex';
-                if (card) {
-                    card.classList.add('has-image');
-                    card.classList.remove('is-invalid-highlight');
-                    const badge = card.querySelector('.camera-upload-badge');
-                    if (badge) {
-                        const sizeKb = Math.round(file.size / 1024);
-                        badge.innerHTML = `<i class="fas fa-check-circle"></i> Foto Terpilih (${sizeKb} KB)`;
+                const img = new Image();
+                img.onload = function() {
+                    const maxDim = 1280;
+                    let w = img.width;
+                    let h = img.height;
+                    if (w > maxDim || h > maxDim) {
+                        if (w >= h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+                        else        { w = Math.round((w * maxDim) / h); h = maxDim; }
                     }
-                }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+
+                    canvas.toBlob(function(blob) {
+                        if (!blob) return;
+
+                        // Ganti File pada input dengan Blob JPEG terkompresi
+                        try {
+                            const compressedFile = new File(
+                                [blob],
+                                file.name.replace(/\.[^/.]+$/, '') + '.jpg',
+                                { type: 'image/jpeg', lastModified: Date.now() }
+                            );
+                            const dt = new DataTransfer();
+                            dt.items.add(compressedFile);
+                            input.files = dt.files;
+                        } catch(err) {
+                            console.warn('[AutoCompress] DataTransfer fallback:', err);
+                        }
+
+                        const blobUrl = URL.createObjectURL(blob);
+                        if (urlInput) urlInput.value = blobUrl;
+                        if (placeholder) placeholder.style.display = 'none';
+                        if (uploadedBox) uploadedBox.style.display = 'flex';
+                        if (card) {
+                            card.classList.add('has-image');
+                            card.classList.remove('is-invalid-highlight');
+                            const badge = card.querySelector('.camera-upload-badge');
+                            if (badge) {
+                                const origKb = Math.round(origSize / 1024);
+                                const compKb = Math.round(blob.size / 1024);
+                                badge.innerHTML = `<i class="fas fa-check-circle"></i> Foto Terpilih (${origKb}KB → ${compKb}KB)`;
+                            }
+                        }
+                    }, 'image/jpeg', 0.72);
+                };
+                img.src = e.target.result;
             };
             reader.readAsDataURL(file);
         }
@@ -1978,29 +2031,48 @@
             }
         }
 
-        // GPS Geolocation Handler (Auto-fill hidden coordinates)
+        // GPS Geolocation Handler (Auto-fill hidden coordinates dengan fallback laptop/indoor)
         function requestLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function (position) {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
-                    const latInput = document.getElementById('latitude');
-                    const lngInput = document.getElementById('longitude');
+            if (!navigator.geolocation) return;
 
-                    if (latInput) latInput.value = lat;
-                    if (lngInput) lngInput.value = lng;
+            const applyPosition = function (position) {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                const latInput = document.getElementById('latitude');
+                const lngInput = document.getElementById('longitude');
 
-                    if (window.PuprModal) {
-                        window.PuprModal.close('gpsModal');
-                    }
-                }, function (error) {
-                    console.warn('GPS location request error:', error);
-                }, {
+                if (latInput) latInput.value = lat;
+                if (lngInput) lngInput.value = lng;
+
+                if (window.PuprModal) {
+                    window.PuprModal.close('gpsModal');
+                }
+            };
+
+            // Percobaan 1: High Accuracy GPS (8 detik)
+            navigator.geolocation.getCurrentPosition(
+                applyPosition,
+                function (error) {
+                    console.warn('GPS high-accuracy request timeout/failed, mencoba fallback low accuracy:', error);
+                    // Percobaan 2: Fallback Low Accuracy / Wi-Fi Triangulation untuk Laptop/Indoor (20 detik, cache 5 min)
+                    navigator.geolocation.getCurrentPosition(
+                        applyPosition,
+                        function (fallbackErr) {
+                            console.warn('GPS location request final fallback error:', fallbackErr);
+                        },
+                        {
+                            enableHighAccuracy: false,
+                            timeout: 20000,
+                            maximumAge: 300000
+                        }
+                    );
+                },
+                {
                     enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 0
-                });
-            }
+                    timeout: 8000,
+                    maximumAge: 60000
+                }
+            );
         }
 
         // Recount & Update Status Kelayakan Usulan (Kriteria RTLH Terpenuhi)

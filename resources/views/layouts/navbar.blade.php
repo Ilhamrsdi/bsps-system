@@ -84,7 +84,12 @@
         @php
             $userName = Auth::check() ? Auth::user()->name : 'Admin PUPR';
             $userEmail = Auth::check() ? Auth::user()->email : 'admin@pupr.jember.go.id';
-            $userAvatar = Auth::check() ? strtoupper(substr(Auth::user()->name, 0, 2)) : 'AD';
+            $words = explode(' ', trim($userName));
+            if (count($words) >= 2) {
+                $userAvatar = strtoupper(substr($words[0], 0, 1) . substr($words[1], 0, 1));
+            } else {
+                $userAvatar = strtoupper(substr($userName, 0, 2));
+            }
         @endphp
 
         <!-- Dropdown User Profile (Tampil di Seluruh Halaman) -->
