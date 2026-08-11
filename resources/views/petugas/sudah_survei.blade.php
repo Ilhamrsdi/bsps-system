@@ -379,12 +379,62 @@
 <script>
     let pendingSurveyUrl = null;
 
+    /**
+     * Offline Client-Side Search untuk Petugas
+     */
+    function filterSudahTableOffline() {
+        const searchInput = document.querySelector('input[name="search"]');
+        const query = (searchInput?.value || '').toLowerCase().trim();
+        const rows = document.querySelectorAll('.table-petugas-wrapper tbody tr');
+        let count = 0;
+
+        rows.forEach(function(row) {
+            if (row.querySelector('td[colspan]')) return;
+            const text = row.innerText.toLowerCase();
+            if (!query || text.includes(query)) {
+                row.style.display = '';
+                count++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        if (window.showToast) {
+            showToast(`Mode Offline: Menampilkan ${count} penerima selesai`, 'success');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterForm = document.querySelector('form.filter-section');
+        if (filterForm) {
+            filterForm.addEventListener('submit', function(e) {
+                if (!navigator.onLine) {
+                    e.preventDefault();
+                    filterSudahTableOffline();
+                    return;
+                }
+                if (window.PuprLoading) {
+                    window.PuprLoading.show('Mencari Data...');
+                }
+            });
+        }
+
+        const searchInput = document.querySelector('input[name="search"]');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                if (!navigator.onLine) {
+                    filterSudahTableOffline();
+                }
+            });
+        }
+    });
+
     function startSurveyWithGps(targetUrl) {
         pendingSurveyUrl = targetUrl;
 
         // 1. Tampilkan Reusable Loading Overlay
         if (window.PuprLoading) {
-            window.PuprLoading.show('Sedang Memuat Lokasi GPS...');
+            window.PuprLoading.show('Sedang Memuat Lokasi GPS Satelit...');
         }
 
         if (!navigator.geolocation) {
@@ -410,7 +460,7 @@
                     alert("Silakan aktifkan lokasi jika mau melakukan survei!");
                 }
             },
-            { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+            { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 }
         );
     }
 
@@ -441,7 +491,7 @@
                     window.PuprModal.open('modalGpsRequired');
                 }
             },
-            { enableHighAccuracy: true, timeout: 8000 }
+            { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 }
         );
     }
 </script>

@@ -17,6 +17,12 @@
     <!-- Favicon Logo PUPR -->
     <link rel="icon" href="{{ asset('logo.jpg') }}" type="image/jpeg" />
 
+    <!-- PWA Manifest & Mobile Capability -->
+    <link rel="manifest" href="{{ asset('manifest.json') }}" />
+    <meta name="theme-color" content="#002855" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <!-- Font Awesome Icons -->
@@ -103,17 +109,44 @@
     @stack('scripts')
     @yield('scripts')
 
-    <!-- PWA Service Worker Global Registration for Offline Blankspot Support -->
+    <!-- PWA Service Worker Registration & Realtime Offline Detector -->
     <script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-            navigator.serviceWorker.register('/sw.js').then(function(reg) {
-                console.log('[PWA] ServiceWorker registered with scope:', reg.scope);
-            }).catch(function(err) {
-                console.warn('[PWA] ServiceWorker registration failed:', err);
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js').then(function(reg) {
+                    console.log('[PWA] Service Worker aktif:', reg.scope);
+                }).catch(function(err) {
+                    console.warn('[PWA] Service Worker gagal didaftarkan:', err);
+                });
             });
-        });
-    }
+        }
+
+        // Indikator Status Koneksi Online / Offline Mengambang
+        function updateOnlineStatusUI() {
+            let badge = document.getElementById('offlineStatusBadge');
+            if (!navigator.onLine) {
+                if (!badge) {
+                    badge = document.createElement('div');
+                    badge.id = 'offlineStatusBadge';
+                    badge.style.cssText = 'position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:99999;background:#b91c1c;color:#ffffff;padding:6px 16px;border-radius:30px;font-size:12px;font-weight:800;display:flex;align-items:center;gap:8px;box-shadow:0 6px 18px rgba(0,0,0,0.25);letter-spacing:0.3px;';
+                    badge.innerHTML = '<i class="fas fa-wifi" style="font-size:11px;opacity:0.8;"></i> <span>Mode Offline (Akses Lokal HP)</span>';
+                    document.body.appendChild(badge);
+                }
+            } else {
+                if (badge) {
+                    badge.style.background = '#15803d';
+                    badge.innerHTML = '<i class="fas fa-wifi"></i> <span>Koneksi Kembali Online</span>';
+                    setTimeout(function() {
+                        if (badge) badge.remove();
+                    }, 2500);
+                }
+            }
+        }
+
+        window.addEventListener('online', updateOnlineStatusUI);
+        window.addEventListener('offline', updateOnlineStatusUI);
+        document.addEventListener('DOMContentLoaded', updateOnlineStatusUI);
     </script>
+
 </body>
 </html>
