@@ -151,9 +151,9 @@ class VervalDataController extends Controller
         }
 
         if ($statusFilter === 'sudah') {
-            $query->whereNotNull('foto_sudut_depan');
+            $query->sudahSurvei();
         } elseif ($statusFilter === 'belum') {
-            $query->whereNull('foto_sudut_depan');
+            $query->belumSurvei();
         }
 
         $paginator = $query->paginate(50)->withQueryString();
@@ -218,9 +218,9 @@ class VervalDataController extends Controller
         }
 
         if ($statusFilter === 'sudah') {
-            $query->whereNotNull('foto_sudut_depan');
+            $query->sudahSurvei();
         } elseif ($statusFilter === 'belum') {
-            $query->whereNull('foto_sudut_depan');
+            $query->belumSurvei();
         }
 
         $paginator = $query->paginate(50)->withQueryString();

@@ -40,8 +40,8 @@ class PetugasController extends Controller
         $query = $this->getPetugasQuery();
 
         $totalTugas     = (clone $query)->count();
-        $sudahSurvei    = (clone $query)->whereNotNull('foto_sudut_depan')->count();
-        $belumSurvei    = (clone $query)->whereNull('foto_sudut_depan')->count();
+        $sudahSurvei    = (clone $query)->sudahSurvei()->count();
+        $belumSurvei    = (clone $query)->belumSurvei()->count();
         $usulanBaruCount = (clone $query)->where(function ($q) {
             $q->where('pengelompokan_desil', 'like', '%Usulan%')
               ->orWhere('status', 'Usulan Petugas');
@@ -81,9 +81,9 @@ class PetugasController extends Controller
         }
 
         if ($statusFilter === 'sudah') {
-            $tableQuery->whereNotNull('foto_sudut_depan');
+            $tableQuery->sudahSurvei();
         } elseif ($statusFilter === 'belum') {
-            $tableQuery->whereNull('foto_sudut_depan');
+            $tableQuery->belumSurvei();
         }
 
         $vervals = $tableQuery->orderBy('id', 'asc')->paginate(15)->withQueryString();
@@ -103,7 +103,7 @@ class PetugasController extends Controller
         $user = Auth::user();
         $search = $request->get('search');
 
-        $query = $this->getPetugasQuery()->whereNull('foto_sudut_depan');
+        $query = $this->getPetugasQuery()->belumSurvei();
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -116,7 +116,7 @@ class PetugasController extends Controller
 
         $penerimas = $query->orderBy('id', 'asc')->paginate(20)->withQueryString();
         $allPenerimas = (clone $this->getPetugasQuery())
-            ->whereNull('foto_sudut_depan')
+            ->belumSurvei()
             ->select('id', 'nama', 'no_ktp', 'no_kk', 'alamat', 'jenis_kelamin', 'pengelompokan_desil', 'status')
             ->orderBy('id', 'asc')
             ->get();
@@ -132,7 +132,7 @@ class PetugasController extends Controller
         $user = Auth::user();
         $search = $request->get('search');
 
-        $query = $this->getPetugasQuery()->whereNotNull('foto_sudut_depan');
+        $query = $this->getPetugasQuery()->sudahSurvei();
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -145,7 +145,7 @@ class PetugasController extends Controller
 
         $penerimas = $query->orderBy('updated_at', 'desc')->paginate(20)->withQueryString();
         $allPenerimas = (clone $this->getPetugasQuery())
-            ->whereNotNull('foto_sudut_depan')
+            ->sudahSurvei()
             ->select('id', 'nama', 'no_ktp', 'no_kk', 'alamat', 'jenis_kelamin', 'pengelompokan_desil', 'status', 'foto_sudut_depan', 'updated_at')
             ->orderBy('updated_at', 'desc')
             ->get();
