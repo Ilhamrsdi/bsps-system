@@ -280,9 +280,12 @@
                                         <div class="cell-data-sub">
                                             <i class="fas fa-location-dot" style="color:var(--primary);font-size:11px;"></i>
                                             {{ $item->alamat ?: '-' }},
+                                            @if($item->dusun)
+                                                Dusun: <strong>{{ $item->dusun }}</strong>,
+                                            @endif
                                             Desa/Kel: <strong>{{ $item->desa_kelurahan ?: '-' }}</strong>,
                                             Kec: <strong>{{ $item->kecamatan ?: '-' }}</strong>,
-                                            Kab: <strong>{{ $item->kabupaten_kota ?: 'Banyuwangi' }}</strong>
+                                            Kab: <strong>{{ $item->kabupaten_kota ?: 'Jember' }}</strong>
                                         </div>
                                         @if($item->tempat_lahir || $item->tanggal_lahir)
                                             <div style="font-size:11.5px;color:var(--text-muted);margin-top:4px;">
@@ -312,9 +315,12 @@
                                                 @if($dg->rt_rw)
                                                     <span style="font-weight:700;color:var(--primary);">({{ $dg->rt_rw }})</span>,
                                                 @endif
+                                                @if($dg->dusun)
+                                                    Dusun: <strong class="{{ isset($diffs['dusun']) ? 'diff-highlight' : '' }}">{{ $dg->dusun }}</strong>,
+                                                @endif
                                                 Desa/Kel: <strong class="{{ isset($diffs['desa_kelurahan']) ? 'diff-highlight' : '' }}">{{ $dg->desa_kelurahan ?: '-' }}</strong>,
                                                 Kec: <strong class="{{ isset($diffs['kecamatan']) ? 'diff-highlight' : '' }}">{{ $dg->kecamatan ?: '-' }}</strong>,
-                                                Kab: <strong class="{{ isset($diffs['kabupaten_kota']) ? 'diff-highlight' : '' }}">{{ $dg->kabupaten_kota ?: 'Banyuwangi' }}</strong>
+                                                Kab: <strong class="{{ isset($diffs['kabupaten_kota']) ? 'diff-highlight' : '' }}">{{ $dg->kabupaten_kota ?: 'Jember' }}</strong>
                                             </div>
                                             @if($dg->tempat_lahir || $dg->tanggal_lahir)
                                                 <div style="font-size:11.5px;color:var(--text-muted);margin-top:4px;">

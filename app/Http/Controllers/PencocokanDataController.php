@@ -84,6 +84,7 @@ class PencocokanDataController extends Controller
             // Ekstrak atribut Dataguse dengan fallback yang fleksibel
             $dgNama    = trim($dp->nama ?? '');
             $dgAlamat  = trim($dp->alamat ?? '');
+            $dgDusun   = trim($dp->dusun ?? $dp->dukuh ?? $dp->kampung ?? '');
             $dgDesa    = trim($dp->desa_kelurahan ?? $dp->kelurahan ?? $dp->desa ?? '');
             $dgKec     = trim($dp->kecamatan ?? '');
             $dgKab     = trim($dp->kabupaten ?? $dp->kabupaten_kota ?? '');
@@ -96,6 +97,7 @@ class PencocokanDataController extends Controller
                 'nik'            => $dp->nomor_induk_kependudukan ?? $item->no_ktp,
                 'nama'           => $dgNama,
                 'alamat'         => $dgAlamat,
+                'dusun'          => $dgDusun,
                 'desa_kelurahan' => $dgDesa,
                 'kecamatan'      => $dgKec,
                 'kabupaten_kota' => $dgKab,
@@ -114,6 +116,9 @@ class PencocokanDataController extends Controller
             }
             if ($dgAlamat && strcasecmp(trim($item->alamat ?? ''), $dgAlamat) !== 0) {
                 $diffs['alamat'] = true;
+            }
+            if ($dgDusun && strcasecmp(trim($item->dusun ?? ''), $dgDusun) !== 0) {
+                $diffs['dusun'] = true;
             }
             if ($dgDesa && strcasecmp(trim($item->desa_kelurahan ?? ''), $dgDesa) !== 0) {
                 $diffs['desa_kelurahan'] = true;
@@ -193,6 +198,10 @@ class PencocokanDataController extends Controller
             if (!empty($dp->alamat)) {
                 $updateData['alamat'] = $dp->alamat;
             }
+            $dgDusun = $dp->dusun ?? $dp->dukuh ?? $dp->kampung ?? null;
+            if (!empty($dgDusun)) {
+                $updateData['dusun'] = $dgDusun;
+            }
             $dgDesa = $dp->desa_kelurahan ?? $dp->kelurahan ?? $dp->desa ?? null;
             if (!empty($dgDesa)) {
                 $updateData['desa_kelurahan'] = $dgDesa;
@@ -268,6 +277,8 @@ class PencocokanDataController extends Controller
 
                     if (!empty($dp->nama))           $updateData['nama'] = $dp->nama;
                     if (!empty($dp->alamat))         $updateData['alamat'] = $dp->alamat;
+                    $dgDusun = $dp->dusun ?? $dp->dukuh ?? $dp->kampung ?? null;
+                    if (!empty($dgDusun))            $updateData['dusun'] = $dgDusun;
                     $dgDesa = $dp->desa_kelurahan ?? $dp->kelurahan ?? $dp->desa ?? null;
                     if (!empty($dgDesa))             $updateData['desa_kelurahan'] = $dgDesa;
                     if (!empty($dp->kecamatan))      $updateData['kecamatan'] = $dp->kecamatan;
