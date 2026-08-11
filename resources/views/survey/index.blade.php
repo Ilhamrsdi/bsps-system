@@ -459,6 +459,27 @@
 
     <main class="dashboard-content dashboard-content-public">
         <div class="survey-container">
+            <!-- Offline Blankspot Sync Bar & Status Banner -->
+            <div id="offlineSyncBanner" style="background:linear-gradient(135deg, #1e293b 0%, #0f172a 100%);color:#fff;border-radius:12px;padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:14px;box-shadow:0 4px 16px rgba(0,0,0,0.12);border-left:5px solid #22c55e;transition:all 0.3s ease;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div id="networkStatusIcon" style="width:36px;height:36px;border-radius:50%;background:rgba(34,197,94,0.16);color:#22c55e;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">
+                        <i class="fas fa-wifi"></i>
+                    </div>
+                    <div>
+                        <div id="networkStatusTitle" style="font-weight:800;font-size:13.5px;color:#fff;">Mode Terhubung (Online)</div>
+                        <div id="networkStatusSub" style="font-size:12px;color:rgba(255,255,255,0.75);">Koneksi lancar. Data survei &amp; foto dikirim langsung ke server.</div>
+                    </div>
+                </div>
+                <div id="offlineQueueBox" style="display:none;align-items:center;gap:10px;">
+                    <span id="offlineCountBadge" style="background:#eab308;color:#000;font-weight:900;font-size:12px;padding:4px 10px;border-radius:20px;">
+                        0 Draf Offline
+                    </span>
+                    <button type="button" id="btnSyncOffline" onclick="window.BspsOfflineManager.syncNow()" style="background:#22c55e;color:#fff;border:none;padding:7px 14px;border-radius:6px;font-weight:800;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(34,197,94,0.3);">
+                        <i class="fas fa-rotate"></i> Sinkronkan Sekarang
+                    </button>
+                </div>
+            </div>
+
             <!-- Recipient Quick Header Bar -->
             <div class="recipient-selector-bar">
                 <div>
@@ -1894,6 +1915,59 @@
                     if (wrapper) wrapper.classList.remove('is-invalid-highlight');
                 });
             });
+
+            // Offline Form Submit Interceptor (Khusus Area Blankspot)
+            const surveyForm = document.querySelector('form[action*="/survey"]') || document.querySelector('form');
+            if (surveyForm) {
+                surveyForm.addEventListener('submit', function(e) {
+                    if (!navigator.onLine) {
+                        e.preventDefault();
+
+                        const fields = {};
+                        const formData = new FormData(surveyForm);
+                        formData.forEach((val, key) => {
+                            if (typeof val === 'string') {
+                                fields[key] = val;
+                            }
+                        });
+
+                        const photos = {};
+                        const photoFields = ['ktp', 'kk', 'sertifikat_tanah', 'foto_sudut_depan', 'foto_sudut_belakang', 'foto_bagian_dalam', 'foto_sudut_kiri', 'foto_sudut_kanan'];
+                        
+                        let photoPromises = photoFields.map(field => {
+                            const input = document.getElementById('input_' + field) || document.querySelector(`input[name="${field}"]`);
+                            if (input && input.files && input.files[0]) {
+                                const file = input.files[0];
+                                return new Promise(resolve => {
+                                    const reader = new FileReader();
+                                    reader.onload = function(evt) {
+                                        photos[field] = { name: file.name, dataUrl: evt.target.result };
+                                        resolve();
+                                    };
+                                    reader.readAsDataURL(file);
+                                });
+                            }
+                            return Promise.resolve();
+                        });
+
+                        Promise.all(photoPromises).then(() => {
+                            const recipientId = '{{ $vervalData->id ?? "" }}';
+                            const recipientName = '{{ $vervalData->nama ?? "Calon Penerima" }}';
+
+                            window.BspsOfflineManager.saveOfflineSurvey({
+                                recipientId: recipientId,
+                                recipientName: recipientName,
+                                actionUrl: surveyForm.action,
+                                fields: fields,
+                                photos: photos,
+                                savedAt: new Date().toISOString()
+                            }).then(() => {
+                                alert('🟢 BERHASIL SIMPAN OFFLINE!\n\nData survei & foto untuk ' + recipientName + ' telah tersimpan di memori HP Anda (Area Blankspot).\n\nData akan dikirim otomatis ke server begitu HP kembali terhubung ke sinyal internet.');
+                            });
+                        });
+                    }
+                });
+            }
         });
 
         @if(auth()->check() && auth()->user()->isAdminKecamatan())
@@ -1906,5 +1980,244 @@
             });
         });
         @endif
+    </script>
+
+    <!-- PWA Service Worker & IndexedDB Offline Sync Manager (Khusus Blankspot) -->
+    <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/sw.js').then(function(reg) {
+                console.log('[PWA] ServiceWorker registered scope:', reg.scope);
+            }).catch(function(err) {
+                console.warn('[PWA] ServiceWorker failed:', err);
+            });
+        });
+    }
+
+    window.BspsOfflineManager = (function() {
+        const DB_NAME = 'BspsOfflineDB';
+        const DB_VERSION = 1;
+        const STORE_NAME = 'offline_surveys';
+        let db = null;
+
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                if (db) return resolve(db);
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                request.onupgradeneeded = function(e) {
+                    const dbInst = e.target.result;
+                    if (!dbInst.objectStoreNames.contains(STORE_NAME)) {
+                        dbInst.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+                    }
+                };
+                request.onsuccess = function(e) {
+                    db = e.target.result;
+                    resolve(db);
+                };
+                request.onerror = function(e) {
+                    console.error('[IndexedDB] Error initializing DB:', e);
+                    reject(e);
+                };
+            });
+        }
+
+        function saveOfflineSurvey(surveyData) {
+            return initDB().then(dbInst => {
+                return new Promise((resolve, reject) => {
+                    const tx = dbInst.transaction(STORE_NAME, 'readwrite');
+                    const store = tx.objectStore(STORE_NAME);
+                    const req = store.add(surveyData);
+                    req.onsuccess = function() {
+                        updateUIStatus();
+                        resolve(req.result);
+                    };
+                    req.onerror = function(e) {
+                        reject(e);
+                    };
+                });
+            });
+        }
+
+        function getOfflineSurveys() {
+            return initDB().then(dbInst => {
+                return new Promise((resolve, reject) => {
+                    const tx = dbInst.transaction(STORE_NAME, 'readonly');
+                    const store = tx.objectStore(STORE_NAME);
+                    const req = store.getAll();
+                    req.onsuccess = function() {
+                        resolve(req.result || []);
+                    };
+                    req.onerror = function(e) {
+                        reject(e);
+                    };
+                });
+            });
+        }
+
+        function deleteOfflineSurvey(id) {
+            return initDB().then(dbInst => {
+                return new Promise((resolve, reject) => {
+                    const tx = dbInst.transaction(STORE_NAME, 'readwrite');
+                    const store = tx.objectStore(STORE_NAME);
+                    const req = store.delete(id);
+                    req.onsuccess = function() {
+                        updateUIStatus();
+                        resolve();
+                    };
+                    req.onerror = function(e) {
+                        reject(e);
+                    };
+                });
+            });
+        }
+
+        function updateUIStatus() {
+            const banner = document.getElementById('offlineSyncBanner');
+            const icon = document.getElementById('networkStatusIcon');
+            const title = document.getElementById('networkStatusTitle');
+            const sub = document.getElementById('networkStatusSub');
+            const queueBox = document.getElementById('offlineQueueBox');
+            const countBadge = document.getElementById('offlineCountBadge');
+
+            const isOnline = navigator.onLine;
+
+            getOfflineSurveys().then(items => {
+                const count = items.length;
+
+                if (!isOnline) {
+                    if (banner) banner.style.borderLeftColor = '#eab308';
+                    if (icon) {
+                        icon.style.background = 'rgba(234, 179, 8, 0.16)';
+                        icon.style.color = '#eab308';
+                        icon.innerHTML = '<i class="fas fa-triangle-exclamation"></i>';
+                    }
+                    if (title) title.textContent = 'Mode Blankspot (Offline)';
+                    if (sub) sub.textContent = 'Sinyal terputus. Hasil survei & foto akan otomatis tersimpan di memori HP Anda.';
+                } else {
+                    if (banner) banner.style.borderLeftColor = '#22c55e';
+                    if (icon) {
+                        icon.style.background = 'rgba(34, 197, 94, 0.16)';
+                        icon.style.color = '#22c55e';
+                        icon.innerHTML = '<i class="fas fa-wifi"></i>';
+                    }
+                    if (title) title.textContent = 'Mode Terhubung (Online)';
+                    if (sub) sub.textContent = count > 0 ? 'Terdapat draf offline tersimpan. Klik tombol untuk mengunggah ke server.' : 'Koneksi lancar. Data survei dikirim langsung ke server.';
+                }
+
+                if (count > 0) {
+                    if (queueBox) queueBox.style.display = 'flex';
+                    if (countBadge) countBadge.textContent = count + ' Draf Offline';
+                } else {
+                    if (queueBox) queueBox.style.display = 'none';
+                }
+            });
+        }
+
+        function syncNow() {
+            if (!navigator.onLine) {
+                alert('Perangkat masih dalam kondisi offline (blankspot). Hubungkan ke sinyal internet/Wi-Fi untuk mensinkronkan.');
+                return;
+            }
+
+            const syncBtn = document.getElementById('btnSyncOffline');
+            if (syncBtn) {
+                syncBtn.disabled = true;
+                syncBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengunggah...';
+            }
+
+            getOfflineSurveys().then(items => {
+                if (items.length === 0) {
+                    if (syncBtn) {
+                        syncBtn.disabled = false;
+                        syncBtn.innerHTML = '<i class="fas fa-rotate"></i> Sinkronkan Sekarang';
+                    }
+                    updateUIStatus();
+                    return;
+                }
+
+                let completed = 0;
+                let total = items.length;
+
+                items.forEach(item => {
+                    const formData = new FormData();
+                    for (let key in item.fields) {
+                        formData.append(key, item.fields[key]);
+                    }
+                    // Append photos
+                    for (let field in item.photos) {
+                        if (item.photos[field] && item.photos[field].dataUrl) {
+                            const blob = dataURLtoBlob(item.photos[field].dataUrl);
+                            formData.append(field, blob, item.photos[field].name || (field + '.jpg'));
+                        }
+                    }
+                    formData.append('_token', '{{ csrf_token() }}');
+
+                    fetch(item.actionUrl || ('/survey/' + item.recipientId), {
+                        method: 'POST',
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                        body: formData
+                    })
+                    .then(res => {
+                        deleteOfflineSurvey(item.id).then(() => {
+                            completed++;
+                            if (completed >= total) {
+                                alert('Berhasil! Seluruh ' + total + ' data survei offline telah tersinkronisasi ke server.');
+                                if (syncBtn) {
+                                    syncBtn.disabled = false;
+                                    syncBtn.innerHTML = '<i class="fas fa-rotate"></i> Sinkronkan Sekarang';
+                                }
+                                updateUIStatus();
+                                window.location.reload();
+                            }
+                        });
+                    })
+                    .catch(err => {
+                        console.error('[Sync Error]', err);
+                        completed++;
+                        if (completed >= total) {
+                            if (syncBtn) {
+                                syncBtn.disabled = false;
+                                syncBtn.innerHTML = '<i class="fas fa-rotate"></i> Sinkronkan Sekarang';
+                            }
+                            updateUIStatus();
+                        }
+                    });
+                });
+            });
+        }
+
+        function dataURLtoBlob(dataurl) {
+            const arr = dataurl.split(',');
+            const mime = arr[0].match(/:(.*?);/)[1];
+            const bstr = atob(arr[1]);
+            let n = bstr.length;
+            const u8arr = new Uint8Array(n);
+            while (n--) {
+                u8arr[n] = bstr.charCodeAt(n);
+            }
+            return new Blob([u8arr], { type: mime });
+        }
+
+        window.addEventListener('online', function() {
+            updateUIStatus();
+            syncNow();
+        });
+
+        window.addEventListener('offline', function() {
+            updateUIStatus();
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            updateUIStatus();
+        });
+
+        return {
+            saveOfflineSurvey,
+            getOfflineSurveys,
+            deleteOfflineSurvey,
+            updateUIStatus,
+            syncNow
+        };
+    })();
     </script>
 @endpush
