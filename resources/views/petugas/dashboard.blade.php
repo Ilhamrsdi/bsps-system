@@ -7,11 +7,10 @@
 @push('styles')
 <style>
     /* Hero Banner Petugas */
-    /* Hero Banner Petugas */
     .welcome-card {
-        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        background: linear-gradient(135deg, #002855 0%, #001835 100%);
         color: #ffffff;
-        border-radius: var(--radius);
+        border-radius: 14px;
         padding: 22px 28px;
         margin-bottom: 24px;
         box-shadow: 0 10px 24px rgba(0, 40, 85, 0.18);
@@ -19,53 +18,93 @@
         align-items: center;
         justify-content: space-between;
         gap: 20px;
-        flex-wrap: wrap;
-        border-left: 6px solid var(--secondary);
+        border-left: 6px solid #ffb800;
         width: 100%;
         box-sizing: border-box;
     }
-    .welcome-text { flex: 1; min-width: 260px; }
+    .welcome-text { flex: 1; }
     .welcome-text h2 { font-size: 20px; font-weight: 800; margin-bottom: 4px; color:#fff; }
-    .welcome-text p  { font-size: 13.5px; opacity: 0.9; margin: 0; color:rgba(255,255,255,0.9); }
+    .welcome-text p  { font-size: 13.5px; opacity: 0.9; margin: 0; color:rgba(255,255,255,0.85); }
+    .welcome-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+    }
+    @media (max-width: 992px) {
+        .welcome-card {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .welcome-actions {
+            width: 100%;
+            flex-wrap: wrap;
+        }
+    }
 
-    /* Stats Grid */
+    /* Stats Grid 5 Kolom */
     .stats-grid-petugas {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 16px;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 14px;
         margin-bottom: 24px;
         width: 100%;
         box-sizing: border-box;
     }
+    @media (max-width: 1100px) {
+        .stats-grid-petugas {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+    @media (max-width: 768px) {
+        .stats-grid-petugas {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    @media (max-width: 480px) {
+        .stats-grid-petugas {
+            grid-template-columns: 1fr;
+        }
+    }
+
     .stat-card-petugas {
         background: var(--bg-card);
-        border-radius: var(--radius);
-        padding: 18px 20px;
+        border-radius: 12px;
+        padding: 16px 18px;
         box-shadow: var(--shadow-sm);
-        border: 1px solid rgba(0, 40, 85, 0.06);
+        border: 1px solid rgba(0, 40, 85, 0.08);
         display: flex;
         align-items: center;
-        gap: 14px;
+        gap: 12px;
         text-decoration: none;
         color: inherit;
-        transition: var(--transition);
+        transition: all 0.2s ease;
         min-width: 0;
         box-sizing: border-box;
     }
-    .stat-card-petugas:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
-    .stat-card-petugas .stat-icon {
-        width: 46px; height: 46px;
-        border-radius: var(--radius-sm);
-        display: flex; align-items: center; justify-content: center;
-        font-size: 19px; flex-shrink: 0;
+    .stat-card-petugas:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 40, 85, 0.12);
+        border-color: var(--primary);
     }
-    .stat-card-petugas .stat-icon.blue   { background: rgba(0,40,85,0.10);   color: var(--primary); }
+    .stat-card-petugas .stat-icon {
+        width: 42px; height: 42px;
+        border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 18px; flex-shrink: 0;
+    }
+    .stat-card-petugas .stat-icon.blue   { background: rgba(0,40,85,0.08);   color: var(--primary); }
     .stat-card-petugas .stat-icon.orange { background: rgba(255,184,0,0.15); color: #d69e00; }
-    .stat-card-petugas .stat-icon.green  { background: rgba(39,174,96,0.12); color: var(--success); }
-    .stat-card-petugas .stat-icon.purple { background: rgba(142,68,173,0.12); color: #8e44ad; }
+    .stat-card-petugas .stat-icon.green  { background: rgba(34,197,94,0.14); color: #15803d; }
+    .stat-card-petugas .stat-icon.cyan   { background: rgba(6,182,212,0.14);  color: #0891b2; }
+    .stat-card-petugas .stat-icon.purple { background: rgba(142,68,173,0.12); color: #7e22ce; }
+    
     .stat-card-petugas .stat-info { flex: 1; min-width: 0; }
     .stat-card-petugas .stat-value { font-size: 22px; font-weight: 800; line-height: 1.1; color: var(--primary-dark); }
-    .stat-card-petugas .stat-label { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 3px; line-height: 1.3; }
+    .stat-card-petugas .stat-label {
+        font-size: 11.5px; color: var(--text-muted); font-weight: 600; margin-top: 3px; line-height: 1.25;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
 
     /* Chart Grid Section */
     .petugas-charts-grid {
@@ -341,18 +380,17 @@
             <div class="welcome-text">
                 <h2>Selamat Datang, {{ $user->name }}!</h2>
                 <p>
-                    Wilayah Tugas: <strong>Desa {{ $user->desa ?: '-' }}</strong> &bull; 
-                    Kecamatan <strong>{{ $user->kecamatan ?: '-' }}</strong>
+                    <i class="fas fa-location-dot" style="margin-right:4px;color:#ffb800;"></i> Wilayah Tugas: <strong>Desa {{ $user->desa ?: '-' }}</strong> &bull; Kecamatan <strong>{{ $user->kecamatan ?: '-' }}</strong>
                 </p>
             </div>
-            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-                <button type="button" class="btn" style="background:#22c55e;color:#fff;font-weight:800;padding:10px 16px;border-radius:var(--radius-sm);border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 14px rgba(34,197,94,0.35);" onclick="window.PuprModal.open('modalTambahUsulan')" title="Tambah Usulan Calon Penerima Baru di Desa {{ $user->desa ?: '-' }}">
+            <div class="welcome-actions">
+                <button type="button" class="btn" style="background:#22c55e;color:#fff;font-weight:800;padding:10px 16px;border-radius:8px;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 14px rgba(34,197,94,0.35);white-space:nowrap;" onclick="window.PuprModal.open('modalTambahUsulan')" title="Tambah Usulan Calon Penerima Baru di Desa {{ $user->desa ?: '-' }}">
                     <i class="fas fa-plus-circle"></i> + Tambah Usulan Baru
                 </button>
-                <a href="{{ route('verval-data.surat-pernyataan-kolektif', array_merge(['desa' => $user->desa], request()->all())) }}" target="_blank" class="btn" style="background:#ffb800;color:#002855;font-weight:800;padding:10px 16px;border-radius:var(--radius-sm);text-decoration:none;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(0,0,0,0.15);" title="Cetak Surat Pernyataan secara kolektif untuk Desa {{ $user->desa ?: '-' }}">
+                <a href="{{ route('verval-data.surat-pernyataan-kolektif', array_merge(['desa' => $user->desa], request()->all())) }}" target="_blank" class="btn" style="background:#ffb800;color:#002855;font-weight:800;padding:10px 16px;border-radius:8px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(0,0,0,0.15);white-space:nowrap;" title="Cetak Surat Pernyataan secara kolektif untuk Desa {{ $user->desa ?: '-' }}">
                     <i class="fas fa-file-signature"></i> Cetak Kolektif Surat
                 </a>
-                <a href="{{ url('/petugas/belum-survei') }}" class="btn" style="background:rgba(255,255,255,0.18);color:#fff;font-weight:700;padding:10px 16px;border-radius:var(--radius-sm);text-decoration:none;display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,0.35);">
+                <a href="{{ url('/petugas/belum-survei') }}" class="btn" style="background:rgba(255,255,255,0.15);color:#fff;font-weight:700;padding:10px 16px;border-radius:8px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,0.3);white-space:nowrap;">
                     <i class="fas fa-clipboard-question"></i> Belum Survei
                 </a>
             </div>
@@ -364,35 +402,35 @@
                 <div class="stat-icon blue"><i class="fas fa-users-viewfinder"></i></div>
                 <div class="stat-info">
                     <div class="stat-value">{{ number_format($stats['total_tugas'], 0, ',', '.') }}</div>
-                    <div class="stat-label">Total Calon Penerima Desa Ini</div>
+                    <div class="stat-label">Total Penerima Desa</div>
                 </div>
             </div>
             <a href="{{ url('/petugas/belum-survei') }}" class="stat-card-petugas">
                 <div class="stat-icon orange"><i class="fas fa-clipboard-question"></i></div>
                 <div class="stat-info">
                     <div class="stat-value" style="color:#d69e00;">{{ number_format($stats['belum_survei'], 0, ',', '.') }}</div>
-                    <div class="stat-label">Belum Di-survei (Perlu Survei)</div>
+                    <div class="stat-label">Belum Di-survei</div>
                 </div>
             </a>
             <a href="{{ url('/petugas/sudah-survei') }}" class="stat-card-petugas">
                 <div class="stat-icon green"><i class="fas fa-clipboard-check"></i></div>
                 <div class="stat-info">
-                    <div class="stat-value" style="color:var(--success);">{{ number_format($stats['sudah_survei'], 0, ',', '.') }}</div>
+                    <div class="stat-value" style="color:#15803d;">{{ number_format($stats['sudah_survei'], 0, ',', '.') }}</div>
                     <div class="stat-label">Sudah Selesai Survei</div>
                 </div>
             </a>
             <div class="stat-card-petugas">
-                <div class="stat-icon cyan" style="background:rgba(34,197,94,0.15);color:#16a34a;"><i class="fas fa-user-plus"></i></div>
+                <div class="stat-icon cyan"><i class="fas fa-user-plus"></i></div>
                 <div class="stat-info">
-                    <div class="stat-value" style="color:#16a34a;">{{ number_format($stats['usulan_baru'], 0, ',', '.') }}</div>
+                    <div class="stat-value" style="color:#0891b2;">{{ number_format($stats['usulan_baru'], 0, ',', '.') }}</div>
                     <div class="stat-label">Usulan Baru Lapangan</div>
                 </div>
             </div>
             <div class="stat-card-petugas">
                 <div class="stat-icon purple"><i class="fas fa-chart-pie"></i></div>
                 <div class="stat-info">
-                    <div class="stat-value" style="color:#8e44ad;">{{ $stats['persentase_selesai'] }}%</div>
-                    <div class="stat-label">Tingkat Penyelesaian</div>
+                    <div class="stat-value" style="color:#7e22ce;">{{ $stats['persentase_selesai'] }}%</div>
+                    <div class="stat-label">Persentase Selesai</div>
                 </div>
             </div>
         </div>
