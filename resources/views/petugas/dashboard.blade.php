@@ -21,8 +21,9 @@
         border-left: 6px solid #ffb800;
         width: 100%;
         box-sizing: border-box;
+        flex-wrap: wrap;
     }
-    .welcome-text { flex: 1; }
+    .welcome-text { flex: 1; min-width: 260px; }
     .welcome-text h2 { font-size: 20px; font-weight: 800; margin-bottom: 4px; color:#fff; }
     .welcome-text p  { font-size: 13.5px; opacity: 0.9; margin: 0; color:rgba(255,255,255,0.85); }
     .welcome-actions {
@@ -30,8 +31,9 @@
         align-items: center;
         gap: 10px;
         flex-shrink: 0;
+        flex-wrap: wrap;
     }
-    @media (max-width: 992px) {
+    @media (max-width: 1280px) {
         .welcome-card {
             flex-direction: column;
             align-items: flex-start;
@@ -42,10 +44,10 @@
         }
     }
 
-    /* Stats Grid 5 Kolom */
+    /* Stats Grid Responsive Auto-Fit */
     .stats-grid-petugas {
         display: grid;
-        grid-template-columns: repeat(5, 1fr);
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
         gap: 14px;
         margin-bottom: 24px;
         width: 100%;
@@ -299,7 +301,6 @@
     }
 
     @media (max-width: 992px) {
-        .stats-grid-petugas { grid-template-columns: repeat(2, 1fr); gap: 12px; }
         .petugas-charts-grid { grid-template-columns: 1fr; }
     }
 
@@ -384,13 +385,13 @@
                 </p>
             </div>
             <div class="welcome-actions">
-                <button type="button" class="btn" style="background:#22c55e;color:#fff;font-weight:800;padding:10px 16px;border-radius:8px;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 14px rgba(34,197,94,0.35);white-space:nowrap;" onclick="window.PuprModal.open('modalTambahUsulan')" title="Tambah Usulan Calon Penerima Baru di Desa {{ $user->desa ?: '-' }}">
-                    <i class="fas fa-plus-circle"></i> + Tambah Usulan Baru
+                <button type="button" class="btn" style="background:#22c55e;color:#fff;font-weight:800;padding:10px 16px;border-radius:8px;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 14px rgba(34,197,94,0.35);" onclick="window.PuprModal.open('modalTambahUsulan')" title="Tambah Usulan Calon Penerima Baru di Desa {{ $user->desa ?: '-' }}">
+                    <i class="fas fa-plus-circle"></i> Tambah Usulan
                 </button>
-                <a href="{{ route('verval-data.surat-pernyataan-kolektif', array_merge(['desa' => $user->desa], request()->all())) }}" target="_blank" class="btn" style="background:#ffb800;color:#002855;font-weight:800;padding:10px 16px;border-radius:8px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(0,0,0,0.15);white-space:nowrap;" title="Cetak Surat Pernyataan secara kolektif untuk Desa {{ $user->desa ?: '-' }}">
-                    <i class="fas fa-file-signature"></i> Cetak Kolektif Surat
+                <a href="{{ route('verval-data.surat-pernyataan-kolektif', array_merge(['desa' => $user->desa], request()->all())) }}" target="_blank" class="btn" style="background:#ffb800;color:#002855;font-weight:800;padding:10px 16px;border-radius:8px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(0,0,0,0.15);" title="Cetak Surat Pernyataan secara kolektif untuk Desa {{ $user->desa ?: '-' }}">
+                    <i class="fas fa-file-signature"></i> Cetak Kolektif
                 </a>
-                <a href="{{ url('/petugas/belum-survei') }}" class="btn" style="background:rgba(255,255,255,0.15);color:#fff;font-weight:700;padding:10px 16px;border-radius:8px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,0.3);white-space:nowrap;">
+                <a href="{{ url('/petugas/belum-survei') }}" class="btn" style="background:rgba(255,255,255,0.15);color:#fff;font-weight:700;padding:10px 16px;border-radius:8px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,0.3);">
                     <i class="fas fa-clipboard-question"></i> Belum Survei
                 </a>
             </div>

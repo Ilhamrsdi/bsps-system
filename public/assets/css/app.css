@@ -465,6 +465,7 @@ html, body {
     min-width: 0;
     position: relative;
     box-sizing: border-box;
+    overflow-x: hidden;
 }
 
 .navbar {
@@ -765,6 +766,7 @@ html[data-theme="dark"] .user-dropdown-item:hover {
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
+    overflow-x: hidden;
 }
 
 /* ============================================================
