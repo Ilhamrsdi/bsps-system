@@ -34,8 +34,8 @@ class AdminKecamatanSeeder extends Seeder
                 ['email' => $email],
                 [
                     'name'           => $name,
-                    'password'       => Hash::make('password123'),
-                    'plain_password' => 'password123',
+                    'password'       => Hash::make('password'),
+                    'plain_password' => 'password',
                     'role'           => 'admin_kecamatan',
                     'kecamatan' => strtoupper($k),
                     'jabatan'   => 'Admin Kecamatan ' . ucwords(strtolower($k)),
