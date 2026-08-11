@@ -246,6 +246,6 @@ class PetugasController extends Controller
             return redirect()->route('survey', ['id' => $penerima->id])->with('success', "Calon penerima '{$penerima->nama}' berhasil ditambahkan! Silakan lengkapi data survei & foto.");
         }
 
-        return redirect()->back()->with('success', "Calon penerima '{$penerima->nama}' (NIK: {$noKtp}) berhasil diusulkan ke Desa {$user->desa}!");
+        return redirect()->route('petugas.belum-survei')->with('success', "Calon penerima '{$penerima->nama}' (NIK: {$noKtp}) berhasil diusulkan ke Desa {$user->desa}! Data telah tersimpan di daftar Belum Survei.");
     }
 }

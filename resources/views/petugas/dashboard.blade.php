@@ -921,9 +921,6 @@
                     <button type="submit" class="btn btn-primary" style="padding: 9px 18px; font-weight: 800; background: #002855; color: #fff; display: inline-flex; align-items: center; gap: 6px;">
                         <i class="fas fa-save"></i> Simpan Usulan
                     </button>
-                    <button type="submit" name="survei_sekarang" value="1" class="btn" style="padding: 9px 18px; font-weight: 800; background: #22c55e; color: #fff; border: none; border-radius: var(--radius-sm); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);">
-                        <i class="fas fa-clipboard-check"></i> Simpan &amp; Mulai Survei
-                    </button>
                 </div>
             </form>
         </div>
