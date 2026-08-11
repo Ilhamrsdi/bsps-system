@@ -181,13 +181,30 @@ class PencocokanDataController extends Controller
             $penerimas->setCollection($filteredItems);
         }
 
+        // Base query untuk statistik akumulasi keseluruhan database
+        $baseStatQuery = DataPenerima::query();
+        if ($user && $user->isAdminKecamatan()) {
+            $baseStatQuery->where('kecamatan', $user->kecamatan);
+        }
+
+        $overallTotal = (clone $baseStatQuery)->count();
+        $overallCocok = (clone $baseStatQuery)->where('dg_status', 'cocok')->count();
+        $overallBeda = (clone $baseStatQuery)->where('dg_status', 'beda')->count();
+        $overallTidak = (clone $baseStatQuery)->where('dg_status', 'tidak_ditemukan')->count();
+
+        // Fallback jika belum terpopulasi / un-evaluated
+        if ($overallCocok === 0 && $overallBeda === 0 && $overallTidak === 0) {
+            $overallCocok = $totalCocok;
+            $overallBeda  = $totalBeda;
+            $overallTidak = $totalTidakDitemukan;
+        }
+
         $stats = [
-            'total'           => $penerimas->total(),
+            'total'           => $overallTotal,
+            'cocok'           => $overallCocok,
+            'beda'            => $overallBeda,
+            'tidak_ditemukan' => $overallTidak,
             'page_count'      => $penerimas->count(),
-            'cocok'           => $totalCocok,
-            'beda'            => $totalBeda,
-            'tidak_ditemukan' => $totalTidakDitemukan,
-            'is_all'          => ($perPageParam === 'all' || $penerimas->total() <= $penerimas->count()),
             'per_page'        => $perPageParam,
         ];
 

@@ -181,36 +181,21 @@
                 <div class="stat-icon green"><i class="fas fa-check-double"></i></div>
                 <div class="stat-info">
                     <div class="stat-value" style="color:#15803d;">{{ number_format($stats['cocok'], 0, ',', '.') }}</div>
-                    <div class="stat-label">
-                        Cocok Sempurna (Match)
-                        <span style="display:block;font-size:11px;font-weight:600;color:var(--text-muted);margin-top:2px;">
-                            @if($stats['is_all']) (Seluruh Data) @else (dari {{ $stats['page_count'] }} Data Hal. Ini) @endif
-                        </span>
-                    </div>
+                    <div class="stat-label">Cocok Sempurna (Match)</div>
                 </div>
             </div>
             <div class="stat-card-pencocokan">
                 <div class="stat-icon orange"><i class="fas fa-triangle-exclamation"></i></div>
                 <div class="stat-info">
                     <div class="stat-value" style="color:#d97706;">{{ number_format($stats['beda'], 0, ',', '.') }}</div>
-                    <div class="stat-label">
-                        Perlu Di-sync (Beda Data)
-                        <span style="display:block;font-size:11px;font-weight:600;color:var(--text-muted);margin-top:2px;">
-                            @if($stats['is_all']) (Seluruh Data) @else (dari {{ $stats['page_count'] }} Data Hal. Ini) @endif
-                        </span>
-                    </div>
+                    <div class="stat-label">Perlu Di-sync (Beda Data)</div>
                 </div>
             </div>
             <div class="stat-card-pencocokan">
                 <div class="stat-icon red"><i class="fas fa-user-xmark"></i></div>
                 <div class="stat-info">
                     <div class="stat-value" style="color:#ef4444;">{{ number_format($stats['tidak_ditemukan'], 0, ',', '.') }}</div>
-                    <div class="stat-label">
-                        Tidak Ditemukan
-                        <span style="display:block;font-size:11px;font-weight:600;color:var(--text-muted);margin-top:2px;">
-                            @if($stats['is_all']) (Seluruh Data) @else (dari {{ $stats['page_count'] }} Data Hal. Ini) @endif
-                        </span>
-                    </div>
+                    <div class="stat-label">Tidak Ditemukan di Dataguse</div>
                 </div>
             </div>
         </div>
