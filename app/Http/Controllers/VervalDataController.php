@@ -14,11 +14,22 @@ class VervalDataController extends Controller
      */
     public function index(Request $request)
     {
+        $user = Auth::user();
         $search = $request->get('search');
         $kecamatan = $request->get('kecamatan', 'all');
         $desil = $request->get('desil', 'all');
 
+        if ($user && $user->isAdminKecamatan()) {
+            $kecamatan = $user->kecamatan;
+        }
+
         $query = DataPenerima::query();
+
+        if ($user && $user->isAdminKecamatan()) {
+            $query->where('kecamatan', $user->kecamatan);
+        } elseif ($kecamatan && $kecamatan !== 'all') {
+            $query->where('kecamatan', $kecamatan);
+        }
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -30,17 +41,18 @@ class VervalDataController extends Controller
             });
         }
 
-        if ($kecamatan && $kecamatan !== 'all') {
-            $query->where('kecamatan', $kecamatan);
-        }
-
         if ($desil && $desil !== 'all') {
             $query->where('pengelompokan_desil', 'like', "%{$desil}%");
         }
 
-        $totalPenerima = DataPenerima::distinct('no_ktp')->count('no_ktp');
-        $totalKecamatan = DataPenerima::distinct('kecamatan')->count('kecamatan');
-        $totalDesa = DataPenerima::selectRaw("COUNT(DISTINCT CONCAT(kecamatan, ' - ', desa_kelurahan)) as total")->value('total');
+        $baseQuery = DataPenerima::query();
+        if ($user && $user->isAdminKecamatan()) {
+            $baseQuery->where('kecamatan', $user->kecamatan);
+        }
+
+        $totalPenerima = (clone $baseQuery)->distinct('no_ktp')->count('no_ktp');
+        $totalKecamatan = (clone $baseQuery)->distinct('kecamatan')->count('kecamatan');
+        $totalDesa = (clone $baseQuery)->selectRaw("COUNT(DISTINCT CONCAT(kecamatan, ' - ', desa_kelurahan)) as total")->value('total');
 
         $stats = [
             'total'     => $totalPenerima,
@@ -50,7 +62,11 @@ class VervalDataController extends Controller
         ];
 
         // Daftar Kecamatan untuk filter dropdown
-        $listKecamatan = DataPenerima::distinct()->orderBy('kecamatan', 'asc')->pluck('kecamatan')->filter()->values();
+        if ($user && $user->isAdminKecamatan()) {
+            $listKecamatan = collect([$user->kecamatan]);
+        } else {
+            $listKecamatan = DataPenerima::distinct()->orderBy('kecamatan', 'asc')->pluck('kecamatan')->filter()->values();
+        }
 
         $vervals = $query->paginate(20)->withQueryString();
 
@@ -74,6 +90,7 @@ class VervalDataController extends Controller
      */
     public function suratPernyataanKolektif(Request $request)
     {
+        $user = Auth::user();
         $search = $request->get('search');
         $kecamatan = $request->get('kecamatan', 'all');
         $desa = $request->get('desa', 'all');
@@ -82,9 +99,9 @@ class VervalDataController extends Controller
 
         $query = DataPenerima::query();
 
-        // Jika user yang login adalah Petugas Lapangan, batasi wilayah tugasnya secara otomatis
-        $user = Auth::user();
-        if ($user && $user->isPetugas()) {
+        if ($user && $user->isAdminKecamatan()) {
+            $query->where('kecamatan', $user->kecamatan);
+        } elseif ($user && $user->isPetugas()) {
             $petugasId   = $user->id;
             $petugasDesa = $user->desa;
             $query->where(function ($q) use ($petugasId, $petugasDesa) {

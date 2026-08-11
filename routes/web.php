@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\SurveyController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DashboardKecamatanController;
 use App\Http\Controllers\VervalDataController;
 use App\Http\Controllers\GeoMapController;
 use App\Http\Controllers\UserController;
@@ -194,8 +195,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/survey/{id?}', [SurveyController::class, 'store'])->name('survey.store')->where('id', '[0-9]+');
     Route::put('/survey/{id}', [SurveyController::class, 'store'])->name('survey.update')->where('id', '[0-9]+');
 
-    // Admin Dashboard System
+    // Admin Dashboard System (Kabupaten & Kecamatan)
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard-kecamatan', [DashboardKecamatanController::class, 'index'])
+        ->middleware('role:admin,admin_kecamatan')
+        ->name('dashboard.kecamatan');
     // Data Verval BSPS
     Route::get('/verval-data', [VervalDataController::class, 'index'])->name('verval-data');
     Route::get('/data-verval', [VervalDataController::class, 'index'])->name('data-verval');
@@ -205,17 +209,19 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/data-verval/{id}', [SurveyController::class, 'store'])->name('data-verval.update');
     Route::put('/data-verval/{id}/status', [VervalDataController::class, 'updateStatus'])->name('data-verval.update-status');
 
-    // Pencocokan Data Kependudukan (Dataguse vs Data Penerima BSPS)
-    Route::get('/pencocokan-data', [\App\Http\Controllers\PencocokanDataController::class, 'index'])->name('pencocokan-data');
-    Route::post('/pencocokan-data/sync-batch', [\App\Http\Controllers\PencocokanDataController::class, 'syncBatch'])->name('pencocokan-data.sync-batch');
-    Route::post('/pencocokan-data/{id}/sync', [\App\Http\Controllers\PencocokanDataController::class, 'syncSingle'])->name('pencocokan-data.sync-single');
+    // Pencocokan Data Kependudukan (Dataguse vs Data Penerima BSPS) — Khusus Super Admin
+    Route::middleware(['role:admin'])->group(function () {
+        Route::get('/pencocokan-data', [\App\Http\Controllers\PencocokanDataController::class, 'index'])->name('pencocokan-data');
+        Route::post('/pencocokan-data/sync-batch', [\App\Http\Controllers\PencocokanDataController::class, 'syncBatch'])->name('pencocokan-data.sync-batch');
+        Route::post('/pencocokan-data/{id}/sync', [\App\Http\Controllers\PencocokanDataController::class, 'syncSingle'])->name('pencocokan-data.sync-single');
+    });
 
     // Geo Maps
     Route::get('/geomaps', [GeoMapController::class, 'index'])->name('geomaps');
     Route::get('/geoMaps', [GeoMapController::class, 'index']);
 
-    // Penugasan & Petugas Survei Management — Khusus Admin
-    Route::middleware(['role:admin'])->group(function () {
+    // Penugasan & Petugas Survei Management — Khusus Admin Kab. & Admin Kec.
+    Route::middleware(['role:admin,admin_kecamatan'])->group(function () {
         // Penugasan Petugas Survei Lapangan
         Route::get('/penugasan', [PenugasanController::class, 'index'])->name('penugasan');
         Route::post('/penugasan/{dataMingguan}', [PenugasanController::class, 'update'])->name('penugasan.update');

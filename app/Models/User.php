@@ -61,11 +61,27 @@ class User extends Authenticatable
     }
 
     /**
-     * Cek apakah user memiliki role admin.
+     * Cek apakah user memiliki role admin (Super Admin).
      */
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
+    }
+
+    /**
+     * Cek apakah user memiliki role admin kecamatan.
+     */
+    public function isAdminKecamatan(): bool
+    {
+        return $this->role === 'admin_kecamatan';
+    }
+
+    /**
+     * Cek apakah user merupakan Admin Kabupaten/Super Admin atau Admin Kecamatan.
+     */
+    public function isAdminOrKecamatan(): bool
+    {
+        return in_array($this->role, ['admin', 'admin_kecamatan']);
     }
 
     /**

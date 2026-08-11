@@ -13,11 +13,22 @@ class PenugasanController extends Controller
      */
     public function index(Request $request)
     {
+        $authUser  = \Illuminate\Support\Facades\Auth::user();
         $search    = $request->get('search');
         $kecamatan = $request->get('kecamatan', 'all');
         $petugasId = $request->get('petugas_id', 'all');
 
+        if ($authUser && $authUser->isAdminKecamatan()) {
+            $kecamatan = $authUser->kecamatan;
+        }
+
         $query = DataPenerima::with('petugas');
+
+        if ($authUser && $authUser->isAdminKecamatan()) {
+            $query->where('kecamatan', $authUser->kecamatan);
+        } elseif ($kecamatan && $kecamatan !== 'all') {
+            $query->where('kecamatan', $kecamatan);
+        }
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -34,19 +45,22 @@ class PenugasanController extends Controller
             });
         }
 
-        if ($kecamatan && $kecamatan !== 'all') {
-            $query->where('kecamatan', $kecamatan);
-        }
-
         if ($petugasId && $petugasId !== 'all') {
             $query->where('user_id', $petugasId);
         }
 
-        // Statistik Penugasan
-        $totalPenerima   = DataPenerima::count();
-        $totalDitugaskan = DataPenerima::whereNotNull('user_id')->count();
-        $totalPetugas    = User::where('role', 'petugas')->count();
-        $totalDesa       = DataPenerima::distinct('desa_kelurahan')->count('desa_kelurahan');
+        // Statistik Penugasan (Scoped untuk Admin Kecamatan)
+        $baseQuery = DataPenerima::query();
+        $petugasQuery = User::where('role', 'petugas');
+        if ($authUser && $authUser->isAdminKecamatan()) {
+            $baseQuery->where('kecamatan', $authUser->kecamatan);
+            $petugasQuery->where('kecamatan', $authUser->kecamatan);
+        }
+
+        $totalPenerima   = (clone $baseQuery)->count();
+        $totalDitugaskan = (clone $baseQuery)->whereNotNull('user_id')->count();
+        $totalPetugas    = (clone $petugasQuery)->count();
+        $totalDesa       = (clone $baseQuery)->whereNotNull('desa_kelurahan')->distinct('desa_kelurahan')->count('desa_kelurahan');
 
         $stats = [
             'total'          => $totalPenerima,
@@ -57,8 +71,13 @@ class PenugasanController extends Controller
         ];
 
         // List Kecamatan & List Petugas untuk dropdown filter
-        $listKecamatan = DataPenerima::distinct()->orderBy('kecamatan', 'asc')->pluck('kecamatan')->filter()->values();
-        $listPetugas   = User::where('role', 'petugas')->orderBy('desa', 'asc')->get(['id', 'name', 'desa', 'kecamatan']);
+        if ($authUser && $authUser->isAdminKecamatan()) {
+            $listKecamatan = collect([$authUser->kecamatan]);
+        } else {
+            $listKecamatan = DataPenerima::distinct()->orderBy('kecamatan', 'asc')->pluck('kecamatan')->filter()->values();
+        }
+
+        $listPetugas   = $petugasQuery->orderBy('name', 'asc')->get(['id', 'name', 'desa', 'kecamatan']);
 
         $vervals = $query->paginate(20)->withQueryString();
 

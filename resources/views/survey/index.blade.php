@@ -1895,5 +1895,16 @@
                 });
             });
         });
+
+        @if(auth()->check() && auth()->user()->isAdminKecamatan())
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('input, select, textarea, button[type="submit"]').forEach(function(el) {
+                el.disabled = true;
+            });
+            document.querySelectorAll('.upload-btn-group, .btn-upload, .delete-photo-btn, .file-input-drop, .btn-submit-survey').forEach(function(btn) {
+                btn.style.display = 'none';
+            });
+        });
+        @endif
     </script>
 @endpush

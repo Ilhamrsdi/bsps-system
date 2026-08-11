@@ -598,10 +598,12 @@
                     style="padding:10px 16px;font-size:13px;text-decoration:none;border-radius:var(--radius-sm);">
                     <i class="fas fa-redo"></i> Reset
                 </a>
+                @if(!auth()->check() || !auth()->user()->isAdminKecamatan())
                 <a href="{{ url('/survey') }}" class="btn btn-primary"
                     style="padding:10px 20px;font-size:13px;font-weight:700;background:var(--primary);color:#fff;text-decoration:none;border-radius:var(--radius-sm);display:inline-flex;align-items:center;gap:8px;">
                     <i class="fas fa-plus"></i> Input Survei Baru
                 </a>
+                @endif
             </div>
         </form>
 
@@ -688,24 +690,30 @@
                                         $textColor = $currentStatus == 'pindah' ? '#000' : '#fff';
                                         $bgColor = $statusColors[$currentStatus] ?? '#28a745';
                                     @endphp
-                                    <select class="form-select status-select" data-id="{{ $item->id }}"
-                                        style="background-color: {{ $bgColor }}; color: {{ $textColor }}; font-weight: bold; border: none; border-radius: 20px; padding: 4px 12px; font-size: 11px; width: 120px; text-align: center; cursor: pointer; outline: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                                        <option value="ditemukan" {{ $currentStatus == 'ditemukan' ? 'selected' : '' }}
-                                            style="background: #fff; color: #000;">Ditemukan</option>
-                                        <option value="meninggal" {{ $currentStatus == 'meninggal' ? 'selected' : '' }}
-                                            style="background: #fff; color: #000;">Meninggal</option>
-                                        <option value="pindah" {{ $currentStatus == 'pindah' ? 'selected' : '' }}
-                                            style="background: #fff; color: #000;">Pindah</option>
-                                        <option value="tidak diketahui" {{ $currentStatus == 'tidak diketahui' ? 'selected' : '' }} style="background: #fff; color: #000;">Tidak Diketahui</option>
-                                    </select>
+                                    @if(auth()->check() && auth()->user()->isAdminKecamatan())
+                                        <span style="background-color: {{ $bgColor }}; color: {{ $textColor }}; font-weight: bold; border-radius: 20px; padding: 4px 12px; font-size: 11px; display: inline-block; width: 110px; text-align: center; text-transform: capitalize;">
+                                            {{ $currentStatus }}
+                                        </span>
+                                    @else
+                                        <select class="form-select status-select" data-id="{{ $item->id }}"
+                                            style="background-color: {{ $bgColor }}; color: {{ $textColor }}; font-weight: bold; border: none; border-radius: 20px; padding: 4px 12px; font-size: 11px; width: 120px; text-align: center; cursor: pointer; outline: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                            <option value="ditemukan" {{ $currentStatus == 'ditemukan' ? 'selected' : '' }}
+                                                style="background: #fff; color: #000;">Ditemukan</option>
+                                            <option value="meninggal" {{ $currentStatus == 'meninggal' ? 'selected' : '' }}
+                                                style="background: #fff; color: #000;">Meninggal</option>
+                                            <option value="pindah" {{ $currentStatus == 'pindah' ? 'selected' : '' }}
+                                                style="background: #fff; color: #000;">Pindah</option>
+                                            <option value="tidak diketahui" {{ $currentStatus == 'tidak diketahui' ? 'selected' : '' }} style="background: #fff; color: #000;">Tidak Diketahui</option>
+                                        </select>
+                                    @endif
                                 </td>
                                 <td style="padding:14px 18px;text-align:center;">
                                     <div class="action-btn-group" style="justify-content:center;">
                                         <a href="{{ route('verval-data.surat-pernyataan', $item->id) }}" target="_blank" class="btn-act print" style="background:rgba(255,184,0,0.15);color:#d69e00;" title="Cetak Surat Pernyataan Pemohon Ini">
                                             <i class="fas fa-file-signature"></i>
                                         </a>
-                                        <a href="{{ url('/survey/' . $item->id) }}" class="btn-act view" style="background:rgba(39,174,96,0.12);color:var(--success);" title="Buka Form Survei Lapangan & Lengkapi Data/Foto">
-                                            <i class="fas fa-clipboard-check"></i>
+                                        <a href="{{ url('/survey/' . $item->id) }}" class="btn-act view" style="background:rgba(39,174,96,0.12);color:var(--success);" title="{{ auth()->check() && auth()->user()->isAdminKecamatan() ? 'Lihat Detail Data Verval (Read-Only)' : 'Buka Form Survei Lapangan & Lengkapi Data/Foto' }}">
+                                            <i class="fas {{ auth()->check() && auth()->user()->isAdminKecamatan() ? 'fa-eye' : 'fa-clipboard-check' }}"></i>
                                         </a>
                                     </div>
                                 </td>

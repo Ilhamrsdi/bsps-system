@@ -17,7 +17,12 @@ class PencocokanDataController extends Controller
         $search = trim($request->get('search', ''));
         $statusFilter = $request->get('status', 'all'); // all, cocok, beda, tidak_ditemukan
 
+        $user = \Illuminate\Support\Facades\Auth::user();
         $query = DataPenerima::query();
+
+        if ($user && $user->isAdminKecamatan()) {
+            $query->where('kecamatan', $user->kecamatan);
+        }
 
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {

@@ -42,6 +42,11 @@ class SurveyController extends Controller
      */
     public function store(Request $request, $id = null)
     {
+        $user = Auth::user();
+        if ($user && $user->isAdminKecamatan()) {
+            return redirect()->back()->with('error', 'Akses ditolak! Admin Kecamatan hanya memiliki akses melihat data dan mencetak surat pernyataan.');
+        }
+
         $targetId = $id ?? $request->get('id');
         $vervalData = DataPenerima::findOrFail($targetId);
 
@@ -196,6 +201,11 @@ class SurveyController extends Controller
      */
     public function uploadPhoto(Request $request)
     {
+        $user = Auth::user();
+        if ($user && $user->isAdminKecamatan()) {
+            return response()->json(['status' => 'error', 'message' => 'Akses ditolak! Admin Kecamatan tidak diizinkan mengubah foto.'], 403);
+        }
+
         $request->validate([
             'id'    => 'required|exists:data_penerimas,id',
             'field' => 'required|in:ktp,kk,sertifikat_tanah,foto_sudut_depan,foto_sudut_belakang,foto_bagian_dalam,foto_sudut_kiri,foto_sudut_kanan',
@@ -271,6 +281,11 @@ class SurveyController extends Controller
      */
     public function deletePhoto(Request $request)
     {
+        $user = Auth::user();
+        if ($user && $user->isAdminKecamatan()) {
+            return response()->json(['status' => 'error', 'message' => 'Akses ditolak! Admin Kecamatan tidak diizinkan mengubah foto.'], 403);
+        }
+
         $request->validate([
             'id'    => 'required|exists:data_penerimas,id',
             'field' => 'required|in:ktp,kk,sertifikat_tanah,foto_sudut_depan,foto_sudut_belakang,foto_bagian_dalam,foto_sudut_kiri,foto_sudut_kanan',

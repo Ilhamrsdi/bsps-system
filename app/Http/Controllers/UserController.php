@@ -13,7 +13,14 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
+        $authUser = \Illuminate\Support\Facades\Auth::user();
         $query = User::query();
+
+        if ($authUser && $authUser->isAdminKecamatan()) {
+            $query->where('kecamatan', $authUser->kecamatan);
+        } elseif ($request->filled('kecamatan') && $request->kecamatan !== 'all') {
+            $query->where('kecamatan', $request->kecamatan);
+        }
 
         // Search Keyword
         if ($request->filled('search')) {
@@ -31,25 +38,29 @@ class UserController extends Controller
             $query->where('status', $request->status);
         }
 
-        // Filter Kecamatan
-        if ($request->filled('kecamatan') && $request->kecamatan !== 'all') {
-            $query->where('kecamatan', $request->kecamatan);
-        }
-
         // Paginate 10 data per halaman dengan mempertahankan query string filter & search
         $users = $query->orderBy('id', 'asc')->paginate(10)->withQueryString();
 
-        // Counter Statistics Global
-        $totalCount = User::count();
-        $aktifCount = User::where('status', 'aktif')->count();
-        $bertugasCount = User::where('status', 'bertugas')->count();
-        $cutiCount = User::where('status', 'cuti')->count();
+        // Counter Statistics (Scoped untuk Admin Kecamatan)
+        $baseQuery = User::query();
+        if ($authUser && $authUser->isAdminKecamatan()) {
+            $baseQuery->where('kecamatan', $authUser->kecamatan);
+        }
+
+        $totalCount = (clone $baseQuery)->count();
+        $aktifCount = (clone $baseQuery)->where('status', 'aktif')->count();
+        $bertugasCount = (clone $baseQuery)->where('status', 'bertugas')->count();
+        $cutiCount = (clone $baseQuery)->where('status', 'cuti')->count();
 
         // Daftar Kecamatan untuk filter
-        $kecamatanList = \App\Models\DataPenerima::distinct('kecamatan')
-            ->whereNotNull('kecamatan')
-            ->orderBy('kecamatan', 'asc')
-            ->pluck('kecamatan');
+        if ($authUser && $authUser->isAdminKecamatan()) {
+            $kecamatanList = collect([$authUser->kecamatan]);
+        } else {
+            $kecamatanList = \App\Models\DataPenerima::distinct('kecamatan')
+                ->whereNotNull('kecamatan')
+                ->orderBy('kecamatan', 'asc')
+                ->pluck('kecamatan');
+        }
 
         return view('user.index', compact('users', 'totalCount', 'aktifCount', 'bertugasCount', 'cutiCount', 'kecamatanList'));
     }
@@ -67,7 +78,7 @@ class UserController extends Controller
             'kecamatan' => 'required|string|max:255',
             'phone' => 'nullable|string|max:20',
             'status' => 'required|in:aktif,bertugas,cuti',
-            'role' => 'required|in:admin,petugas',
+            'role' => 'required|in:admin,admin_kecamatan,petugas',
             'password' => 'required|string|min:6',
         ]);
 
@@ -93,7 +104,7 @@ class UserController extends Controller
             'kecamatan' => 'required|string|max:255',
             'phone' => 'nullable|string|max:20',
             'status' => 'required|in:aktif,bertugas,cuti',
-            'role' => 'required|in:admin,petugas',
+            'role' => 'required|in:admin,admin_kecamatan,petugas',
             'password' => 'nullable|string|min:6',
         ]);
 

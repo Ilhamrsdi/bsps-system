@@ -53,18 +53,32 @@
             {{-- NAVIGATION ADMINISTRATOR --}}
             <div class="menu-label">Navigasi Utama</div>
 
-            <a class="menu-item {{ Request::is('dashboard') ? 'active' : '' }}" href="{{ url('/dashboard') }}">
-                <i class="fas fa-th-large"></i>
-                Dashboard
-            </a>
+            @if(auth()->check() && auth()->user()->isAdminKecamatan())
+                <a class="menu-item {{ Request::is('dashboard-kecamatan*', 'dashboard*') ? 'active' : '' }}" href="{{ url('/dashboard-kecamatan') }}">
+                    <i class="fas fa-chart-pie"></i>
+                    Monitoring Desa
+                </a>
+            @else
+                <a class="menu-item {{ Request::is('dashboard') ? 'active' : '' }}" href="{{ url('/dashboard') }}">
+                    <i class="fas fa-th-large"></i>
+                    Dashboard Global
+                </a>
+                <a class="menu-item {{ Request::is('dashboard-kecamatan*') ? 'active' : '' }}" href="{{ url('/dashboard-kecamatan') }}">
+                    <i class="fas fa-chart-pie"></i>
+                    Monitoring Kecamatan
+                </a>
+            @endif
+
             <a class="menu-item {{ Request::is('verval-data*', 'data-verval*') ? 'active' : '' }}" href="{{ url('/verval-data') }}">
                 <i class="fas fa-clipboard-list"></i>
                 Data Verval
             </a>
+            @if(!auth()->check() || auth()->user()->isAdmin())
             <a class="menu-item {{ Request::is('pencocokan-data*') ? 'active' : '' }}" href="{{ url('/pencocokan-data') }}">
                 <i class="fas fa-id-card-clip"></i>
                 Pencocokan Dataguse
             </a>
+            @endif
             <a class="menu-item {{ Request::is('geomaps*', 'geoMaps*') ? 'active' : '' }}" href="{{ url('/geomaps') }}">
                 <i class="fas fa-map-marked-alt"></i>
                 Geo Maps
@@ -120,7 +134,11 @@
                     <div style="display:flex;align-items:center;gap:4px;margin-top:2px;">
                         @if(auth()->user()->isAdmin())
                             <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(255,255,255,0.15);color:#ffffff;">
-                                <i class="fas fa-shield-halved"></i> Admin
+                                <i class="fas fa-shield-halved"></i> Admin Kab.
+                            </span>
+                        @elseif(auth()->user()->isAdminKecamatan())
+                            <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(255,184,0,0.25);color:#ffb800;">
+                                <i class="fas fa-building-flag"></i> Admin Kec.
                             </span>
                         @else
                             <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(255,184,0,0.2);color:#ffb800;">

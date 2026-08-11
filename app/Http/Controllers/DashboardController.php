@@ -10,8 +10,13 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        if (Auth::check() && Auth::user()->isPetugas()) {
-            return redirect()->route('petugas.dashboard');
+        if (Auth::check()) {
+            if (Auth::user()->isPetugas()) {
+                return redirect()->route('petugas.dashboard');
+            }
+            if (Auth::user()->isAdminKecamatan()) {
+                return redirect()->route('dashboard.kecamatan');
+            }
         }
 
         // 1. Ringkasan Utama dari Database Real (DataPenerima)

@@ -9,12 +9,19 @@ class GeoMapController extends Controller
 {
     public function index()
     {
+        $user = \Illuminate\Support\Facades\Auth::user();
+
         // Ambil semua penerima yang SUDAH memiliki koordinat GPS dari survei lapangan
-        $penerimaList = DataPenerima::whereNotNull('latitude')
+        $query = DataPenerima::whereNotNull('latitude')
             ->whereNotNull('longitude')
             ->where('latitude', '!=', '')
-            ->where('longitude', '!=', '')
-            ->with('petugas')
+            ->where('longitude', '!=', '');
+
+        if ($user && $user->isAdminKecamatan()) {
+            $query->where('kecamatan', $user->kecamatan);
+        }
+
+        $penerimaList = $query->with('petugas')
             ->orderBy('updated_at', 'desc')
             ->get();
 

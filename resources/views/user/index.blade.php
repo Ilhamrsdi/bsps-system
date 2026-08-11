@@ -655,6 +655,7 @@
                             <label class="form-label" style="display:block;font-size:12.5px;font-weight:700;margin-bottom:6px;">Role <span style="color:var(--danger);">*</span></label>
                             <select class="form-control" name="role" id="inputRole" style="width:100%;padding:9px 12px;border-radius:6px;border:1px solid rgba(0,40,85,0.14);box-sizing:border-box;">
                                 <option value="petugas">Petugas Lapangan</option>
+                                <option value="admin_kecamatan">Admin Kecamatan</option>
                                 <option value="admin">Administrator</option>
                             </select>
                         </div>

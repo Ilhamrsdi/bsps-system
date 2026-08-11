@@ -18,7 +18,7 @@ class RoleMiddleware
      *
      * @param  string  $role  Role yang diizinkan (misal: 'admin')
      */
-    public function handle(Request $request, Closure $next, string $role): Response
+    public function handle(Request $request, Closure $next, string ...$roles): Response
     {
         if (!Auth::check()) {
             return redirect()->route('login');
@@ -26,11 +26,23 @@ class RoleMiddleware
 
         $user = Auth::user();
 
-        if ($user->role !== $role) {
-            // Petugas mencoba akses halaman admin-only → redirect ke dashboard + pesan
+        $allowedRoles = [];
+        foreach ($roles as $r) {
+            foreach (explode(',', $r) as $subRole) {
+                $allowedRoles[] = trim($subRole);
+            }
+        }
+
+        if (!in_array($user->role, $allowedRoles)) {
+            if ($user->isPetugas()) {
+                return redirect()->route('petugas.dashboard')->with('error', 'Akses ditolak!');
+            }
+            if ($user->isAdminKecamatan()) {
+                return redirect()->route('dashboard.kecamatan')->with('error', 'Akses ditolak!');
+            }
             return redirect()->route('dashboard')->with(
                 'error',
-                'Akses ditolak! Halaman ini hanya dapat diakses oleh Administrator.'
+                'Akses ditolak! Anda tidak memiliki izin untuk mengakses halaman tersebut.'
             );
         }
 
