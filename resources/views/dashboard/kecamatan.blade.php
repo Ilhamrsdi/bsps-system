@@ -451,6 +451,12 @@
                                     <i class="fas fa-location-dot" style="color:var(--primary);margin-right:3px;"></i>
                                     {{ $ptg->desa ?: 'Semua Desa' }}
                                 </div>
+                                <div style="font-size:11.5px;color:var(--text-muted);font-family:monospace;margin-top:4px;">
+                                    <i class="fas fa-envelope" style="color:var(--primary);font-size:10px;margin-right:3px;"></i> {{ $ptg->email }}
+                                </div>
+                                <div style="font-size:11px;color:#27ae60;font-weight:700;font-family:monospace;margin-top:3px;background:rgba(39,174,96,0.1);padding:2px 8px;border-radius:6px;display:inline-block;">
+                                    <i class="fas fa-key" style="font-size:9px;margin-right:3px;"></i> Password: {{ $ptg->plain_password ?: 'password' }}
+                                </div>
                             </div>
                         </div>
                         <div>

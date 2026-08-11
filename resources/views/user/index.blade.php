@@ -426,6 +426,9 @@
             </div>
 
             <div style="display:flex;gap:10px;align-items:center;">
+                <a href="{{ route('user.export-admin-kecamatan') }}" class="btn btn-primary" style="padding:10px 16px;background:var(--primary);color:#fff;text-decoration:none;border-radius:var(--radius-sm);font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:6px;" title="Download File Excel Kredensial Akun Admin Kecamatan">
+                    <i class="fas fa-file-excel"></i> Export Excel Admin Kec.
+                </a>
                 <a href="{{ url('/user') }}" class="btn btn-outline" style="padding:10px 16px;border:1px solid rgba(0,40,85,0.15);text-decoration:none;color:var(--text-secondary);border-radius:var(--radius-sm);font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:6px;">
                     <i class="fas fa-redo"></i> Reset
                 </a>
@@ -469,6 +472,9 @@
                                         <div>
                                             <div style="font-weight:800;color:var(--primary-dark);">{{ $item->name }}</div>
                                             <div style="font-size:12px;color:var(--text-muted);font-family:monospace;margin-top:2px;">{{ $item->email }}</div>
+                                            <div style="font-size:11px;color:#27ae60;font-weight:700;font-family:monospace;margin-top:3px;background:rgba(39,174,96,0.1);padding:2px 8px;border-radius:4px;display:inline-flex;align-items:center;gap:4px;">
+                                                <i class="fas fa-key" style="font-size:10px;"></i> Pass: {{ $item->plain_password ?: 'password123' }}
+                                            </div>
                                         </div>
                                     </div>
                                 </td>

@@ -1,0 +1,275 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Daftar Akun Admin Kecamatan</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
+<style>
+    th { background-color: #002855; color: #ffffff; font-weight: bold; text-align: center; border: 1px solid #000000; padding: 8px; }
+    td { border: 1px solid #cccccc; padding: 6px 10px; font-family: Arial, sans-serif; font-size: 11pt; }
+    .center { text-align: center; }
+    .bold { font-weight: bold; }
+</style>
+</head>
+<body>
+<h2>DAFTAR AKUN ADMIN KECAMATAN BSPS KABUPATEN JEMBER</h2>
+<p>Tanggal Export: 11 August 2026 04:02:05</p>
+<table>
+    <thead>
+        <tr>
+            <th>No</th>
+            <th>Nama Akun</th>
+            <th>Email / Username Login</th>
+            <th>Password</th>
+            <th>Kecamatan</th>
+            <th>Jabatan</th>
+            <th>Status Akun</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td class="center">1</td>
+        <td class="bold">Admin Kec. Ajung</td>
+        <td>admin.ajung@gmail.com</td>
+        <td class="center bold" style="color: #004080;">password123</td>
+        <td class="center bold">AJUNG</td>
+        <td>Admin Kecamatan Ajung</td>
+        <td class="center">Aktif</td>
+    </tr><tr>
+        <td class="center">2</td>
+        <td class="bold">Admin Kec. Ambulu</td>
+        <td>admin.ambulu@gmail.com</td>
+        <td class="center bold" style="color: #004080;">password123</td>
+        <td class="center bold">AMBULU</td>
+        <td>Admin Kecamatan Ambulu</td>
+        <td class="center">Aktif</td>
+    </tr><tr>
+        <td class="center">3</td>
+        <td class="bold">Admin Kec. Arjasa</td>
+        <td>admin.arjasa@gmail.com</td>
+        <td class="center bold" style="color: #004080;">password123</td>
+        <td class="center bold">ARJASA</td>
+        <td>Admin Kecamatan Arjasa</td>
+        <td class="center">Aktif</td>
+    </tr><tr>
+        <td class="center">4</td>
+        <td class="bold">Admin Kec. Balung</td>
+        <td>admin.balung@gmail.com</td>
+        <td class="center bold" style="color: #004080;">password123</td>
+        <td class="center bold">BALUNG</td>
+        <td>Admin Kecamatan Balung</td>
+        <td class="center">Aktif</td>
+    </tr><tr>
+        <td class="center">5</td>
+        <td class="bold">Admin Kec. Bangsalsari</td>
+        <td>admin.bangsalsari@gmail.com</td>
+        <td class="center bold" style="color: #004080;">password123</td>
+        <td class="center bold">BANGSALSARI</td>
+        <td>Admin Kecamatan Bangsalsari</td>
+        <td class="center">Aktif</td>
+    </tr><tr>
+        <td class="center">6</td>
+        <td class="bold">Admin Kec. Gumukmas</td>
+        <td>admin.gumukmas@gmail.com</td>
+        <td class="center bold" style="color: #004080;">password123</td>
+        <td class="center bold">GUMUKMAS</td>
+        <td>Admin Kecamatan Gumukmas</td>
+        <td class="center">Aktif</td>
+    </tr><tr>
+        <td class="center">7</td>
+        <td class="bold">Admin Kec. Jelbuk</td>
+        <td>admin.jelbuk@gmail.com</td>
+        <td class="center bold" style="color: #004080;">password123</td>
+        <td class="center bold">JELBUK</td>
+        <td>Admin Kecamatan Jelbuk</td>
+        <td class="center">Aktif</td>
+    </tr><tr>
+        <td class="center">8</td>
+        <td class="bold">Admin Kec. Jenggawah</td>
+        <td>admin.jenggawah@gmail.com</td>
+        <td class="center bold" style="color: #004080;">password123</td>
+        <td class="center bold">JENGGAWAH</td>
+        <td>Admin Kecamatan Jenggawah</td>
+        <td class="center">Aktif</td>
+    </tr><tr>
+        <td class="center">9</td>
+        <td class="bold">Admin Kec. Jombang</td>
+        <td>admin.jombang@gmail.com</td>
+        <td class="center bold" style="color: #004080;">password123</td>
+        <td class="center bold">JOMBANG</td>
+        <td>Admin Kecamatan Jombang</td>
+        <td class="center">Aktif</td>
+    </tr><tr>
+        <td class="center">10</td>
+        <td class="bold">Admin Kec. Kalisat</td>
+        <td>admin.kalisat@gmail.com</td>
+        <td class="center bold" style="color: #004080;">password123</td>
+        <td class="center bold">KALISAT</td>
+        <td>Admin Kecamatan Kalisat</td>
+        <td class="center">Aktif</td>
+    </tr><tr>
+        <td class="center">11</td>
+        <td class="bold">Admin Kec. Kaliwates</td>
+        <td>admin.kaliwates@gmail.com</td>
+        <td class="center bold" style="color: #004080;">password123</td>
+        <td class="center bold">KALIWATES</td>
+        <td>Admin Kecamatan Kaliwates</td>
+        <td class="center">Aktif</td>
+    </tr><tr>
+        <td class="center">12</td>
+        <td class="bold">Admin Kec. Kencong</td>
+        <td>admin.kencong@gmail.com</td>
+        <td class="center bold" style="color: #004080;">password123</td>
+        <td class="center bold">KENCONG</td>
+        <td>Admin Kecamatan Kencong</td>
+        <td class="center">Aktif</td>
+    </tr><tr>
+        <td class="center">13</td>
+        <td class="bold">Admin Kec. Ledokombo</td>
+        <td>admin.ledokombo@gmail.com</td>
+        <td class="center bold" style="color: #004080;">password123</td>
+        <td class="center bold">LEDOKOMBO</td>
+        <td>Admin Kecamatan Ledokombo</td>
+        <td class="center">Aktif</td>
+    </tr><tr>
+        <td class="center">14</td>
+        <td class="bold">Admin Kec. Mayang</td>
+        <td>admin.mayang@gmail.com</td>
+        <td class="center bold" style="color: #004080;">password123</td>
+        <td class="center bold">MAYANG</td>
+        <td>Admin Kecamatan Mayang</td>
+        <td class="center">Aktif</td>
+    </tr><tr>
+        <td class="center">15</td>
+        <td class="bold">Admin Kec. Mumbulsari</td>
+        <td>admin.mumbulsari@gmail.com</td>
+        <td class="center bold" style="color: #004080;">password123</td>
+        <td class="center bold">MUMBULSARI</td>
+        <td>Admin Kecamatan Mumbulsari</td>
+        <td class="center">Aktif</td>
+    </tr><tr>
+        <td class="center">16</td>
+        <td class="bold">Admin Kec. Pakusari</td>
+        <td>admin.pakusari@gmail.com</td>
+        <td class="center bold" style="color: #004080;">password123</td>
+        <td class="center bold">PAKUSARI</td>
+        <td>Admin Kecamatan Pakusari</td>
+        <td class="center">Aktif</td>
+    </tr><tr>
+        <td class="center">17</td>
+        <td class="bold">Admin Kec. Panti</td>
+        <td>admin.panti@gmail.com</td>
+        <td class="center bold" style="color: #004080;">password123</td>
+        <td class="center bold">PANTI</td>
+        <td>Admin Kecamatan Panti</td>
+        <td class="center">Aktif</td>
+    </tr><tr>
+        <td class="center">18</td>
+        <td class="bold">Admin Kec. Patrang</td>
+        <td>admin.patrang@gmail.com</td>
+        <td class="center bold" style="color: #004080;">password123</td>
+        <td class="center bold">PATRANG</td>
+        <td>Admin Kecamatan Patrang</td>
+        <td class="center">Aktif</td>
+    </tr><tr>
+        <td class="center">19</td>
+        <td class="bold">Admin Kec. Puger</td>
+        <td>admin.puger@gmail.com</td>
+        <td class="center bold" style="color: #004080;">password123</td>
+        <td class="center bold">PUGER</td>
+        <td>Admin Kecamatan Puger</td>
+        <td class="center">Aktif</td>
+    </tr><tr>
+        <td class="center">20</td>
+        <td class="bold">Admin Kec. Rambipuji</td>
+        <td>admin.rambipuji@gmail.com</td>
+        <td class="center bold" style="color: #004080;">password123</td>
+        <td class="center bold">RAMBIPUJI</td>
+        <td>Admin Kecamatan Rambipuji</td>
+        <td class="center">Aktif</td>
+    </tr><tr>
+        <td class="center">21</td>
+        <td class="bold">Admin Kec. Semboro</td>
+        <td>admin.semboro@gmail.com</td>
+        <td class="center bold" style="color: #004080;">password123</td>
+        <td class="center bold">SEMBORO</td>
+        <td>Admin Kecamatan Semboro</td>
+        <td class="center">Aktif</td>
+    </tr><tr>
+        <td class="center">22</td>
+        <td class="bold">Admin Kec. Silo</td>
+        <td>admin.silo@gmail.com</td>
+        <td class="center bold" style="color: #004080;">password123</td>
+        <td class="center bold">SILO</td>
+        <td>Admin Kecamatan Silo</td>
+        <td class="center">Aktif</td>
+    </tr><tr>
+        <td class="center">23</td>
+        <td class="bold">Admin Kec. Sukorambi</td>
+        <td>admin.sukorambi@gmail.com</td>
+        <td class="center bold" style="color: #004080;">password123</td>
+        <td class="center bold">SUKORAMBI</td>
+        <td>Admin Kecamatan Sukorambi</td>
+        <td class="center">Aktif</td>
+    </tr><tr>
+        <td class="center">24</td>
+        <td class="bold">Admin Kec. Sukowono</td>
+        <td>admin.sukowono@gmail.com</td>
+        <td class="center bold" style="color: #004080;">password123</td>
+        <td class="center bold">SUKOWONO</td>
+        <td>Admin Kecamatan Sukowono</td>
+        <td class="center">Aktif</td>
+    </tr><tr>
+        <td class="center">25</td>
+        <td class="bold">Admin Kec. Sumberbaru</td>
+        <td>admin.sumberbaru@gmail.com</td>
+        <td class="center bold" style="color: #004080;">password123</td>
+        <td class="center bold">SUMBERBARU</td>
+        <td>Admin Kecamatan Sumberbaru</td>
+        <td class="center">Aktif</td>
+    </tr><tr>
+        <td class="center">26</td>
+        <td class="bold">Admin Kec. Sumberjambe</td>
+        <td>admin.sumberjambe@gmail.com</td>
+        <td class="center bold" style="color: #004080;">password123</td>
+        <td class="center bold">SUMBERJAMBE</td>
+        <td>Admin Kecamatan Sumberjambe</td>
+        <td class="center">Aktif</td>
+    </tr><tr>
+        <td class="center">27</td>
+        <td class="bold">Admin Kec. Sumbersari</td>
+        <td>admin.sumbersari@gmail.com</td>
+        <td class="center bold" style="color: #004080;">password123</td>
+        <td class="center bold">SUMBERSARI</td>
+        <td>Admin Kecamatan Sumbersari</td>
+        <td class="center">Aktif</td>
+    </tr><tr>
+        <td class="center">28</td>
+        <td class="bold">Admin Kec. Tanggul</td>
+        <td>admin.tanggul@gmail.com</td>
+        <td class="center bold" style="color: #004080;">password123</td>
+        <td class="center bold">TANGGUL</td>
+        <td>Admin Kecamatan Tanggul</td>
+        <td class="center">Aktif</td>
+    </tr><tr>
+        <td class="center">29</td>
+        <td class="bold">Admin Kec. Tempurejo</td>
+        <td>admin.tempurejo@gmail.com</td>
+        <td class="center bold" style="color: #004080;">password123</td>
+        <td class="center bold">TEMPUREJO</td>
+        <td>Admin Kecamatan Tempurejo</td>
+        <td class="center">Aktif</td>
+    </tr><tr>
+        <td class="center">30</td>
+        <td class="bold">Admin Kec. Umbulsari</td>
+        <td>admin.umbulsari@gmail.com</td>
+        <td class="center bold" style="color: #004080;">password123</td>
+        <td class="center bold">UMBULSARI</td>
+        <td>Admin Kecamatan Umbulsari</td>
+        <td class="center">Aktif</td>
+    </tr><tr>
+        <td class="center">31</td>
+        <td class="bold">Admin Kec. Wuluhan</td>
+        <td>admin.wuluhan@gmail.com</td>
+        <td class="center bold" style="color: #004080;">password123</td>
+        <td class="center bold">WULUHAN</td>
+        <td>Admin Kecamatan Wuluhan</td>
+        <td class="center">Aktif</td>
+    </tr></tbody></table></body></html>

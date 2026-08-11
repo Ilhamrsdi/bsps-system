@@ -82,6 +82,7 @@ class UserController extends Controller
             'password' => 'required|string|min:6',
         ]);
 
+        $validated['plain_password'] = $validated['password'];
         $validated['password'] = Hash::make($validated['password']);
 
         User::create($validated);
@@ -109,6 +110,7 @@ class UserController extends Controller
         ]);
 
         if ($request->filled('password')) {
+            $validated['plain_password'] = $request->password;
             $validated['password'] = Hash::make($request->password);
         } else {
             unset($validated['password']);
@@ -127,6 +129,46 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $user->delete();
 
-        return redirect()->back()->with('success', 'Petugas survei berhasil dihapus dari database!');
+        return redirect()->back()->with('success', 'Petugas survei berhasil dihapus dari sistem!');
+    }
+
+    /**
+     * Download Excel / CSV Akun Admin Kecamatan
+     */
+    public function exportAdminKecamatan()
+    {
+        $users = User::where('role', 'admin_kecamatan')->orderBy('kecamatan', 'asc')->get();
+
+        $headers = [
+            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="Daftar_Akun_Admin_Kecamatan_BSPS.csv"',
+            'Pragma'              => 'no-cache',
+            'Cache-Control'       => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires'             => '0',
+        ];
+
+        $callback = function () use ($users) {
+            $file = fopen('php://output', 'w');
+            // Write UTF-8 BOM for Microsoft Excel compatibility
+            fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+            fputcsv($file, ['No', 'Nama Akun', 'Email / Username Login', 'Password', 'Kecamatan', 'Jabatan', 'Status Akun']);
+
+            $no = 1;
+            foreach ($users as $u) {
+                fputcsv($file, [
+                    $no++,
+                    $u->name,
+                    $u->email,
+                    $u->plain_password ?: 'password123',
+                    $u->kecamatan,
+                    $u->jabatan,
+                    ucfirst($u->status ?: 'aktif'),
+                ]);
+            }
+            fclose($file);
+        };
+
+        return response()->streamDownload($callback, 'Daftar_Akun_Admin_Kecamatan_BSPS.csv', $headers);
     }
 }
