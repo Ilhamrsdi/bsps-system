@@ -7,6 +7,7 @@
 @push('styles')
 <style>
     /* Hero Banner Petugas */
+    /* Hero Banner Petugas */
     .welcome-card {
         background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
         color: #ffffff;
@@ -20,57 +21,60 @@
         gap: 20px;
         flex-wrap: wrap;
         border-left: 6px solid var(--secondary);
+        width: 100%;
+        box-sizing: border-box;
     }
-    .welcome-text { flex: 1; min-width: 280px; }
+    .welcome-text { flex: 1; min-width: 260px; }
     .welcome-text h2 { font-size: 20px; font-weight: 800; margin-bottom: 4px; color:#fff; }
     .welcome-text p  { font-size: 13.5px; opacity: 0.9; margin: 0; color:rgba(255,255,255,0.9); }
 
     /* Stats Grid */
     .stats-grid-petugas {
         display: grid;
-        grid-template-columns: repeat(5, 1fr);
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         gap: 16px;
         margin-bottom: 24px;
-    }
-    @media (max-width: 1280px) {
-        .stats-grid-petugas {
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        }
+        width: 100%;
+        box-sizing: border-box;
     }
     .stat-card-petugas {
         background: var(--bg-card);
         border-radius: var(--radius);
-        padding: 20px;
+        padding: 18px 20px;
         box-shadow: var(--shadow-sm);
         border: 1px solid rgba(0, 40, 85, 0.06);
         display: flex;
         align-items: center;
-        gap: 16px;
+        gap: 14px;
         text-decoration: none;
         color: inherit;
         transition: var(--transition);
+        min-width: 0;
+        box-sizing: border-box;
     }
     .stat-card-petugas:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
     .stat-card-petugas .stat-icon {
-        width: 48px; height: 48px;
+        width: 46px; height: 46px;
         border-radius: var(--radius-sm);
         display: flex; align-items: center; justify-content: center;
-        font-size: 20px; flex-shrink: 0;
+        font-size: 19px; flex-shrink: 0;
     }
     .stat-card-petugas .stat-icon.blue   { background: rgba(0,40,85,0.10);   color: var(--primary); }
     .stat-card-petugas .stat-icon.orange { background: rgba(255,184,0,0.15); color: #d69e00; }
     .stat-card-petugas .stat-icon.green  { background: rgba(39,174,96,0.12); color: var(--success); }
     .stat-card-petugas .stat-icon.purple { background: rgba(142,68,173,0.12); color: #8e44ad; }
-    .stat-card-petugas .stat-info { flex: 1; }
-    .stat-card-petugas .stat-value { font-size: 24px; font-weight: 800; line-height: 1.1; color: var(--primary-dark); }
-    .stat-card-petugas .stat-label { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 3px; }
+    .stat-card-petugas .stat-info { flex: 1; min-width: 0; }
+    .stat-card-petugas .stat-value { font-size: 22px; font-weight: 800; line-height: 1.1; color: var(--primary-dark); }
+    .stat-card-petugas .stat-label { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 3px; line-height: 1.3; }
 
     /* Chart Grid Section */
     .petugas-charts-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: 20px;
         margin-bottom: 24px;
+        width: 100%;
+        box-sizing: border-box;
     }
     .chart-box {
         background: var(--bg-card);
@@ -342,14 +346,14 @@
                 </p>
             </div>
             <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-                <button type="button" class="btn" style="background:#22c55e;color:#fff;font-weight:800;padding:10px 18px;border-radius:var(--radius-sm);border:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 14px rgba(34,197,94,0.35);" onclick="window.PuprModal.open('modalTambahUsulan')" title="Tambah Usulan Calon Penerima Baru di Desa {{ $user->desa ?: '-' }}">
-                    <i class="fas fa-user-plus"></i> + Tambah Usulan Penerima Baru
+                <button type="button" class="btn" style="background:#22c55e;color:#fff;font-weight:800;padding:10px 16px;border-radius:var(--radius-sm);border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 14px rgba(34,197,94,0.35);" onclick="window.PuprModal.open('modalTambahUsulan')" title="Tambah Usulan Calon Penerima Baru di Desa {{ $user->desa ?: '-' }}">
+                    <i class="fas fa-plus-circle"></i> + Tambah Usulan Baru
                 </button>
-                <a href="{{ route('verval-data.surat-pernyataan-kolektif', array_merge(['desa' => $user->desa], request()->all())) }}" target="_blank" class="btn" style="background:#ffb800;color:#002855;font-weight:800;padding:10px 18px;border-radius:var(--radius-sm);text-decoration:none;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(0,0,0,0.15);" title="Cetak Surat Pernyataan secara kolektif untuk seluruh calon penerima Desa {{ $user->desa ?: '-' }}">
-                    <i class="fas fa-file-signature"></i> Cetak Kolektif Surat Pernyataan (Desa {{ $user->desa ?: '-' }})
+                <a href="{{ route('verval-data.surat-pernyataan-kolektif', array_merge(['desa' => $user->desa], request()->all())) }}" target="_blank" class="btn" style="background:#ffb800;color:#002855;font-weight:800;padding:10px 16px;border-radius:var(--radius-sm);text-decoration:none;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(0,0,0,0.15);" title="Cetak Surat Pernyataan secara kolektif untuk Desa {{ $user->desa ?: '-' }}">
+                    <i class="fas fa-file-signature"></i> Cetak Kolektif Surat
                 </a>
-                <a href="{{ url('/petugas/belum-survei') }}" class="btn" style="background:rgba(255,255,255,0.18);color:#fff;font-weight:700;padding:10px 18px;border-radius:var(--radius-sm);text-decoration:none;display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,0.35);">
-                    <i class="fas fa-clipboard-question"></i> Tugas Belum Survei
+                <a href="{{ url('/petugas/belum-survei') }}" class="btn" style="background:rgba(255,255,255,0.18);color:#fff;font-weight:700;padding:10px 16px;border-radius:var(--radius-sm);text-decoration:none;display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,0.35);">
+                    <i class="fas fa-clipboard-question"></i> Belum Survei
                 </a>
             </div>
         </div>
