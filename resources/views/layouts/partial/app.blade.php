@@ -137,55 +137,14 @@
         // secara client-side, gunakan fetch() API (yang TETAP melewati
         // Service Worker), lalu render halaman dari cache.
         // ============================================================
-        document.addEventListener('click', function(e) {
-            // Hanya aktif saat offline
-            if (navigator.onLine) return;
-
-            // Cari elemen <a> terdekat yang diklik
-            var link = e.target.closest('a[href]');
-            if (!link) return;
-
-            var href = link.getAttribute('href');
-            if (!href) return;
-
-            // Abaikan link javascript:, #anchor, mailto:, tel:, blob:, data:
-            if (href.startsWith('javascript:') || href.startsWith('#') ||
-                href.startsWith('mailto:') || href.startsWith('tel:') ||
-                href.startsWith('blob:') || href.startsWith('data:')) {
-                return;
-            }
-
-            // Abaikan link yang membuka tab baru (target=_blank)
-            if (link.target === '_blank') {
-                e.preventDefault();
-                alert('Tidak dapat membuka tab baru saat Mode Offline.');
-                return;
-            }
-
-            // Abaikan link ke domain eksternal
-            try {
-                var linkUrl = new URL(href, window.location.origin);
-                if (linkUrl.origin !== window.location.origin) {
-                    e.preventDefault();
-                    alert('Link ke situs eksternal tidak tersedia saat Mode Offline.');
-                    return;
-                }
-                href = linkUrl.href; // normalize ke URL penuh
-            } catch(err) {
-                return; // biarkan browser handle jika URL tidak valid
-            }
-
-            // Intercept navigasi!
-            e.preventDefault();
+        
+        window.navigateOffline = function(href) {
             console.log('[Offline Nav] Intercepting navigation to:', href);
 
-            // Tampilkan loading indicator
             if (window.PuprLoading) {
                 window.PuprLoading.show('Memuat halaman dari cache offline...');
             }
 
-            // Gunakan fetch() API — ini TETAP melewati Service Worker
-            // meskipun adapter jaringan (Wi-Fi) mati total
             fetch(href, {
                 headers: { 'Accept': 'text/html' },
                 cache: 'only-if-cached',
@@ -193,7 +152,6 @@
             })
             .then(function(response) {
                 if (!response || !response.ok) {
-                    // Coba lagi tanpa cache restriction
                     return fetch(href, { headers: { 'Accept': 'text/html' } });
                 }
                 return response;
@@ -205,17 +163,13 @@
                 return response.text();
             })
             .then(function(html) {
-                // Berhasil! Ganti konten halaman dengan HTML dari cache
                 document.open();
                 document.write(html);
                 document.close();
 
-                // Update URL bar tanpa reload
                 try {
                     window.history.pushState({ offlinePage: true }, '', href);
-                } catch(e) {
-                    // Abaikan error pushState
-                }
+                } catch(e) {}
 
                 console.log('[Offline Nav] Halaman berhasil dimuat dari cache:', href);
             })
@@ -224,7 +178,49 @@
                 if (window.PuprLoading) window.PuprLoading.hide();
                 alert('Halaman "' + href + '" tidak tersedia secara offline.\n\nPastikan Anda sudah pernah membuka halaman ini saat online agar ter-cache oleh Service Worker.');
             });
-        }, true); // capture phase agar dijalankan lebih dulu
+        };
+
+        document.addEventListener('click', function(e) {
+            // Hanya aktif saat offline
+            if (navigator.onLine) return;
+
+            // Cari elemen <a> terdekat yang diklik
+            var link = e.target.closest('a[href]');
+            if (!link) return;
+
+            var href = link.getAttribute('href');
+            if (!href) return;
+
+            // Abaikan link khusus
+            if (href.startsWith('javascript:') || href.startsWith('#') ||
+                href.startsWith('mailto:') || href.startsWith('tel:') ||
+                href.startsWith('blob:') || href.startsWith('data:')) {
+                return;
+            }
+
+            // Abaikan target=_blank
+            if (link.target === '_blank') {
+                e.preventDefault();
+                alert('Tidak dapat membuka tab baru saat Mode Offline.');
+                return;
+            }
+
+            // Abaikan eksternal
+            try {
+                var linkUrl = new URL(href, window.location.origin);
+                if (linkUrl.origin !== window.location.origin) {
+                    e.preventDefault();
+                    alert('Link ke situs eksternal tidak tersedia saat Mode Offline.');
+                    return;
+                }
+                href = linkUrl.href;
+            } catch(err) {
+                return; 
+            }
+
+            e.preventDefault();
+            window.navigateOffline(href);
+        }, true);
 
         // Handle tombol Back browser saat offline
         window.addEventListener('popstate', function(e) {
