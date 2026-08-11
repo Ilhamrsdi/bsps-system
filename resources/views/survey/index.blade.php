@@ -1734,13 +1734,21 @@
                             window.BspsOffline.showPuprToast('Data survei & foto berhasil disimpan di HP (Offline)!', 'success');
                         }
                         setTimeout(() => {
-                            window.location.href = '{{ route("petugas.sudah-survei") }}';
+                            if (typeof window.navigateOffline === 'function') {
+                                window.navigateOffline('{{ route("petugas.sudah-survei") }}');
+                            } else {
+                                window.location.href = '{{ route("petugas.sudah-survei") }}';
+                            }
                         }, 800);
                     });
                 } else {
                     if (window.PuprLoading) window.PuprLoading.hide();
                     alert('Data survei berhasil disimpan di HP!');
-                    window.location.href = '{{ route("petugas.sudah-survei") }}';
+                    if (typeof window.navigateOffline === 'function') {
+                        window.navigateOffline('{{ route("petugas.sudah-survei") }}');
+                    } else {
+                        window.location.href = '{{ route("petugas.sudah-survei") }}';
+                    }
                 }
                 return false;
             }
