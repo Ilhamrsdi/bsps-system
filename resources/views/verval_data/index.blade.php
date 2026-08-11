@@ -961,10 +961,12 @@
 @push('scripts')
     <script>
         /**
-         * Client-Side Filter: Menyaring baris tabel langsung di browser saat Mode Offline
+         * Client-Side Filter: Menyaring baris tabel langsung di browser secara instan
          */
-        function filterTableClientSide() {
+        function filterTableClientSide(showFeedback = false) {
+            if (window.PuprLoading) window.PuprLoading.hide();
             const searchVal = (document.querySelector('input[name="search"]')?.value || '').toLowerCase().trim();
+            const terms = searchVal.split(/\s+/).filter(t => t.length > 0);
             const kecVal = (document.getElementById('hiddenKecamatan')?.value || 'all').toLowerCase().trim();
             const desilVal = (document.getElementById('hiddenDesil')?.value || 'all').toLowerCase().trim();
 
@@ -972,13 +974,14 @@
             let visibleCount = 0;
 
             rows.forEach(function(row) {
-                if (row.querySelector('td[colspan]')) return;
+                if (row.id === 'noSearchResultRow') return;
+                if (row.querySelector('td[colspan]') && row.id !== 'noSearchResultRow') return;
 
-                const rowText = row.innerText.toLowerCase();
-                const kecCell = row.children[6]?.innerText.toLowerCase() || '';
-                const desilCell = row.children[7]?.innerText.toLowerCase() || '';
+                const rowText = (row.textContent || row.innerText || '').toLowerCase();
+                const kecCell = (row.children[6]?.textContent || '').toLowerCase();
+                const desilCell = (row.children[7]?.textContent || '').toLowerCase();
 
-                const matchSearch = !searchVal || rowText.includes(searchVal);
+                const matchSearch = terms.length === 0 || terms.every(term => rowText.includes(term));
                 const matchKec = kecVal === 'all' || kecCell.includes(kecVal);
                 const matchDesil = desilVal === 'all' || desilCell.includes(desilVal);
 
@@ -990,7 +993,26 @@
                 }
             });
 
-            showToast(`Mode Offline: Menampilkan ${visibleCount} data yang cocok`, 'success');
+            const tbody = document.querySelector('.table-verval-wrapper tbody');
+            let noResultRow = document.getElementById('noSearchResultRow');
+            if (visibleCount === 0 && (searchVal || kecVal !== 'all' || desilVal !== 'all')) {
+                if (!noResultRow && tbody) {
+                    noResultRow = document.createElement('tr');
+                    noResultRow.id = 'noSearchResultRow';
+                    noResultRow.innerHTML = `<td colspan="10" style="text-align:center;padding:30px;color:var(--text-muted);font-weight:600;"><i class="fas fa-search" style="margin-right:6px;"></i> Tidak ada data calon penerima yang cocok dengan kriteria saringan</td>`;
+                    tbody.appendChild(noResultRow);
+                }
+            } else {
+                if (noResultRow) noResultRow.remove();
+            }
+
+            if (showFeedback && window.BspsOffline && window.BspsOffline.showPuprToast) {
+                if (searchVal) {
+                    window.BspsOffline.showPuprToast(`Ditemukan ${visibleCount} penerima untuk "${searchVal}"`, visibleCount > 0 ? 'success' : 'warning');
+                } else {
+                    window.BspsOffline.showPuprToast(`Menampilkan ${visibleCount} penerima`, 'success');
+                }
+            }
         }
 
         /**
@@ -1008,21 +1030,8 @@
                 wrapper.classList.remove('active');
             }
 
-            // Jika sedang offline, saring tabel langsung di browser tanpa memanggil server
-            if (!navigator.onLine) {
-                filterTableClientSide();
-                return;
-            }
-
-            if (formId) {
-                const form = document.getElementById(formId);
-                if (form) {
-                    if (window.PuprLoading) {
-                        window.PuprLoading.show('Menyaring Data Verval...');
-                    }
-                    form.submit();
-                }
-            }
+            // Saring tabel langsung di browser
+            filterTableClientSide(false);
         }
 
         function showToast(message, type = 'success') {
@@ -1058,17 +1067,12 @@
         }
 
         document.addEventListener('DOMContentLoaded', function () {
-            // 1. Pencarian & Filter: Offline client-side filter vs Online server submit
             const filterForm = document.getElementById('filterFormVerval');
             if (filterForm) {
                 filterForm.addEventListener('submit', function(e) {
                     if (!navigator.onLine) {
                         e.preventDefault();
-                        filterTableClientSide();
-                        return;
-                    }
-                    if (window.PuprLoading) {
-                        window.PuprLoading.show('Mencari & Memuat Data Verval...');
+                        filterTableClientSide(true);
                     }
                 });
             }
@@ -1076,8 +1080,14 @@
             const searchInput = document.querySelector('input[name="search"]');
             if (searchInput) {
                 searchInput.addEventListener('input', function() {
-                    if (!navigator.onLine) {
-                        filterTableClientSide();
+                    filterTableClientSide(false);
+                });
+                searchInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        if (!navigator.onLine) {
+                            e.preventDefault();
+                            filterTableClientSide(true);
+                        }
                     }
                 });
             }

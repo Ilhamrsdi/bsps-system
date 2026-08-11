@@ -177,10 +177,10 @@
         </div>
 
         {{-- Filter & Search --}}
-        <form action="{{ route('petugas.belum-survei') }}" method="GET" class="filter-section">
+        <form action="{{ route('petugas.belum-survei') }}" method="GET" class="filter-section" id="filterFormPetugasBelum">
             <div class="search-input-wrap">
                 <i class="fas fa-search"></i>
-                <input type="text" name="search" value="{{ $search }}" placeholder="Cari nama calon penerima yang belum disurvei, NIK, atau alamat..." />
+                <input type="text" id="searchPetugasBelum" name="search" value="{{ $search }}" placeholder="Cari nama calon penerima yang belum disurvei, NIK, atau alamat..." />
             </div>
             <a href="{{ route('verval-data.surat-pernyataan-kolektif', array_merge(['desa' => $user->desa, 'status' => 'belum'], request()->all())) }}" target="_blank" class="btn" style="padding:10px 16px;font-size:13px;font-weight:700;background:#ffb800;color:#002855;text-decoration:none;border-radius:var(--radius-sm);display:inline-flex;align-items:center;gap:6px;" title="Cetak Surat Pernyataan Kolektif untuk warga yang belum disurvei di Desa {{ $user->desa ?: '-' }}">
                 <i class="fas fa-file-signature"></i> Cetak Kolektif (Belum Survei)
@@ -474,6 +474,10 @@
     </div>
 @endsection
 
+<script id="allPenerimasBelumData" type="application/json">
+    {!! json_encode($allPenerimas ?? []) !!}
+</script>
+
 @push('scripts')
 <script>
     let pendingSurveyUrl = null;
@@ -540,6 +544,23 @@
 
         const newStatus = selectedRadio.value;
 
+        if (newStatus === 'ditemukan') {
+            if (window.PuprModal) window.PuprModal.close('modalStatusVerification');
+            if (currentTargetSurveyUrl) {
+                window.location.href = currentTargetSurveyUrl;
+            }
+            return;
+        }
+
+        // Jika status selain ditemukan (meninggal/pindah/tidak diketahui)
+        if (!navigator.onLine) {
+            if (window.PuprModal) window.PuprModal.close('modalStatusVerification');
+            if (window.BspsOffline && window.BspsOffline.showPuprToast) {
+                window.BspsOffline.showPuprToast(`Status dicatat: "${newStatus.toUpperCase()}" (Offline)`, 'success');
+            }
+            return;
+        }
+
         if (window.PuprLoading) {
             window.PuprLoading.show('Memperbarui Status Penerima...');
         }
@@ -555,77 +576,157 @@
         })
         .then(response => response.json())
         .then(data => {
+            if (window.PuprLoading) window.PuprLoading.hide();
+            if (window.PuprModal) window.PuprModal.close('modalStatusVerification');
             if (data.success) {
-                if (newStatus === 'ditemukan') {
-                    if (window.PuprModal) window.PuprModal.close('modalStatusVerification');
-                    startSurveyWithGps(currentTargetSurveyUrl);
-                } else {
-                    if (window.PuprLoading) window.PuprLoading.hide();
-                    if (window.PuprModal) window.PuprModal.close('modalStatusVerification');
-                    if (window.PuprToast) {
-                        window.PuprToast.success(`Status berhasil diperbarui menjadi "${newStatus.toUpperCase()}"`);
-                    } else {
-                        alert(`Status berhasil diperbarui menjadi "${newStatus.toUpperCase()}"`);
-                    }
-                    setTimeout(() => { window.location.reload(); }, 1000);
+                if (window.BspsOffline && window.BspsOffline.showPuprToast) {
+                    window.BspsOffline.showPuprToast(`Status berhasil diperbarui menjadi "${newStatus.toUpperCase()}"`, 'success');
                 }
+                setTimeout(() => { window.location.reload(); }, 800);
             } else {
-                if (window.PuprLoading) window.PuprLoading.hide();
                 alert(data.message || 'Gagal memperbarui status.');
             }
         })
         .catch(err => {
             if (window.PuprLoading) window.PuprLoading.hide();
-            console.error(err);
-            alert('Terjadi kesalahan koneksi saat memperbarui status.');
+            if (window.PuprModal) window.PuprModal.close('modalStatusVerification');
         });
     }
 
-    /**
-     * Offline Client-Side Search untuk Petugas
-     */
-    function filterPetugasTableOffline() {
-        const searchInput = document.querySelector('input[name="search"]');
-        const query = (searchInput?.value || '').toLowerCase().trim();
-        const rows = document.querySelectorAll('.table-petugas-wrapper tbody tr');
-        let count = 0;
+    function startSurveyWithGps(targetUrl) {
+        if (targetUrl) {
+            window.location.href = targetUrl;
+        }
+    }
 
-        rows.forEach(function(row) {
-            if (row.querySelector('td[colspan]')) return;
-            const text = row.innerText.toLowerCase();
-            if (!query || text.includes(query)) {
-                row.style.display = '';
-                count++;
-            } else {
-                row.style.display = 'none';
+    let ALL_DATA_BELUM = [];
+    try {
+        const raw = document.getElementById('allPenerimasBelumData')?.textContent;
+        if (raw) ALL_DATA_BELUM = JSON.parse(raw);
+    } catch (e) {
+        console.error('Error parsing all penerimas belum:', e);
+    }
+
+    let ORIGINAL_ROWS_BELUM = null;
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    /**
+     * Client-Side Search untuk Petugas (Mencari di SELURUH data desa walau ratusan orang)
+     */
+    function filterPetugasTableOffline(showFeedback = false) {
+        if (window.PuprLoading) window.PuprLoading.hide();
+        const searchInput = document.getElementById('searchPetugasBelum');
+        const query = (searchInput?.value || '').toLowerCase().trim();
+        const terms = query.split(/\s+/).filter(t => t.length > 0);
+        const tbody = document.querySelector('.table-petugas-wrapper tbody');
+        if (!tbody) return;
+
+        // Simpan baris tabel asli jika belum tersimpan
+        if (ORIGINAL_ROWS_BELUM === null) {
+            ORIGINAL_ROWS_BELUM = tbody.innerHTML;
+        }
+
+        // Jika pencarian kosong, kembalikan tabel ke tampilan halaman awal
+        if (terms.length === 0) {
+            tbody.innerHTML = ORIGINAL_ROWS_BELUM;
+            updateBelumSurveiOfflineState();
+            if (showFeedback && window.BspsOffline && window.BspsOffline.showPuprToast) {
+                window.BspsOffline.showPuprToast(`Menampilkan halaman awal (${ALL_DATA_BELUM.length} total di desa)`, 'success');
             }
+            return;
+        }
+
+        // Cari di SELURUH RATUSAN DATA PENERIMA DESA!
+        const matches = ALL_DATA_BELUM.filter(item => {
+            const fullText = `${item.nama || ''} ${item.no_ktp || ''} ${item.no_kk || ''} ${item.alamat || ''} ${item.pengelompokan_desil || ''}`.toLowerCase();
+            return terms.every(term => fullText.includes(term));
         });
 
-        if (window.showToast) {
-            showToast(`Mode Offline: Menampilkan ${count} penerima`, 'success');
+        if (matches.length === 0) {
+            tbody.innerHTML = `<tr id="noSearchResultRow"><td colspan="8" style="text-align:center;padding:30px;color:var(--text-muted);font-weight:600;"><i class="fas fa-search" style="margin-right:6px;"></i> Tidak ada penerima yang cocok dengan "<strong>${escapeHtml(query)}</strong>" dari seluruh ${ALL_DATA_BELUM.length} data desa</td></tr>`;
+        } else {
+            let html = '';
+            matches.forEach((item, idx) => {
+                const genderClass = (item.jenis_kelamin || '').toLowerCase();
+                let statusBadge = '';
+                if (item.status === 'ditemukan') {
+                    statusBadge = `<span class="badge btn-trigger-status-modal" style="background:#dcfce7;color:#15803d;padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:800;cursor:pointer;" data-id="${item.id}" data-nama="${escapeHtml(item.nama)}" data-nik="${escapeHtml(item.no_ktp || '-')}" data-alamat="${escapeHtml(item.alamat || '-')}" data-status="${escapeHtml(item.status)}" data-url="/survey/${item.id}"><i class="fas fa-check-circle"></i> Ditemukan</span>`;
+                } else if (item.status === 'meninggal') {
+                    statusBadge = `<span class="badge btn-trigger-status-modal" style="background:#fee2e2;color:#b91c1c;padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:800;cursor:pointer;" data-id="${item.id}" data-nama="${escapeHtml(item.nama)}" data-nik="${escapeHtml(item.no_ktp || '-')}" data-alamat="${escapeHtml(item.alamat || '-')}" data-status="${escapeHtml(item.status)}" data-url="/survey/${item.id}"><i class="fas fa-times-circle"></i> Meninggal</span>`;
+                } else if (item.status === 'pindah') {
+                    statusBadge = `<span class="badge btn-trigger-status-modal" style="background:#ffedd5;color:#c2410c;padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:800;cursor:pointer;" data-id="${item.id}" data-nama="${escapeHtml(item.nama)}" data-nik="${escapeHtml(item.no_ktp || '-')}" data-alamat="${escapeHtml(item.alamat || '-')}" data-status="${escapeHtml(item.status)}" data-url="/survey/${item.id}"><i class="fas fa-truck-moving"></i> Pindah</span>`;
+                } else {
+                    statusBadge = `<span class="badge btn-trigger-status-modal" style="background:#f1f5f9;color:#64748b;padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:800;cursor:pointer;" data-id="${item.id}" data-nama="${escapeHtml(item.nama)}" data-nik="${escapeHtml(item.no_ktp || '-')}" data-alamat="${escapeHtml(item.alamat || '-')}" data-status="${escapeHtml(item.status || 'belum_ditentukan')}" data-url="/survey/${item.id}"><i class="fas fa-question-circle"></i> Belum Verifikasi</span>`;
+                }
+
+                html += `
+                    <tr data-id="${item.id}" style="border-bottom:1px solid rgba(0,40,85,0.06);font-size:13px;">
+                        <td style="padding:14px 18px;font-weight:700;color:var(--text-muted);">${idx + 1}</td>
+                        <td style="padding:14px 18px;">
+                            <div style="font-weight:800;color:var(--primary-dark);">${escapeHtml(item.nama)}</div>
+                        </td>
+                        <td style="padding:14px 18px;text-align:center;">
+                            <span class="badge-gender ${genderClass}">${escapeHtml(item.jenis_kelamin || '-')}</span>
+                        </td>
+                        <td style="padding:14px 18px;">
+                            <div style="font-family:monospace;font-weight:700;color:var(--text-primary);">NIK: ${escapeHtml(item.no_ktp || '-')}</div>
+                            <div style="font-family:monospace;font-size:12px;color:var(--text-muted);margin-top:2px;">KK: ${escapeHtml(item.no_kk || '-')}</div>
+                        </td>
+                        <td style="padding:14px 18px;color:var(--text-secondary);">${escapeHtml(item.alamat || '-')}</td>
+                        <td style="padding:14px 18px;">
+                            <span style="font-size:12px;font-weight:700;color:var(--primary);">${escapeHtml(item.pengelompokan_desil || 'Desil 1-4')}</span>
+                        </td>
+                        <td style="padding:14px 18px;text-align:center;">${statusBadge}</td>
+                        <td style="padding:14px 18px;text-align:center;">
+                            <button type="button" class="btn-act survey btn-trigger-status-modal"
+                                    data-id="${item.id}" data-nama="${escapeHtml(item.nama)}" data-nik="${escapeHtml(item.no_ktp || '-')}" data-alamat="${escapeHtml(item.alamat || '-')}" data-status="${escapeHtml(item.status || 'belum_ditentukan')}" data-url="/survey/${item.id}">
+                                <i class="fas fa-camera"></i> Mulai Survei
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+
+        // Perbarui status survei lokal dari IndexedDB
+        updateBelumSurveiOfflineState();
+
+        if (showFeedback && window.BspsOffline && window.BspsOffline.showPuprToast) {
+            if (matches.length > 0) {
+                window.BspsOffline.showPuprToast(`Ditemukan ${matches.length} dari seluruh ${ALL_DATA_BELUM.length} penerima desa`, 'success');
+            } else {
+                window.BspsOffline.showPuprToast(`Tidak ditemukan penerima untuk "${query}"`, 'warning');
+            }
         }
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        const filterForm = document.querySelector('form.filter-section');
+        const filterForm = document.getElementById('filterFormPetugasBelum');
         if (filterForm) {
             filterForm.addEventListener('submit', function(e) {
                 if (!navigator.onLine) {
                     e.preventDefault();
-                    filterPetugasTableOffline();
-                    return;
-                }
-                if (window.PuprLoading) {
-                    window.PuprLoading.show('Mencari Data Penerima...');
+                    filterPetugasTableOffline(true);
                 }
             });
         }
 
-        const searchInput = document.querySelector('input[name="search"]');
+        const searchInput = document.getElementById('searchPetugasBelum');
         if (searchInput) {
             searchInput.addEventListener('input', function() {
-                if (!navigator.onLine) {
-                    filterPetugasTableOffline();
+                filterPetugasTableOffline(false);
+            });
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    if (!navigator.onLine) {
+                        e.preventDefault();
+                        filterPetugasTableOffline(true);
+                    }
                 }
             });
         }

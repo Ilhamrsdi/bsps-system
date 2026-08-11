@@ -82,8 +82,12 @@ class PetugasController extends Controller
         }
 
         $vervals = $tableQuery->orderBy('id', 'asc')->paginate(15)->withQueryString();
+        $allPenerimas = (clone $this->getPetugasQuery())
+            ->select('id', 'nama', 'no_ktp', 'no_kk', 'alamat', 'jenis_kelamin', 'pengelompokan_desil', 'status', 'foto_sudut_depan')
+            ->orderBy('id', 'asc')
+            ->get();
 
-        return view('petugas.dashboard', compact('user', 'stats', 'vervals', 'search', 'statusFilter'));
+        return view('petugas.dashboard', compact('user', 'stats', 'vervals', 'allPenerimas', 'search', 'statusFilter'));
     }
 
     /**
@@ -106,8 +110,13 @@ class PetugasController extends Controller
         }
 
         $penerimas = $query->orderBy('id', 'asc')->paginate(20)->withQueryString();
+        $allPenerimas = (clone $this->getPetugasQuery())
+            ->whereNull('foto_sudut_depan')
+            ->select('id', 'nama', 'no_ktp', 'no_kk', 'alamat', 'jenis_kelamin', 'pengelompokan_desil', 'status')
+            ->orderBy('id', 'asc')
+            ->get();
 
-        return view('petugas.belum_survei', compact('user', 'penerimas', 'search'));
+        return view('petugas.belum_survei', compact('user', 'penerimas', 'allPenerimas', 'search'));
     }
 
     /**
@@ -130,8 +139,13 @@ class PetugasController extends Controller
         }
 
         $penerimas = $query->orderBy('updated_at', 'desc')->paginate(20)->withQueryString();
+        $allPenerimas = (clone $this->getPetugasQuery())
+            ->whereNotNull('foto_sudut_depan')
+            ->select('id', 'nama', 'no_ktp', 'no_kk', 'alamat', 'jenis_kelamin', 'pengelompokan_desil', 'status', 'foto_sudut_depan', 'updated_at')
+            ->orderBy('updated_at', 'desc')
+            ->get();
 
-        return view('petugas.sudah_survei', compact('user', 'penerimas', 'search'));
+        return view('petugas.sudah_survei', compact('user', 'penerimas', 'allPenerimas', 'search'));
     }
 
     /**

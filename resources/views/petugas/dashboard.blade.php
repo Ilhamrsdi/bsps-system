@@ -409,7 +409,7 @@
         <form action="{{ route('petugas.dashboard') }}" method="GET" class="filter-section" id="filterFormPetugasDash">
             <div class="search-input-wrap">
                 <i class="fas fa-search"></i>
-                <input type="text" name="search" value="{{ $search }}" placeholder="Cari nama calon penerima, NIK, KK, atau alamat..." />
+                <input type="text" id="searchPetugasDash" name="search" value="{{ $search }}" placeholder="Cari nama calon penerima, NIK, KK, atau alamat..." />
             </div>
 
             <input type="hidden" name="status" id="hiddenStatusPetugas" value="{{ $statusFilter }}" />
@@ -717,6 +717,10 @@
     </div>
 @endsection
 
+<script id="allPenerimasDashData" type="application/json">
+    {!! json_encode($allPenerimas ?? []) !!}
+</script>
+
 @push('scripts')
 <!-- Local Chart.js -->
 <script src="{{ asset('assets/js/chart.js') }}"></script>
@@ -788,6 +792,23 @@
 
         const newStatus = selectedRadio.value;
 
+        if (newStatus === 'ditemukan') {
+            if (window.PuprModal) window.PuprModal.close('modalStatusVerification');
+            if (currentTargetSurveyUrl) {
+                window.location.href = currentTargetSurveyUrl;
+            }
+            return;
+        }
+
+        // Jika status selain ditemukan (meninggal/pindah/tidak diketahui)
+        if (!navigator.onLine) {
+            if (window.PuprModal) window.PuprModal.close('modalStatusVerification');
+            if (window.BspsOffline && window.BspsOffline.showPuprToast) {
+                window.BspsOffline.showPuprToast(`Status dicatat: "${newStatus.toUpperCase()}" (Offline)`, 'success');
+            }
+            return;
+        }
+
         if (window.PuprLoading) {
             window.PuprLoading.show('Memperbarui Status Penerima...');
         }
@@ -803,77 +824,186 @@
         })
         .then(response => response.json())
         .then(data => {
+            if (window.PuprLoading) window.PuprLoading.hide();
+            if (window.PuprModal) window.PuprModal.close('modalStatusVerification');
             if (data.success) {
-                if (newStatus === 'ditemukan') {
-                    if (window.PuprModal) window.PuprModal.close('modalStatusVerification');
-                    startSurveyWithGps(currentTargetSurveyUrl);
-                } else {
-                    if (window.PuprLoading) window.PuprLoading.hide();
-                    if (window.PuprModal) window.PuprModal.close('modalStatusVerification');
-                    if (window.PuprToast) {
-                        window.PuprToast.success(`Status berhasil diperbarui menjadi "${newStatus.toUpperCase()}"`);
-                    } else {
-                        alert(`Status berhasil diperbarui menjadi "${newStatus.toUpperCase()}"`);
-                    }
-                    setTimeout(() => { window.location.reload(); }, 1000);
+                if (window.BspsOffline && window.BspsOffline.showPuprToast) {
+                    window.BspsOffline.showPuprToast(`Status berhasil diperbarui menjadi "${newStatus.toUpperCase()}"`, 'success');
                 }
+                setTimeout(() => { window.location.reload(); }, 800);
             } else {
-                if (window.PuprLoading) window.PuprLoading.hide();
                 alert(data.message || 'Gagal memperbarui status.');
             }
         })
         .catch(err => {
             if (window.PuprLoading) window.PuprLoading.hide();
-            console.error(err);
-            alert('Terjadi kesalahan koneksi saat memperbarui status.');
+            if (window.PuprModal) window.PuprModal.close('modalStatusVerification');
         });
     }
 
-    /**
-     * Offline Client-Side Search untuk Petugas
-     */
-    function filterDashboardTableOffline() {
-        const searchInput = document.querySelector('input[name="search"]');
-        const query = (searchInput?.value || '').toLowerCase().trim();
-        const rows = document.querySelectorAll('.table-petugas-wrapper tbody tr');
-        let count = 0;
+    function startSurveyWithGps(targetUrl) {
+        if (targetUrl) {
+            window.location.href = targetUrl;
+        }
+    }
 
-        rows.forEach(function(row) {
-            if (row.querySelector('td[colspan]')) return;
-            const text = row.innerText.toLowerCase();
-            if (!query || text.includes(query)) {
-                row.style.display = '';
-                count++;
-            } else {
-                row.style.display = 'none';
+    /**
+     * Helper: Pilih item di custom pupr-dropdown
+     */
+    function selectDropdown(hiddenInputId, wrapperId, value, label, formId) {
+        const hidden = document.getElementById(hiddenInputId);
+        if (hidden) hidden.value = value;
+
+        const wrapper = document.getElementById(wrapperId);
+        if (wrapper) {
+            const lbl = wrapper.querySelector('.selected-label');
+            if (lbl) lbl.textContent = label;
+            wrapper.querySelectorAll('.pupr-dropdown-item').forEach(i => i.classList.remove('active'));
+            wrapper.classList.remove('active');
+        }
+
+        // Jika sedang offline, saring tabel langsung di browser tanpa reload
+        if (!navigator.onLine) {
+            filterDashboardTableOffline();
+            return;
+        }
+
+        if (formId) {
+            const form = document.getElementById(formId);
+            if (form) {
+                if (window.PuprLoading) {
+                    window.PuprLoading.show('Menyaring Data Petugas...');
+                }
+                form.submit();
             }
+        }
+    }
+
+    let ALL_DATA_DASH = [];
+    try {
+        const raw = document.getElementById('allPenerimasDashData')?.textContent;
+        if (raw) ALL_DATA_DASH = JSON.parse(raw);
+    } catch (e) {
+        console.error('Error parsing all penerimas dash:', e);
+    }
+
+    let ORIGINAL_ROWS_DASH = null;
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    /**
+     * Client-Side Search & Status Filter untuk Petugas Dashboard (Mencari di SELURUH data desa)
+     */
+    function filterDashboardTableOffline(showFeedback = false) {
+        if (window.PuprLoading) window.PuprLoading.hide();
+        const searchInput = document.getElementById('searchPetugasDash');
+        const query = (searchInput?.value || '').toLowerCase().trim();
+        const terms = query.split(/\s+/).filter(t => t.length > 0);
+        const statusVal = (document.getElementById('hiddenStatusPetugas')?.value || 'all').toLowerCase().trim();
+        const tbody = document.querySelector('.table-petugas-wrapper tbody');
+        if (!tbody) return;
+
+        if (ORIGINAL_ROWS_DASH === null) {
+            ORIGINAL_ROWS_DASH = tbody.innerHTML;
+        }
+
+        if (terms.length === 0 && statusVal === 'all') {
+            tbody.innerHTML = ORIGINAL_ROWS_DASH;
+            if (showFeedback && window.BspsOffline && window.BspsOffline.showPuprToast) {
+                window.BspsOffline.showPuprToast(`Menampilkan halaman awal (${ALL_DATA_DASH.length} total di desa)`, 'success');
+            }
+            return;
+        }
+
+        const matches = ALL_DATA_DASH.filter(item => {
+            const fullText = `${item.nama || ''} ${item.no_ktp || ''} ${item.no_kk || ''} ${item.alamat || ''}`.toLowerCase();
+            const matchSearch = terms.length === 0 || terms.every(term => fullText.includes(term));
+            let matchStatus = true;
+            if (statusVal === 'sudah') {
+                matchStatus = Boolean(item.foto_sudut_depan);
+            } else if (statusVal === 'belum') {
+                matchStatus = !item.foto_sudut_depan;
+            }
+            return matchSearch && matchStatus;
         });
 
-        if (window.showToast) {
-            showToast(`Mode Offline: Menampilkan ${count} penerima`, 'success');
+        if (matches.length === 0) {
+            tbody.innerHTML = `<tr id="noSearchResultRow"><td colspan="7" style="text-align:center;padding:30px;color:var(--text-muted);font-weight:600;"><i class="fas fa-search" style="margin-right:6px;"></i> Tidak ada penerima yang cocok dengan kriteria pencarian dari seluruh ${ALL_DATA_DASH.length} data desa</td></tr>`;
+        } else {
+            let html = '';
+            matches.forEach((item, idx) => {
+                const genderClass = (item.jenis_kelamin || '').toLowerCase();
+                const isSudah = Boolean(item.foto_sudut_depan);
+                const statusBadge = isSudah
+                    ? `<span class="badge-status-survey sudah"><i class="fas fa-check-circle"></i> Sudah Survei</span>`
+                    : `<span class="badge-status-survey belum"><i class="fas fa-clock"></i> Belum Survei</span>`;
+
+                html += `
+                    <tr style="border-bottom:1px solid rgba(0,40,85,0.06);font-size:13px;">
+                        <td style="padding:14px 18px;font-weight:700;color:var(--text-muted);">${idx + 1}</td>
+                        <td style="padding:14px 18px;">
+                            <div style="font-weight:800;color:var(--primary-dark);">${escapeHtml(item.nama)}</div>
+                        </td>
+                        <td style="padding:14px 18px;text-align:center;">
+                            <span class="badge-gender ${genderClass}">${escapeHtml(item.jenis_kelamin || '-')}</span>
+                        </td>
+                        <td style="padding:14px 18px;">
+                            <div style="font-family:monospace;font-weight:700;color:var(--text-primary);">NIK: ${escapeHtml(item.no_ktp || '-')}</div>
+                            <div style="font-family:monospace;font-size:12px;color:var(--text-muted);margin-top:2px;">KK: ${escapeHtml(item.no_kk || '-')}</div>
+                        </td>
+                        <td style="padding:14px 18px;color:var(--text-secondary);">${escapeHtml(item.alamat || '-')}</td>
+                        <td style="padding:14px 18px;text-align:center;">${statusBadge}</td>
+                        <td style="padding:14px 18px;text-align:center;">
+                            <div style="display:inline-flex;align-items:center;gap:6px;">
+                                <button type="button" class="btn-act survey btn-trigger-status-modal"
+                                        data-id="${item.id}" data-nama="${escapeHtml(item.nama)}" data-nik="${escapeHtml(item.no_ktp || '-')}" data-alamat="${escapeHtml(item.alamat || '-')}" data-status="${escapeHtml(item.status || 'belum_ditentukan')}" data-url="/survey/${item.id}">
+                                    <i class="fas fa-camera"></i> ${isSudah ? 'Lihat / Edit' : 'Mulai Survei'}
+                                </button>
+                                <a href="/verval-data/surat-pernyataan/${item.id}" target="_blank" class="btn-act" style="background:rgba(0,40,85,0.08);color:var(--primary-dark);padding:7px 10px;" title="Cetak Surat Pernyataan Satuan">
+                                    <i class="fas fa-file-signature"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+
+        if (showFeedback && window.BspsOffline && window.BspsOffline.showPuprToast) {
+            if (matches.length > 0) {
+                window.BspsOffline.showPuprToast(`Ditemukan ${matches.length} dari seluruh ${ALL_DATA_DASH.length} penerima desa`, 'success');
+            } else {
+                window.BspsOffline.showPuprToast(`Tidak ditemukan penerima untuk pencarian ini`, 'warning');
+            }
         }
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        const filterForm = document.querySelector('form.filter-section');
+        const filterForm = document.getElementById('filterFormPetugasDash');
         if (filterForm) {
             filterForm.addEventListener('submit', function(e) {
                 if (!navigator.onLine) {
                     e.preventDefault();
-                    filterDashboardTableOffline();
-                    return;
-                }
-                if (window.PuprLoading) {
-                    window.PuprLoading.show('Mencari Data Penerima...');
+                    filterDashboardTableOffline(true);
                 }
             });
         }
 
-        const searchInput = document.querySelector('input[name="search"]');
+        const searchInput = document.getElementById('searchPetugasDash');
         if (searchInput) {
             searchInput.addEventListener('input', function() {
-                if (!navigator.onLine) {
-                    filterDashboardTableOffline();
+                filterDashboardTableOffline(false);
+            });
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    if (!navigator.onLine) {
+                        e.preventDefault();
+                        filterDashboardTableOffline(true);
+                    }
                 }
             });
         }

@@ -115,16 +115,20 @@
 
     // Auto-trigger loading overlay on form submits & pagination links
     document.addEventListener('DOMContentLoaded', function() {
-        // Auto-show loading on filter forms
+        // Auto-show loading on filter forms (Hanya jika sedang online dan form tidak dicegah)
         document.querySelectorAll('form.filter-section, form[method="GET"]').forEach(form => {
-            form.addEventListener('submit', function() {
+            form.addEventListener('submit', function(e) {
+                if (!navigator.onLine || e.defaultPrevented) {
+                    return;
+                }
                 window.PuprLoading.show('Memuat Hasil Pencarian...');
             });
         });
 
         // Auto-show loading on pagination link clicks
-        document.querySelectorAll('.pagination a').forEach(link => {
+        document.querySelectorAll('.pagination a, .pg-link:not(.disabled):not(.active)').forEach(link => {
             link.addEventListener('click', function() {
+                if (!navigator.onLine) return;
                 window.PuprLoading.show('Membuka Halaman...');
             });
         });
