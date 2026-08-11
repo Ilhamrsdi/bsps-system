@@ -181,10 +181,10 @@
         </div>
 
         {{-- Filter & Search --}}
-        <form action="{{ route('petugas.sudah-survei') }}" method="GET" class="filter-section">
+        <form action="{{ route('petugas.sudah-survei') }}" method="GET" class="filter-section" id="filterFormPetugasSudah">
             <div class="search-input-wrap">
                 <i class="fas fa-search"></i>
-                <input type="text" name="search" value="{{ $search }}" placeholder="Cari nama calon penerima yang sudah disurvei, NIK, atau alamat..." />
+                <input type="text" id="searchPetugasSudah" name="search" value="{{ $search }}" placeholder="Cari nama calon penerima yang sudah disurvei, NIK, atau alamat..." />
             </div>
             <a href="{{ route('verval-data.surat-pernyataan-kolektif', array_merge(['desa' => $user->desa, 'status' => 'sudah'], request()->all())) }}" target="_blank" class="btn" style="padding:10px 16px;font-size:13px;font-weight:700;background:#ffb800;color:#002855;text-decoration:none;border-radius:var(--radius-sm);display:inline-flex;align-items:center;gap:6px;" title="Cetak Surat Pernyataan Kolektif untuk warga yang sudah disurvei di Desa {{ $user->desa ?: '-' }}">
                 <i class="fas fa-file-signature"></i> Cetak Kolektif (Sudah Survei)
@@ -375,55 +375,133 @@
     </div>
 @endsection
 
+<script id="allPenerimasSudahData" type="application/json">
+    {!! json_encode($allPenerimas ?? []) !!}
+</script>
+
 @push('scripts')
 <script>
+    let ALL_DATA_SUDAH = [];
+    try {
+        const raw = document.getElementById('allPenerimasSudahData')?.textContent;
+        if (raw) ALL_DATA_SUDAH = JSON.parse(raw);
+    } catch (e) {
+        console.error('Error parsing all penerimas sudah:', e);
+    }
+
+    let ORIGINAL_ROWS_SUDAH = null;
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
     let pendingSurveyUrl = null;
 
     /**
-     * Offline Client-Side Search untuk Petugas
+     * Client-Side Search untuk Petugas Sudah Survei (Mencari di SELURUH data desa)
      */
-    function filterSudahTableOffline() {
-        const searchInput = document.querySelector('input[name="search"]');
+    function filterSudahTableOffline(showFeedback = false) {
+        if (window.PuprLoading) window.PuprLoading.hide();
+        const searchInput = document.getElementById('searchPetugasSudah');
         const query = (searchInput?.value || '').toLowerCase().trim();
-        const rows = document.querySelectorAll('.table-petugas-wrapper tbody tr');
-        let count = 0;
+        const terms = query.split(/\s+/).filter(t => t.length > 0);
+        const tbody = document.querySelector('.table-petugas-wrapper tbody');
+        if (!tbody) return;
 
-        rows.forEach(function(row) {
-            if (row.querySelector('td[colspan]')) return;
-            const text = row.innerText.toLowerCase();
-            if (!query || text.includes(query)) {
-                row.style.display = '';
-                count++;
-            } else {
-                row.style.display = 'none';
+        if (ORIGINAL_ROWS_SUDAH === null) {
+            ORIGINAL_ROWS_SUDAH = tbody.innerHTML;
+        }
+
+        if (terms.length === 0) {
+            tbody.innerHTML = ORIGINAL_ROWS_SUDAH;
+            loadOfflinePendingSurveys();
+            if (showFeedback && window.BspsOffline && window.BspsOffline.showPuprToast) {
+                window.BspsOffline.showPuprToast(`Menampilkan halaman awal (${ALL_DATA_SUDAH.length} total di desa)`, 'success');
             }
+            return;
+        }
+
+        const matches = ALL_DATA_SUDAH.filter(item => {
+            const fullText = `${item.nama || ''} ${item.no_ktp || ''} ${item.no_kk || ''} ${item.alamat || ''}`.toLowerCase();
+            return terms.every(term => fullText.includes(term));
         });
 
-        if (window.showToast) {
-            showToast(`Mode Offline: Menampilkan ${count} penerima selesai`, 'success');
+        if (matches.length === 0) {
+            tbody.innerHTML = `<tr id="noSearchResultRow"><td colspan="8" style="text-align:center;padding:30px;color:var(--text-muted);font-weight:600;"><i class="fas fa-search" style="margin-right:6px;"></i> Tidak ada penerima selesai survei yang cocok dengan "<strong>${escapeHtml(query)}</strong>" dari seluruh ${ALL_DATA_SUDAH.length} data desa</td></tr>`;
+        } else {
+            let html = '';
+            matches.forEach((item, idx) => {
+                const genderClass = (item.jenis_kelamin || '').toLowerCase();
+                html += `
+                    <tr data-id="${item.id}" style="border-bottom:1px solid rgba(0,40,85,0.06);font-size:13px;">
+                        <td style="padding:14px 18px;font-weight:700;color:var(--text-muted);">${idx + 1}</td>
+                        <td style="padding:14px 18px;">
+                            <div style="font-weight:800;color:var(--primary-dark);">${escapeHtml(item.nama)}</div>
+                        </td>
+                        <td style="padding:14px 18px;text-align:center;">
+                            <span class="badge-gender ${genderClass}">${escapeHtml(item.jenis_kelamin || '-')}</span>
+                        </td>
+                        <td style="padding:14px 18px;">
+                            <div style="font-family:monospace;font-weight:700;color:var(--text-primary);">NIK: ${escapeHtml(item.no_ktp || '-')}</div>
+                            <div style="font-family:monospace;font-size:12px;color:var(--text-muted);margin-top:2px;">KK: ${escapeHtml(item.no_kk || '-')}</div>
+                        </td>
+                        <td style="padding:14px 18px;color:var(--text-secondary);">${escapeHtml(item.alamat || '-')}</td>
+                        <td style="padding:14px 18px;text-align:center;">
+                            <span class="badge-status-survey sudah" id="syncStatus_${item.id}"><i class="fas fa-check-circle"></i> Selesai (Tersinkron)</span>
+                        </td>
+                        <td style="padding:14px 18px;text-align:center;">
+                            <div style="display:inline-flex;align-items:center;gap:6px;">
+                                <a href="/survey/${item.id}" class="btn-act survey" style="background:#002855;color:#fff;">
+                                    <i class="fas fa-eye"></i> Lihat / Edit
+                                </a>
+                                <a href="/verval-data/surat-pernyataan/${item.id}" target="_blank" class="btn-act" style="background:rgba(255,184,0,0.15);color:#d69e00;" title="Cetak Surat Pernyataan">
+                                    <i class="fas fa-file-signature"></i>
+                                </a>
+                                <a href="/verval-data/lampiran-foto/${item.id}" target="_blank" class="btn-act" style="background:rgba(0,123,255,0.15);color:#007bff;" title="Cetak Lampiran Foto">
+                                    <i class="fas fa-file-image"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+
+        loadOfflinePendingSurveys();
+
+        if (showFeedback && window.BspsOffline && window.BspsOffline.showPuprToast) {
+            if (matches.length > 0) {
+                window.BspsOffline.showPuprToast(`Ditemukan ${matches.length} dari seluruh ${ALL_DATA_SUDAH.length} penerima desa`, 'success');
+            } else {
+                window.BspsOffline.showPuprToast(`Tidak ditemukan penerima selesai untuk "${query}"`, 'warning');
+            }
         }
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        const filterForm = document.querySelector('form.filter-section');
+        const filterForm = document.getElementById('filterFormPetugasSudah');
         if (filterForm) {
             filterForm.addEventListener('submit', function(e) {
                 if (!navigator.onLine) {
                     e.preventDefault();
-                    filterSudahTableOffline();
-                    return;
-                }
-                if (window.PuprLoading) {
-                    window.PuprLoading.show('Mencari Data...');
+                    filterSudahTableOffline(true);
                 }
             });
         }
 
-        const searchInput = document.querySelector('input[name="search"]');
+        const searchInput = document.getElementById('searchPetugasSudah');
         if (searchInput) {
             searchInput.addEventListener('input', function() {
-                if (!navigator.onLine) {
-                    filterSudahTableOffline();
+                filterSudahTableOffline(false);
+            });
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    if (!navigator.onLine) {
+                        e.preventDefault();
+                        filterSudahTableOffline(true);
+                    }
                 }
             });
         }
