@@ -42,6 +42,10 @@ class PetugasController extends Controller
         $totalTugas     = (clone $query)->count();
         $sudahSurvei    = (clone $query)->whereNotNull('foto_sudut_depan')->count();
         $belumSurvei    = (clone $query)->whereNull('foto_sudut_depan')->count();
+        $usulanBaruCount = (clone $query)->where(function ($q) {
+            $q->where('pengelompokan_desil', 'like', '%Usulan%')
+              ->orWhere('status', 'Usulan Petugas');
+        })->count();
         $lakiCount      = (clone $query)->where('jenis_kelamin', 'L')->count();
         $perempuanCount = (clone $query)->where('jenis_kelamin', 'P')->count();
         $backlog1Count  = (clone $query)->where('pengelompokan_desil', 'like', '%Backlog 1%')->count();
@@ -52,6 +56,7 @@ class PetugasController extends Controller
             'total_tugas'        => $totalTugas,
             'sudah_survei'       => $sudahSurvei,
             'belum_survei'       => $belumSurvei,
+            'usulan_baru'        => $usulanBaruCount,
             'laki_count'         => $lakiCount,
             'perempuan_count'    => $perempuanCount,
             'backlog1_count'     => $backlog1Count,
@@ -177,5 +182,70 @@ class PetugasController extends Controller
             'message' => 'Status berhasil diperbarui menjadi "' . $request->status . '".',
             'status'  => $request->status,
         ]);
+    }
+
+    /**
+     * Petugas Menambahkan Usulan Calon Penerima Baru di Desanya
+     */
+    public function storeUsulan(Request $request)
+    {
+        $user = Auth::user();
+
+        $request->validate([
+            'nama'   => 'required|string|max:255',
+            'no_ktp' => 'required|numeric|digits:16',
+            'no_kk'  => 'nullable|numeric|digits:16',
+        ], [
+            'nama.required'   => 'Nama calon penerima wajib diisi.',
+            'no_ktp.required' => 'NIK (No. KTP) wajib diisi.',
+            'no_ktp.numeric'  => 'NIK harus berupa angka 16 digit.',
+            'no_ktp.digits'   => 'NIK harus tepat 16 digit.',
+            'no_kk.numeric'   => 'Nomor KK harus berupa angka 16 digit.',
+            'no_kk.digits'    => 'Nomor KK harus tepat 16 digit.',
+        ]);
+
+        $noKtp = trim($request->no_ktp);
+        
+        // Cek duplikasi NIK di database
+        $existing = DataPenerima::where('no_ktp', $noKtp)->first();
+        if ($existing) {
+            return redirect()->back()->withInput()->with('error', "NIK {$noKtp} sudah terdaftar dalam sistem atas nama {$existing->nama} (Desa {$existing->desa_kelurahan}).");
+        }
+
+        $alamat = trim($request->input('alamat', ''));
+        $rt = trim($request->input('rt', ''));
+        $rw = trim($request->input('rw', ''));
+
+        if (($rt || $rw) && !preg_match('/rt\s*\d+/i', $alamat)) {
+            $rtLabel = $rt ? "RT" . str_pad($rt, 3, '0', STR_PAD_LEFT) : "";
+            $rwLabel = $rw ? "RW" . str_pad($rw, 3, '0', STR_PAD_LEFT) : "";
+            $rtrwTag = trim("{$rtLabel} {$rwLabel}");
+            if ($rtrwTag) {
+                $alamat = $alamat ? "{$alamat} {$rtrwTag}" : $rtrwTag;
+            }
+        }
+
+        $penerima = DataPenerima::create([
+            'user_id'             => $user->id,
+            'nama'                => trim($request->nama),
+            'no_ktp'              => $noKtp,
+            'no_kk'               => trim($request->no_kk),
+            'alamat'              => $alamat,
+            'dusun'               => trim($request->dusun),
+            'rt'                  => $rt,
+            'rw'                  => $rw,
+            'desa_kelurahan'      => $user->desa,
+            'kecamatan'           => $user->kecamatan,
+            'kabupaten_kota'      => 'Jember',
+            'jenis_kelamin'       => $request->input('jenis_kelamin', 'L'),
+            'pengelompokan_desil' => $request->input('pengelompokan_desil', 'Usulan Baru Lapangan'),
+            'status'              => 'Usulan Petugas',
+        ]);
+
+        if ($request->has('survei_sekarang')) {
+            return redirect()->route('survey', ['id' => $penerima->id])->with('success', "Calon penerima '{$penerima->nama}' berhasil ditambahkan! Silakan lengkapi data survei & foto.");
+        }
+
+        return redirect()->back()->with('success', "Calon penerima '{$penerima->nama}' (NIK: {$noKtp}) berhasil diusulkan ke Desa {$user->desa}!");
     }
 }

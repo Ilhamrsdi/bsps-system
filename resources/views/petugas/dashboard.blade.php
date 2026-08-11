@@ -11,24 +11,31 @@
         background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
         color: #ffffff;
         border-radius: var(--radius);
-        padding: 24px 28px;
+        padding: 22px 28px;
         margin-bottom: 24px;
         box-shadow: 0 10px 24px rgba(0, 40, 85, 0.18);
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 20px;
+        flex-wrap: wrap;
         border-left: 6px solid var(--secondary);
     }
+    .welcome-text { flex: 1; min-width: 280px; }
     .welcome-text h2 { font-size: 20px; font-weight: 800; margin-bottom: 4px; color:#fff; }
     .welcome-text p  { font-size: 13.5px; opacity: 0.9; margin: 0; color:rgba(255,255,255,0.9); }
 
     /* Stats Grid */
     .stats-grid-petugas {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(5, 1fr);
         gap: 16px;
         margin-bottom: 24px;
+    }
+    @media (max-width: 1280px) {
+        .stats-grid-petugas {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
     }
     .stat-card-petugas {
         background: var(--bg-card);
@@ -306,6 +313,25 @@
             <span>Desa {{ $user->desa ?: '-' }}</span>
         </div>
 
+        <!-- Alert Success & Error Banners -->
+        @if(session('success'))
+            <div class="alert alert-success" style="background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;border-radius:12px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:14px;box-shadow:0 4px 16px rgba(34,197,94,0.12);animation:fadeIn 0.4s ease;">
+                <div style="width:36px;height:36px;border-radius:50%;background:rgba(34,197,94,0.18);color:#22c55e;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">
+                    <i class="fas fa-circle-check"></i>
+                </div>
+                <div style="font-weight:700;font-size:14px;line-height:1.4;">{{ session('success') }}</div>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="alert alert-danger" style="background:#fef2f2;border:1px solid #fecaca;color:#991b1b;border-radius:12px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:14px;box-shadow:0 4px 16px rgba(239,68,68,0.12);animation:fadeIn 0.4s ease;">
+                <div style="width:36px;height:36px;border-radius:50%;background:rgba(239,68,68,0.18);color:#ef4444;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">
+                    <i class="fas fa-triangle-exclamation"></i>
+                </div>
+                <div style="font-weight:700;font-size:14px;line-height:1.4;">{{ session('error') }}</div>
+            </div>
+        @endif
+
         <!-- Welcome Banner Petugas -->
         <div class="welcome-card">
             <div class="welcome-text">
@@ -316,6 +342,9 @@
                 </p>
             </div>
             <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                <button type="button" class="btn" style="background:#22c55e;color:#fff;font-weight:800;padding:10px 18px;border-radius:var(--radius-sm);border:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 14px rgba(34,197,94,0.35);" onclick="window.PuprModal.open('modalTambahUsulan')" title="Tambah Usulan Calon Penerima Baru di Desa {{ $user->desa ?: '-' }}">
+                    <i class="fas fa-user-plus"></i> + Tambah Usulan Penerima Baru
+                </button>
                 <a href="{{ route('verval-data.surat-pernyataan-kolektif', array_merge(['desa' => $user->desa], request()->all())) }}" target="_blank" class="btn" style="background:#ffb800;color:#002855;font-weight:800;padding:10px 18px;border-radius:var(--radius-sm);text-decoration:none;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(0,0,0,0.15);" title="Cetak Surat Pernyataan secara kolektif untuk seluruh calon penerima Desa {{ $user->desa ?: '-' }}">
                     <i class="fas fa-file-signature"></i> Cetak Kolektif Surat Pernyataan (Desa {{ $user->desa ?: '-' }})
                 </a>
@@ -325,7 +354,7 @@
             </div>
         </div>
 
-        <!-- 4 Stats Cards -->
+        <!-- 5 Stats Cards -->
         <div class="stats-grid-petugas">
             <div class="stat-card-petugas">
                 <div class="stat-icon blue"><i class="fas fa-users-viewfinder"></i></div>
@@ -348,6 +377,13 @@
                     <div class="stat-label">Sudah Selesai Survei</div>
                 </div>
             </a>
+            <div class="stat-card-petugas">
+                <div class="stat-icon cyan" style="background:rgba(34,197,94,0.15);color:#16a34a;"><i class="fas fa-user-plus"></i></div>
+                <div class="stat-info">
+                    <div class="stat-value" style="color:#16a34a;">{{ number_format($stats['usulan_baru'], 0, ',', '.') }}</div>
+                    <div class="stat-label">Usulan Baru Lapangan</div>
+                </div>
+            </div>
             <div class="stat-card-petugas">
                 <div class="stat-icon purple"><i class="fas fa-chart-pie"></i></div>
                 <div class="stat-info">
@@ -450,10 +486,12 @@
         </form>
 
         {{-- Tabel Data Calon Penerima Desa --}}
-        <div class="table-container-card">
             <div class="table-header-bar">
                 <h3><i class="fas fa-clipboard-list"></i> Daftar Calon Penerima BSPS — Desa {{ $user->desa ?: '-' }}</h3>
-                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                    <button type="button" class="btn" style="padding:8px 14px;font-size:12.5px;font-weight:800;background:#22c55e;color:#fff;border:none;border-radius:var(--radius-sm);cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(34,197,94,0.3);" onclick="window.PuprModal.open('modalTambahUsulan')">
+                        <i class="fas fa-user-plus"></i> + Tambah Usulan
+                    </button>
                     <a href="{{ route('verval-data.surat-pernyataan-kolektif', array_merge(['desa' => $user->desa], request()->all())) }}" target="_blank" class="btn" style="padding:8px 14px;font-size:12.5px;font-weight:800;background:#ffb800;color:#002855;text-decoration:none;border-radius:var(--radius-sm);display:inline-flex;align-items:center;gap:6px;" title="Cetak Surat Pernyataan Kolektif per Desa">
                         <i class="fas fa-print"></i> Cetak Kolektif (Desa {{ $user->desa ?: '-' }})
                     </a>
@@ -713,6 +751,127 @@
                     <i class="fas fa-location-crosshairs"></i> Simpan &amp; Lanjutkan Survei
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal Tambah Usulan Calon Penerima BSPS (PUPR Style) -->
+    <div class="modal-overlay" id="modalTambahUsulan">
+        <div class="modal-box" style="max-width: 600px; border-radius: 14px; overflow: hidden; box-shadow: 0 20px 40px rgba(0, 40, 85, 0.25);">
+            <div class="modal-header" style="background: linear-gradient(135deg, #002855 0%, #001835 100%); color: #fff; padding: 18px 22px; display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(34, 197, 94, 0.2); color: #22c55e; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div>
+                        <h3 style="font-size: 16px; font-weight: 800; margin: 0; color: #fff;">Usulkan Calon Penerima Baru</h3>
+                        <p style="font-size: 12px; color: rgba(255, 255, 255, 0.75); margin: 2px 0 0 0;">
+                            Desa <strong>{{ $user->desa ?: '-' }}</strong> &bull; Kec. <strong>{{ $user->kecamatan ?: '-' }}</strong>
+                        </p>
+                    </div>
+                </div>
+                <button type="button" style="background: transparent; border: none; color: rgba(255,255,255,0.7); font-size: 22px; cursor: pointer; line-height: 1;" onclick="window.PuprModal.close('modalTambahUsulan')">&times;</button>
+            </div>
+
+            <form action="{{ route('petugas.usulkan-penerima') }}" method="POST" id="formTambahUsulan">
+                @csrf
+                <div class="modal-body" style="padding: 22px; max-height: 75vh; overflow-y: auto;">
+                    {{-- Alert Info Desa --}}
+                    <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 8px; padding: 12px 14px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between;">
+                        <span style="font-size: 12.5px; color: #15803d; font-weight: 600;">
+                            <i class="fas fa-location-dot" style="margin-right: 4px;"></i> Wilayah Usulan: <strong>Desa {{ $user->desa ?: '-' }}</strong> (Kec. {{ $user->kecamatan ?: '-' }})
+                        </span>
+                        <span style="background: #22c55e; color: #fff; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 12px; text-transform: uppercase;">
+                            Otomatis Terunci
+                        </span>
+                    </div>
+
+                    {{-- Grid Input Form --}}
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                        <div style="grid-column: span 2;">
+                            <label style="font-size: 12px; font-weight: 700; color: #334155; display: block; margin-bottom: 4px;">
+                                Nama Lengkap Calon Penerima <span style="color:#ef4444;">*</span>
+                            </label>
+                            <input type="text" name="nama" class="form-control" placeholder="Contoh: SAMAD" required style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px;">
+                        </div>
+
+                        <div>
+                            <label style="font-size: 12px; font-weight: 700; color: #334155; display: block; margin-bottom: 4px;">
+                                NIK / No. KTP (16 Digit) <span style="color:#ef4444;">*</span>
+                            </label>
+                            <input type="text" name="no_ktp" class="form-control" maxlength="16" minlength="16" placeholder="350917..." required style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px;">
+                        </div>
+
+                        <div>
+                            <label style="font-size: 12px; font-weight: 700; color: #334155; display: block; margin-bottom: 4px;">
+                                Nomor Kartu Keluarga (KK)
+                            </label>
+                            <input type="text" name="no_kk" class="form-control" maxlength="16" placeholder="350917..." style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px;">
+                        </div>
+
+                        <div>
+                            <label style="font-size: 12px; font-weight: 700; color: #334155; display: block; margin-bottom: 4px;">
+                                Jenis Kelamin
+                            </label>
+                            <select name="jenis_kelamin" class="form-control" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; background: #fff;">
+                                <option value="L">Laki-laki</option>
+                                <option value="P">Perempuan</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label style="font-size: 12px; font-weight: 700; color: #334155; display: block; margin-bottom: 4px;">
+                                Pengelompokan Desil / Status Usulan
+                            </label>
+                            <input type="hidden" name="pengelompokan_desil" value="Usulan Baru Lapangan">
+                            <div style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; background: #f8fafc; color: #15803d; font-weight: 800; display: flex; align-items: center; justify-content: space-between;">
+                                <span><i class="fas fa-tag" style="margin-right:6px;color:#22c55e;"></i> Usulan Baru Lapangan</span>
+                                <span style="font-size: 9.5px; background: #22c55e; color: #fff; padding: 2px 6px; border-radius: 10px; font-weight: 800; text-transform: uppercase;">Terkunci</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label style="font-size: 12px; font-weight: 700; color: #334155; display: block; margin-bottom: 4px;">
+                                Dusun / Dukuh
+                            </label>
+                            <input type="text" name="dusun" class="form-control" placeholder="Contoh: Krajan" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px;">
+                        </div>
+
+                        <div style="display: flex; gap: 8px;">
+                            <div style="flex: 1;">
+                                <label style="font-size: 12px; font-weight: 700; color: #334155; display: block; margin-bottom: 4px;">
+                                    RT
+                                </label>
+                                <input type="text" name="rt" class="form-control" maxlength="5" placeholder="001" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px;">
+                            </div>
+                            <div style="flex: 1;">
+                                <label style="font-size: 12px; font-weight: 700; color: #334155; display: block; margin-bottom: 4px;">
+                                    RW
+                                </label>
+                                <input type="text" name="rw" class="form-control" maxlength="5" placeholder="002" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px;">
+                            </div>
+                        </div>
+
+                        <div style="grid-column: span 2;">
+                            <label style="font-size: 12px; font-weight: 700; color: #334155; display: block; margin-bottom: 4px;">
+                                Alamat Jalan / Rumah
+                            </label>
+                            <textarea name="alamat" class="form-control" rows="2" placeholder="Contoh: Jl. Mawar No. 12" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; font-family: inherit;"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer" style="padding: 14px 22px; background: var(--bg-body); border-top: 1px solid rgba(0, 40, 85, 0.06); display: flex; gap: 10px; justify-content: flex-end; align-items: center; flex-wrap: wrap;">
+                    <button type="button" class="btn btn-outline" style="padding: 9px 16px;" onclick="window.PuprModal.close('modalTambahUsulan')">
+                        Batal
+                    </button>
+                    <button type="submit" class="btn btn-primary" style="padding: 9px 18px; font-weight: 800; background: #002855; color: #fff; display: inline-flex; align-items: center; gap: 6px;">
+                        <i class="fas fa-save"></i> Simpan Usulan
+                    </button>
+                    <button type="submit" name="survei_sekarang" value="1" class="btn" style="padding: 9px 18px; font-weight: 800; background: #22c55e; color: #fff; border: none; border-radius: var(--radius-sm); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);">
+                        <i class="fas fa-clipboard-check"></i> Simpan &amp; Mulai Survei
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 @endsection
