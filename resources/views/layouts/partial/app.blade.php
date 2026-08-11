@@ -121,8 +121,12 @@
                 navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' }).then(function(reg) {
                     console.log('[PWA] Service Worker aktif:', reg.scope);
 
-                    // Force update SW jika ada versi baru
-                    reg.update();
+                    // Force update SW jika ada versi baru & sedang online
+                    if (navigator.onLine && typeof reg.update === 'function') {
+                        reg.update().catch(function(e) {
+                            console.log('[PWA] Check update SW dilewati (offline/error):', e ? e.message : e);
+                        });
+                    }
                 }).catch(function(err) {
                     console.warn('[PWA] Service Worker gagal didaftarkan:', err);
                 });

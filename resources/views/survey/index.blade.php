@@ -2031,29 +2031,48 @@
             }
         }
 
-        // GPS Geolocation Handler (Auto-fill hidden coordinates)
+        // GPS Geolocation Handler (Auto-fill hidden coordinates dengan fallback laptop/indoor)
         function requestLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function (position) {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
-                    const latInput = document.getElementById('latitude');
-                    const lngInput = document.getElementById('longitude');
+            if (!navigator.geolocation) return;
 
-                    if (latInput) latInput.value = lat;
-                    if (lngInput) lngInput.value = lng;
+            const applyPosition = function (position) {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                const latInput = document.getElementById('latitude');
+                const lngInput = document.getElementById('longitude');
 
-                    if (window.PuprModal) {
-                        window.PuprModal.close('gpsModal');
-                    }
-                }, function (error) {
-                    console.warn('GPS location request error:', error);
-                }, {
+                if (latInput) latInput.value = lat;
+                if (lngInput) lngInput.value = lng;
+
+                if (window.PuprModal) {
+                    window.PuprModal.close('gpsModal');
+                }
+            };
+
+            // Percobaan 1: High Accuracy GPS (8 detik)
+            navigator.geolocation.getCurrentPosition(
+                applyPosition,
+                function (error) {
+                    console.warn('GPS high-accuracy request timeout/failed, mencoba fallback low accuracy:', error);
+                    // Percobaan 2: Fallback Low Accuracy / Wi-Fi Triangulation untuk Laptop/Indoor (20 detik, cache 5 min)
+                    navigator.geolocation.getCurrentPosition(
+                        applyPosition,
+                        function (fallbackErr) {
+                            console.warn('GPS location request final fallback error:', fallbackErr);
+                        },
+                        {
+                            enableHighAccuracy: false,
+                            timeout: 20000,
+                            maximumAge: 300000
+                        }
+                    );
+                },
+                {
                     enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 0
-                });
-            }
+                    timeout: 8000,
+                    maximumAge: 60000
+                }
+            );
         }
 
         // Recount & Update Status Kelayakan Usulan (Kriteria RTLH Terpenuhi)
