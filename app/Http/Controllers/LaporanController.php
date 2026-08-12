@@ -19,10 +19,17 @@ class LaporanController extends Controller
         $kecamatan = $request->get('kecamatan', 'all');
         $desa = $request->get('desa', 'all');
         $status = $request->get('status', 'all');
+        $perPage = $request->get('per_page', 15);
 
         $user = Auth::user();
         if ($user && $user->isAdminKecamatan()) {
             $kecamatan = $user->kecamatan;
+        }
+
+        if ($perPage === 'all') {
+            $perPageLimit = 999999;
+        } else {
+            $perPageLimit = in_array((int)$perPage, [10, 15, 20, 25, 50, 100]) ? (int)$perPage : 15;
         }
 
         // Base Query dengan Filter Role & Input User
@@ -44,7 +51,8 @@ class LaporanController extends Controller
                   ->orWhere('no_ktp', 'like', "%{$search}%")
                   ->orWhere('no_kk', 'like', "%{$search}%")
                   ->orWhere('alamat', 'like', "%{$search}%")
-                  ->orWhere('desa_kelurahan', 'like', "%{$search}%");
+                  ->orWhere('desa_kelurahan', 'like', "%{$search}%")
+                  ->orWhere('kecamatan', 'like', "%{$search}%");
             });
         }
 
@@ -62,6 +70,11 @@ class LaporanController extends Controller
         $baseQuery = DataPenerima::query();
         if ($user && $user->isAdminKecamatan()) {
             $baseQuery->where('kecamatan', $user->kecamatan);
+        } elseif ($kecamatan && $kecamatan !== 'all') {
+            $baseQuery->where('kecamatan', $kecamatan);
+        }
+        if ($desa && $desa !== 'all') {
+            $baseQuery->where('desa_kelurahan', $desa);
         }
 
         $totalPenerima = (clone $baseQuery)->count();
@@ -79,6 +92,20 @@ class LaporanController extends Controller
             'persen_layak'     => $totalSudahSurvei > 0 ? round(($totalLayak / $totalSudahSurvei) * 100, 1) : 0,
         ];
 
+        // Hitung Grand Total Capaian Indikator untuk Footer Tab Indikator
+        $indTotals = (clone $baseQuery)
+            ->selectRaw("
+                COUNT(*) as total_penerima,
+                SUM(CASE WHEN (foto_sudut_depan IS NOT NULL AND foto_sudut_depan != '') THEN 1 ELSE 0 END) as total_sudah_survei,
+                SUM(CASE WHEN indikator_atap = 'tidak_ada' THEN 1 ELSE 0 END) as atap_rtlh,
+                SUM(CASE WHEN indikator_dinding = 'tidak_ada' THEN 1 ELSE 0 END) as dinding_rtlh,
+                SUM(CASE WHEN indikator_lantai = 'tidak_ada' THEN 1 ELSE 0 END) as lantai_rtlh,
+                SUM(CASE WHEN indikator_pondasi = 'tidak_ada' THEN 1 ELSE 0 END) as pondasi_rtlh,
+                SUM(CASE WHEN indikator_struktur = 'tidak_ada' THEN 1 ELSE 0 END) as struktur_rtlh,
+                SUM(CASE WHEN indikator_penghasilan = 'ada' THEN 1 ELSE 0 END) as penghasilan_rtlh
+            ")
+            ->first();
+
         // 2. DROPDOWN LIST KECAMATAN & DESA
         if ($user && $user->isAdminKecamatan()) {
             $listKecamatan = collect([$user->kecamatan]);
@@ -93,9 +120,9 @@ class LaporanController extends Controller
         $listDesa = $desaQuery->orderBy('desa_kelurahan', 'asc')->pluck('desa_kelurahan')->filter()->values();
 
         // 3. AGREGASI BERDASARKAN TAB
-        $rekapDesaKecamatan = collect();
-        $rekapIndikator = collect();
-        $penerimaList = collect();
+        $rekapDesaKecamatan = null;
+        $rekapIndikator = null;
+        $penerimaList = null;
 
         // Konstruksi SQL Cek Kelengkapan Survei (Sesuai DataPenerima::$fieldWajibSurvei & Status Khusus)
         $conds = [];
@@ -116,6 +143,12 @@ class LaporanController extends Controller
             if ($desa && $desa !== 'all') {
                 $rekapQuery->where('desa_kelurahan', $desa);
             }
+            if ($search) {
+                $rekapQuery->where(function($q) use ($search) {
+                    $q->where('desa_kelurahan', 'like', "%{$search}%")
+                      ->orWhere('kecamatan', 'like', "%{$search}%");
+                });
+            }
 
             $rekapDesaKecamatan = $rekapQuery
                 ->selectRaw("
@@ -129,7 +162,9 @@ class LaporanController extends Controller
                 ->groupBy('kecamatan', 'desa_kelurahan')
                 ->orderBy('kecamatan')
                 ->orderBy('desa_kelurahan')
-                ->get();
+                ->paginate($perPageLimit)
+                ->withQueryString();
+
         } elseif ($tab === 'indikator') {
             // TAB 2: CAPAIAN 6 INDIKATOR RTLH PER DESA & KECAMATAN
             $indQuery = DataPenerima::query();
@@ -140,6 +175,12 @@ class LaporanController extends Controller
             }
             if ($desa && $desa !== 'all') {
                 $indQuery->where('desa_kelurahan', $desa);
+            }
+            if ($search) {
+                $indQuery->where(function($q) use ($search) {
+                    $q->where('desa_kelurahan', 'like', "%{$search}%")
+                      ->orWhere('kecamatan', 'like', "%{$search}%");
+                });
             }
 
             $rekapIndikator = $indQuery
@@ -158,20 +199,24 @@ class LaporanController extends Controller
                 ->groupBy('kecamatan', 'desa_kelurahan')
                 ->orderBy('kecamatan')
                 ->orderBy('desa_kelurahan')
-                ->get();
+                ->paginate($perPageLimit)
+                ->withQueryString();
+
         } else {
             // TAB 3 (GALERI FOTO) & TAB 4 (DETAIL PENERIMA)
-            $penerimaList = $query->orderBy('nama', 'asc')->paginate(20)->withQueryString();
+            $penerimaList = $query->orderBy('nama', 'asc')->paginate($perPageLimit)->withQueryString();
         }
 
         return view('laporan.index', compact(
             'tab',
             'stats',
+            'indTotals',
             'listKecamatan',
             'listDesa',
             'rekapDesaKecamatan',
             'rekapIndikator',
-            'penerimaList'
+            'penerimaList',
+            'perPage'
         ));
     }
 
@@ -248,7 +293,13 @@ class LaporanController extends Controller
     public function exportExcel(Request $request)
     {
         $user = Auth::user();
+        $scope = $request->get('export_scope', 'all');
         $kecamatan = $request->get('kecamatan', 'all');
+        
+        if ($scope === 'all' && (!$user || !$user->isAdminKecamatan())) {
+            $kecamatan = 'all';
+        }
+
         $desa = $request->get('desa', 'all');
         $status = $request->get('status', 'all');
         $search = $request->get('search');
@@ -272,7 +323,8 @@ class LaporanController extends Controller
                   ->orWhere('no_ktp', 'like', "%{$search}%")
                   ->orWhere('no_kk', 'like', "%{$search}%")
                   ->orWhere('alamat', 'like', "%{$search}%")
-                  ->orWhere('desa_kelurahan', 'like', "%{$search}%");
+                  ->orWhere('desa_kelurahan', 'like', "%{$search}%")
+                  ->orWhere('kecamatan', 'like', "%{$search}%");
             });
         }
         if ($status === 'layak') {
@@ -320,7 +372,7 @@ class LaporanController extends Controller
             ->get();
 
         // Data Detail Calon Penerima dengan Foto Lapangan
-        $detailPenerima = (clone $query)->orderBy('nama', 'asc')->get();
+        $detailPenerima = (clone $query)->orderBy('kecamatan', 'asc')->orderBy('desa_kelurahan', 'asc')->orderBy('nama', 'asc')->get();
 
         // Convert Foto ke Base64 Inline
         $detailPenerima->transform(function ($item) {
@@ -330,7 +382,10 @@ class LaporanController extends Controller
             return $item;
         });
 
-        $filename = 'rekap_bsps_verval_' . date('Ymd_His') . '.xls';
+        $prefix = ($kecamatan && $kecamatan !== 'all') 
+            ? 'rekap_bsps_kec_' . strtolower(str_replace([' ', '/', '\\'], '_', $kecamatan)) 
+            : 'rekap_bsps_kab_jember_semua_desa';
+        $filename = $prefix . '_' . date('Ymd_His') . '.xls';
 
         $content = view('laporan.excel', compact(
             'stats',
