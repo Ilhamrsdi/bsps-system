@@ -654,10 +654,12 @@
                     @endif
                 </h3>
                 <div style="display:flex;align-items:center;gap:8px;">
+                    @if(auth()->check() && auth()->user()->isAdmin())
                     <button type="button" class="btn-export-excel" onclick="window.PuprModal.open('modalExportExcel')" title="Pilih opsi dan download data ke format Microsoft Excel" style="cursor:pointer;border:none;">
                         <i class="fas fa-file-excel"></i>
                         <span>Export Excel (.XLS)</span>
                     </button>
+                    @endif
                 </div>
             </div>
 
@@ -1206,52 +1208,84 @@
             </div>
             
             <form action="{{ route('laporan.export') }}" method="GET" target="_blank" id="formExportExcelModal" data-no-loading="true" style="overflow: visible !important;">
-                <div class="modal-body" style="padding: 22px 24px; overflow: visible !important; min-height: 240px;">
-                    <p style="font-size: 13px; color: #64748b; margin-top: 0; margin-bottom: 18px; line-height: 1.5;">
-                        Silakan pilih lingkup wilayah rekapitulasi data BSPS yang ingin Anda unduh ke format Microsoft Excel:
-                    </p>
+                <div class="modal-body" style="padding: 22px 24px; overflow: visible !important; min-height: 200px;">
+                    @if(auth()->check() && auth()->user()->isPetugas())
+                        {{-- PETUGAS DESA --}}
+                        <input type="hidden" name="export_scope" value="desa" />
+                        <input type="hidden" name="kecamatan" value="{{ auth()->user()->kecamatan }}" />
+                        <input type="hidden" name="desa" value="{{ auth()->user()->desa }}" />
 
-                    <!-- Pilihan Lingkup Export -->
-                    <div style="display: flex; flex-direction: column; gap: 12px;">
-                        <!-- Pilihan 1: Export Keseluruhan Kabupaten (Semua Desa) -->
-                        <div class="export-option-card active" id="optCardAll" onclick="setExportScope('all')">
-                            <div style="display: flex; align-items: flex-start; gap: 12px;">
-                                <input type="radio" name="export_scope" value="all" id="scopeAll" checked style="margin-top: 3px; cursor: pointer;" />
-                                <div>
-                                    <strong style="font-size: 13.5px; color: #002855; display: block;">
-                                        <i class="fas fa-globe-asia" style="color: #002855; margin-right: 6px;"></i>Export Seluruh Kabupaten (Semua Desa)
-                                    </strong>
-                                    <span style="font-size: 12px; color: #64748b; margin-top: 3px; display: block; line-height: 1.4;">
-                                        Mendownload data rekapitulasi lengkap dari seluruh desa/kelurahan di 31 kecamatan se-Kabupaten Jember.
-                                    </span>
+                        <div style="padding: 16px; border-radius: 10px; background: rgba(0, 40, 85, 0.04); border: 1px solid rgba(0, 40, 85, 0.12);">
+                            <strong style="font-size: 14px; color: #002855; display: block; margin-bottom: 6px;">
+                                <i class="fas fa-user-check" style="color: #27ae60; margin-right: 6px;"></i>
+                                Export Data Verval Petugas Lapangan
+                            </strong>
+                            <p style="font-size: 12.5px; color: #64748b; margin: 0; line-height: 1.5;">
+                                File Excel akan mencakup seluruh rekapitulasi indikator dan foto verifikasi calon penerima BSPS di 
+                                <strong>Desa {{ ucwords(strtolower(auth()->user()->desa)) }}</strong>, 
+                                <strong>Kecamatan {{ ucwords(strtolower(auth()->user()->kecamatan)) }}</strong>.
+                            </p>
+                        </div>
+                    @elseif(auth()->check() && auth()->user()->isAdminKecamatan())
+                        {{-- ADMIN KECAMATAN --}}
+                        <input type="hidden" name="export_scope" value="kecamatan" />
+                        <input type="hidden" name="kecamatan" value="{{ auth()->user()->kecamatan }}" />
+
+                        <p style="font-size: 13px; color: #64748b; margin-top: 0; margin-bottom: 14px; line-height: 1.5;">
+                            Unduh rekapitulasi data BSPS untuk wilayah <strong>Kecamatan {{ ucwords(strtolower(auth()->user()->kecamatan)) }}</strong>:
+                        </p>
+
+                        <div style="margin-bottom: 14px;">
+                            <label style="font-size: 12px; font-weight: 700; color: #002855; display: block; margin-bottom: 6px;">
+                                Pilih Desa (Opsional):
+                            </label>
+                            <select name="desa" class="form-control" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid #cbd5e1;font-size:13px;">
+                                <option value="all">-- Semua Desa di Kecamatan {{ ucwords(strtolower(auth()->user()->kecamatan)) }} --</option>
+                                @foreach($listDesa as $d)
+                                <option value="{{ $d }}">Desa {{ ucwords(strtolower($d)) }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @else
+                        {{-- SUPER ADMIN / ADMIN KABUPATEN --}}
+                        <p style="font-size: 13px; color: #64748b; margin-top: 0; margin-bottom: 18px; line-height: 1.5;">
+                            Silakan pilih lingkup wilayah rekapitulasi data BSPS yang ingin Anda unduh ke format Microsoft Excel:
+                        </p>
+
+                        <!-- Pilihan Lingkup Export -->
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <!-- Pilihan 1: Export Keseluruhan Kabupaten (Semua Desa) -->
+                            <div class="export-option-card active" id="optCardAll" onclick="setExportScope('all')">
+                                <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                    <input type="radio" name="export_scope" value="all" id="scopeAll" checked style="margin-top: 3px; cursor: pointer;" />
+                                    <div>
+                                        <strong style="font-size: 13.5px; color: #002855; display: block;">
+                                            <i class="fas fa-globe-asia" style="color: #002855; margin-right: 6px;"></i>Export Seluruh Kabupaten (Semua Desa)
+                                        </strong>
+                                        <span style="font-size: 12px; color: #64748b; margin-top: 3px; display: block; line-height: 1.4;">
+                                            Mendownload data rekapitulasi lengkap dari seluruh desa/kelurahan di 31 kecamatan se-Kabupaten Jember.
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Pilihan 2: Export Per Kecamatan Tertentu -->
-                        <div class="export-option-card" id="optCardKecamatan" onclick="setExportScope('kecamatan')">
-                            <div style="display: flex; align-items: flex-start; gap: 12px;">
-                                <input type="radio" name="export_scope" value="kecamatan" id="scopeKecamatan" style="margin-top: 3px; cursor: pointer;" />
-                                <div style="width: 100%;">
-                                    <strong style="font-size: 13.5px; color: #002855; display: block;">
-                                        <i class="fas fa-building-flag" style="color: #107c41; margin-right: 6px;"></i>Export Per Kecamatan Tertentu
-                                    </strong>
-                                    <span style="font-size: 12px; color: #64748b; margin-top: 3px; display: block; line-height: 1.4;">
-                                        Hanya mendownload seluruh desa/kelurahan dan calon penerima di dalam satu kecamatan yang dipilih.
-                                    </span>
-                                    
-                                    <!-- Dropdown Pilihan Kecamatan di dalam Modal Menggunakan PUPR Theme -->
-                                    <div id="wrapperPilihKecamatanModal" style="margin-top: 12px; display: none;" onclick="event.stopPropagation();">
-                                        <label style="font-size: 12px; font-weight: 700; color: #002855; display: block; margin-bottom: 6px;">
-                                            Pilih Kecamatan:
-                                        </label>
-                                        @if(auth()->check() && auth()->user()->isAdminKecamatan())
-                                            <input type="hidden" name="kecamatan" value="{{ auth()->user()->kecamatan }}" />
-                                            <div style="padding: 9px 14px; border-radius: 8px; background: #f1f5f9; border: 1px solid #cbd5e1; font-weight: 700; font-size: 13px; color: #002855; display: flex; align-items: center; gap: 8px;">
-                                                <i class="fas fa-building-flag" style="color: #002855;"></i>
-                                                <span>Kec. {{ ucwords(strtolower(auth()->user()->kecamatan)) }}</span>
-                                            </div>
-                                        @else
+                            <!-- Pilihan 2: Export Per Kecamatan Tertentu -->
+                            <div class="export-option-card" id="optCardKecamatan" onclick="setExportScope('kecamatan')">
+                                <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                    <input type="radio" name="export_scope" value="kecamatan" id="scopeKecamatan" style="margin-top: 3px; cursor: pointer;" />
+                                    <div style="width: 100%;">
+                                        <strong style="font-size: 13.5px; color: #002855; display: block;">
+                                            <i class="fas fa-building-flag" style="color: #107c41; margin-right: 6px;"></i>Export Per Kecamatan Tertentu
+                                        </strong>
+                                        <span style="font-size: 12px; color: #64748b; margin-top: 3px; display: block; line-height: 1.4;">
+                                            Hanya mendownload seluruh desa/kelurahan dan calon penerima di dalam satu kecamatan yang dipilih.
+                                        </span>
+                                        
+                                        <!-- Dropdown Pilihan Kecamatan di dalam Modal Menggunakan PUPR Theme -->
+                                        <div id="wrapperPilihKecamatanModal" style="margin-top: 12px; display: none;" onclick="event.stopPropagation();">
+                                            <label style="font-size: 12px; font-weight: 700; color: #002855; display: block; margin-bottom: 6px;">
+                                                Pilih Kecamatan:
+                                            </label>
                                             @php
                                                 $firstKec = $listKecamatan->first() ?? '';
                                             @endphp
@@ -1275,12 +1309,12 @@
                                                     @endforeach
                                                 </div>
                                             </div>
-                                        @endif
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    @endif
                 </div>
 
                 <div class="modal-footer" style="padding: 14px 24px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 10px; background: #f8fafc; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; position: relative; z-index: 2;">

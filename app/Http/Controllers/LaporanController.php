@@ -22,8 +22,13 @@ class LaporanController extends Controller
         $perPage = $request->get('per_page', 15);
 
         $user = Auth::user();
-        if ($user && $user->isAdminKecamatan()) {
-            $kecamatan = $user->kecamatan;
+        if ($user) {
+            if ($user->isAdminKecamatan() && $user->kecamatan) {
+                $kecamatan = $user->kecamatan;
+            } elseif ($user->isPetugas()) {
+                if ($user->kecamatan) $kecamatan = $user->kecamatan;
+                if ($user->desa) $desa = $user->desa;
+            }
         }
 
         if ($perPage === 'all') {
@@ -35,14 +40,12 @@ class LaporanController extends Controller
         // Base Query dengan Filter Role & Input User
         $query = DataPenerima::query();
 
-        if ($user && $user->isAdminKecamatan()) {
-            $query->where('kecamatan', $user->kecamatan);
-        } elseif ($kecamatan && $kecamatan !== 'all') {
-            $query->where('kecamatan', $kecamatan);
+        if ($kecamatan && $kecamatan !== 'all') {
+            $query->whereRaw('LOWER(TRIM(kecamatan)) = ?', [strtolower(trim($kecamatan))]);
         }
 
         if ($desa && $desa !== 'all') {
-            $query->where('desa_kelurahan', $desa);
+            $query->whereRaw('LOWER(TRIM(desa_kelurahan)) = ?', [strtolower(trim($desa))]);
         }
 
         if ($search) {
@@ -68,13 +71,11 @@ class LaporanController extends Controller
 
         // 1. STATISTIK RINGKASAN UTAMA
         $baseQuery = DataPenerima::query();
-        if ($user && $user->isAdminKecamatan()) {
-            $baseQuery->where('kecamatan', $user->kecamatan);
-        } elseif ($kecamatan && $kecamatan !== 'all') {
-            $baseQuery->where('kecamatan', $kecamatan);
+        if ($kecamatan && $kecamatan !== 'all') {
+            $baseQuery->whereRaw('LOWER(TRIM(kecamatan)) = ?', [strtolower(trim($kecamatan))]);
         }
         if ($desa && $desa !== 'all') {
-            $baseQuery->where('desa_kelurahan', $desa);
+            $baseQuery->whereRaw('LOWER(TRIM(desa_kelurahan)) = ?', [strtolower(trim($desa))]);
         }
 
         $totalPenerima = (clone $baseQuery)->count();
@@ -107,17 +108,19 @@ class LaporanController extends Controller
             ->first();
 
         // 2. DROPDOWN LIST KECAMATAN & DESA
-        if ($user && $user->isAdminKecamatan()) {
+        if ($user && $user->isAdminKecamatan() && $user->kecamatan) {
+            $listKecamatan = collect([$user->kecamatan]);
+        } elseif ($user && $user->isPetugas() && $user->kecamatan) {
             $listKecamatan = collect([$user->kecamatan]);
         } else {
-            $listKecamatan = DataPenerima::distinct()->orderBy('kecamatan', 'asc')->pluck('kecamatan')->filter()->values();
+            $listKecamatan = DataPenerima::distinct()->whereNotNull('kecamatan')->where('kecamatan', '!=', '')->orderBy('kecamatan', 'asc')->pluck('kecamatan')->filter()->values();
         }
 
         $desaQuery = DataPenerima::distinct();
         if ($kecamatan && $kecamatan !== 'all') {
-            $desaQuery->where('kecamatan', $kecamatan);
+            $desaQuery->whereRaw('LOWER(TRIM(kecamatan)) = ?', [strtolower(trim($kecamatan))]);
         }
-        $listDesa = $desaQuery->orderBy('desa_kelurahan', 'asc')->pluck('desa_kelurahan')->filter()->values();
+        $listDesa = $desaQuery->whereNotNull('desa_kelurahan')->where('desa_kelurahan', '!=', '')->orderBy('desa_kelurahan', 'asc')->pluck('desa_kelurahan')->filter()->values();
 
         // 3. AGREGASI BERDASARKAN TAB
         $rekapDesaKecamatan = null;
@@ -135,13 +138,11 @@ class LaporanController extends Controller
         if ($tab === 'rekap') {
             // TAB 1: REKAP HASIL SESUAI VS TIDAK SESUAI PER DESA & KECAMATAN
             $rekapQuery = DataPenerima::query();
-            if ($user && $user->isAdminKecamatan()) {
-                $rekapQuery->where('kecamatan', $user->kecamatan);
-            } elseif ($kecamatan && $kecamatan !== 'all') {
-                $rekapQuery->where('kecamatan', $kecamatan);
+            if ($kecamatan && $kecamatan !== 'all') {
+                $rekapQuery->whereRaw('LOWER(TRIM(kecamatan)) = ?', [strtolower(trim($kecamatan))]);
             }
             if ($desa && $desa !== 'all') {
-                $rekapQuery->where('desa_kelurahan', $desa);
+                $rekapQuery->whereRaw('LOWER(TRIM(desa_kelurahan)) = ?', [strtolower(trim($desa))]);
             }
             if ($search) {
                 $rekapQuery->where(function($q) use ($search) {
@@ -168,13 +169,11 @@ class LaporanController extends Controller
         } elseif ($tab === 'indikator') {
             // TAB 2: CAPAIAN 6 INDIKATOR RTLH PER DESA & KECAMATAN
             $indQuery = DataPenerima::query();
-            if ($user && $user->isAdminKecamatan()) {
-                $indQuery->where('kecamatan', $user->kecamatan);
-            } elseif ($kecamatan && $kecamatan !== 'all') {
-                $indQuery->where('kecamatan', $kecamatan);
+            if ($kecamatan && $kecamatan !== 'all') {
+                $indQuery->whereRaw('LOWER(TRIM(kecamatan)) = ?', [strtolower(trim($kecamatan))]);
             }
             if ($desa && $desa !== 'all') {
-                $indQuery->where('desa_kelurahan', $desa);
+                $indQuery->whereRaw('LOWER(TRIM(desa_kelurahan)) = ?', [strtolower(trim($desa))]);
             }
             if ($search) {
                 $indQuery->where(function($q) use ($search) {
@@ -229,18 +228,21 @@ class LaporanController extends Controller
         $kecamatan = $request->get('kecamatan', 'all');
         $desa = $request->get('desa', 'all');
 
-        if ($user && $user->isAdminKecamatan()) {
-            $kecamatan = $user->kecamatan;
+        if ($user) {
+            if ($user->isAdminKecamatan() && $user->kecamatan) {
+                $kecamatan = $user->kecamatan;
+            } elseif ($user->isPetugas()) {
+                if ($user->kecamatan) $kecamatan = $user->kecamatan;
+                if ($user->desa) $desa = $user->desa;
+            }
         }
 
         $query = DataPenerima::query();
-        if ($user && $user->isAdminKecamatan()) {
-            $query->where('kecamatan', $user->kecamatan);
-        } elseif ($kecamatan && $kecamatan !== 'all') {
-            $query->where('kecamatan', $kecamatan);
+        if ($kecamatan && $kecamatan !== 'all') {
+            $query->whereRaw('LOWER(TRIM(kecamatan)) = ?', [strtolower(trim($kecamatan))]);
         }
         if ($desa && $desa !== 'all') {
-            $query->where('desa_kelurahan', $desa);
+            $query->whereRaw('LOWER(TRIM(desa_kelurahan)) = ?', [strtolower(trim($desa))]);
         }
 
         $totalPenerima = (clone $query)->count();
@@ -292,31 +294,33 @@ class LaporanController extends Controller
      */
     public function exportExcel(Request $request)
     {
+        @set_time_limit(300);
+        @ini_set('memory_limit', '512M');
+
         $user = Auth::user();
         $scope = $request->get('export_scope', 'all');
         $kecamatan = $request->get('kecamatan', 'all');
-        
-        if ($scope === 'all' && (!$user || !$user->isAdminKecamatan())) {
-            $kecamatan = 'all';
-        }
-
         $desa = $request->get('desa', 'all');
         $status = $request->get('status', 'all');
         $search = $request->get('search');
 
-        if ($user && $user->isAdminKecamatan()) {
-            $kecamatan = $user->kecamatan;
+        if ($user) {
+            if ($user->isAdminKecamatan() && $user->kecamatan) {
+                $kecamatan = $user->kecamatan;
+            } elseif ($user->isPetugas()) {
+                if ($user->kecamatan) $kecamatan = $user->kecamatan;
+                if ($user->desa) $desa = $user->desa;
+            }
         }
 
         $query = DataPenerima::query();
-        if ($user && $user->isAdminKecamatan()) {
-            $query->where('kecamatan', $user->kecamatan);
-        } elseif ($kecamatan && $kecamatan !== 'all') {
-            $query->where('kecamatan', $kecamatan);
+        if ($kecamatan && $kecamatan !== 'all') {
+            $query->whereRaw('LOWER(TRIM(kecamatan)) = ?', [strtolower(trim($kecamatan))]);
         }
         if ($desa && $desa !== 'all') {
-            $query->where('desa_kelurahan', $desa);
+            $query->whereRaw('LOWER(TRIM(desa_kelurahan)) = ?', [strtolower(trim($desa))]);
         }
+
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%")
@@ -351,12 +355,19 @@ class LaporanController extends Controller
             'tidak_layak' => $totalTidakLayak,
         ];
 
+        $conds = [];
+        foreach (DataPenerima::$fieldWajibSurvei as $field) {
+            $conds[] = "({$field} IS NOT NULL AND TRIM({$field}) != '')";
+        }
+        $formLengkapSql = "(" . implode(" AND ", $conds) . ")";
+        $sudahSql = "(status IN ('meninggal', 'pindah', 'tidak diketahui') OR {$formLengkapSql})";
+
         $rekapDesaKecamatan = (clone $query)
             ->selectRaw("
                 kecamatan,
                 desa_kelurahan,
                 COUNT(*) as total_penerima,
-                SUM(CASE WHEN (foto_sudut_depan IS NOT NULL AND foto_sudut_depan != '') THEN 1 ELSE 0 END) as total_sudah_survei,
+                SUM(CASE WHEN {$sudahSql} THEN 1 ELSE 0 END) as total_sudah_survei,
                 SUM(CASE WHEN status_kelayakan = 'Layak Diusulkan' THEN 1 ELSE 0 END) as total_layak,
                 SUM(CASE WHEN status_kelayakan = 'Tidak Layak Diusulkan' THEN 1 ELSE 0 END) as total_tidak_layak,
                 SUM(CASE WHEN indikator_atap = 'tidak_ada' THEN 1 ELSE 0 END) as atap_rtlh,
@@ -374,17 +385,34 @@ class LaporanController extends Controller
         // Data Detail Calon Penerima dengan Foto Lapangan
         $detailPenerima = (clone $query)->orderBy('kecamatan', 'asc')->orderBy('desa_kelurahan', 'asc')->orderBy('nama', 'asc')->get();
 
-        // Convert Foto ke Base64 Inline
+        // Resolve URL, File URI, dan Base64 untuk Foto Lapangan Excel
         $detailPenerima->transform(function ($item) {
-            $item->foto_depan_base64    = $this->fileToBase64($item->foto_sudut_depan);
-            $item->foto_dalam_base64    = $this->fileToBase64($item->foto_bagian_dalam);
-            $item->foto_ktp_base64      = $this->fileToBase64($item->ktp);
+            $depanData = $this->getPhotoInfo($item->foto_sudut_depan);
+            $dalamData = $this->getPhotoInfo($item->foto_bagian_dalam);
+            $ktpData   = $this->getPhotoInfo($item->ktp);
+
+            $item->foto_depan_url    = $depanData['url'];
+            $item->foto_depan_file_uri = $depanData['file_uri'];
+            $item->foto_depan_base64 = $depanData['base64'];
+
+            $item->foto_dalam_url    = $dalamData['url'];
+            $item->foto_dalam_file_uri = $dalamData['file_uri'];
+            $item->foto_dalam_base64 = $dalamData['base64'];
+
+            $item->foto_ktp_url      = $ktpData['url'];
+            $item->foto_ktp_file_uri   = $ktpData['file_uri'];
+            $item->foto_ktp_base64   = $ktpData['base64'];
+
             return $item;
         });
 
-        $prefix = ($kecamatan && $kecamatan !== 'all') 
-            ? 'rekap_bsps_kec_' . strtolower(str_replace([' ', '/', '\\'], '_', $kecamatan)) 
-            : 'rekap_bsps_kab_jember_semua_desa';
+        if ($desa && $desa !== 'all') {
+            $prefix = 'rekap_bsps_desa_' . strtolower(str_replace([' ', '/', '\\'], '_', $desa));
+        } elseif ($kecamatan && $kecamatan !== 'all') {
+            $prefix = 'rekap_bsps_kec_' . strtolower(str_replace([' ', '/', '\\'], '_', $kecamatan));
+        } else {
+            $prefix = 'rekap_bsps_kab_jember_semua_desa';
+        }
         $filename = $prefix . '_' . date('Ymd_His') . '.xls';
 
         $content = view('laporan.excel', compact(
@@ -405,30 +433,53 @@ class LaporanController extends Controller
     }
 
     /**
-     * Helper Konversi File Gambar Lokal / Uploads ke Base64 String
+     * Helper Resolving Informasi Gambar (HTTP URL, Local File URI, & Base64)
      */
-    private function fileToBase64($path)
+    private function getPhotoInfo($path)
     {
-        if (empty($path)) return null;
+        $default = ['url' => null, 'file_uri' => null, 'base64' => null];
+        if (empty($path)) return $default;
+
+        $cleanPath = ltrim($path, '/');
+        if (!str_starts_with($cleanPath, 'uploads/')) {
+            $cleanPath = 'uploads/' . $cleanPath;
+        }
 
         $possiblePaths = [
-            public_path(ltrim($path, '/')),
-            base_path(ltrim($path, '/')),
-            storage_path('app/public/' . ltrim($path, '/')),
-            storage_path('app/' . ltrim($path, '/')),
+            public_path($cleanPath),
+            base_path($cleanPath),
+            storage_path('app/public/' . $cleanPath),
+            storage_path('app/' . $cleanPath),
         ];
 
+        $foundPath = null;
         foreach ($possiblePaths as $p) {
             if (file_exists($p) && !is_dir($p)) {
-                $ext = strtolower(pathinfo($p, PATHINFO_EXTENSION));
-                $mime = $ext === 'png' ? 'image/png' : ($ext === 'webp' ? 'image/webp' : 'image/jpeg');
-                $data = @file_get_contents($p);
-                if ($data) {
-                    return 'data:' . $mime . ';base64,' . base64_encode($data);
-                }
+                $foundPath = $p;
+                break;
             }
         }
 
-        return null;
+        if (!$foundPath) {
+            return $default;
+        }
+
+        // 1. Full HTTP URL untuk server web / Excel online
+        $httpUrl = url($cleanPath);
+
+        // 2. Absolute file:// URI untuk Excel lokal
+        $fileUri = 'file:///' . str_replace('\\', '/', $foundPath);
+
+        // 3. Base64
+        $ext = strtolower(pathinfo($foundPath, PATHINFO_EXTENSION));
+        $mime = $ext === 'png' ? 'image/png' : ($ext === 'webp' ? 'image/webp' : 'image/jpeg');
+        $data = @file_get_contents($foundPath);
+        $base64 = $data ? 'data:' . $mime . ';base64,' . base64_encode($data) : null;
+
+        return [
+            'url'      => $httpUrl,
+            'file_uri' => $fileUri,
+            'base64'   => $base64,
+        ];
     }
 }
