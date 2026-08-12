@@ -347,6 +347,101 @@
         line-height: 1.5;
     }
 
+    /* 2 Card Kelayakan Utama (Layak vs Tidak Layak) */
+    .kelayakan-action-card {
+        border-radius: 14px;
+        padding: 20px 22px;
+        background: #ffffff;
+        border: 2px solid #e2e8f0;
+        transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 14px;
+        position: relative;
+        overflow: hidden;
+    }
+    .kelayakan-action-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 28px rgba(0, 40, 85, 0.12);
+    }
+    .kelayakan-action-card.card-layak {
+        border-color: #86efac;
+        background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%);
+    }
+    .kelayakan-action-card.card-layak:hover {
+        border-color: #22c55e;
+        box-shadow: 0 12px 28px rgba(34, 197, 94, 0.18);
+    }
+    .kelayakan-action-card.card-tidak {
+        border-color: #fca5a5;
+        background: linear-gradient(180deg, #fef2f2 0%, #ffffff 100%);
+    }
+    .kelayakan-action-card.card-tidak:hover {
+        border-color: #ef4444;
+        box-shadow: 0 12px 28px rgba(239, 68, 68, 0.18);
+    }
+    .card-top-icon {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .card-top-icon .icon-circle {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+    }
+    .icon-green { background: #dcfce7; color: #16a34a; }
+    .icon-red { background: #fee2e2; color: #dc2626; }
+    .badge-status-pill {
+        font-size: 11px;
+        font-weight: 800;
+        padding: 4px 10px;
+        border-radius: 20px;
+    }
+    .pill-green { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+    .pill-red { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+    .card-main-metric .metric-val {
+        font-size: 28px;
+        font-weight: 900;
+        letter-spacing: -0.5px;
+        line-height: 1.1;
+    }
+    .card-main-metric .unit { font-size: 16px; font-weight: 700; opacity: 0.8; }
+    .text-green { color: #15803d; }
+    .text-red { color: #b91c1c; }
+    .card-main-metric .metric-title {
+        font-size: 12px;
+        font-weight: 800;
+        color: #64748b;
+        letter-spacing: 0.5px;
+        margin-top: 4px;
+        text-transform: uppercase;
+    }
+    .card-footer-info {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-top: 1px solid rgba(0, 0, 0, 0.06);
+        padding-top: 12px;
+        font-size: 12px;
+    }
+    .card-footer-info .pct-text {
+        color: #475569;
+        font-weight: 600;
+    }
+    .btn-goto-table {
+        font-weight: 800;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+    }
+
     /* Accordion Capaian Global Desa */
     .global-verval-card {
         background: var(--bg-card);
@@ -819,7 +914,7 @@
                         <div class="stat-value">{{ number_format($totalPenerima, 0, ',', '.') }}</div>
                         <span id="badgeToggleGlobalVerval" style="font-size: 10.5px; font-weight: 800; background: rgba(0, 40, 85, 0.08); color: #002855; padding: 2px 7px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px;">
                             <i class="fas fa-chevron-down" id="iconToggleGlobalVerval"></i>
-                            <span id="textToggleGlobalVerval">Lihat Desa</span>
+                            <span id="textToggleGlobalVerval">Lihat Kelayakan</span>
                         </span>
                     </div>
                     <div class="stat-label">Total Calon Penerima</div>
@@ -885,13 +980,19 @@
                 </div>
             </div>
 
-            <!-- 5. Desa / Kelurahan -->
-            <div class="stat-card">
+            <!-- 5. Desa / Kelurahan (Klik untuk Buka Tabel Target & Progres Seluruh Desa) -->
+            <div class="stat-card" onclick="window.location.href='{{ route('dashboard.rekap-desa') }}'" style="cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);" title="Klik untuk melihat tabel rekapitulasi target & progres seluruh {{ $totalDesa }} Desa/Kelurahan">
                 <div class="stat-icon orange">
                     <i class="fas fa-city"></i>
                 </div>
-                <div class="stat-info">
-                    <div class="stat-value">{{ $totalDesa }}</div>
+                <div class="stat-info" style="width: 100%;">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <div class="stat-value">{{ $totalDesa }}</div>
+                        <span style="font-size: 10.5px; font-weight: 800; background: rgba(0, 40, 85, 0.08); color: #002855; padding: 2px 7px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px;">
+                            <span>Lihat Rekap</span>
+                            <i class="fas fa-arrow-right" style="font-size: 9px;"></i>
+                        </span>
+                    </div>
                     <div class="stat-label">Desa / Kelurahan</div>
                     <div class="stat-change blue">
                         <i class="fas fa-house-chimney-user"></i> Titik Sebaran
@@ -918,165 +1019,57 @@
 
         <!-- SECTION CAPAIAN VERVAL GLOBAL & DROP-EXPAND DESA CARDS (KESELURUHAN KABUPATEN JEMBER) -->
         <div class="global-verval-card" id="globalVervalSection" style="display: none;">
-            <div class="global-verval-header">
-                <div class="title-area">
-                    <h2>
-                        <i class="fas fa-layer-group" style="color: #ffb800;"></i>
-                        <span>Capaian Verval &amp; Kelayakan Seluruh Desa (Global Kab. Jember)</span>
-                    </h2>
-                    <p>
-                        Monitoring capaian survei lapangan &amp; persentase kelayakan dari total <strong>{{ number_format($globalVervalStats['total_target']) }} calon penerima</strong> di 31 kecamatan dan 220+ desa/kelurahan.
-                    </p>
-                </div>
-                <div class="global-stats-pills">
-                    <div class="global-stat-badge">
-                        <i class="fas fa-users"></i>
-                        <span>Target: <strong>{{ number_format($globalVervalStats['total_target']) }} KK</strong></span>
-                    </div>
-                    <div class="global-stat-badge">
-                        <i class="fas fa-clipboard-check"></i>
-                        <span>Sudah Survei: <strong>{{ number_format($globalVervalStats['total_sudah']) }} KK ({{ $globalVervalStats['persen_survei'] }}%)</strong></span>
-                    </div>
-                    <div class="global-stat-badge badge-layak">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Layak: <strong>{{ number_format($globalVervalStats['total_layak']) }} KK ({{ $globalVervalStats['persen_layak'] }}%)</strong></span>
-                    </div>
-                    <div class="global-stat-badge">
-                        <i class="fas fa-circle-xmark"></i>
-                        <span>Tidak Layak: <strong>{{ number_format($globalVervalStats['total_tidak_layak']) }} KK</strong></span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Toolbar Pencarian & Toggle Accordion -->
-            <div class="global-verval-toolbar">
-                <div class="search-kec-input-wrap">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="inputSearchKecamatanDesa" class="search-kec-input" placeholder="Ketik nama Kecamatan atau Desa untuk mencari..." onkeyup="filterKecamatanAccordion(this.value)" />
-                </div>
-                <div style="display: flex; gap: 8px;">
-                    <button type="button" class="btn btn-outline" onclick="toggleAllAccordion(true)" style="padding: 7px 14px; font-size: 12px; font-weight: 700; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff; cursor: pointer; color: #002855;">
-                        <i class="fas fa-chevron-down" style="margin-right: 4px;"></i> Buka Semua
-                    </button>
-                    <button type="button" class="btn btn-outline" onclick="toggleAllAccordion(false)" style="padding: 7px 14px; font-size: 12px; font-weight: 700; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff; cursor: pointer; color: #64748b;">
-                        <i class="fas fa-chevron-up" style="margin-right: 4px;"></i> Tutup Semua
-                    </button>
-                </div>
-            </div>
-
-            <!-- List Accordion Tiap Kecamatan -->
-            <div class="accordion-kecamatan-list" id="accordionKecamatanContainer">
-                @foreach($rekapPerKecamatan as $kecName => $kecData)
-                <div class="accordion-kec-item" data-kecamatan="{{ strtolower($kecName) }}">
-                    <!-- Header Kecamatan: Klik untuk keluar kartu-kartu desa -->
-                    <div class="accordion-kec-header" onclick="toggleKecAccordion(this.parentElement)">
-                        <div class="kec-header-left">
-                            <div class="kec-icon-circle">
-                                <i class="fas fa-building-flag"></i>
-                            </div>
-                            <div class="kec-title-wrap">
-                                <h4>Kecamatan {{ ucwords(strtolower($kecName)) }}</h4>
-                                <span>{{ $kecData->total_desa }} Desa/Kelurahan &bull; {{ number_format($kecData->total_target) }} KK Target</span>
-                            </div>
+            <!-- 2 CARD UTAMA: KELAYAKAN HASIL VERVAL (KLIK UNTUK PINDAH KE TABEL RINCIAN) -->
+            <div style="padding: 20px 20px 12px 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; background: transparent;">
+                <!-- 1. CARD LAYAK DIUSULKAN -->
+                <a href="{{ route('dashboard.data-kelayakan', ['status' => 'layak']) }}" class="kelayakan-action-card card-layak" style="text-decoration: none;" title="Klik untuk membuka tabel rincian data calon penerima Layak Diusulkan">
+                    <div class="card-top-icon">
+                        <div class="icon-circle icon-green">
+                            <i class="fas fa-circle-check"></i>
                         </div>
-
-                        <div class="kec-header-center">
-                            <!-- Progress Survei -->
-                            <div class="kec-stat-item">
-                                <div class="kec-stat-label">Progress Verval</div>
-                                <div class="kec-stat-val">{{ $kecData->progres_percent }}% <span style="font-size: 11px; font-weight: 600; color: #64748b;">({{ number_format($kecData->total_sudah) }}/{{ number_format($kecData->total_target) }})</span></div>
-                                <div class="kec-progress-bar-wrap">
-                                    <div class="kec-progress-bar-bg">
-                                        <div class="kec-progress-bar-fill" style="width: {{ $kecData->progres_percent }}%;"></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Layak Diusulkan -->
-                            <div class="kec-stat-item">
-                                <div class="kec-stat-label">Layak Diusulkan</div>
-                                <div class="kec-stat-val layak">{{ number_format($kecData->total_layak) }} KK <span style="font-size: 11px; font-weight: 600;">({{ $kecData->layak_percent }}%)</span></div>
-                            </div>
-
-                            <!-- Tidak Layak -->
-                            <div class="kec-stat-item">
-                                <div class="kec-stat-label">Tidak Layak</div>
-                                <div class="kec-stat-val tidak">{{ number_format($kecData->total_tidak_layak) }} KK</div>
-                            </div>
-
-                            <!-- Belum Survei -->
-                            <div class="kec-stat-item">
-                                <div class="kec-stat-label">Belum Survei</div>
-                                <div class="kec-stat-val" style="color: #64748b;">{{ number_format($kecData->total_belum) }} KK</div>
-                            </div>
+                        <span class="badge-status-pill pill-green">
+                            <i class="fas fa-award"></i> Memenuhi Kriteria (≥2 RTLH)
+                        </span>
+                    </div>
+                    <div class="card-main-metric">
+                        <div class="metric-val text-green">{{ number_format($globalVervalStats['total_layak']) }} <span class="unit">KK</span></div>
+                        <div class="metric-title">CALON PENERIMA LAYAK DIUSULKAN</div>
+                    </div>
+                    <div class="card-footer-info">
+                        <div class="pct-text">
+                            <strong>{{ $globalVervalStats['persen_layak'] }}%</strong> dari total verval selesai
                         </div>
-
-                        <div class="kec-header-toggle-btn">
-                            <i class="fas fa-chevron-down"></i>
+                        <div class="btn-goto-table text-green">
+                            <span>Buka Tabel Data Layak</span>
+                            <i class="fas fa-arrow-right"></i>
                         </div>
                     </div>
+                </a>
 
-                    <!-- Body: Drop down keluar Grid Card Tiap Desa -->
-                    <div class="accordion-kec-body">
-                        <div class="desa-cards-grid">
-                            @foreach($kecData->desa_list as $desa)
-                            <div class="desa-card" data-desa="{{ strtolower($desa->desa_kelurahan) }}">
-                                <div class="desa-card-top">
-                                    <div class="desa-card-name">
-                                        <i class="fas fa-house-chimney" style="color: #002855; font-size: 12px;"></i>
-                                        <span>Desa {{ ucwords(strtolower($desa->desa_kelurahan)) }}</span>
-                                    </div>
-                                    <div>
-                                        @if($desa->progres_percent >= 100)
-                                            <span class="desa-card-badge badge-done"><i class="fas fa-check"></i> 100% Selesai</span>
-                                        @elseif($desa->progres_percent > 0)
-                                            <span class="desa-card-badge badge-progress"><i class="fas fa-spinner"></i> {{ $desa->progres_percent }}%</span>
-                                        @else
-                                            <span class="desa-card-badge badge-none">Belum Ada</span>
-                                        @endif
-                                    </div>
-                                </div>
-
-                                <!-- Progress Bar Desa -->
-                                <div class="desa-card-progress">
-                                    <div class="desa-prog-header">
-                                        <span>Progres Survei</span>
-                                        <strong>{{ $desa->total_sudah }} / {{ $desa->total_target }} KK ({{ $desa->progres_percent }}%)</strong>
-                                    </div>
-                                    <div class="desa-prog-bg">
-                                        <div class="desa-prog-fill" style="width: {{ $desa->progres_percent }}%;"></div>
-                                    </div>
-                                </div>
-
-                                <!-- 2 Kotak Metrik Layak vs Tidak Layak -->
-                                <div class="desa-card-metric-grid">
-                                    <div class="desa-metric-box layak">
-                                        <div class="label"><i class="fas fa-check-circle"></i> Layak</div>
-                                        <div class="val">{{ number_format($desa->total_layak) }} KK</div>
-                                        <div class="sub-val">{{ $desa->persen_layak }}% dari verval</div>
-                                    </div>
-                                    <div class="desa-metric-box tidak">
-                                        <div class="label"><i class="fas fa-times-circle"></i> Tidak Layak</div>
-                                        <div class="val">{{ number_format($desa->total_tidak_layak) }} KK</div>
-                                        <div class="sub-val">{{ $desa->persen_tidak }}% dari verval</div>
-                                    </div>
-                                </div>
-
-                                <div class="desa-card-footer">
-                                    <span style="color: #64748b;">
-                                        Belum: <strong>{{ number_format($desa->total_belum) }} KK</strong>
-                                    </span>
-                                    <a href="{{ route('laporan', ['kecamatan' => $kecName, 'desa' => $desa->desa_kelurahan]) }}">
-                                        <span>Lihat Rekap</span>
-                                        <i class="fas fa-arrow-right" style="font-size: 10px;"></i>
-                                    </a>
-                                </div>
-                            </div>
-                            @endforeach
+                <!-- 2. CARD TIDAK LAYAK DIUSULKAN -->
+                <a href="{{ route('dashboard.data-kelayakan', ['status' => 'tidak_layak']) }}" class="kelayakan-action-card card-tidak" style="text-decoration: none;" title="Klik untuk membuka tabel rincian data calon penerima Tidak Layak">
+                    <div class="card-top-icon">
+                        <div class="icon-circle icon-red">
+                            <i class="fas fa-circle-xmark"></i>
+                        </div>
+                        <span class="badge-status-pill pill-red">
+                            <i class="fas fa-circle-exclamation"></i> Tidak Memenuhi (&lt;2 RTLH)
+                        </span>
+                    </div>
+                    <div class="card-main-metric">
+                        <div class="metric-val text-red">{{ number_format($globalVervalStats['total_tidak_layak']) }} <span class="unit">KK</span></div>
+                        <div class="metric-title">CALON PENERIMA TIDAK LAYAK</div>
+                    </div>
+                    <div class="card-footer-info">
+                        <div class="pct-text">
+                            <strong>{{ $globalVervalStats['total_sudah'] > 0 ? round(($globalVervalStats['total_tidak_layak'] / $globalVervalStats['total_sudah']) * 100, 1) : 0 }}%</strong> dari total verval selesai
+                        </div>
+                        <div class="btn-goto-table text-red">
+                            <span>Buka Tabel Data Tidak Layak</span>
+                            <i class="fas fa-arrow-right"></i>
                         </div>
                     </div>
-                </div>
-                @endforeach
+                </a>
             </div>
         </div>
 
@@ -1194,15 +1187,18 @@
                     </div>
                     <div class="panel-body" style="padding:10px 22px;">
                         @foreach($topDesa as $desa)
-                            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(0,40,85,0.05);font-size:13px;">
+                            <a href="{{ route('dashboard.desa', ['kecamatan' => $desa->kecamatan, 'desa' => $desa->desa_kelurahan]) }}" style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(0,40,85,0.05);font-size:13px;text-decoration:none;transition:var(--transition);" title="Lihat Capaian & Kelayakan Desa {{ $desa->desa_kelurahan }}">
                                 <div>
-                                    <div style="font-weight:700;color:var(--primary-dark);">Desa {{ ucwords(strtolower($desa->desa_kelurahan)) }}</div>
+                                    <div style="font-weight:700;color:var(--primary-dark);display:flex;align-items:center;gap:5px;">
+                                        <span>Desa {{ ucwords(strtolower($desa->desa_kelurahan)) }}</span>
+                                        <i class="fas fa-arrow-up-right-from-square" style="font-size:10px;color:var(--primary);opacity:0.7;"></i>
+                                    </div>
                                     <div style="font-size:11px;color:var(--text-muted);">Kec. {{ ucwords(strtolower($desa->kecamatan)) }}</div>
                                 </div>
                                 <span style="font-weight:800;color:var(--primary);background:rgba(0,40,85,0.06);padding:4px 10px;border-radius:12px;font-size:12px;">
                                     {{ number_format($desa->total, 0, ',', '.') }} KK
                                 </span>
-                            </div>
+                            </a>
                         @endforeach
                     </div>
                 </div>
@@ -1375,7 +1371,7 @@ function toggleGlobalVervalSection() {
     if (sec.style.display === 'none' || !sec.style.display) {
         sec.style.display = 'block';
         if (icon) icon.className = 'fas fa-chevron-up';
-        if (text) text.textContent = 'Tutup Rekap';
+        if (text) text.textContent = 'Tutup';
         if (card) {
             card.style.borderColor = '#002855';
             card.style.boxShadow = '0 6px 20px rgba(0, 40, 85, 0.15)';
@@ -1386,59 +1382,12 @@ function toggleGlobalVervalSection() {
     } else {
         sec.style.display = 'none';
         if (icon) icon.className = 'fas fa-chevron-down';
-        if (text) text.textContent = 'Lihat Desa';
+        if (text) text.textContent = 'Lihat Kelayakan';
         if (card) {
             card.style.borderColor = '';
             card.style.boxShadow = '';
         }
     }
-}
-
-// Interactive Accordion Functions for Global Kecamatan & Desa
-function toggleKecAccordion(el) {
-    el.classList.toggle('active');
-}
-
-function toggleAllAccordion(isOpen) {
-    document.querySelectorAll('.accordion-kec-item').forEach(item => {
-        if (isOpen) {
-            item.classList.add('active');
-        } else {
-            item.classList.remove('active');
-        }
-    });
-}
-
-function filterKecamatanAccordion(keyword) {
-    const q = keyword.toLowerCase().trim();
-    const items = document.querySelectorAll('.accordion-kec-item');
-
-    items.forEach(item => {
-        const kecName = item.getAttribute('data-kecamatan') || '';
-        const desaCards = item.querySelectorAll('.desa-card');
-        let hasMatchingDesa = false;
-
-        desaCards.forEach(card => {
-            const desaName = card.getAttribute('data-desa') || '';
-            if (!q || desaName.includes(q) || kecName.includes(q)) {
-                card.style.display = 'flex';
-                if (q && desaName.includes(q)) hasMatchingDesa = true;
-            } else {
-                card.style.display = 'none';
-            }
-        });
-
-        if (!q) {
-            item.style.display = 'block';
-            item.classList.remove('active');
-        } else if (kecName.includes(q) || hasMatchingDesa) {
-            item.style.display = 'block';
-            item.classList.add('active'); // auto open when searching
-        } else {
-            item.style.display = 'none';
-            item.classList.remove('active');
-        }
-    });
 }
 </script>
 @endpush

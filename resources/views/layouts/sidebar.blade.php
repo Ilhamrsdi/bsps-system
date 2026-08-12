@@ -69,7 +69,7 @@
                     Monitoring Desa
                 </a>
             @else
-                <a class="menu-item {{ Request::is('dashboard') ? 'active' : '' }}" href="{{ url('/dashboard') }}">
+                <a class="menu-item {{ (Request::is('dashboard*') && !Request::is('dashboard-kecamatan*')) ? 'active' : '' }}" href="{{ url('/dashboard') }}">
                     <i class="fas fa-th-large"></i>
                     Dashboard Global
                 </a>
