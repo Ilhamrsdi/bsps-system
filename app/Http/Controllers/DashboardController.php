@@ -48,12 +48,28 @@ class DashboardController extends Controller
 
         $topKecamatan = $rawKecamatan;
 
-        // 4. Top Desa/Kelurahan dengan Usulan Terbanyak
-        $topDesa = DataPenerima::selectRaw('desa_kelurahan, kecamatan, count(*) as total')
-            ->groupBy('desa_kelurahan', 'kecamatan')
-            ->orderByDesc('total')
-            ->limit(6)
-            ->get();
+        $conds = [];
+        foreach (DataPenerima::$fieldWajibSurvei as $field) {
+            $conds[] = "({$field} IS NOT NULL AND TRIM({$field}) != '')";
+        }
+        $formLengkapSql = "(" . implode(" AND ", $conds) . ")";
+        $sudahSql = "(status IN ('meninggal', 'pindah', 'tidak diketahui') OR {$formLengkapSql})";
+
+        // 4. Top 6 Desa/Kelurahan dengan Capaian Layak Terbanyak
+        $topDesa = DataPenerima::selectRaw("
+            desa_kelurahan,
+            kecamatan,
+            COUNT(*) as total,
+            SUM(CASE WHEN {$sudahSql} THEN 1 ELSE 0 END) as sudah_survei,
+            SUM(CASE WHEN status_kelayakan = 'Layak Diusulkan' THEN 1 ELSE 0 END) as total_layak
+        ")
+        ->whereNotNull('desa_kelurahan')
+        ->where('desa_kelurahan', '!=', '')
+        ->groupBy('desa_kelurahan', 'kecamatan')
+        ->orderByDesc('total_layak')
+        ->orderByDesc('sudah_survei')
+        ->limit(6)
+        ->get();
 
         // 5. Statistik Jenis Kelamin Kepala Keluarga
         $genderStats = DataPenerima::selectRaw('jenis_kelamin, count(*) as total')
@@ -166,6 +182,14 @@ class DashboardController extends Controller
             ];
         });
 
+        // 9. Ranking Kecamatan Berdasarkan Capaian Layak Terbanyak
+        $rankingKecamatan = $rekapPerKecamatan->sortByDesc(function ($item) {
+            return ($item->total_layak * 1000000) + $item->total_sudah;
+        })->values();
+
+        $top1KecamatanCapaian = $rankingKecamatan->first();
+        $topKecamatanCapaian = $rankingKecamatan->take(10);
+
         return view('dashboard.index', compact(
             'totalPenerima',
             'totalKecamatan',
@@ -183,7 +207,10 @@ class DashboardController extends Controller
             'chartBacklog2Data',
             'chartTotalData',
             'globalVervalStats',
-            'rekapPerKecamatan'
+            'rekapPerKecamatan',
+            'rankingKecamatan',
+            'top1KecamatanCapaian',
+            'topKecamatanCapaian'
         ));
     }
 
