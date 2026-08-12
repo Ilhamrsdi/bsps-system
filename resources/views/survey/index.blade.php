@@ -2063,82 +2063,58 @@
             }
 
             const badge = card ? card.querySelector('.camera-upload-badge') : null;
+            const origKb = Math.round(file.size / 1024);
             if (badge) {
-                const origKb = Math.round(file.size / 1024);
-                badge.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Memproses Foto... (${origKb} KB)`;
+                badge.innerHTML = `<i class="fas fa-check-circle"></i> Foto Terpilih (${origKb} KB)`;
             }
 
-            // Kompresi Otomatis Foto di Sisi Klien (Canvas API)
-            const origSize = file.size;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    try {
-                        const maxDim = 1280;
-                        let w = img.width;
-                        let h = img.height;
-                        if (w > maxDim || h > maxDim) {
-                            if (w >= h) { h = Math.round((h * maxDim) / w); w = maxDim; }
-                            else        { w = Math.round((w * maxDim) / h); h = maxDim; }
-                        }
+            // Kompresi Otomatis Sisi Klien via Object URL (Instant tanpa overhead Base64)
+            const img = new Image();
+            img.onload = function() {
+                try {
+                    const maxDim = 1280;
+                    let w = img.width;
+                    let h = img.height;
+                    if (w > maxDim || h > maxDim) {
+                        if (w >= h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+                        else        { w = Math.round((w * maxDim) / h); h = maxDim; }
+                    }
 
-                        const canvas = document.createElement('canvas');
-                        canvas.width = w;
-                        canvas.height = h;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, w, h);
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
 
-                        canvas.toBlob(function(blob) {
-                            if (blob) {
-                                try {
-                                    const compressedFile = new File(
-                                        [blob],
-                                        file.name.replace(/\.[^/.]+$/, '') + '.jpg',
-                                        { type: 'image/jpeg', lastModified: Date.now() }
-                                    );
-                                    const dt = new DataTransfer();
-                                    dt.items.add(compressedFile);
-                                    input.files = dt.files;
-                                } catch(err) {
-                                    console.warn('[AutoCompress] DataTransfer fallback:', err);
-                                }
-
-                                const compKb = Math.round(blob.size / 1024);
-                                if (badge) {
-                                    badge.innerHTML = `<i class="fas fa-check-circle"></i> Foto Terpilih (${origKb}KB → ${compKb}KB)`;
-                                }
-                            } else {
-                                if (badge) {
-                                    badge.innerHTML = `<i class="fas fa-check-circle"></i> Foto Terpilih (${origKb} KB)`;
-                                }
+                    canvas.toBlob(function(blob) {
+                        if (blob) {
+                            try {
+                                const compressedFile = new File(
+                                    [blob],
+                                    file.name.replace(/\.[^/.]+$/, '') + '.jpg',
+                                    { type: 'image/jpeg', lastModified: Date.now() }
+                                );
+                                const dt = new DataTransfer();
+                                dt.items.add(compressedFile);
+                                input.files = dt.files;
+                            } catch(err) {
+                                console.warn('[AutoCompress] DataTransfer fallback:', err);
                             }
-                        }, 'image/jpeg', 0.72);
-                    } catch(err) {
-                        console.warn('[AutoCompress] Canvas error:', err);
-                        if (badge) {
-                            badge.innerHTML = `<i class="fas fa-check-circle"></i> Foto Terpilih (${Math.round(origSize / 1024)} KB)`;
+
+                            const compKb = Math.round(blob.size / 1024);
+                            if (badge) {
+                                badge.innerHTML = `<i class="fas fa-check-circle"></i> Foto Terpilih (${origKb}KB → ${compKb}KB)`;
+                            }
                         }
-                    }
-                };
-
-                img.onerror = function() {
-                    console.warn('[AutoCompress] Image load error');
-                    if (badge) {
-                        badge.innerHTML = `<i class="fas fa-check-circle"></i> Foto Terpilih (${Math.round(origSize / 1024)} KB)`;
-                    }
-                };
-
-                img.src = e.target.result;
-            };
-
-            reader.onerror = function() {
-                if (badge) {
-                    badge.innerHTML = `<i class="fas fa-check-circle"></i> Foto Terpilih (${Math.round(file.size / 1024)} KB)`;
+                    }, 'image/jpeg', 0.72);
+                } catch(err) {
+                    console.warn('[AutoCompress] Canvas error:', err);
                 }
             };
-
-            reader.readAsDataURL(file);
+            img.onerror = function() {
+                console.warn('[AutoCompress] Image load error');
+            };
+            img.src = objectUrl;
         }
 
         // Hapus / Ganti Foto Terpilih
