@@ -191,6 +191,27 @@
             display: none;
         }
 
+        .camera-thumb-preview {
+            width: 100%;
+            max-height: 150px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+        }
+
+        .camera-thumb-img {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 6px;
+            display: block;
+        }
+
         .camera-placeholder-box,
         .camera-uploaded-box {
             display: flex;
@@ -653,8 +674,10 @@
 
                                 {{-- State Tersimpan / Terpilih (2 Tombol Aksi) --}}
                                 <div class="camera-uploaded-box" id="uploaded_ktp" style="{{ $vervalData->ktp ? 'display:flex;' : 'display:none;' }}">
-                                    <div class="camera-icon-bubble success">
-                                        <i class="fas fa-check-circle"></i>
+                                    <div class="camera-thumb-preview" id="thumb_ktp">
+                                        @if($vervalData->ktp)
+                                            <img src="{{ url('/uploads/' . basename($vervalData->ktp)) }}" class="camera-thumb-img" alt="Pratinjau KTP">
+                                        @endif
                                     </div>
                                     <div class="camera-upload-title">Berkas KTP</div>
                                     <span class="camera-upload-badge"><i class="fas fa-file-image"></i> {{ $vervalData->ktp ? 'Foto Tersimpan' : 'Foto Terpilih' }}</span>
@@ -691,8 +714,10 @@
 
                                 {{-- State Tersimpan / Terpilih (2 Tombol Aksi) --}}
                                 <div class="camera-uploaded-box" id="uploaded_kk" style="{{ $vervalData->kk ? 'display:flex;' : 'display:none;' }}">
-                                    <div class="camera-icon-bubble success">
-                                        <i class="fas fa-check-circle"></i>
+                                    <div class="camera-thumb-preview" id="thumb_kk">
+                                        @if($vervalData->kk)
+                                            <img src="{{ url('/uploads/' . basename($vervalData->kk)) }}" class="camera-thumb-img" alt="Pratinjau KK">
+                                        @endif
                                     </div>
                                     <div class="camera-upload-title">Berkas KK</div>
                                     <span class="camera-upload-badge"><i class="fas fa-file-image"></i> {{ $vervalData->kk ? 'Foto Tersimpan' : 'Foto Terpilih' }}</span>
@@ -729,8 +754,10 @@
 
                                 {{-- State Tersimpan / Terpilih (2 Tombol Aksi) --}}
                                 <div class="camera-uploaded-box" id="uploaded_sertifikat_tanah" style="{{ $vervalData->sertifikat_tanah ? 'display:flex;' : 'display:none;' }}">
-                                    <div class="camera-icon-bubble success">
-                                        <i class="fas fa-check-circle"></i>
+                                    <div class="camera-thumb-preview" id="thumb_sertifikat_tanah">
+                                        @if($vervalData->sertifikat_tanah)
+                                            <img src="{{ url('/uploads/' . basename($vervalData->sertifikat_tanah)) }}" class="camera-thumb-img" alt="Pratinjau Bukti Tanah">
+                                        @endif
                                     </div>
                                     <div class="camera-upload-title">Bukti Kepemilikan Lahan</div>
                                     <span class="camera-upload-badge"><i class="fas fa-file-image"></i> {{ $vervalData->sertifikat_tanah ? 'Foto Tersimpan' : 'Foto Terpilih' }}</span>
@@ -767,8 +794,14 @@
 
                                 {{-- State Tersimpan / Terpilih (2 Tombol Aksi) --}}
                                 <div class="camera-uploaded-box" id="uploaded_surat_pernyataan" style="{{ $vervalData->surat_pernyataan ? 'display:flex;' : 'display:none;' }}">
-                                    <div class="camera-icon-bubble success">
-                                        <i class="fas fa-check-circle"></i>
+                                    <div class="camera-thumb-preview" id="thumb_surat_pernyataan">
+                                        @if($vervalData->surat_pernyataan)
+                                            @if(\Illuminate\Support\Str::endsWith(strtolower($vervalData->surat_pernyataan), '.pdf'))
+                                                <div class="pdf-file-icon" style="padding:12px;font-weight:700;color:#e11d48;font-size:13px;display:flex;align-items:center;gap:6px;"><i class="fas fa-file-pdf"></i> Dokumen PDF Tersimpan</div>
+                                            @else
+                                                <img src="{{ url('/uploads/' . basename($vervalData->surat_pernyataan)) }}" class="camera-thumb-img" alt="Pratinjau Surat Pernyataan">
+                                            @endif
+                                        @endif
                                     </div>
                                     <div class="camera-upload-title">Surat Pernyataan</div>
                                     <span class="camera-upload-badge"><i class="fas fa-file-lines"></i> {{ $vervalData->surat_pernyataan ? 'Berkas Tersimpan' : 'Berkas Terpilih' }}</span>
@@ -1005,8 +1038,10 @@
 
                                 {{-- State Tersimpan / Terpilih (2 Tombol Aksi) --}}
                                 <div class="camera-uploaded-box" id="uploaded_foto_sudut_depan" style="{{ $vervalData->foto_sudut_depan ? 'display:flex;' : 'display:none;' }}">
-                                    <div class="camera-icon-bubble success">
-                                        <i class="fas fa-check-circle"></i>
+                                    <div class="camera-thumb-preview" id="thumb_foto_sudut_depan">
+                                        @if($vervalData->foto_sudut_depan)
+                                            <img src="{{ url('/uploads/' . basename($vervalData->foto_sudut_depan)) }}" class="camera-thumb-img" alt="Pratinjau Tampak Depan">
+                                        @endif
                                     </div>
                                     <div class="camera-upload-title">Tampak Depan</div>
                                     <span class="camera-upload-badge"><i class="fas fa-file-image"></i> {{ $vervalData->foto_sudut_depan ? 'Foto Tersimpan' : 'Foto Terpilih' }}</span>
@@ -1043,8 +1078,10 @@
 
                                 {{-- State Tersimpan / Terpilih (2 Tombol Aksi) --}}
                                 <div class="camera-uploaded-box" id="uploaded_foto_sudut_belakang" style="{{ $vervalData->foto_sudut_belakang ? 'display:flex;' : 'display:none;' }}">
-                                    <div class="camera-icon-bubble success">
-                                        <i class="fas fa-check-circle"></i>
+                                    <div class="camera-thumb-preview" id="thumb_foto_sudut_belakang">
+                                        @if($vervalData->foto_sudut_belakang)
+                                            <img src="{{ url('/uploads/' . basename($vervalData->foto_sudut_belakang)) }}" class="camera-thumb-img" alt="Pratinjau Tampak Belakang">
+                                        @endif
                                     </div>
                                     <div class="camera-upload-title">Tampak Belakang</div>
                                     <span class="camera-upload-badge"><i class="fas fa-file-image"></i> {{ $vervalData->foto_sudut_belakang ? 'Foto Tersimpan' : 'Foto Terpilih' }}</span>
@@ -1081,8 +1118,10 @@
 
                                 {{-- State Tersimpan / Terpilih (2 Tombol Aksi) --}}
                                 <div class="camera-uploaded-box" id="uploaded_foto_bagian_dalam" style="{{ $vervalData->foto_bagian_dalam ? 'display:flex;' : 'display:none;' }}">
-                                    <div class="camera-icon-bubble success">
-                                        <i class="fas fa-check-circle"></i>
+                                    <div class="camera-thumb-preview" id="thumb_foto_bagian_dalam">
+                                        @if($vervalData->foto_bagian_dalam)
+                                            <img src="{{ url('/uploads/' . basename($vervalData->foto_bagian_dalam)) }}" class="camera-thumb-img" alt="Pratinjau Bagian Dalam">
+                                        @endif
                                     </div>
                                     <div class="camera-upload-title">Bagian Dalam / Interior</div>
                                     <span class="camera-upload-badge"><i class="fas fa-file-image"></i> {{ $vervalData->foto_bagian_dalam ? 'Foto Tersimpan' : 'Foto Terpilih' }}</span>
@@ -1119,8 +1158,10 @@
 
                                 {{-- State Tersimpan / Terpilih (2 Tombol Aksi) --}}
                                 <div class="camera-uploaded-box" id="uploaded_foto_sudut_kiri" style="{{ $vervalData->foto_sudut_kiri ? 'display:flex;' : 'display:none;' }}">
-                                    <div class="camera-icon-bubble success">
-                                        <i class="fas fa-check-circle"></i>
+                                    <div class="camera-thumb-preview" id="thumb_foto_sudut_kiri">
+                                        @if($vervalData->foto_sudut_kiri)
+                                            <img src="{{ url('/uploads/' . basename($vervalData->foto_sudut_kiri)) }}" class="camera-thumb-img" alt="Pratinjau Samping Kiri">
+                                        @endif
                                     </div>
                                     <div class="camera-upload-title">Samping Kiri</div>
                                     <span class="camera-upload-badge"><i class="fas fa-file-image"></i> {{ $vervalData->foto_sudut_kiri ? 'Foto Tersimpan' : 'Foto Terpilih' }}</span>
@@ -1157,8 +1198,10 @@
 
                                 {{-- State Tersimpan / Terpilih (2 Tombol Aksi) --}}
                                 <div class="camera-uploaded-box" id="uploaded_foto_sudut_kanan" style="{{ $vervalData->foto_sudut_kanan ? 'display:flex;' : 'display:none;' }}">
-                                    <div class="camera-icon-bubble success">
-                                        <i class="fas fa-check-circle"></i>
+                                    <div class="camera-thumb-preview" id="thumb_foto_sudut_kanan">
+                                        @if($vervalData->foto_sudut_kanan)
+                                            <img src="{{ url('/uploads/' . basename($vervalData->foto_sudut_kanan)) }}" class="camera-thumb-img" alt="Pratinjau Samping Kanan">
+                                        @endif
                                     </div>
                                     <div class="camera-upload-title">Samping Kanan</div>
                                     <span class="camera-upload-badge"><i class="fas fa-file-image"></i> {{ $vervalData->foto_sudut_kanan ? 'Foto Tersimpan' : 'Foto Terpilih' }}</span>
@@ -1985,85 +2028,116 @@
 
             const placeholder = document.getElementById('placeholder_' + field);
             const uploadedBox = document.getElementById('uploaded_' + field);
+            const thumbBox = document.getElementById('thumb_' + field);
             const card = placeholder ? placeholder.closest('.camera-upload-card') : null;
             const urlInput = document.getElementById('url_' + field);
 
-            // Jika file PDF / Non-Gambar: tampilkan info tanpa kompresi canvas
+            // Dapatkan URL instan untuk preview langsung tanpa menunggu kompresi
+            const objectUrl = URL.createObjectURL(file);
+            if (urlInput) urlInput.value = objectUrl;
+
+            // Tampilkan kotak terunggah & sembunyikan placeholder secara LANGSUNG
+            if (placeholder) placeholder.style.display = 'none';
+            if (uploadedBox) uploadedBox.style.display = 'flex';
+            if (card) {
+                card.classList.add('has-image');
+                card.classList.remove('is-invalid-highlight');
+            }
+
+            // Jika file PDF / Non-Gambar: tampilkan info berkas
             if (!file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    if (urlInput) urlInput.value = e.target.result;
-                    if (placeholder) placeholder.style.display = 'none';
-                    if (uploadedBox) uploadedBox.style.display = 'flex';
-                    if (card) {
-                        card.classList.add('has-image');
-                        card.classList.remove('is-invalid-highlight');
-                        const badge = card.querySelector('.camera-upload-badge');
-                        if (badge) {
-                            const sizeKb = Math.round(file.size / 1024);
-                            badge.innerHTML = `<i class="fas fa-check-circle"></i> Berkas Terpilih (${sizeKb} KB)`;
-                        }
-                    }
-                };
-                reader.readAsDataURL(file);
+                if (thumbBox) {
+                    thumbBox.innerHTML = '<div class="pdf-file-icon" style="padding:12px;font-weight:700;color:#e11d48;font-size:13px;display:flex;align-items:center;gap:6px;"><i class="fas fa-file-pdf"></i> Dokumen PDF Terpilih</div>';
+                }
+                const badge = card ? card.querySelector('.camera-upload-badge') : null;
+                if (badge) {
+                    const sizeKb = Math.round(file.size / 1024);
+                    badge.innerHTML = `<i class="fas fa-check-circle"></i> Berkas Terpilih (${sizeKb} KB)`;
+                }
                 return;
             }
 
-            // Kompresi Otomatis Foto di Sisi Klien (Canvas API -> Maks 1280px / 150-300 KB)
+            // Tampilkan thumbnail gambar instan langsung di kartu form HP/Laptop!
+            if (thumbBox) {
+                thumbBox.innerHTML = `<img src="${objectUrl}" class="camera-thumb-img" alt="Pratinjau Foto ${field}">`;
+            }
+
+            const badge = card ? card.querySelector('.camera-upload-badge') : null;
+            if (badge) {
+                const origKb = Math.round(file.size / 1024);
+                badge.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Memproses Foto... (${origKb} KB)`;
+            }
+
+            // Kompresi Otomatis Foto di Sisi Klien (Canvas API)
             const origSize = file.size;
             const reader = new FileReader();
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
-                    const maxDim = 1280;
-                    let w = img.width;
-                    let h = img.height;
-                    if (w > maxDim || h > maxDim) {
-                        if (w >= h) { h = Math.round((h * maxDim) / w); w = maxDim; }
-                        else        { w = Math.round((w * maxDim) / h); h = maxDim; }
-                    }
-
-                    const canvas = document.createElement('canvas');
-                    canvas.width = w;
-                    canvas.height = h;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, w, h);
-
-                    canvas.toBlob(function(blob) {
-                        if (!blob) return;
-
-                        // Ganti File pada input dengan Blob JPEG terkompresi
-                        try {
-                            const compressedFile = new File(
-                                [blob],
-                                file.name.replace(/\.[^/.]+$/, '') + '.jpg',
-                                { type: 'image/jpeg', lastModified: Date.now() }
-                            );
-                            const dt = new DataTransfer();
-                            dt.items.add(compressedFile);
-                            input.files = dt.files;
-                        } catch(err) {
-                            console.warn('[AutoCompress] DataTransfer fallback:', err);
+                    try {
+                        const maxDim = 1280;
+                        let w = img.width;
+                        let h = img.height;
+                        if (w > maxDim || h > maxDim) {
+                            if (w >= h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+                            else        { w = Math.round((w * maxDim) / h); h = maxDim; }
                         }
 
-                        const blobUrl = URL.createObjectURL(blob);
-                        if (urlInput) urlInput.value = blobUrl;
-                        if (placeholder) placeholder.style.display = 'none';
-                        if (uploadedBox) uploadedBox.style.display = 'flex';
-                        if (card) {
-                            card.classList.add('has-image');
-                            card.classList.remove('is-invalid-highlight');
-                            const badge = card.querySelector('.camera-upload-badge');
-                            if (badge) {
-                                const origKb = Math.round(origSize / 1024);
+                        const canvas = document.createElement('canvas');
+                        canvas.width = w;
+                        canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+
+                        canvas.toBlob(function(blob) {
+                            if (blob) {
+                                try {
+                                    const compressedFile = new File(
+                                        [blob],
+                                        file.name.replace(/\.[^/.]+$/, '') + '.jpg',
+                                        { type: 'image/jpeg', lastModified: Date.now() }
+                                    );
+                                    const dt = new DataTransfer();
+                                    dt.items.add(compressedFile);
+                                    input.files = dt.files;
+                                } catch(err) {
+                                    console.warn('[AutoCompress] DataTransfer fallback:', err);
+                                }
+
                                 const compKb = Math.round(blob.size / 1024);
-                                badge.innerHTML = `<i class="fas fa-check-circle"></i> Foto Terpilih (${origKb}KB → ${compKb}KB)`;
+                                if (badge) {
+                                    badge.innerHTML = `<i class="fas fa-check-circle"></i> Foto Terpilih (${origKb}KB → ${compKb}KB)`;
+                                }
+                            } else {
+                                if (badge) {
+                                    badge.innerHTML = `<i class="fas fa-check-circle"></i> Foto Terpilih (${origKb} KB)`;
+                                }
                             }
+                        }, 'image/jpeg', 0.72);
+                    } catch(err) {
+                        console.warn('[AutoCompress] Canvas error:', err);
+                        if (badge) {
+                            badge.innerHTML = `<i class="fas fa-check-circle"></i> Foto Terpilih (${Math.round(origSize / 1024)} KB)`;
                         }
-                    }, 'image/jpeg', 0.72);
+                    }
                 };
+
+                img.onerror = function() {
+                    console.warn('[AutoCompress] Image load error');
+                    if (badge) {
+                        badge.innerHTML = `<i class="fas fa-check-circle"></i> Foto Terpilih (${Math.round(origSize / 1024)} KB)`;
+                    }
+                };
+
                 img.src = e.target.result;
             };
+
+            reader.onerror = function() {
+                if (badge) {
+                    badge.innerHTML = `<i class="fas fa-check-circle"></i> Foto Terpilih (${Math.round(file.size / 1024)} KB)`;
+                }
+            };
+
             reader.readAsDataURL(file);
         }
 
@@ -2073,10 +2147,12 @@
             const urlInput = document.getElementById('url_' + field);
             const placeholder = document.getElementById('placeholder_' + field);
             const uploadedBox = document.getElementById('uploaded_' + field);
+            const thumbBox = document.getElementById('thumb_' + field);
             const card = placeholder ? placeholder.closest('.camera-upload-card') : null;
 
             if (input) input.value = '';
             if (urlInput) urlInput.value = '';
+            if (thumbBox) thumbBox.innerHTML = '';
             if (placeholder) placeholder.style.display = 'flex';
             if (uploadedBox) uploadedBox.style.display = 'none';
             if (card) card.classList.remove('has-image');
