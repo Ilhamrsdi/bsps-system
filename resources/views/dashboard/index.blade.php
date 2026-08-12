@@ -138,6 +138,14 @@
         align-items: start;
     }
 
+    .dashboard-sticky-right {
+        position: -webkit-sticky !important;
+        position: sticky !important;
+        top: 85px !important;
+        z-index: 10;
+        align-self: start;
+    }
+
     .card-panel {
         background: var(--bg-card);
         border-radius: var(--radius);
@@ -1216,7 +1224,7 @@
             </div>
 
             <!-- Right: Demografi & Top Desa (Sticky Floating on Scroll) -->
-            <div style="position: sticky; top: 85px; z-index: 5;">
+            <div class="dashboard-sticky-right">
                 <!-- Demografi Kepala Keluarga (Gender) -->
                 <div class="card-panel" style="margin-bottom:20px;">
                     <div class="panel-header">

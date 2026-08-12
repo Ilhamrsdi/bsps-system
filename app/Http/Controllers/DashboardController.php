@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\DataPenerima;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -119,8 +120,8 @@ class DashboardController extends Controller
 
         // Agregasi Desa & Kecamatan Lengkap (Semua Kecamatan & Seluruh Desa se-Kabupaten Jember)
         $desaStats = DataPenerima::selectRaw("
-            kecamatan,
-            desa_kelurahan,
+            UPPER(TRIM(kecamatan)) as kecamatan,
+            UPPER(TRIM(desa_kelurahan)) as desa_kelurahan,
             COUNT(*) as total_target,
             SUM(CASE WHEN {$sudahSql} THEN 1 ELSE 0 END) as total_sudah,
             SUM(CASE WHEN status_kelayakan = 'Layak Diusulkan' THEN 1 ELSE 0 END) as total_layak,
@@ -130,9 +131,9 @@ class DashboardController extends Controller
         ->where('kecamatan', '!=', '')
         ->whereNotNull('desa_kelurahan')
         ->where('desa_kelurahan', '!=', '')
-        ->groupBy('kecamatan', 'desa_kelurahan')
-        ->orderBy('kecamatan')
-        ->orderBy('desa_kelurahan')
+        ->groupBy(DB::raw('UPPER(TRIM(kecamatan))'), DB::raw('UPPER(TRIM(desa_kelurahan))'))
+        ->orderBy(DB::raw('UPPER(TRIM(kecamatan))'))
+        ->orderBy(DB::raw('UPPER(TRIM(desa_kelurahan))'))
         ->get();
 
         $rekapPerKecamatan = $desaStats->groupBy('kecamatan')->map(function ($desas, $kecName) {
