@@ -423,6 +423,14 @@
         box-shadow: 0 2px 8px rgba(16, 124, 65, 0.12);
     }
 
+    /* Modal Export Excel Fix Overflow */
+    #modalExportExcel .modal-box {
+        overflow: visible !important;
+    }
+    #modalExportExcel .modal-body {
+        overflow: visible !important;
+    }
+    #modalExportExcel .pupr-dropdown-menu {
     /* Button Export PDF & Excel PUPR Theme */
     .btn-export-pdf {
         display: inline-flex;
@@ -700,6 +708,8 @@
                         <i class="fas fa-table-list" style="color:#8e44ad;margin-right:8px;"></i>Daftar Detail Hasil Verifikasi &amp; Validasi Penerima
                     @endif
                 </h3>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    @if(auth()->check() && auth()->user()->isAdmin())
                 <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                     <button type="button" class="btn-export-pdf" onclick="window.PuprModal.open('modalPdfDesa')" title="Cetak Laporan PDF Resmi per Desa (Kertas F4)" style="cursor:pointer;border:none;">
                         <i class="fas fa-file-pdf"></i>
@@ -709,6 +719,7 @@
                         <i class="fas fa-file-excel"></i>
                         <span>Export Excel (.XLS)</span>
                     </button>
+                    @endif
                 </div>
             </div>
 
@@ -901,6 +912,7 @@
                                 </tr>
                             @empty
                                 <tr>
+                                    <td colspan="10" style="text-align:center;padding:40px;color:#94a3b8;">
                                     <td colspan="11" style="text-align:center;padding:40px;color:#94a3b8;">
                                         <i class="fas fa-inbox" style="font-size:32px;display:block;margin-bottom:10px;opacity:0.4;"></i>
                                         Belum ada data indikator RTLH.
@@ -1269,6 +1281,84 @@
             </div>
             
             <form action="{{ route('laporan.export') }}" method="GET" target="_blank" id="formExportExcelModal" data-no-loading="true" style="overflow: visible !important;">
+                <div class="modal-body" style="padding: 22px 24px; overflow: visible !important; min-height: 200px;">
+                    @if(auth()->check() && auth()->user()->isPetugas())
+                        {{-- PETUGAS DESA --}}
+                        <input type="hidden" name="export_scope" value="desa" />
+                        <input type="hidden" name="kecamatan" value="{{ auth()->user()->kecamatan }}" />
+                        <input type="hidden" name="desa" value="{{ auth()->user()->desa }}" />
+
+                        <div style="padding: 16px; border-radius: 10px; background: rgba(0, 40, 85, 0.04); border: 1px solid rgba(0, 40, 85, 0.12);">
+                            <strong style="font-size: 14px; color: #002855; display: block; margin-bottom: 6px;">
+                                <i class="fas fa-user-check" style="color: #27ae60; margin-right: 6px;"></i>
+                                Export Data Verval Petugas Lapangan
+                            </strong>
+                            <p style="font-size: 12.5px; color: #64748b; margin: 0; line-height: 1.5;">
+                                File Excel akan mencakup seluruh rekapitulasi indikator dan foto verifikasi calon penerima BSPS di 
+                                <strong>Desa {{ ucwords(strtolower(auth()->user()->desa)) }}</strong>, 
+                                <strong>Kecamatan {{ ucwords(strtolower(auth()->user()->kecamatan)) }}</strong>.
+                            </p>
+                        </div>
+                    @elseif(auth()->check() && auth()->user()->isAdminKecamatan())
+                        {{-- ADMIN KECAMATAN --}}
+                        <input type="hidden" name="export_scope" value="kecamatan" />
+                        <input type="hidden" name="kecamatan" value="{{ auth()->user()->kecamatan }}" />
+
+                        <p style="font-size: 13px; color: #64748b; margin-top: 0; margin-bottom: 14px; line-height: 1.5;">
+                            Unduh rekapitulasi data BSPS untuk wilayah <strong>Kecamatan {{ ucwords(strtolower(auth()->user()->kecamatan)) }}</strong>:
+                        </p>
+
+                        <div style="margin-bottom: 14px;">
+                            <label style="font-size: 12px; font-weight: 700; color: #002855; display: block; margin-bottom: 6px;">
+                                Pilih Desa (Opsional):
+                            </label>
+                            <select name="desa" class="form-control" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid #cbd5e1;font-size:13px;">
+                                <option value="all">-- Semua Desa di Kecamatan {{ ucwords(strtolower(auth()->user()->kecamatan)) }} --</option>
+                                @foreach($listDesa as $d)
+                                <option value="{{ $d }}">Desa {{ ucwords(strtolower($d)) }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @else
+                        {{-- SUPER ADMIN / ADMIN KABUPATEN --}}
+                        <p style="font-size: 13px; color: #64748b; margin-top: 0; margin-bottom: 18px; line-height: 1.5;">
+                            Silakan pilih lingkup wilayah rekapitulasi data BSPS yang ingin Anda unduh ke format Microsoft Excel:
+                        </p>
+
+                        <!-- Pilihan Lingkup Export -->
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <!-- Pilihan 1: Export Keseluruhan Kabupaten (Semua Desa) -->
+                            <div class="export-option-card active" id="optCardAll" onclick="setExportScope('all')">
+                                <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                    <input type="radio" name="export_scope" value="all" id="scopeAll" checked style="margin-top: 3px; cursor: pointer;" />
+                                    <div>
+                                        <strong style="font-size: 13.5px; color: #002855; display: block;">
+                                            <i class="fas fa-globe-asia" style="color: #002855; margin-right: 6px;"></i>Export Seluruh Kabupaten (Semua Desa)
+                                        </strong>
+                                        <span style="font-size: 12px; color: #64748b; margin-top: 3px; display: block; line-height: 1.4;">
+                                            Mendownload data rekapitulasi lengkap dari seluruh desa/kelurahan di 31 kecamatan se-Kabupaten Jember.
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pilihan 2: Export Per Kecamatan Tertentu -->
+                            <div class="export-option-card" id="optCardKecamatan" onclick="setExportScope('kecamatan')">
+                                <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                    <input type="radio" name="export_scope" value="kecamatan" id="scopeKecamatan" style="margin-top: 3px; cursor: pointer;" />
+                                    <div style="width: 100%;">
+                                        <strong style="font-size: 13.5px; color: #002855; display: block;">
+                                            <i class="fas fa-building-flag" style="color: #107c41; margin-right: 6px;"></i>Export Per Kecamatan Tertentu
+                                        </strong>
+                                        <span style="font-size: 12px; color: #64748b; margin-top: 3px; display: block; line-height: 1.4;">
+                                            Hanya mendownload seluruh desa/kelurahan dan calon penerima di dalam satu kecamatan yang dipilih.
+                                        </span>
+                                        
+                                        <!-- Dropdown Pilihan Kecamatan di dalam Modal Menggunakan PUPR Theme -->
+                                        <div id="wrapperPilihKecamatanModal" style="margin-top: 12px; display: none;" onclick="event.stopPropagation();">
+                                            <label style="font-size: 12px; font-weight: 700; color: #002855; display: block; margin-bottom: 6px;">
+                                                Pilih Kecamatan:
+                                            </label>
                 <div class="modal-body" style="padding: 22px 24px; overflow: visible !important; min-height: 240px;">
                     <p style="font-size: 13px; color: #64748b; margin-top: 0; margin-bottom: 18px; line-height: 1.5;">
                         Silakan pilih lingkup wilayah rekapitulasi data BSPS yang ingin Anda unduh ke format Microsoft Excel:
@@ -1320,6 +1410,7 @@
                                             @endphp
                                             <input type="hidden" name="kecamatan" id="modalInputKecamatan" value="{{ $firstKec }}" disabled />
                                             <div class="pupr-dropdown-wrapper" id="ddModalKecamatanWrapper" style="width: 100%;">
+                                                <button type="button" class="pupr-dropdown-toggle" style="width: 100%;" onclick="event.stopPropagation(); window.PuprDropdown.toggle(document.getElementById('ddModalKecamatanWrapper')); setTimeout(() => { const s = document.getElementById('inputSearchKecamatanModal'); if(s) s.focus(); }, 100);">
                                                 <button type="button" class="pupr-dropdown-toggle" style="width: 100%;" onclick="event.stopPropagation(); window.PuprDropdown.toggle(document.getElementById('ddModalKecamatanWrapper'))">
                                                     <span style="display:flex;align-items:center;gap:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
                                                         <i class="fas fa-building-flag" style="font-size:12px;opacity:0.6;"></i>
@@ -1329,6 +1420,25 @@
                                                     </span>
                                                     <i class="fas fa-chevron-down" style="font-size:10px;opacity:0.5;"></i>
                                                 </button>
+                                                <div class="pupr-dropdown-menu" style="min-width: 220px; max-height: 230px; overflow-y: auto; width: 100%; z-index: 1050; box-shadow: 0 12px 30px rgba(0, 40, 85, 0.22); padding: 6px;">
+                                                    <div style="padding: 4px 6px 8px 6px; position: sticky; top: 0; background: #fff; z-index: 10;" onclick="event.stopPropagation();">
+                                                        <div style="position: relative;">
+                                                            <i class="fas fa-search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 11px; color: #94a3b8;"></i>
+                                                            <input type="text" id="inputSearchKecamatanModal" placeholder="Cari nama kecamatan..." onkeyup="filterModalKecamatanList(this.value)" style="width: 100%; padding: 6px 10px 6px 28px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 12px; outline: none; box-sizing: border-box;" />
+                                                        </div>
+                                                    </div>
+                                                    <div id="containerModalKecItems">
+                                                        @foreach($listKecamatan as $kec)
+                                                        <div class="pupr-dropdown-item {{ $firstKec === $kec ? 'active' : '' }}"
+                                                             data-kec="{{ strtolower($kec) }}"
+                                                             onclick="event.stopPropagation(); selectModalKecamatan('{{ $kec }}', 'Kec. {{ ucwords(strtolower($kec)) }}', this)">
+                                                            <i class="fas fa-map-pin" style="font-size:11px;opacity:0.5;"></i> Kec. {{ ucwords(strtolower($kec)) }}
+                                                        </div>
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                                 <div class="pupr-dropdown-menu" style="min-width: 220px; max-height: 190px; overflow-y: auto; width: 100%; z-index: 1050; box-shadow: 0 12px 30px rgba(0, 40, 85, 0.22);">
                                                     @foreach($listKecamatan as $kec)
                                                     <div class="pupr-dropdown-item {{ $firstKec === $kec ? 'active' : '' }}"
@@ -1343,6 +1453,7 @@
                                 </div>
                             </div>
                         </div>
+                    @endif
                     </div>
                 </div>
 
@@ -1591,6 +1702,19 @@
             if (wrapperKec) wrapperKec.style.display = 'block';
             if (inputKec) inputKec.disabled = false;
         }
+    }
+
+    function filterModalKecamatanList(query) {
+        const term = query.toLowerCase().trim();
+        const items = document.querySelectorAll('#containerModalKecItems .pupr-dropdown-item');
+        items.forEach(item => {
+            const text = (item.getAttribute('data-kec') || item.textContent).toLowerCase();
+            if (text.includes(term)) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        });
     }
 
     function selectModalKecamatan(val, label, el) {

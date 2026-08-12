@@ -651,6 +651,7 @@
 
                 {{-- Hidden inputs untuk submit via dropdown --}}
                 <input type="hidden" name="kecamatan" id="hiddenKecamatan" value="{{ request('kecamatan', 'all') }}" />
+                <input type="hidden" name="desa" id="hiddenDesa" value="{{ request('desa', 'all') }}" />
                 <input type="hidden" name="desil" id="hiddenDesil" value="{{ request('desil', 'all') }}" />
 
                 {{-- Custom Dropdown: Kecamatan --}}
@@ -672,6 +673,30 @@
                         <div class="pupr-dropdown-item {{ request('kecamatan') === $kec ? 'active' : '' }}"
                              onclick="selectDropdown('hiddenKecamatan', 'ddKecWrapper', '{{ $kec }}', 'Kec. {{ $kec }}', 'filterFormVerval')">
                             <i class="fas fa-map-pin" style="font-size:11px;opacity:0.4;"></i> Kec. {{ $kec }}
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                {{-- Custom Dropdown: Desa / Kelurahan --}}
+                <div class="pupr-dropdown-wrapper" id="ddDesaWrapper">
+                    <button type="button" class="pupr-dropdown-toggle" id="ddDesaBtn" onclick="window.PuprDropdown.toggle(document.getElementById('ddDesaWrapper'))">
+                        <i class="fas fa-city" style="font-size:12px;opacity:0.6;"></i>
+                        <span class="selected-label">
+                            {{ request('desa') && request('desa') !== 'all' ? 'Desa '.request('desa') : 'Semua Desa' }}
+                        </span>
+                        <i class="fas fa-chevron-down" style="font-size:10px;opacity:0.5;"></i>
+                    </button>
+                    <div class="pupr-dropdown-menu" style="min-width:200px;max-height:300px;overflow-y:auto;">
+                        <div class="pupr-dropdown-item {{ request('desa', 'all') === 'all' ? 'active' : '' }}"
+                             onclick="selectDropdown('hiddenDesa', 'ddDesaWrapper', 'all', 'Semua Desa', 'filterFormVerval')">
+                            <i class="fas fa-th-list" style="font-size:12px;opacity:0.5;"></i> Semua Desa
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        @foreach($listDesa as $d)
+                        <div class="pupr-dropdown-item {{ request('desa') === $d ? 'active' : '' }}"
+                             onclick="selectDropdown('hiddenDesa', 'ddDesaWrapper', '{{ $d }}', 'Desa {{ $d }}', 'filterFormVerval')">
+                            <i class="fas fa-building" style="font-size:11px;opacity:0.4;"></i> Desa {{ $d }}
                         </div>
                         @endforeach
                     </div>

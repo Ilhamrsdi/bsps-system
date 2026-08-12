@@ -17,6 +17,7 @@ class VervalDataController extends Controller
         $user = Auth::user();
         $search = $request->get('search');
         $kecamatan = $request->get('kecamatan', 'all');
+        $desa = $request->get('desa', 'all');
         $desil = $request->get('desil', 'all');
 
         if ($user && $user->isAdminKecamatan()) {
@@ -29,6 +30,10 @@ class VervalDataController extends Controller
             $query->where('kecamatan', $user->kecamatan);
         } elseif ($kecamatan && $kecamatan !== 'all') {
             $query->where('kecamatan', $kecamatan);
+        }
+
+        if ($desa && $desa !== 'all') {
+            $query->where('desa_kelurahan', $desa);
         }
 
         if ($search) {
@@ -65,12 +70,21 @@ class VervalDataController extends Controller
         if ($user && $user->isAdminKecamatan()) {
             $listKecamatan = collect([$user->kecamatan]);
         } else {
-            $listKecamatan = DataPenerima::distinct()->orderBy('kecamatan', 'asc')->pluck('kecamatan')->filter()->values();
+            $listKecamatan = DataPenerima::distinct()->whereNotNull('kecamatan')->where('kecamatan', '!=', '')->orderBy('kecamatan', 'asc')->pluck('kecamatan')->filter()->values();
         }
+
+        // Daftar Desa / Kelurahan berdasarkan kecamatan yang dipilih
+        $desaQuery = DataPenerima::query();
+        if ($user && $user->isAdminKecamatan()) {
+            $desaQuery->where('kecamatan', $user->kecamatan);
+        } elseif ($kecamatan && $kecamatan !== 'all') {
+            $desaQuery->where('kecamatan', $kecamatan);
+        }
+        $listDesa = $desaQuery->distinct()->whereNotNull('desa_kelurahan')->where('desa_kelurahan', '!=', '')->orderBy('desa_kelurahan', 'asc')->pluck('desa_kelurahan')->filter()->values();
 
         $vervals = $query->paginate(20)->withQueryString();
 
-        return view('verval_data.index', compact('vervals', 'stats', 'listKecamatan'));
+        return view('verval_data.index', compact('vervals', 'stats', 'listKecamatan', 'listDesa'));
     }
 
     /**

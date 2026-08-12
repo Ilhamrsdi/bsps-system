@@ -318,25 +318,58 @@
         </div>
 
         @if(auth()->check() && auth()->user()->isAdmin())
-            <!-- Custom Dropdown Filter Kecamatan Khusus Super Admin -->
-            <form action="{{ route('dashboard.kecamatan') }}" method="GET" id="formFilterKecamatan" style="display:flex;align-items:center;gap:10px;">
-                <input type="hidden" name="kecamatan" id="hiddenKecamatanFilter" value="{{ $kecamatanSelected }}" />
-                <label style="font-size:13px;font-weight:700;color:var(--text-muted);white-space:nowrap;">Pilih Kecamatan:</label>
-                <div class="pupr-dropdown-wrapper" id="ddKecamatanMonitorWrapper" style="min-width:220px;">
-                    <button type="button" class="pupr-dropdown-toggle" onclick="window.PuprDropdown.toggle(document.getElementById('ddKecamatanMonitorWrapper'))">
-                        <i class="fas fa-building-flag" style="font-size:12px;opacity:0.6;"></i>
-                        <span class="selected-label">
-                            Kec. {{ ucwords(strtolower($kecamatanSelected)) }}
-                        </span>
-                        <i class="fas fa-chevron-down" style="font-size:10px;opacity:0.5;"></i>
-                    </button>
-                    <div class="pupr-dropdown-menu" style="min-width:220px;max-height:320px;overflow-y:auto;">
-                        @foreach($listKecamatan as $kec)
-                        <div class="pupr-dropdown-item {{ $kecamatanSelected === $kec ? 'active' : '' }}"
-                             onclick="selectDropdown('hiddenKecamatanFilter', 'ddKecamatanMonitorWrapper', '{{ $kec }}', 'Kec. {{ ucwords(strtolower($kec)) }}', 'formFilterKecamatan')">
-                            <i class="fas fa-map-pin" style="font-size:11px;opacity:0.4;"></i> Kec. {{ ucwords(strtolower($kec)) }}
+            <!-- Custom Dropdown Filter Kecamatan & Desa -->
+            <form action="{{ route('dashboard.kecamatan') }}" method="GET" id="formFilterKecamatan" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                @if(auth()->check() && auth()->user()->isAdmin())
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <label style="font-size:13px;font-weight:700;color:var(--text-muted);white-space:nowrap;">Pilih Kecamatan:</label>
+                    <input type="hidden" name="kecamatan" id="hiddenKecamatanFilter" value="{{ $kecamatanSelected }}" />
+                    <div class="pupr-dropdown-wrapper" id="ddKecamatanMonitorWrapper" style="min-width:200px;">
+                        <button type="button" class="pupr-dropdown-toggle" onclick="window.PuprDropdown.toggle(document.getElementById('ddKecamatanMonitorWrapper'))">
+                            <i class="fas fa-building-flag" style="font-size:12px;opacity:0.6;"></i>
+                            <span class="selected-label">
+                                Kec. {{ ucwords(strtolower($kecamatanSelected)) }}
+                            </span>
+                            <i class="fas fa-chevron-down" style="font-size:10px;opacity:0.5;"></i>
+                        </button>
+                        <div class="pupr-dropdown-menu" style="min-width:200px;max-height:320px;overflow-y:auto;">
+                            @foreach($listKecamatan as $kec)
+                            <div class="pupr-dropdown-item {{ $kecamatanSelected === $kec ? 'active' : '' }}"
+                                 onclick="selectDropdown('hiddenKecamatanFilter', 'ddKecamatanMonitorWrapper', '{{ $kec }}', 'Kec. {{ ucwords(strtolower($kec)) }}', 'formFilterKecamatan')">
+                                <i class="fas fa-map-pin" style="font-size:11px;opacity:0.4;"></i> Kec. {{ ucwords(strtolower($kec)) }}
+                            </div>
+                            @endforeach
                         </div>
-                        @endforeach
+                    </div>
+                </div>
+                @else
+                <input type="hidden" name="kecamatan" value="{{ $kecamatanSelected }}" />
+                @endif
+
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <label style="font-size:13px;font-weight:700;color:var(--text-muted);white-space:nowrap;">Pilih Desa:</label>
+                    <input type="hidden" name="desa" id="hiddenDesaFilter" value="{{ $desaSelected ?? 'all' }}" />
+                    <div class="pupr-dropdown-wrapper" id="ddDesaMonitorWrapper" style="min-width:200px;">
+                        <button type="button" class="pupr-dropdown-toggle" onclick="window.PuprDropdown.toggle(document.getElementById('ddDesaMonitorWrapper'))">
+                            <i class="fas fa-city" style="font-size:12px;opacity:0.6;"></i>
+                            <span class="selected-label">
+                                {{ isset($desaSelected) && $desaSelected !== 'all' ? 'Desa '.ucwords(strtolower($desaSelected)) : 'Semua Desa' }}
+                            </span>
+                            <i class="fas fa-chevron-down" style="font-size:10px;opacity:0.5;"></i>
+                        </button>
+                        <div class="pupr-dropdown-menu" style="min-width:200px;max-height:320px;overflow-y:auto;">
+                            <div class="pupr-dropdown-item {{ (!isset($desaSelected) || $desaSelected === 'all') ? 'active' : '' }}"
+                                 onclick="selectDropdown('hiddenDesaFilter', 'ddDesaMonitorWrapper', 'all', 'Semua Desa', 'formFilterKecamatan')">
+                                <i class="fas fa-th-list" style="font-size:11px;opacity:0.4;"></i> Semua Desa
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            @foreach($listDesa as $d)
+                            <div class="pupr-dropdown-item {{ (isset($desaSelected) && strtolower($desaSelected) === strtolower($d)) ? 'active' : '' }}"
+                                 onclick="selectDropdown('hiddenDesaFilter', 'ddDesaMonitorWrapper', '{{ $d }}', 'Desa {{ ucwords(strtolower($d)) }}', 'formFilterKecamatan')">
+                                <i class="fas fa-building" style="font-size:11px;opacity:0.4;"></i> Desa {{ ucwords(strtolower($d)) }}
+                            </div>
+                            @endforeach
+                        </div>
                     </div>
                 </div>
             </form>

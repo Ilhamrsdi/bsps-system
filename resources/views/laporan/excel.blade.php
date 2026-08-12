@@ -173,21 +173,33 @@
                         {{ !empty($ind) ? implode(', ', $ind) : '-' }}
                     </td>
                     <td class="td-center" style="padding:4px;vertical-align:middle;height:85px;">
-                        @if(!empty($p->foto_depan_base64))
+                        @if(!empty($p->foto_depan_url))
+                            <img src="{{ $p->foto_depan_url }}" width="100" height="75" style="border:1px solid #cbd5e1;object-fit:cover;" />
+                        @elseif(!empty($p->foto_depan_file_uri))
+                            <img src="{{ $p->foto_depan_file_uri }}" width="100" height="75" style="border:1px solid #cbd5e1;object-fit:cover;" />
+                        @elseif(!empty($p->foto_depan_base64))
                             <img src="{{ $p->foto_depan_base64 }}" width="100" height="75" style="border:1px solid #cbd5e1;object-fit:cover;" />
                         @else
                             <span style="color:#94a3b8;font-size:8pt;">(Tanpa Foto)</span>
                         @endif
                     </td>
                     <td class="td-center" style="padding:4px;vertical-align:middle;height:85px;">
-                        @if(!empty($p->foto_dalam_base64))
+                        @if(!empty($p->foto_dalam_url))
+                            <img src="{{ $p->foto_dalam_url }}" width="100" height="75" style="border:1px solid #cbd5e1;object-fit:cover;" />
+                        @elseif(!empty($p->foto_dalam_file_uri))
+                            <img src="{{ $p->foto_dalam_file_uri }}" width="100" height="75" style="border:1px solid #cbd5e1;object-fit:cover;" />
+                        @elseif(!empty($p->foto_dalam_base64))
                             <img src="{{ $p->foto_dalam_base64 }}" width="100" height="75" style="border:1px solid #cbd5e1;object-fit:cover;" />
                         @else
                             <span style="color:#94a3b8;font-size:8pt;">(Tanpa Foto)</span>
                         @endif
                     </td>
                     <td class="td-center" style="padding:4px;vertical-align:middle;height:85px;">
-                        @if(!empty($p->foto_ktp_base64))
+                        @if(!empty($p->foto_ktp_url))
+                            <img src="{{ $p->foto_ktp_url }}" width="100" height="75" style="border:1px solid #cbd5e1;object-fit:cover;" />
+                        @elseif(!empty($p->foto_ktp_file_uri))
+                            <img src="{{ $p->foto_ktp_file_uri }}" width="100" height="75" style="border:1px solid #cbd5e1;object-fit:cover;" />
+                        @elseif(!empty($p->foto_ktp_base64))
                             <img src="{{ $p->foto_ktp_base64 }}" width="100" height="75" style="border:1px solid #cbd5e1;object-fit:cover;" />
                         @else
                             <span style="color:#94a3b8;font-size:8pt;">(Tanpa KTP)</span>

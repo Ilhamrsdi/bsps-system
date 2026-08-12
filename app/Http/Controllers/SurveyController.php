@@ -62,8 +62,15 @@ class SurveyController extends Controller
         $vervalData = DataPenerima::findOrFail($targetId);
 
         $request->validate([
+            'nama'                    => 'nullable|string|max:255',
+            'no_ktp'                  => 'nullable|string|max:255',
+            'no_kk'                   => 'nullable|string|max:255',
+            'jenis_kelamin'           => 'nullable|in:L,P',
             'tempat_lahir'            => 'required|string|max:255',
             'tanggal_lahir'           => 'required|date',
+            'alamat'                  => 'nullable|string',
+            'desa_kelurahan'          => 'nullable|string|max:255',
+            'kecamatan'               => 'nullable|string|max:255',
             'penghasilan'             => 'nullable|string|max:255',
             'luas_tanah'              => 'required|string|max:255',
             'telah_ditempati_selama'  => 'required|string|max:255',
