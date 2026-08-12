@@ -347,6 +347,425 @@
         line-height: 1.5;
     }
 
+    /* Accordion Capaian Global Desa */
+    .global-verval-card {
+        background: var(--bg-card);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid rgba(0, 40, 85, 0.08);
+        margin-bottom: 26px;
+        overflow: hidden;
+    }
+
+    .global-verval-header {
+        padding: 20px 24px;
+        background: linear-gradient(135deg, #002855 0%, #003b7a 100%);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .global-verval-header .title-area h2 {
+        font-size: 17px;
+        font-weight: 800;
+        margin: 0 0 4px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #ffffff;
+    }
+
+    .global-verval-header .title-area p {
+        font-size: 12.5px;
+        color: #cbd5e1;
+        margin: 0;
+    }
+
+    .global-stats-pills {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .global-stat-badge {
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        padding: 6px 12px;
+        font-size: 12px;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .global-stat-badge strong {
+        font-size: 13px;
+        color: #ffb800;
+    }
+
+    .global-stat-badge.badge-layak strong {
+        color: #4ade80;
+    }
+
+    .global-verval-toolbar {
+        padding: 14px 24px;
+        background: #f8fafc;
+        border-bottom: 1px solid rgba(0, 40, 85, 0.08);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+
+    .search-kec-input-wrap {
+        position: relative;
+        flex: 1;
+        max-width: 380px;
+    }
+
+    .search-kec-input-wrap i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 13px;
+    }
+
+    .search-kec-input {
+        width: 100%;
+        padding: 9px 14px 9px 36px;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        font-size: 13px;
+        font-weight: 500;
+        background: #ffffff;
+        color: #0f172a;
+        outline: none;
+        transition: var(--transition);
+    }
+
+    .search-kec-input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(0, 40, 85, 0.1);
+    }
+
+    .accordion-kecamatan-list {
+        padding: 16px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .accordion-kec-item {
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        background: #ffffff;
+        transition: all 0.25s ease;
+        overflow: hidden;
+    }
+
+    .accordion-kec-item:hover {
+        border-color: #cbd5e1;
+        box-shadow: 0 4px 12px rgba(0, 40, 85, 0.05);
+    }
+
+    .accordion-kec-item.active {
+        border-color: #002855;
+        box-shadow: 0 6px 18px rgba(0, 40, 85, 0.08);
+    }
+
+    .accordion-kec-header {
+        padding: 14px 18px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        user-select: none;
+        background: #ffffff;
+        transition: background 0.2s ease;
+    }
+
+    .accordion-kec-item.active .accordion-kec-header {
+        background: #f1f5f9;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .kec-header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 220px;
+    }
+
+    .kec-icon-circle {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: #002855;
+        color: #ffb800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        flex-shrink: 0;
+    }
+
+    .kec-title-wrap h4 {
+        font-size: 14.5px;
+        font-weight: 800;
+        color: #002855;
+        margin: 0;
+    }
+
+    .kec-title-wrap span {
+        font-size: 11.5px;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    .kec-header-center {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex: 1;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .kec-stat-item {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    .kec-stat-label {
+        font-size: 10.5px;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .kec-stat-val {
+        font-size: 13.5px;
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+    .kec-stat-val.layak { color: #16a34a; }
+    .kec-stat-val.tidak { color: #dc2626; }
+
+    .kec-progress-bar-wrap {
+        width: 140px;
+    }
+
+    .kec-progress-bar-bg {
+        height: 7px;
+        background: #e2e8f0;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-top: 3px;
+    }
+
+    .kec-progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #002855, #27ae60);
+        border-radius: 4px;
+        transition: width 0.4s ease;
+    }
+
+    .kec-header-toggle-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: #f1f5f9;
+        color: #002855;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        transition: transform 0.25s ease, background 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    .accordion-kec-item.active .kec-header-toggle-btn {
+        transform: rotate(180deg);
+        background: #002855;
+        color: #ffffff;
+    }
+
+    .accordion-kec-body {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.35s ease;
+        background: #f8fafc;
+    }
+
+    .accordion-kec-item.active .accordion-kec-body {
+        max-height: 3000px;
+    }
+
+    /* Grid Kartu-Kartu Desa */
+    .desa-cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 14px;
+        padding: 18px 20px;
+    }
+
+    .desa-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 14px 16px;
+        box-shadow: 0 2px 6px rgba(0, 40, 85, 0.03);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .desa-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 40, 85, 0.08);
+        border-color: #cbd5e1;
+    }
+
+    .desa-card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        gap: 8px;
+    }
+
+    .desa-card-name {
+        font-size: 13.5px;
+        font-weight: 800;
+        color: #002855;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .desa-card-badge {
+        font-size: 10px;
+        font-weight: 800;
+        padding: 2px 8px;
+        border-radius: 12px;
+        white-space: nowrap;
+    }
+
+    .badge-done { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+    .badge-progress { background: #dbeafe; color: #1d4ed8; border: 1px solid #93c5fd; }
+    .badge-none { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
+
+    .desa-card-progress {
+        margin-bottom: 12px;
+    }
+
+    .desa-prog-header {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        margin-bottom: 3px;
+        color: #475569;
+        font-weight: 600;
+    }
+
+    .desa-prog-bg {
+        height: 6px;
+        background: #e2e8f0;
+        border-radius: 3px;
+        overflow: hidden;
+    }
+
+    .desa-prog-fill {
+        height: 100%;
+        background: #22c55e;
+        border-radius: 3px;
+    }
+
+    .desa-card-metric-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    .desa-metric-box {
+        padding: 8px 10px;
+        border-radius: 6px;
+        background: #f8fafc;
+        border: 1px solid #f1f5f9;
+    }
+
+    .desa-metric-box.layak {
+        background: #f0fdf4;
+        border-color: #bbf7d0;
+    }
+
+    .desa-metric-box.tidak {
+        background: #fef2f2;
+        border-color: #fecaca;
+    }
+
+    .desa-metric-box .label {
+        font-size: 9.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #64748b;
+        margin-bottom: 2px;
+    }
+
+    .desa-metric-box.layak .label { color: #15803d; }
+    .desa-metric-box.tidak .label { color: #b91c1c; }
+
+    .desa-metric-box .val {
+        font-size: 13px;
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+    .desa-metric-box.layak .val { color: #16a34a; }
+    .desa-metric-box.tidak .val { color: #dc2626; }
+
+    .desa-metric-box .sub-val {
+        font-size: 10px;
+        font-weight: 600;
+        color: #64748b;
+    }
+
+    .desa-card-footer {
+        border-top: 1px solid #f1f5f9;
+        padding-top: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 11px;
+    }
+
+    .desa-card-footer a {
+        color: #002855;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .desa-card-footer a:hover {
+        color: #ffb800;
+    }
+
     @media (max-width: 1100px) {
         .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
         .desil-banner-grid { grid-template-columns: 1fr; }
@@ -390,13 +809,19 @@
 
         <!-- 6 Stat Summary Cards (Desain Seragam & Rapi) -->
         <div class="stats-grid">
-            <!-- 1. Total Calon Penerima -->
-            <div class="stat-card">
+            <!-- 1. Total Calon Penerima (Klik untuk Buka/Tutup Rekap Capaian Seluruh Desa) -->
+            <div class="stat-card" id="cardTotalCalonPenerima" onclick="toggleGlobalVervalSection()" style="cursor: pointer; position: relative; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);" title="Klik untuk membuka / menutup Rekapitulasi Capaian Seluruh Desa">
                 <div class="stat-icon blue">
                     <i class="fas fa-users-viewfinder"></i>
                 </div>
-                <div class="stat-info">
-                    <div class="stat-value">{{ number_format($totalPenerima, 0, ',', '.') }}</div>
+                <div class="stat-info" style="width: 100%;">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <div class="stat-value">{{ number_format($totalPenerima, 0, ',', '.') }}</div>
+                        <span id="badgeToggleGlobalVerval" style="font-size: 10.5px; font-weight: 800; background: rgba(0, 40, 85, 0.08); color: #002855; padding: 2px 7px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px;">
+                            <i class="fas fa-chevron-down" id="iconToggleGlobalVerval"></i>
+                            <span id="textToggleGlobalVerval">Lihat Desa</span>
+                        </span>
+                    </div>
                     <div class="stat-label">Total Calon Penerima</div>
                     <div class="stat-change blue">
                         <i class="fas fa-database"></i> Database Lengkap
@@ -488,6 +913,170 @@
                         <i class="fas fa-arrow-trend-up"></i> Peringkat #1
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- SECTION CAPAIAN VERVAL GLOBAL & DROP-EXPAND DESA CARDS (KESELURUHAN KABUPATEN JEMBER) -->
+        <div class="global-verval-card" id="globalVervalSection" style="display: none;">
+            <div class="global-verval-header">
+                <div class="title-area">
+                    <h2>
+                        <i class="fas fa-layer-group" style="color: #ffb800;"></i>
+                        <span>Capaian Verval &amp; Kelayakan Seluruh Desa (Global Kab. Jember)</span>
+                    </h2>
+                    <p>
+                        Monitoring capaian survei lapangan &amp; persentase kelayakan dari total <strong>{{ number_format($globalVervalStats['total_target']) }} calon penerima</strong> di 31 kecamatan dan 220+ desa/kelurahan.
+                    </p>
+                </div>
+                <div class="global-stats-pills">
+                    <div class="global-stat-badge">
+                        <i class="fas fa-users"></i>
+                        <span>Target: <strong>{{ number_format($globalVervalStats['total_target']) }} KK</strong></span>
+                    </div>
+                    <div class="global-stat-badge">
+                        <i class="fas fa-clipboard-check"></i>
+                        <span>Sudah Survei: <strong>{{ number_format($globalVervalStats['total_sudah']) }} KK ({{ $globalVervalStats['persen_survei'] }}%)</strong></span>
+                    </div>
+                    <div class="global-stat-badge badge-layak">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Layak: <strong>{{ number_format($globalVervalStats['total_layak']) }} KK ({{ $globalVervalStats['persen_layak'] }}%)</strong></span>
+                    </div>
+                    <div class="global-stat-badge">
+                        <i class="fas fa-circle-xmark"></i>
+                        <span>Tidak Layak: <strong>{{ number_format($globalVervalStats['total_tidak_layak']) }} KK</strong></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Toolbar Pencarian & Toggle Accordion -->
+            <div class="global-verval-toolbar">
+                <div class="search-kec-input-wrap">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="inputSearchKecamatanDesa" class="search-kec-input" placeholder="Ketik nama Kecamatan atau Desa untuk mencari..." onkeyup="filterKecamatanAccordion(this.value)" />
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" class="btn btn-outline" onclick="toggleAllAccordion(true)" style="padding: 7px 14px; font-size: 12px; font-weight: 700; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff; cursor: pointer; color: #002855;">
+                        <i class="fas fa-chevron-down" style="margin-right: 4px;"></i> Buka Semua
+                    </button>
+                    <button type="button" class="btn btn-outline" onclick="toggleAllAccordion(false)" style="padding: 7px 14px; font-size: 12px; font-weight: 700; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff; cursor: pointer; color: #64748b;">
+                        <i class="fas fa-chevron-up" style="margin-right: 4px;"></i> Tutup Semua
+                    </button>
+                </div>
+            </div>
+
+            <!-- List Accordion Tiap Kecamatan -->
+            <div class="accordion-kecamatan-list" id="accordionKecamatanContainer">
+                @foreach($rekapPerKecamatan as $kecName => $kecData)
+                <div class="accordion-kec-item" data-kecamatan="{{ strtolower($kecName) }}">
+                    <!-- Header Kecamatan: Klik untuk keluar kartu-kartu desa -->
+                    <div class="accordion-kec-header" onclick="toggleKecAccordion(this.parentElement)">
+                        <div class="kec-header-left">
+                            <div class="kec-icon-circle">
+                                <i class="fas fa-building-flag"></i>
+                            </div>
+                            <div class="kec-title-wrap">
+                                <h4>Kecamatan {{ ucwords(strtolower($kecName)) }}</h4>
+                                <span>{{ $kecData->total_desa }} Desa/Kelurahan &bull; {{ number_format($kecData->total_target) }} KK Target</span>
+                            </div>
+                        </div>
+
+                        <div class="kec-header-center">
+                            <!-- Progress Survei -->
+                            <div class="kec-stat-item">
+                                <div class="kec-stat-label">Progress Verval</div>
+                                <div class="kec-stat-val">{{ $kecData->progres_percent }}% <span style="font-size: 11px; font-weight: 600; color: #64748b;">({{ number_format($kecData->total_sudah) }}/{{ number_format($kecData->total_target) }})</span></div>
+                                <div class="kec-progress-bar-wrap">
+                                    <div class="kec-progress-bar-bg">
+                                        <div class="kec-progress-bar-fill" style="width: {{ $kecData->progres_percent }}%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Layak Diusulkan -->
+                            <div class="kec-stat-item">
+                                <div class="kec-stat-label">Layak Diusulkan</div>
+                                <div class="kec-stat-val layak">{{ number_format($kecData->total_layak) }} KK <span style="font-size: 11px; font-weight: 600;">({{ $kecData->layak_percent }}%)</span></div>
+                            </div>
+
+                            <!-- Tidak Layak -->
+                            <div class="kec-stat-item">
+                                <div class="kec-stat-label">Tidak Layak</div>
+                                <div class="kec-stat-val tidak">{{ number_format($kecData->total_tidak_layak) }} KK</div>
+                            </div>
+
+                            <!-- Belum Survei -->
+                            <div class="kec-stat-item">
+                                <div class="kec-stat-label">Belum Survei</div>
+                                <div class="kec-stat-val" style="color: #64748b;">{{ number_format($kecData->total_belum) }} KK</div>
+                            </div>
+                        </div>
+
+                        <div class="kec-header-toggle-btn">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+
+                    <!-- Body: Drop down keluar Grid Card Tiap Desa -->
+                    <div class="accordion-kec-body">
+                        <div class="desa-cards-grid">
+                            @foreach($kecData->desa_list as $desa)
+                            <div class="desa-card" data-desa="{{ strtolower($desa->desa_kelurahan) }}">
+                                <div class="desa-card-top">
+                                    <div class="desa-card-name">
+                                        <i class="fas fa-house-chimney" style="color: #002855; font-size: 12px;"></i>
+                                        <span>Desa {{ ucwords(strtolower($desa->desa_kelurahan)) }}</span>
+                                    </div>
+                                    <div>
+                                        @if($desa->progres_percent >= 100)
+                                            <span class="desa-card-badge badge-done"><i class="fas fa-check"></i> 100% Selesai</span>
+                                        @elseif($desa->progres_percent > 0)
+                                            <span class="desa-card-badge badge-progress"><i class="fas fa-spinner"></i> {{ $desa->progres_percent }}%</span>
+                                        @else
+                                            <span class="desa-card-badge badge-none">Belum Ada</span>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <!-- Progress Bar Desa -->
+                                <div class="desa-card-progress">
+                                    <div class="desa-prog-header">
+                                        <span>Progres Survei</span>
+                                        <strong>{{ $desa->total_sudah }} / {{ $desa->total_target }} KK ({{ $desa->progres_percent }}%)</strong>
+                                    </div>
+                                    <div class="desa-prog-bg">
+                                        <div class="desa-prog-fill" style="width: {{ $desa->progres_percent }}%;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- 2 Kotak Metrik Layak vs Tidak Layak -->
+                                <div class="desa-card-metric-grid">
+                                    <div class="desa-metric-box layak">
+                                        <div class="label"><i class="fas fa-check-circle"></i> Layak</div>
+                                        <div class="val">{{ number_format($desa->total_layak) }} KK</div>
+                                        <div class="sub-val">{{ $desa->persen_layak }}% dari verval</div>
+                                    </div>
+                                    <div class="desa-metric-box tidak">
+                                        <div class="label"><i class="fas fa-times-circle"></i> Tidak Layak</div>
+                                        <div class="val">{{ number_format($desa->total_tidak_layak) }} KK</div>
+                                        <div class="sub-val">{{ $desa->persen_tidak }}% dari verval</div>
+                                    </div>
+                                </div>
+
+                                <div class="desa-card-footer">
+                                    <span style="color: #64748b;">
+                                        Belum: <strong>{{ number_format($desa->total_belum) }} KK</strong>
+                                    </span>
+                                    <a href="{{ route('laporan', ['kecamatan' => $kecName, 'desa' => $desa->desa_kelurahan]) }}">
+                                        <span>Lihat Rekap</span>
+                                        <i class="fas fa-arrow-right" style="font-size: 10px;"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+                @endforeach
             </div>
         </div>
 
@@ -774,5 +1363,82 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Toggle Open / Close Global Verval Section when Total Calon Penerima card is clicked
+function toggleGlobalVervalSection() {
+    const sec = document.getElementById('globalVervalSection');
+    const icon = document.getElementById('iconToggleGlobalVerval');
+    const text = document.getElementById('textToggleGlobalVerval');
+    const card = document.getElementById('cardTotalCalonPenerima');
+    if (!sec) return;
+
+    if (sec.style.display === 'none' || !sec.style.display) {
+        sec.style.display = 'block';
+        if (icon) icon.className = 'fas fa-chevron-up';
+        if (text) text.textContent = 'Tutup Rekap';
+        if (card) {
+            card.style.borderColor = '#002855';
+            card.style.boxShadow = '0 6px 20px rgba(0, 40, 85, 0.15)';
+        }
+        setTimeout(() => {
+            sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 50);
+    } else {
+        sec.style.display = 'none';
+        if (icon) icon.className = 'fas fa-chevron-down';
+        if (text) text.textContent = 'Lihat Desa';
+        if (card) {
+            card.style.borderColor = '';
+            card.style.boxShadow = '';
+        }
+    }
+}
+
+// Interactive Accordion Functions for Global Kecamatan & Desa
+function toggleKecAccordion(el) {
+    el.classList.toggle('active');
+}
+
+function toggleAllAccordion(isOpen) {
+    document.querySelectorAll('.accordion-kec-item').forEach(item => {
+        if (isOpen) {
+            item.classList.add('active');
+        } else {
+            item.classList.remove('active');
+        }
+    });
+}
+
+function filterKecamatanAccordion(keyword) {
+    const q = keyword.toLowerCase().trim();
+    const items = document.querySelectorAll('.accordion-kec-item');
+
+    items.forEach(item => {
+        const kecName = item.getAttribute('data-kecamatan') || '';
+        const desaCards = item.querySelectorAll('.desa-card');
+        let hasMatchingDesa = false;
+
+        desaCards.forEach(card => {
+            const desaName = card.getAttribute('data-desa') || '';
+            if (!q || desaName.includes(q) || kecName.includes(q)) {
+                card.style.display = 'flex';
+                if (q && desaName.includes(q)) hasMatchingDesa = true;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        if (!q) {
+            item.style.display = 'block';
+            item.classList.remove('active');
+        } else if (kecName.includes(q) || hasMatchingDesa) {
+            item.style.display = 'block';
+            item.classList.add('active'); // auto open when searching
+        } else {
+            item.style.display = 'none';
+            item.classList.remove('active');
+        }
+    });
+}
 </script>
 @endpush

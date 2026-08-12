@@ -4,28 +4,29 @@ namespace App\Http\Controllers;
 
 use App\Models\DataPenerima;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class GeoMapController extends Controller
 {
     public function index()
     {
-        $user = \Illuminate\Support\Facades\Auth::user();
+        $user = Auth::user();
 
-        // Ambil semua penerima yang SUDAH memiliki koordinat GPS dari survei lapangan
-        $query = DataPenerima::whereNotNull('latitude')
+        // 1. Ambil penerima yang MEMILIKI koordinat GPS (Muncul di Peta)
+        $queryGps = DataPenerima::whereNotNull('latitude')
             ->whereNotNull('longitude')
             ->where('latitude', '!=', '')
             ->where('longitude', '!=', '');
 
         if ($user && $user->isAdminKecamatan()) {
-            $query->where('kecamatan', $user->kecamatan);
+            $queryGps->where('kecamatan', $user->kecamatan);
         }
 
-        $penerimaList = $query->with('petugas')
+        $penerimaGpsList = $queryGps->with('petugas')
             ->orderBy('updated_at', 'desc')
             ->get();
 
-        $markers = $penerimaList->map(function ($item) {
+        $markers = $penerimaGpsList->map(function ($item) {
             // Hitung jumlah indikator RTLH yang terpenuhi
             $indikatorTerpenuhi = 0;
             if ($item->indikator_lantai === 'tidak_ada')    $indikatorTerpenuhi++;
@@ -77,6 +78,7 @@ class GeoMapController extends Controller
             return [
                 'id'          => 'penerima_' . $item->id,
                 'type'        => 'survey',
+                'penerima_id' => $item->id,
                 'name'        => $item->nama,
                 'nik'         => $item->no_ktp ?: '-',
                 'no_kk'       => $item->no_kk ?: '-',
@@ -95,6 +97,80 @@ class GeoMapController extends Controller
             ];
         });
 
-        return view('geoMaps.index', compact('markers'));
+        // 2. Ambil penerima yang SUDAH SURVEI / VERVAL namun TIDAK MEMILIKI koordinat GPS (GPS Mati / Status Khusus)
+        $queryNonGps = DataPenerima::sudahSurvei()
+            ->where(function($q) {
+                $q->whereNull('latitude')
+                  ->orWhereNull('longitude')
+                  ->orWhere('latitude', '')
+                  ->orWhere('longitude', '');
+            });
+
+        if ($user && $user->isAdminKecamatan()) {
+            $queryNonGps->where('kecamatan', $user->kecamatan);
+        }
+
+        $penerimaNonGpsList = $queryNonGps->with('petugas')
+            ->orderBy('updated_at', 'desc')
+            ->get();
+
+        $nonGpsMarkers = $penerimaNonGpsList->map(function ($item) {
+            $indikatorTerpenuhi = 0;
+            if ($item->indikator_lantai === 'tidak_ada')    $indikatorTerpenuhi++;
+            if ($item->indikator_pondasi === 'tidak_ada')   $indikatorTerpenuhi++;
+            if ($item->indikator_dinding === 'tidak_ada')   $indikatorTerpenuhi++;
+            if ($item->indikator_struktur === 'tidak_ada')  $indikatorTerpenuhi++;
+            if ($item->indikator_atap === 'tidak_ada')      $indikatorTerpenuhi++;
+            if ($item->indikator_penghasilan === 'ada')     $indikatorTerpenuhi++;
+
+            $isStatusKhusus = in_array(strtolower($item->status), ['meninggal', 'pindah', 'tidak diketahui']);
+
+            if ($isStatusKhusus) {
+                $statusLabel = 'Khusus: ' . ucfirst($item->status);
+                $badgeColor = 'purple';
+                $keteranganGps = 'Status Khusus Lapangan';
+            } elseif ($indikatorTerpenuhi >= 2) {
+                $statusLabel = '✅ Layak Diusulkan (Tanpa GPS)';
+                $badgeColor = 'green';
+                $keteranganGps = 'GPS Tidak Aktif saat Survei';
+            } else {
+                $statusLabel = '⚠️ Tidak Layak (Tanpa GPS)';
+                $badgeColor = 'orange';
+                $keteranganGps = 'GPS Tidak Aktif saat Survei';
+            }
+
+            return [
+                'id'            => $item->id,
+                'nama'          => $item->nama,
+                'nik'           => $item->no_ktp ?: '-',
+                'no_kk'         => $item->no_kk ?: '-',
+                'kecamatan'     => $item->kecamatan ?: '-',
+                'desa'          => $item->desa_kelurahan ?: '-',
+                'location'      => 'Desa ' . ($item->desa_kelurahan ?: '-') . ', Kec. ' . ($item->kecamatan ?: '-'),
+                'alamat'        => $item->alamat ?: '-',
+                'petugas'       => $item->petugas ? $item->petugas->name : 'Petugas Lapangan',
+                'status'        => $item->status,
+                'statusLabel'   => $statusLabel,
+                'badgeColor'    => $badgeColor,
+                'keteranganGps' => $keteranganGps,
+                'tanggal'       => $item->updated_at ? $item->updated_at->setTimezone('Asia/Jakarta')->translatedFormat('d M Y, H:i') . ' WIB' : '-',
+            ];
+        });
+
+        $totalGps = $markers->count();
+        $totalNonGps = $nonGpsMarkers->count();
+        $totalSurvei = $totalGps + $totalNonGps;
+        $countGpsMati = $nonGpsMarkers->where('keteranganGps', 'GPS Tidak Aktif saat Survei')->count();
+        $countKhusus = $nonGpsMarkers->where('keteranganGps', 'Status Khusus Lapangan')->count();
+
+        return view('geoMaps.index', compact(
+            'markers',
+            'nonGpsMarkers',
+            'totalGps',
+            'totalNonGps',
+            'totalSurvei',
+            'countGpsMati',
+            'countKhusus'
+        ));
     }
 }

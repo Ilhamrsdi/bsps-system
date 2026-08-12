@@ -431,61 +431,6 @@
         overflow: visible !important;
     }
     #modalExportExcel .pupr-dropdown-menu {
-    /* Button Export PDF & Excel PUPR Theme */
-    .btn-export-pdf {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: linear-gradient(135deg, #dc2626, #b91c1c);
-        color: #ffffff !important;
-        padding: 9px 18px;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 700;
-        text-decoration: none !important;
-        box-shadow: 0 3px 10px rgba(220, 38, 38, 0.28);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        transition: all 0.2s ease;
-    }
-    .btn-export-pdf:hover {
-        background: linear-gradient(135deg, #b91c1c, #991b1b);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(220, 38, 38, 0.38);
-        color: #ffffff !important;
-    }
-    .btn-export-pdf i { font-size: 15px; }
-
-    .btn-pdf-mini {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        background: rgba(220, 38, 38, 0.1);
-        color: #dc2626 !important;
-        border: 1px solid rgba(220, 38, 38, 0.25);
-        padding: 4px 8px;
-        border-radius: 6px;
-        font-size: 11px;
-        font-weight: 700;
-        text-decoration: none !important;
-        transition: all 0.15s ease;
-        white-space: nowrap;
-    }
-    .btn-pdf-mini:hover {
-        background: #dc2626;
-        color: #ffffff !important;
-        border-color: #dc2626;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 6px rgba(220, 38, 38, 0.25);
-    }
-
-    /* Modal Export Excel & PDF Fix Overflow */
-    #modalExportExcel .modal-box, #modalPdfDesa .modal-box {
-        overflow: visible !important;
-    }
-    #modalExportExcel .modal-body, #modalPdfDesa .modal-body {
-        overflow: visible !important;
-    }
-    #modalExportExcel .pupr-dropdown-menu, #modalPdfDesa .pupr-dropdown-menu {
         z-index: 1050 !important;
     }
 
@@ -710,15 +655,12 @@
                 </h3>
                 <div style="display:flex;align-items:center;gap:8px;">
                     @if(auth()->check() && auth()->user()->isAdmin())
-                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-                    <button type="button" class="btn-export-pdf" onclick="window.PuprModal.open('modalPdfDesa')" title="Cetak Laporan PDF Resmi per Desa (Kertas F4)" style="cursor:pointer;border:none;">
-                        <i class="fas fa-file-pdf"></i>
-                        <span>Cetak PDF Desa (F4)</span>
-                    </button>
-                    <button type="button" class="btn-export-excel" onclick="window.PuprModal.open('modalExportExcel')" title="Pilih opsi dan download data ke format Microsoft Excel" style="cursor:pointer;border:none;">
-                        <i class="fas fa-file-excel"></i>
-                        <span>Export Excel (.XLS)</span>
-                    </button>
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                        <button type="button" class="btn-export-excel" onclick="window.PuprModal.open('modalExportExcel')" title="Pilih opsi dan download data ke format Microsoft Excel" style="cursor:pointer;border:none;">
+                            <i class="fas fa-file-excel"></i>
+                            <span>Export Excel (.XLS)</span>
+                        </button>
+                    </div>
                     @endif
                 </div>
             </div>
@@ -739,7 +681,6 @@
                                 <th style="text-align:center;">Hasil Tidak Sesuai</th>
                                 <th style="text-align:center;min-width:130px;">% Progres Survei</th>
                                 <th style="text-align:center;min-width:140px;">% Kesesuaian Hasil</th>
-                                <th style="width:65px;text-align:center;">Laporan</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -770,15 +711,10 @@
                                         </div>
                                         <strong style="color:#27ae60;font-size:12px;">{{ $pctKesesuaian }}%</strong>
                                     </td>
-                                    <td style="text-align:center;">
-                                        <a href="{{ route('laporan.pdf_desa', ['kecamatan' => $row->kecamatan, 'desa' => $row->desa_kelurahan]) }}" target="_blank" class="btn-pdf-mini" title="Cetak PDF Resmi F4 Desa {{ $row->desa_kelurahan }}">
-                                            <i class="fas fa-file-pdf"></i> PDF
-                                        </a>
-                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="11" style="text-align:center;padding:40px;color:#94a3b8;">
+                                    <td colspan="10" style="text-align:center;padding:40px;color:#94a3b8;">
                                         <i class="fas fa-inbox" style="font-size:32px;display:block;margin-bottom:10px;opacity:0.4;"></i>
                                         Belum ada data rekapitulasi desa &amp; kecamatan.
                                     </td>
@@ -888,7 +824,6 @@
                                 <th style="text-align:center;">4. Pondasi Rusak</th>
                                 <th style="text-align:center;">5. Struktur Rusak</th>
                                 <th style="text-align:center;">6. Penghasilan &lt; UMK</th>
-                                <th style="width:65px;text-align:center;">Laporan</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -904,16 +839,10 @@
                                     <td style="text-align:center;"><span class="badge-status danger">{{ number_format($row->pondasi_rtlh) }}</span></td>
                                     <td style="text-align:center;"><span class="badge-status danger">{{ number_format($row->struktur_rtlh) }}</span></td>
                                     <td style="text-align:center;"><span class="badge-status warning">{{ number_format($row->penghasilan_rtlh) }}</span></td>
-                                    <td style="text-align:center;">
-                                        <a href="{{ route('laporan.pdf_desa', ['kecamatan' => $row->kecamatan, 'desa' => $row->desa_kelurahan]) }}" target="_blank" class="btn-pdf-mini" title="Cetak PDF Resmi F4 Desa {{ $row->desa_kelurahan }}">
-                                            <i class="fas fa-file-pdf"></i> PDF
-                                        </a>
-                                    </td>
                                 </tr>
                             @empty
                                 <tr>
                                     <td colspan="10" style="text-align:center;padding:40px;color:#94a3b8;">
-                                    <td colspan="11" style="text-align:center;padding:40px;color:#94a3b8;">
                                         <i class="fas fa-inbox" style="font-size:32px;display:block;margin-bottom:10px;opacity:0.4;"></i>
                                         Belum ada data indikator RTLH.
                                     </td>
@@ -1470,132 +1399,6 @@
         </div>
     </div>
 
-    <!-- Modal Cetak PDF per Desa (Kertas F4) -->
-    <div class="modal-overlay" id="modalPdfDesa">
-        <div class="modal-box" style="max-width: 520px; overflow: visible !important;">
-            <div class="modal-header" style="border-top-left-radius: 12px; border-top-right-radius: 12px;">
-                <h3>
-                    <i class="fas fa-file-pdf" style="color: #dc2626;"></i>
-                    <span>Cetak Laporan PDF Resmi Desa (F4)</span>
-                </h3>
-                <button type="button" class="close-btn" onclick="window.PuprModal.close('modalPdfDesa')">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <form action="{{ route('laporan.pdf_desa') }}" method="GET" target="_blank" id="formPdfDesaModal" data-no-loading="true" style="overflow: visible !important;">
-                <div class="modal-body" style="padding: 22px 24px; overflow: visible !important;">
-                    <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px 14px; margin-bottom: 18px; display: flex; gap: 10px; align-items: flex-start;">
-                        <i class="fas fa-info-circle" style="color: #dc2626; font-size: 16px; margin-top: 2px;"></i>
-                        <div style="font-size: 12px; color: #7f1d1d; line-height: 1.4;">
-                            Dokumen resmi format <strong>Kertas F4 (Folio)</strong> lengkap dengan <strong>Kop Surat Pemkab Jember / Dinas PUPR Cipta Karya</strong>, tabel rekapitulasi formal, dan lembar tanda tangan 2 pihak.
-                        </div>
-                    </div>
-
-                    @php
-                        $firstKecPdf = (auth()->check() && auth()->user()->isAdminKecamatan()) ? auth()->user()->kecamatan : (request('kecamatan') && request('kecamatan') !== 'all' ? request('kecamatan') : ($listKecamatan->first() ?? ''));
-                        $initialDesaList = isset($allDesaByKecamatan[$firstKecPdf]) ? $allDesaByKecamatan[$firstKecPdf] : $listDesa;
-                        $firstDesaPdf = $initialDesaList->first() ?? '';
-                    @endphp
-
-                    {{-- Pilihan Kecamatan Custom Dropdown --}}
-                    @if(!auth()->check() || !auth()->user()->isAdminKecamatan())
-                    <div class="form-group" style="margin-bottom: 16px;">
-                        <label style="font-size: 12px; font-weight: 700; color: #002855; display: block; margin-bottom: 6px;">
-                            Pilih Kecamatan:
-                        </label>
-                        <input type="hidden" name="kecamatan" id="pdfInputKecamatan" value="{{ $firstKecPdf }}" />
-                        <div class="pupr-dropdown-wrapper" id="ddPdfKecamatanWrapper" style="width: 100%;">
-                            <button type="button" class="pupr-dropdown-toggle" style="width: 100%;" onclick="event.stopPropagation(); window.PuprDropdown.toggle(document.getElementById('ddPdfKecamatanWrapper'))">
-                                <span style="display:flex;align-items:center;gap:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
-                                    <i class="fas fa-building-flag" style="font-size:12px;opacity:0.6;"></i>
-                                    <span class="selected-label" id="pdfSelectedKecLabel">
-                                        Kec. {{ ucwords(strtolower($firstKecPdf)) }}
-                                    </span>
-                                </span>
-                                <i class="fas fa-chevron-down" style="font-size:10px;opacity:0.5;"></i>
-                            </button>
-                            <div class="pupr-dropdown-menu" style="min-width: 220px; max-height: 190px; overflow-y: auto; width: 100%; z-index: 1060; box-shadow: 0 12px 30px rgba(0, 40, 85, 0.22);">
-                                @foreach($listKecamatan as $kec)
-                                <div class="pupr-dropdown-item {{ $firstKecPdf === $kec ? 'active' : '' }}"
-                                     onclick="event.stopPropagation(); selectPdfModalKecamatan('{{ $kec }}', 'Kec. {{ ucwords(strtolower($kec)) }}', this)">
-                                    <i class="fas fa-map-pin" style="font-size:11px;opacity:0.5;"></i> Kec. {{ ucwords(strtolower($kec)) }}
-                                </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-                    @else
-                        <input type="hidden" name="kecamatan" value="{{ auth()->user()->kecamatan }}" id="pdfInputKecamatan" />
-                        <div class="form-group" style="margin-bottom: 16px;">
-                            <label style="font-size: 12px; font-weight: 700; color: #002855; display: block; margin-bottom: 6px;">
-                                Wilayah Kecamatan:
-                            </label>
-                            <div style="padding: 9px 14px; border-radius: 8px; background: #f1f5f9; border: 1px solid #cbd5e1; font-weight: 700; font-size: 13px; color: #002855; display: flex; align-items: center; gap: 8px;">
-                                <i class="fas fa-building-flag" style="color: #002855;"></i>
-                                <span>Kec. {{ ucwords(strtolower(auth()->user()->kecamatan)) }}</span>
-                            </div>
-                        </div>
-                    @endif
-
-                    {{-- Pilihan Desa Custom Dropdown --}}
-                    <div class="form-group" style="margin-bottom: 16px;">
-                        <label style="font-size: 12px; font-weight: 700; color: #002855; display: block; margin-bottom: 6px;">
-                            Pilih Desa / Kelurahan:
-                        </label>
-                        <input type="hidden" name="desa" id="pdfInputDesa" value="{{ $firstDesaPdf }}" />
-                        <div class="pupr-dropdown-wrapper" id="ddPdfDesaWrapper" style="width: 100%;">
-                            <button type="button" class="pupr-dropdown-toggle" style="width: 100%;" onclick="event.stopPropagation(); window.PuprDropdown.toggle(document.getElementById('ddPdfDesaWrapper'))">
-                                <span style="display:flex;align-items:center;gap:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
-                                    <i class="fas fa-house-chimney" style="font-size:12px;opacity:0.6;"></i>
-                                    <span class="selected-label" id="pdfSelectedDesaLabel">
-                                        Desa {{ ucwords(strtolower($firstDesaPdf)) }}
-                                    </span>
-                                </span>
-                                <i class="fas fa-chevron-down" style="font-size:10px;opacity:0.5;"></i>
-                            </button>
-                            <div class="pupr-dropdown-menu" id="pdfDesaDropdownMenu" style="min-width: 220px; max-height: 190px; overflow-y: auto; width: 100%; z-index: 1055; box-shadow: 0 12px 30px rgba(0, 40, 85, 0.22);">
-                                @foreach($initialDesaList as $d)
-                                <div class="pupr-dropdown-item {{ $firstDesaPdf === $d ? 'active' : '' }}"
-                                     onclick="event.stopPropagation(); selectPdfModalDesa('{{ $d }}', 'Desa {{ ucwords(strtolower($d)) }}', this)">
-                                    <i class="fas fa-map-marker-alt" style="font-size:11px;opacity:0.5;"></i> Desa {{ ucwords(strtolower($d)) }}
-                                </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Opsi Aksi Cetak / Download --}}
-                    <div class="form-group" style="margin-bottom: 6px;">
-                        <label style="font-size: 12px; font-weight: 700; color: #002855; display: block; margin-bottom: 6px;">
-                            Tindakan Dokumen:
-                        </label>
-                        <div style="display: flex; gap: 12px;">
-                            <label style="display: flex; align-items: center; gap: 6px; font-size: 12.5px; cursor: pointer; color: #002855; font-weight: 600;">
-                                <input type="radio" name="mode" value="stream" checked style="cursor: pointer;" />
-                                Buka di Tab Baru (Print Langsung)
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 6px; font-size: 12.5px; cursor: pointer; color: #002855; font-weight: 600;">
-                                <input type="radio" name="mode" value="download" style="cursor: pointer;" />
-                                Download File PDF (.PDF)
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="modal-footer" style="padding: 14px 24px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 10px; background: #f8fafc; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;">
-                    <button type="button" class="btn btn-outline" onclick="window.PuprModal.close('modalPdfDesa')" style="padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 13px;">
-                        Batal
-                    </button>
-                    <button type="submit" class="btn-export-pdf" onclick="setTimeout(() => { window.PuprModal.close('modalPdfDesa'); if (window.PuprLoading) window.PuprLoading.hide(); }, 300)" style="padding: 8px 18px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; font-size: 13px;">
-                        <i class="fas fa-file-pdf"></i>
-                        <span>Cetak PDF Resmi F4</span>
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <!-- Modal Lightbox Viewer Foto -->
     <div class="lightbox-modal" id="lightboxModal">
         <div class="lightbox-content">
@@ -1612,73 +1415,6 @@
 
 @push('scripts')
 <script>
-    // Data Pemetaan Desa per Kecamatan untuk Modal PDF
-    const mapDesaPerKecamatan = @json($allDesaByKecamatan ?? []);
-
-    function selectPdfModalKecamatan(kec, label, el) {
-        const inputKec = document.getElementById('pdfInputKecamatan');
-        const labelEl = document.getElementById('pdfSelectedKecLabel');
-        const wrapper = document.getElementById('ddPdfKecamatanWrapper');
-
-        if (inputKec) inputKec.value = kec;
-        if (labelEl) labelEl.textContent = label;
-        if (wrapper) {
-            wrapper.querySelectorAll('.pupr-dropdown-item').forEach(i => i.classList.remove('active'));
-            if (el) el.classList.add('active');
-            wrapper.classList.remove('active');
-        }
-
-        // Update list desa di dropdown desa secara dinamis
-        updatePdfDesaDropdown(kec);
-    }
-
-    function updatePdfDesaDropdown(selectedKec) {
-        const menuEl = document.getElementById('pdfDesaDropdownMenu');
-        const inputDesa = document.getElementById('pdfInputDesa');
-        const labelDesa = document.getElementById('pdfSelectedDesaLabel');
-        if (!menuEl) return;
-
-        menuEl.innerHTML = '';
-        const listDesa = mapDesaPerKecamatan[selectedKec] || [];
-
-        if (listDesa.length > 0) {
-            const firstDesa = listDesa[0];
-            const firstDesaLabel = 'Desa ' + firstDesa.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
-
-            if (inputDesa) inputDesa.value = firstDesa;
-            if (labelDesa) labelDesa.textContent = firstDesaLabel;
-
-            listDesa.forEach((d, idx) => {
-                const itemLabel = 'Desa ' + d.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
-                const item = document.createElement('div');
-                item.className = 'pupr-dropdown-item' + (idx === 0 ? ' active' : '');
-                item.innerHTML = '<i class="fas fa-map-marker-alt" style="font-size:11px;opacity:0.5;"></i> ' + itemLabel;
-                item.onclick = function(e) {
-                    e.stopPropagation();
-                    selectPdfModalDesa(d, itemLabel, item);
-                };
-                menuEl.appendChild(item);
-            });
-        } else {
-            if (inputDesa) inputDesa.value = '';
-            if (labelDesa) labelDesa.textContent = 'Semua Desa';
-        }
-    }
-
-    function selectPdfModalDesa(desa, label, el) {
-        const inputDesa = document.getElementById('pdfInputDesa');
-        const labelEl = document.getElementById('pdfSelectedDesaLabel');
-        const wrapper = document.getElementById('ddPdfDesaWrapper');
-
-        if (inputDesa) inputDesa.value = desa;
-        if (labelEl) labelEl.textContent = label;
-        if (wrapper) {
-            wrapper.querySelectorAll('.pupr-dropdown-item').forEach(i => i.classList.remove('active'));
-            if (el) el.classList.add('active');
-            wrapper.classList.remove('active');
-        }
-    }
-
     function setExportScope(scope) {
         const optAll = document.getElementById('optCardAll');
         const optKec = document.getElementById('optCardKecamatan');
