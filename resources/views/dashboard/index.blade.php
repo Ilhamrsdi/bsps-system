@@ -130,18 +130,24 @@
     }
 
     /* Dashboard Split Grid (Leaderboard & Breakdown) */
+    html, body, .main-wrapper, .dashboard-content {
+        overflow-x: clip !important;
+        overflow-y: visible !important;
+    }
+
     .dashboard-split-grid {
         display: grid;
         grid-template-columns: 1.4fr 1fr;
         gap: 20px;
         margin-bottom: 24px;
         align-items: start;
+        position: relative;
     }
 
     .dashboard-sticky-right {
         position: -webkit-sticky !important;
         position: sticky !important;
-        top: 85px !important;
+        top: 90px !important;
         z-index: 10;
         align-self: start;
     }
