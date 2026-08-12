@@ -1291,7 +1291,7 @@
                                             @endphp
                                             <input type="hidden" name="kecamatan" id="modalInputKecamatan" value="{{ $firstKec }}" disabled />
                                             <div class="pupr-dropdown-wrapper" id="ddModalKecamatanWrapper" style="width: 100%;">
-                                                <button type="button" class="pupr-dropdown-toggle" style="width: 100%;" onclick="event.stopPropagation(); window.PuprDropdown.toggle(document.getElementById('ddModalKecamatanWrapper'))">
+                                                <button type="button" class="pupr-dropdown-toggle" style="width: 100%;" onclick="event.stopPropagation(); window.PuprDropdown.toggle(document.getElementById('ddModalKecamatanWrapper')); setTimeout(() => { const s = document.getElementById('inputSearchKecamatanModal'); if(s) s.focus(); }, 100);">
                                                     <span style="display:flex;align-items:center;gap:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
                                                         <i class="fas fa-building-flag" style="font-size:12px;opacity:0.6;"></i>
                                                         <span class="selected-label" id="modalSelectedKecLabel">
@@ -1300,13 +1300,22 @@
                                                     </span>
                                                     <i class="fas fa-chevron-down" style="font-size:10px;opacity:0.5;"></i>
                                                 </button>
-                                                <div class="pupr-dropdown-menu" style="min-width: 220px; max-height: 190px; overflow-y: auto; width: 100%; z-index: 1050; box-shadow: 0 12px 30px rgba(0, 40, 85, 0.22);">
-                                                    @foreach($listKecamatan as $kec)
-                                                    <div class="pupr-dropdown-item {{ $firstKec === $kec ? 'active' : '' }}"
-                                                         onclick="event.stopPropagation(); selectModalKecamatan('{{ $kec }}', 'Kec. {{ ucwords(strtolower($kec)) }}', this)">
-                                                        <i class="fas fa-map-pin" style="font-size:11px;opacity:0.5;"></i> Kec. {{ ucwords(strtolower($kec)) }}
+                                                <div class="pupr-dropdown-menu" style="min-width: 220px; max-height: 230px; overflow-y: auto; width: 100%; z-index: 1050; box-shadow: 0 12px 30px rgba(0, 40, 85, 0.22); padding: 6px;">
+                                                    <div style="padding: 4px 6px 8px 6px; position: sticky; top: 0; background: #fff; z-index: 10;" onclick="event.stopPropagation();">
+                                                        <div style="position: relative;">
+                                                            <i class="fas fa-search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 11px; color: #94a3b8;"></i>
+                                                            <input type="text" id="inputSearchKecamatanModal" placeholder="Cari nama kecamatan..." onkeyup="filterModalKecamatanList(this.value)" style="width: 100%; padding: 6px 10px 6px 28px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 12px; outline: none; box-sizing: border-box;" />
+                                                        </div>
                                                     </div>
-                                                    @endforeach
+                                                    <div id="containerModalKecItems">
+                                                        @foreach($listKecamatan as $kec)
+                                                        <div class="pupr-dropdown-item {{ $firstKec === $kec ? 'active' : '' }}"
+                                                             data-kec="{{ strtolower($kec) }}"
+                                                             onclick="event.stopPropagation(); selectModalKecamatan('{{ $kec }}', 'Kec. {{ ucwords(strtolower($kec)) }}', this)">
+                                                            <i class="fas fa-map-pin" style="font-size:11px;opacity:0.5;"></i> Kec. {{ ucwords(strtolower($kec)) }}
+                                                        </div>
+                                                        @endforeach
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -1369,6 +1378,19 @@
             if (wrapperKec) wrapperKec.style.display = 'block';
             if (inputKec) inputKec.disabled = false;
         }
+    }
+
+    function filterModalKecamatanList(query) {
+        const term = query.toLowerCase().trim();
+        const items = document.querySelectorAll('#containerModalKecItems .pupr-dropdown-item');
+        items.forEach(item => {
+            const text = (item.getAttribute('data-kec') || item.textContent).toLowerCase();
+            if (text.includes(term)) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        });
     }
 
     function selectModalKecamatan(val, label, el) {
