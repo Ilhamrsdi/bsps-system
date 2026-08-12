@@ -97,6 +97,14 @@ class LaporanController extends Controller
         $rekapIndikator = collect();
         $penerimaList = collect();
 
+        // Konstruksi SQL Cek Kelengkapan Survei (Sesuai DataPenerima::$fieldWajibSurvei & Status Khusus)
+        $conds = [];
+        foreach (DataPenerima::$fieldWajibSurvei as $field) {
+            $conds[] = "({$field} IS NOT NULL AND TRIM({$field}) != '')";
+        }
+        $formLengkapSql = "(" . implode(" AND ", $conds) . ")";
+        $sudahSql = "(status IN ('meninggal', 'pindah', 'tidak diketahui') OR {$formLengkapSql})";
+
         if ($tab === 'rekap') {
             // TAB 1: REKAP HASIL SESUAI VS TIDAK SESUAI PER DESA & KECAMATAN
             $rekapQuery = DataPenerima::query();
@@ -116,7 +124,7 @@ class LaporanController extends Controller
                     COUNT(*) as total_penerima,
                     SUM(CASE WHEN status_kelayakan = 'Layak Diusulkan' THEN 1 ELSE 0 END) as total_layak,
                     SUM(CASE WHEN status_kelayakan = 'Tidak Layak Diusulkan' THEN 1 ELSE 0 END) as total_tidak_layak,
-                    SUM(CASE WHEN (foto_sudut_depan IS NOT NULL AND foto_sudut_depan != '') THEN 1 ELSE 0 END) as total_sudah_survei
+                    SUM(CASE WHEN {$sudahSql} THEN 1 ELSE 0 END) as total_sudah_survei
                 ")
                 ->groupBy('kecamatan', 'desa_kelurahan')
                 ->orderBy('kecamatan')
@@ -139,7 +147,7 @@ class LaporanController extends Controller
                     kecamatan,
                     desa_kelurahan,
                     COUNT(*) as total_penerima,
-                    SUM(CASE WHEN (foto_sudut_depan IS NOT NULL AND foto_sudut_depan != '') THEN 1 ELSE 0 END) as total_sudah_survei,
+                    SUM(CASE WHEN {$sudahSql} THEN 1 ELSE 0 END) as total_sudah_survei,
                     SUM(CASE WHEN indikator_atap = 'tidak_ada' THEN 1 ELSE 0 END) as atap_rtlh,
                     SUM(CASE WHEN indikator_dinding = 'tidak_ada' THEN 1 ELSE 0 END) as dinding_rtlh,
                     SUM(CASE WHEN indikator_lantai = 'tidak_ada' THEN 1 ELSE 0 END) as lantai_rtlh,
@@ -204,12 +212,19 @@ class LaporanController extends Controller
             'tidak_layak' => $totalTidakLayak,
         ];
 
+        $conds = [];
+        foreach (DataPenerima::$fieldWajibSurvei as $field) {
+            $conds[] = "({$field} IS NOT NULL AND TRIM({$field}) != '')";
+        }
+        $formLengkapSql = "(" . implode(" AND ", $conds) . ")";
+        $sudahSql = "(status IN ('meninggal', 'pindah', 'tidak diketahui') OR {$formLengkapSql})";
+
         $rekapDesaKecamatan = (clone $query)
             ->selectRaw("
                 kecamatan,
                 desa_kelurahan,
                 COUNT(*) as total_penerima,
-                SUM(CASE WHEN (foto_sudut_depan IS NOT NULL AND foto_sudut_depan != '') THEN 1 ELSE 0 END) as total_sudah_survei,
+                SUM(CASE WHEN {$sudahSql} THEN 1 ELSE 0 END) as total_sudah_survei,
                 SUM(CASE WHEN status_kelayakan = 'Layak Diusulkan' THEN 1 ELSE 0 END) as total_layak,
                 SUM(CASE WHEN status_kelayakan = 'Tidak Layak Diusulkan' THEN 1 ELSE 0 END) as total_tidak_layak,
                 SUM(CASE WHEN indikator_atap = 'tidak_ada' THEN 1 ELSE 0 END) as atap_rtlh,

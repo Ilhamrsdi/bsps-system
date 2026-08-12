@@ -43,26 +43,33 @@ class DataPenerima extends Model
     ];
 
     /**
-     * Scope: Data yang SUDAH survei (semua field wajib terisi).
+     * Scope: Data yang SUDAH survei / diverifikasi (status khusus meninggal/pindah/tidak diketahui atau form fisik lengkap).
      */
     public function scopeSudahSurvei($query)
     {
-        foreach (self::$fieldWajibSurvei as $field) {
-            $query->whereNotNull($field);
-            if ($field !== 'tanggal_lahir') {
-                $query->where($field, '!=', '');
-            }
-        }
-        return $query;
+        return $query->where(function ($q) {
+            $q->whereIn('status', ['meninggal', 'pindah', 'tidak diketahui'])
+              ->orWhere(function ($sub) {
+                  foreach (self::$fieldWajibSurvei as $field) {
+                      $sub->whereNotNull($field);
+                      if ($field !== 'tanggal_lahir') {
+                          $sub->where($field, '!=', '');
+                      }
+                  }
+              });
+        });
     }
 
     /**
-     * Scope: Data yang BELUM survei (minimal 1 field wajib masih kosong).
+     * Scope: Data yang BELUM survei (belum dikunjungi/ditindaklanjuti).
      */
     public function scopeBelumSurvei($query)
     {
         $fields = self::$fieldWajibSurvei;
         return $query->where(function ($q) use ($fields) {
+            $q->whereNull('status')
+              ->orWhereNotIn('status', ['meninggal', 'pindah', 'tidak diketahui']);
+        })->where(function ($q) use ($fields) {
             foreach ($fields as $field) {
                 $q->orWhereNull($field);
                 if ($field !== 'tanggal_lahir') {
@@ -73,10 +80,14 @@ class DataPenerima extends Model
     }
 
     /**
-     * Helper: Cek apakah satu record ini sudah lengkap surveinya.
+     * Helper: Cek apakah satu record ini sudah lengkap surveinya atau memiliki status verifikasi khusus.
      */
     public function isSudahSurvei(): bool
     {
+        if (in_array($this->status, ['meninggal', 'pindah', 'tidak diketahui'])) {
+            return true;
+        }
+
         foreach (self::$fieldWajibSurvei as $field) {
             if (empty($this->{$field})) return false;
         }

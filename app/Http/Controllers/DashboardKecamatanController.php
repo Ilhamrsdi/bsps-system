@@ -57,25 +57,33 @@ class DashboardKecamatanController extends Controller
         $backlog1Count = (clone $query)->where('pengelompokan_desil', 'like', '%Backlog 1%')->count();
         $backlog2Count = (clone $query)->where('pengelompokan_desil', 'like', '%Backlog 2%')->count();
 
+        $desaSelected = $request->get('desa', 'all');
+
         // 4. Data Monitoring Rincian per Desa/Kelurahan
         $conds = [];
         foreach (DataPenerima::$fieldWajibSurvei as $field) {
             $conds[] = "({$field} IS NOT NULL AND TRIM({$field}) != '')";
         }
-        $sudahSql = "(" . implode(" AND ", $conds) . ")";
+        $formLengkapSql = "(" . implode(" AND ", $conds) . ")";
+        $sudahSql = "(status IN ('meninggal', 'pindah', 'tidak diketahui') OR {$formLengkapSql})";
 
-        $desaStats = DataPenerima::selectRaw("
+        $desaStatsQuery = DataPenerima::selectRaw("
                 desa_kelurahan,
                 COUNT(*) as total,
                 SUM(CASE WHEN {$sudahSql} THEN 1 ELSE 0 END) as sudah_survei,
-                SUM(CASE WHEN NOT {$sudahSql} THEN 1 ELSE 0 END) as belum_survei,
+                (COUNT(*) - SUM(CASE WHEN {$sudahSql} THEN 1 ELSE 0 END)) as belum_survei,
                 SUM(CASE WHEN pengelompokan_desil LIKE '%Backlog 1%' THEN 1 ELSE 0 END) as backlog_1,
                 SUM(CASE WHEN pengelompokan_desil LIKE '%Backlog 2%' THEN 1 ELSE 0 END) as backlog_2
             ")
             ->whereRaw('LOWER(TRIM(kecamatan)) = ?', [$kecamatanLower])
             ->whereNotNull('desa_kelurahan')
-            ->where('desa_kelurahan', '!=', '')
-            ->groupBy('desa_kelurahan')
+            ->where('desa_kelurahan', '!=', '');
+
+        if ($desaSelected && $desaSelected !== 'all') {
+            $desaStatsQuery->whereRaw('LOWER(TRIM(desa_kelurahan)) = ?', [strtolower(trim($desaSelected))]);
+        }
+
+        $desaStats = $desaStatsQuery->groupBy('desa_kelurahan')
             ->orderBy('desa_kelurahan', 'asc')
             ->get();
 
@@ -100,19 +108,33 @@ class DashboardKecamatanController extends Controller
         $chartBacklog2Data = $desaStats->pluck('backlog_2');
 
         // 6. Daftar Petugas Lapangan di Kecamatan ini
-        $petugasList = User::whereRaw('LOWER(TRIM(kecamatan)) = ?', [$kecamatanLower])
-            ->orderBy('name', 'asc')
-            ->get();
+        $petugasQuery = User::whereRaw('LOWER(TRIM(kecamatan)) = ?', [$kecamatanLower]);
+        if ($desaSelected && $desaSelected !== 'all') {
+            $petugasQuery->where(function($q) use ($desaSelected) {
+                $q->whereRaw('LOWER(TRIM(desa)) = ?', [strtolower(trim($desaSelected))])
+                  ->orWhereNull('desa')
+                  ->orWhere('desa', '');
+            });
+        }
+        $petugasList = $petugasQuery->orderBy('name', 'asc')->get();
 
-        // 7. List Semua Kecamatan untuk Dropdown Filter (jika dipantau oleh Admin Super)
+        // 7. List Semua Kecamatan & Desa untuk Dropdown Filter
         $listKecamatan = DataPenerima::distinct('kecamatan')
             ->whereNotNull('kecamatan')
             ->where('kecamatan', '!=', '')
             ->orderBy('kecamatan', 'asc')
             ->pluck('kecamatan');
 
+        $listDesa = DataPenerima::whereRaw('LOWER(TRIM(kecamatan)) = ?', [$kecamatanLower])
+            ->whereNotNull('desa_kelurahan')
+            ->where('desa_kelurahan', '!=', '')
+            ->distinct('desa_kelurahan')
+            ->orderBy('desa_kelurahan', 'asc')
+            ->pluck('desa_kelurahan');
+
         return view('dashboard.kecamatan', compact(
             'kecamatanSelected',
+            'desaSelected',
             'totalPenerima',
             'totalDesa',
             'totalSudahSurvei',
@@ -127,7 +149,8 @@ class DashboardKecamatanController extends Controller
             'chartBacklog1Data',
             'chartBacklog2Data',
             'petugasList',
-            'listKecamatan'
+            'listKecamatan',
+            'listDesa'
         ));
     }
 }
