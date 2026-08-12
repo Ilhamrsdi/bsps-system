@@ -255,5 +255,6 @@ Route::middleware(['auth'])->group(function () {
 
     // Pengaturan System & Tema
     Route::get('/setting', [SettingController::class, 'index'])->name('setting');
+    Route::put('/setting/password', [SettingController::class, 'updatePassword'])->name('setting.update-password');
 });
 

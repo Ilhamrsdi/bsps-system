@@ -260,6 +260,10 @@
 @section('content')
     @include('layouts.navbar')
 
+    @php
+        $isPetugasRole = auth()->check() && auth()->user()->isPetugas();
+    @endphp
+
     <main class="dashboard-content">
         <div class="breadcrumb">
             <a href="{{ url('/') }}"><i class="fas fa-home"></i> Home</a>
@@ -270,16 +274,22 @@
         <div class="settings-grid">
             <!-- Settings Sidebar -->
             <div class="settings-sidebar" id="settingsSidebar">
-                <a class="nav-item active" data-panel="tema"><i class="fas fa-palette"></i> Tema & Warna</a>
-                <a class="nav-item" data-panel="log-petugas"><i class="fas fa-user-check"></i> Log Petugas Lapangan</a>
-                <a class="nav-item" data-panel="log-admin"><i class="fas fa-user-shield"></i> Log Aktivitas Admin</a>
+                @if(!$isPetugasRole)
+                    <a class="nav-item {{ session('active_tab') == 'password' || $errors->has('current_password') || $errors->has('password') || session('success_password') ? '' : 'active' }}" data-panel="tema"><i class="fas fa-palette"></i> Tema & Warna</a>
+                @endif
+                <a class="nav-item {{ $isPetugasRole || session('active_tab') == 'password' || $errors->has('current_password') || $errors->has('password') || session('success_password') ? 'active' : '' }}" data-panel="password"><i class="fas fa-lock"></i> Ubah Password</a>
+                @if(!$isPetugasRole)
+                    <a class="nav-item" data-panel="log-petugas"><i class="fas fa-user-check"></i> Log Petugas Lapangan</a>
+                    <a class="nav-item" data-panel="log-admin"><i class="fas fa-user-shield"></i> Log Aktivitas Admin</a>
+                @endif
             </div>
 
             <!-- Settings Content -->
             <div class="settings-content">
 
+                @if(!$isPetugasRole)
                 <!-- PANEL: TEMA & WARNA (FEATURED TEMA DINAMIS) -->
-                <div class="settings-panel active" id="panel-tema">
+                <div class="settings-panel {{ session('active_tab') == 'password' || $errors->has('current_password') || $errors->has('password') || session('success_password') ? '' : 'active' }}" id="panel-tema">
                     <div class="panel-header">
                         <div>
                             <h3><i class="fas fa-palette" style="color:var(--primary);margin-right:10px;"></i>Pengaturan Tema & Warna Sistem</h3>
@@ -378,7 +388,85 @@
                         </div>
                     </div>
                 </div>
+                @endif
 
+                <!-- PANEL: UBAH PASSWORD AKUN -->
+                <div class="settings-panel {{ $isPetugasRole || session('active_tab') == 'password' || $errors->has('current_password') || $errors->has('password') || session('success_password') ? 'active' : '' }}" id="panel-password">
+                    <div class="panel-header">
+                        <div>
+                            <h3><i class="fas fa-lock" style="color:var(--primary);margin-right:10px;"></i>Ubah Password Akun</h3>
+                            <p>Perbarui kata sandi akun Anda secara berkala untuk menjaga keamanan data survei &amp; sistem BSPS Verval.</p>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        @if(session('success_password'))
+                            <div style="background: rgba(39, 174, 96, 0.1); border: 1px solid rgba(39, 174, 96, 0.3); color: #27ae60; padding: 14px 18px; border-radius: var(--radius-sm); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px;">
+                                <i class="fas fa-check-circle" style="font-size: 18px;"></i>
+                                <span>{{ session('success_password') }}</span>
+                            </div>
+                        @endif
+
+                        @if($errors->any())
+                            <div style="background: rgba(231, 76, 60, 0.1); border: 1px solid rgba(231, 76, 60, 0.3); color: #e74c3c; padding: 14px 18px; border-radius: var(--radius-sm); margin-bottom: 20px; display: flex; flex-direction: column; gap: 6px; font-size: 13.5px;">
+                                <div style="display: flex; align-items: center; gap: 10px; font-weight: 700;">
+                                    <i class="fas fa-exclamation-circle" style="font-size: 16px;"></i>
+                                    <span>Terjadi Kesalahan:</span>
+                                </div>
+                                <ul style="margin: 0; padding-left: 28px;">
+                                    @foreach($errors->all() as $err)
+                                        <li>{{ $err }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
+                        <form action="{{ route('setting.update-password') }}" method="POST">
+                            @csrf
+                            @method('PUT')
+
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label for="current_password"><i class="fas fa-key" style="color:var(--primary);margin-right:6px;"></i>Password Saat Ini</label>
+                                <div style="position: relative;">
+                                    <input type="password" id="current_password" name="current_password" class="form-control" placeholder="Masukkan password saat ini..." required style="padding-right: 40px;">
+                                    <button type="button" onclick="togglePasswordVisibility('current_password', this)" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer;">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                <div class="help-text">Verifikasi kata sandi lama Anda demi keamanan akun.</div>
+                            </div>
+
+                            <div class="form-row" style="margin-bottom: 20px;">
+                                <div class="form-group">
+                                    <label for="password"><i class="fas fa-lock" style="color:var(--primary);margin-right:6px;"></i>Password Baru</label>
+                                    <div style="position: relative;">
+                                        <input type="password" id="password" name="password" class="form-control" placeholder="Minimal 6 karakter..." required style="padding-right: 40px;">
+                                        <button type="button" onclick="togglePasswordVisibility('password', this)" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer;">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    <div class="help-text">Minimal 6 karakter.</div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="password_confirmation"><i class="fas fa-shield-alt" style="color:var(--primary);margin-right:6px;"></i>Konfirmasi Password Baru</label>
+                                    <div style="position: relative;">
+                                        <input type="password" id="password_confirmation" name="password_confirmation" class="form-control" placeholder="Ulangi password baru..." required style="padding-right: 40px;">
+                                        <button type="button" onclick="togglePasswordVisibility('password_confirmation', this)" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer;">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    <div class="help-text">Harus sama persis dengan password baru.</div>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Simpan Password Baru</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                @if(!$isPetugasRole)
                 <!-- PANEL 1: LOG AKTIVITAS PETUGAS LAPANGAN -->
                 <div class="settings-panel" id="panel-log-petugas">
                     <div class="panel-header">
@@ -442,61 +530,36 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse($adminLogUsers as $idx => $u)
-                                        <tr style="border-bottom:1px solid rgba(0,40,85,0.04);">
-                                            <td style="padding:14px 18px;">{{ $idx + 1 }}</td>
+                                    @forelse($adminLogUsers as $index => $u)
+                                        <tr style="border-bottom:1px solid rgba(0,40,85,0.05);">
+                                            <td style="padding:14px 18px;font-weight:600;">{{ $index + 1 }}</td>
                                             <td style="padding:14px 18px;">
                                                 <div style="font-weight:700;color:var(--primary-dark);">{{ $u->name }}</div>
                                                 <div style="font-size:11.5px;color:var(--text-muted);">{{ $u->email }}</div>
-                                                <div style="margin-top:4px;">
-                                                    @if($u->role === 'admin')
-                                                        <span class="badge-status" style="background:rgba(0,40,85,0.12);color:var(--primary);font-size:10px;padding:2px 8px;">
-                                                            <i class="fas fa-shield-halved"></i> Admin
-                                                        </span>
-                                                    @else
-                                                        <span class="badge-status" style="background:rgba(255,184,0,0.15);color:#d69e00;font-size:10px;padding:2px 8px;">
-                                                            <i class="fas fa-user-hard-hat"></i> Petugas
-                                                        </span>
-                                                    @endif
-                                                </div>
+                                                <span style="display:inline-block;margin-top:4px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:{{ $u->isPetugas() ? 'rgba(39,174,96,0.15)' : 'rgba(0,40,85,0.1)' }};color:{{ $u->isPetugas() ? 'var(--success)' : 'var(--primary)' }};">
+                                                    {{ strtoupper($u->role ?: 'USER') }}
+                                                </span>
                                             </td>
                                             <td style="padding:14px 18px;">
                                                 @if($u->last_location_at)
-                                                    <div style="font-weight:600;color:var(--text-primary);">
-                                                        <i class="fas fa-clock" style="font-size:11px;color:var(--primary);margin-right:4px;"></i>
-                                                        {{ $u->last_location_at->format('d M Y H:i') }}
-                                                    </div>
-                                                    <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">
-                                                        ({{ $u->last_location_at->diffForHumans() }})
-                                                    </div>
-                                                @else
-                                                    <span style="color:var(--text-muted);font-style:italic;">Belum ada log</span>
-                                                @endif
-                                            </td>
-                                            <td style="padding:14px 18px;">
-                                                @if($u->last_ip)
-                                                    <span style="font-family:monospace;font-size:12px;font-weight:700;background:rgba(0,40,85,0.06);padding:3px 8px;border-radius:4px;color:var(--primary-dark);">
-                                                        <i class="fas fa-network-wired" style="font-size:10px;margin-right:4px;"></i>{{ $u->last_ip }}
-                                                    </span>
+                                                    <div style="font-weight:600;">{{ $u->last_location_at->format('d M Y H:i') }}</div>
+                                                    <div style="font-size:11px;color:var(--text-muted);">{{ $u->last_location_at->diffForHumans() }}</div>
                                                 @else
                                                     <span style="color:var(--text-muted);">-</span>
                                                 @endif
                                             </td>
+                                            <td style="padding:14px 18px;font-family:monospace;font-weight:600;">
+                                                {{ $u->last_ip ?: '-' }}
+                                            </td>
                                             <td style="padding:14px 18px;">
-                                                <div style="font-weight:600;color:var(--text-primary);">
-                                                    <i class="fas {{ str_contains(strtolower($u->device_type ?? ''), 'mobile') ? 'fa-mobile-screen-button' : 'fa-laptop' }}" style="color:var(--primary);margin-right:6px;"></i>
-                                                    {{ $u->device_type ?? 'Desktop / Web' }}
-                                                </div>
-                                                <div style="font-size:11px;color:var(--text-muted);margin-top:2px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="{{ $u->user_agent }}">
-                                                    {{ $u->user_agent ?? '-' }}
-                                                </div>
+                                                <i class="fas {{ str_contains(strtolower($u->user_agent ?? ''), 'mobile') ? 'fa-mobile-alt' : 'fa-desktop' }}" style="margin-right:6px;color:var(--primary);"></i>
+                                                {{ $u->device_type ?: 'Desktop / Web' }}
                                             </td>
                                             <td style="padding:14px 18px;">
                                                 @if($u->latitude && $u->longitude)
-                                                    <div style="font-weight:600;color:var(--primary-dark);">
-                                                        <i class="fas fa-location-dot" style="color:var(--danger);font-size:11px;margin-right:4px;"></i>
-                                                        Kec. {{ ucwords(str_replace('_', ' ', $u->kecamatan ?? 'Jember')) }}
-                                                    </div>
+                                                    <a href="https://maps.google.com/?q={{ $u->latitude }},{{ $u->longitude }}" target="_blank" style="color:var(--primary);font-weight:600;text-decoration:none;">
+                                                        <i class="fas fa-map-marker-alt" style="color:var(--danger);margin-right:4px;"></i> Lihat di Map
+                                                    </a>
                                                     <div style="font-family:monospace;font-size:11px;color:var(--text-muted);margin-top:2px;">
                                                         {{ number_format((float)$u->latitude, 4) }}, {{ number_format((float)$u->longitude, 4) }}
                                                     </div>
@@ -518,6 +581,7 @@
                         </div>
                     </div>
                 </div>
+                @endif
 
             </div>
         </div>
@@ -607,5 +671,21 @@
             });
         }
     });
+
+    function togglePasswordVisibility(inputId, btn) {
+        const input = document.getElementById(inputId);
+        const icon = btn.querySelector('i');
+        if (!input || !icon) return;
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
 </script>
 @endpush

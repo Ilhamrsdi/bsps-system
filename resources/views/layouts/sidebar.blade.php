@@ -51,6 +51,10 @@
             </a>
 
             <div class="menu-label" style="margin-top:16px;">Akun</div>
+            <a class="menu-item {{ Request::is('setting*') ? 'active' : '' }}" href="{{ url('/setting') }}">
+                <i class="fas fa-cog"></i>
+                Pengaturan
+            </a>
             <a class="menu-item" style="color:var(--danger,#e74c3c);" href="javascript:void(0)" onclick="window.PuprModal.open('modalLogoutConfirmation')">
                 <i class="fas fa-sign-out-alt"></i>
                 Logout
