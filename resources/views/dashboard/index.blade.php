@@ -135,6 +135,7 @@
         grid-template-columns: 1.4fr 1fr;
         gap: 20px;
         margin-bottom: 24px;
+        align-items: start;
     }
 
     .card-panel {
@@ -1164,26 +1165,26 @@
 
         <!-- Leaderboard & Demographic Split Grid -->
         <div class="dashboard-split-grid">
-            <!-- Left: Top 10 Kecamatan Leaderboard based on Capaian Layak -->
+            <!-- Left: Seluruh 31 Kecamatan Leaderboard based on Capaian Layak -->
             <div class="card-panel">
                 <div class="panel-header">
                     <div>
-                        <h3 style="margin: 0 0 2px 0;"><i class="fas fa-ranking-star" style="color:#d69e00;"></i> Peringkat 10 Kecamatan Capaian Layak</h3>
-                        <span style="font-size:11.5px;color:var(--text-muted);">Diurutkan dari total calon penerima yang Layak Diusulkan</span>
+                        <h3 style="margin: 0 0 2px 0;"><i class="fas fa-ranking-star" style="color:#d69e00;"></i> Peringkat Capaian Seluruh Kecamatan</h3>
+                        <span style="font-size:11.5px;color:var(--text-muted);">Diurutkan dari total calon penerima yang Layak Diusulkan di 31 Kecamatan</span>
                     </div>
                     <span style="font-size:11px;font-weight:800;background:rgba(39,174,96,0.1);color:#15803d;padding:3px 8px;border-radius:6px;border:1px solid #86efac;">
-                        Hasil Verval
+                        {{ $allKecamatanCapaian->count() }} Kecamatan
                     </span>
                 </div>
                 <div class="panel-body">
                     <div class="kecamatan-list">
                         @php
-                            $maxLayakVal = $topKecamatanCapaian->max('total_layak') ?: 1;
+                            $maxLayakVal = $allKecamatanCapaian->max('total_layak') ?: 1;
                         @endphp
-                        @foreach($topKecamatanCapaian as $idx => $kec)
+                        @foreach($allKecamatanCapaian as $idx => $kec)
                             @php
                                 $rank = $idx + 1;
-                                $layakPct = round(($kec->total_layak / $maxLayakVal) * 100);
+                                $layakPct = $maxLayakVal > 0 ? round(($kec->total_layak / $maxLayakVal) * 100) : 0;
                                 $tidakPct = $kec->total_sudah > 0 ? round(($kec->total_tidak_layak / max(1, $kec->total_sudah)) * $layakPct) : 0;
                             @endphp
                             <a href="{{ url('/dashboard-kecamatan?kecamatan=' . urlencode($kec->kecamatan)) }}" class="kecamatan-item" style="text-decoration: none; color: inherit; transition: var(--transition);" title="Buka Dashboard Kecamatan {{ $kec->kecamatan }}">
@@ -1214,8 +1215,8 @@
                 </div>
             </div>
 
-            <!-- Right: Demografi & Top Desa -->
-            <div>
+            <!-- Right: Demografi & Top Desa (Sticky Floating on Scroll) -->
+            <div style="position: sticky; top: 85px; z-index: 5;">
                 <!-- Demografi Kepala Keluarga (Gender) -->
                 <div class="card-panel" style="margin-bottom:20px;">
                     <div class="panel-header">

@@ -182,13 +182,13 @@ class DashboardController extends Controller
             ];
         });
 
-        // 9. Ranking Kecamatan Berdasarkan Capaian Layak Terbanyak
+        // 9. Ranking Kecamatan Berdasarkan Capaian Layak Terbanyak (Seluruh 31 Kecamatan)
         $rankingKecamatan = $rekapPerKecamatan->sortByDesc(function ($item) {
             return ($item->total_layak * 1000000) + $item->total_sudah;
         })->values();
 
         $top1KecamatanCapaian = $rankingKecamatan->first();
-        $topKecamatanCapaian = $rankingKecamatan->take(10);
+        $allKecamatanCapaian = $rankingKecamatan;
 
         return view('dashboard.index', compact(
             'totalPenerima',
@@ -210,7 +210,7 @@ class DashboardController extends Controller
             'rekapPerKecamatan',
             'rankingKecamatan',
             'top1KecamatanCapaian',
-            'topKecamatanCapaian'
+            'allKecamatanCapaian'
         ));
     }
 
