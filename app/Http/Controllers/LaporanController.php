@@ -440,40 +440,42 @@ class LaporanController extends Controller
         $default = ['url' => null, 'file_uri' => null, 'base64' => null];
         if (empty($path)) return $default;
 
-        $cleanPath = ltrim($path, '/');
-        if (!str_starts_with($cleanPath, 'uploads/')) {
-            $cleanPath = 'uploads/' . $cleanPath;
-        }
+        $cleanPath = ltrim(str_replace('\\', '/', $path), '/');
+        $baseName  = basename($cleanPath);
 
         $possiblePaths = [
-            public_path($cleanPath),
-            base_path($cleanPath),
-            storage_path('app/public/' . $cleanPath),
-            storage_path('app/' . $cleanPath),
+            public_path($cleanPath) => $cleanPath,
+            public_path('uploads/' . $baseName) => 'uploads/' . $baseName,
+            storage_path('app/public/' . $cleanPath) => 'storage/' . $cleanPath,
+            storage_path('app/public/uploads/' . $baseName) => 'storage/uploads/' . $baseName,
+            base_path($cleanPath) => $cleanPath,
         ];
 
-        $foundPath = null;
-        foreach ($possiblePaths as $p) {
-            if (file_exists($p) && !is_dir($p)) {
-                $foundPath = $p;
+        $foundDiskPath = null;
+        $foundRelativeUrl = null;
+
+        foreach ($possiblePaths as $diskPath => $relUrl) {
+            if (file_exists($diskPath) && !is_dir($diskPath)) {
+                $foundDiskPath = $diskPath;
+                $foundRelativeUrl = $relUrl;
                 break;
             }
         }
 
-        if (!$foundPath) {
+        if (!$foundDiskPath) {
             return $default;
         }
 
-        // 1. Full HTTP URL untuk server web / Excel online
-        $httpUrl = url($cleanPath);
+        // 1. Full HTTP URL untuk server web / Excel
+        $httpUrl = url($foundRelativeUrl);
 
         // 2. Absolute file:// URI untuk Excel lokal
-        $fileUri = 'file:///' . str_replace('\\', '/', $foundPath);
+        $fileUri = 'file:///' . str_replace('\\', '/', $foundDiskPath);
 
         // 3. Base64
-        $ext = strtolower(pathinfo($foundPath, PATHINFO_EXTENSION));
+        $ext = strtolower(pathinfo($foundDiskPath, PATHINFO_EXTENSION));
         $mime = $ext === 'png' ? 'image/png' : ($ext === 'webp' ? 'image/webp' : 'image/jpeg');
-        $data = @file_get_contents($foundPath);
+        $data = @file_get_contents($foundDiskPath);
         $base64 = $data ? 'data:' . $mime . ';base64,' . base64_encode($data) : null;
 
         return [
