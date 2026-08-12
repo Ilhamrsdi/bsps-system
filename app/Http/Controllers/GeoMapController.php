@@ -88,7 +88,7 @@ class GeoMapController extends Controller
                 'statusLabel' => $statusLabel,
                 'color'       => $color,
                 'petugas'     => $petugasNama,
-                'tanggal'     => $item->updated_at ? $item->updated_at->translatedFormat('d M Y, H:i') : '-',
+                'tanggal'     => $item->updated_at ? $item->updated_at->setTimezone('Asia/Jakarta')->translatedFormat('d M Y, H:i') . ' WIB' : '-',
                 'foto'        => $fotoUrl,
                 'desil'       => $item->pengelompokan_desil ?: '-',
                 'bap_id'      => $item->id,
