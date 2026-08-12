@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\DataPenerima;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -119,6 +120,17 @@ class LaporanController extends Controller
         }
         $listDesa = $desaQuery->orderBy('desa_kelurahan', 'asc')->pluck('desa_kelurahan')->filter()->values();
 
+        // Mapping Seluruh Desa per Kecamatan untuk Modal Cetak PDF
+        $allDesaByKecamatan = DataPenerima::select('kecamatan', 'desa_kelurahan')
+            ->distinct()
+            ->orderBy('kecamatan', 'asc')
+            ->orderBy('desa_kelurahan', 'asc')
+            ->get()
+            ->groupBy('kecamatan')
+            ->map(function ($items) {
+                return $items->pluck('desa_kelurahan')->values();
+            });
+
         // 3. AGREGASI BERDASARKAN TAB
         $rekapDesaKecamatan = null;
         $rekapIndikator = null;
@@ -205,6 +217,7 @@ class LaporanController extends Controller
             'indTotals',
             'listKecamatan',
             'listDesa',
+            'allDesaByKecamatan',
             'rekapDesaKecamatan',
             'rekapIndikator',
             'penerimaList',
@@ -387,6 +400,121 @@ class LaporanController extends Controller
             'Cache-Control'       => 'must-revalidate, post-check=0, pre-check=0',
             'Expires'             => '0',
         ]);
+    }
+
+    /**
+     * Export / Cetak Laporan Resmi per Desa dalam Format PDF Ukuran F4 (Folio)
+     */
+    public function exportPdfDesa(Request $request)
+    {
+        $user = Auth::user();
+        $kecamatan = $request->get('kecamatan');
+        $desa = $request->get('desa');
+        $mode = $request->get('mode', 'stream'); // stream (buka di browser) atau download
+
+        if ($user && $user->isAdminKecamatan()) {
+            $kecamatan = $user->kecamatan;
+        }
+
+        if (!$kecamatan || $kecamatan === 'all') {
+            $firstRecord = DataPenerima::first();
+            $kecamatan = $firstRecord ? $firstRecord->kecamatan : 'AJUNG';
+        }
+
+        if (!$desa || $desa === 'all') {
+            $firstDesaRecord = DataPenerima::where('kecamatan', $kecamatan)->first();
+            $desa = $firstDesaRecord ? $firstDesaRecord->desa_kelurahan : '';
+        }
+
+        $query = DataPenerima::where('kecamatan', $kecamatan);
+        if ($desa && $desa !== 'all') {
+            $query->where('desa_kelurahan', $desa);
+        }
+
+        $penerimaList = (clone $query)->orderBy('nama', 'asc')->get();
+
+        $totalPenerima = $penerimaList->count();
+        $sudahSurvei = $penerimaList->filter(function($p) {
+            return !empty($p->foto_sudut_depan);
+        })->count();
+        $belumSurvei = max(0, $totalPenerima - $sudahSurvei);
+        $totalLayak = $penerimaList->where('status_kelayakan', 'Layak Diusulkan')->count();
+        $totalTidakLayak = $penerimaList->where('status_kelayakan', 'Tidak Layak Diusulkan')->count();
+
+        // Persentase Layak & Tidak Layak dari data yang disurvei
+        $persenLayak = $sudahSurvei > 0 ? round(($totalLayak / $sudahSurvei) * 100, 1) : 0;
+        $persenTidakLayak = $sudahSurvei > 0 ? round(($totalTidakLayak / $sudahSurvei) * 100, 1) : 0;
+        $persenSurvei = $totalPenerima > 0 ? round(($sudahSurvei / $totalPenerima) * 100, 1) : 0;
+
+        // Capaian Indikator di Desa
+        $indAtap = $penerimaList->where('indikator_atap', 'tidak_ada')->count();
+        $indDinding = $penerimaList->where('indikator_dinding', 'tidak_ada')->count();
+        $indLantai = $penerimaList->where('indikator_lantai', 'tidak_ada')->count();
+        $indPondasi = $penerimaList->where('indikator_pondasi', 'tidak_ada')->count();
+        $indStruktur = $penerimaList->where('indikator_struktur', 'tidak_ada')->count();
+        $indPenghasilan = $penerimaList->where('indikator_penghasilan', 'ada')->count();
+
+        $stats = [
+            'total' => $totalPenerima,
+            'sudah' => $sudahSurvei,
+            'belum' => $belumSurvei,
+            'layak' => $totalLayak,
+            'tidak_layak' => $totalTidakLayak,
+            'persen_layak' => $persenLayak,
+            'persen_tidak_layak' => $persenTidakLayak,
+            'persen_survei' => $persenSurvei,
+            'atap' => $indAtap,
+            'dinding' => $indDinding,
+            'lantai' => $indLantai,
+            'pondasi' => $indPondasi,
+            'struktur' => $indStruktur,
+            'penghasilan' => $indPenghasilan,
+        ];
+
+        $logoPath = public_path('logo.jpg');
+        $logoBase64 = file_exists($logoPath) ? 'data:image/jpeg;base64,' . base64_encode(file_get_contents($logoPath)) : '';
+
+        // Ambil Data Kepala Desa dari DB
+        $kades = null;
+        if ($desa && $desa !== 'all') {
+            $kades = \App\Models\KepalaDesa::whereRaw('LOWER(kecamatan) = ?', [strtolower($kecamatan)])
+                ->whereRaw('LOWER(desa_kelurahan) = ?', [strtolower($desa)])
+                ->first();
+        }
+
+        // Ambil Data Petugas Survei Desa dari DB
+        $petugas = null;
+        if ($desa && $desa !== 'all') {
+            $petugas = \App\Models\User::where('role', 'petugas')
+                ->whereRaw('LOWER(kecamatan) = ?', [strtolower($kecamatan)])
+                ->whereRaw('LOWER(desa) = ?', [strtolower($desa)])
+                ->first();
+        }
+        if (!$petugas) {
+            $firstWithPetugas = $penerimaList->first(function($p) { return !empty($p->user_id) && $p->petugas; });
+            if ($firstWithPetugas) {
+                $petugas = $firstWithPetugas->petugas;
+            }
+        }
+
+        // Ukuran Kertas F4 (Folio) Portrait: 215mm x 330mm = 609.45pt x 935.43pt
+        $pdf = Pdf::loadView('laporan.pdf_desa', compact(
+            'kecamatan',
+            'desa',
+            'penerimaList',
+            'stats',
+            'logoBase64',
+            'kades',
+            'petugas'
+        ))->setPaper([0, 0, 609.45, 935.43], 'portrait');
+
+        $filename = 'Laporan_BSPS_Desa_' . strtolower(str_replace([' ', '/', '\\'], '_', $desa ?: 'semua')) . '_Kec_' . strtolower(str_replace([' ', '/', '\\'], '_', $kecamatan)) . '.pdf';
+
+        if ($mode === 'download') {
+            return $pdf->download($filename);
+        }
+
+        return $pdf->stream($filename);
     }
 
     /**

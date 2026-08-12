@@ -251,6 +251,7 @@ Route::middleware(['auth'])->group(function () {
     // Rekapitulasi Laporan
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan');
     Route::get('/laporan/export', [LaporanController::class, 'exportExcel'])->name('laporan.export');
+    Route::get('/laporan/pdf-desa', [LaporanController::class, 'exportPdfDesa'])->name('laporan.pdf_desa');
     Route::get('/laporan/cetak', [LaporanController::class, 'cetak'])->name('laporan.cetak');
 
     // Pengaturan System & Tema
