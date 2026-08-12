@@ -115,20 +115,30 @@
 
     // Auto-trigger loading overlay on form submits & pagination links
     document.addEventListener('DOMContentLoaded', function() {
-        // Auto-show loading on filter forms (Hanya jika sedang online dan form tidak dicegah)
+        // Auto-show loading on filter forms (Kecuali form export / file download / target=_blank)
         document.querySelectorAll('form.filter-section, form[method="GET"]').forEach(form => {
             form.addEventListener('submit', function(e) {
                 if (!navigator.onLine || e.defaultPrevented) {
                     return;
                 }
+                const action = (form.getAttribute('action') || '').toLowerCase();
+                const target = (form.getAttribute('target') || '').toLowerCase();
+                const noLoading = form.hasAttribute('data-no-loading') || form.getAttribute('data-no-loading') === 'true';
+
+                if (noLoading || target === '_blank' || action.includes('export') || action.includes('download') || action.includes('cetak')) {
+                    return;
+                }
+
                 window.PuprLoading.show('Memuat Hasil Pencarian...');
             });
         });
 
         // Auto-show loading on pagination link clicks
-        document.querySelectorAll('.pagination a, .pg-link:not(.disabled):not(.active)').forEach(link => {
-            link.addEventListener('click', function() {
-                if (!navigator.onLine) return;
+        document.querySelectorAll('.pagination a, .pg-link:not(.disabled):not(.active), .page-btn:not(.disabled):not(.active)').forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (!navigator.onLine || e.defaultPrevented) return;
+                const href = link.getAttribute('href');
+                if (!href || href === '#' || href.startsWith('javascript:')) return;
                 window.PuprLoading.show('Membuka Halaman...');
             });
         });

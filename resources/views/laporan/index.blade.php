@@ -73,7 +73,7 @@
         gap: 8px;
     }
     .laporan-tab-item:hover { background: rgba(0, 40, 85, 0.05); color: #002855; }
-    .laporan-tab-item.active { background: #002855; color: #ffffff; font-weight: 700; shadow: 0 3px 10px rgba(0,40,85,0.2); }
+    .laporan-tab-item.active { background: #002855; color: #ffffff; font-weight: 700; box-shadow: 0 3px 10px rgba(0,40,85,0.2); }
 
     /* Filter Form PUPR Layout */
     .filter-card {
@@ -92,7 +92,7 @@
     }
     .filter-item {
         flex: 1;
-        min-width: 180px;
+        min-width: 170px;
     }
     .filter-item input, .filter-item select {
         width: 100%;
@@ -176,7 +176,7 @@
     .badge-status.info { background: rgba(0, 40, 85, 0.1); color: #002855; }
 
     .progress-bar-mini {
-        width: 100px;
+        width: 90px;
         height: 6px;
         background: #e2e8f0;
         border-radius: 4px;
@@ -308,6 +308,132 @@
         object-fit: contain;
     }
 
+    /* Custom Pagination Styling */
+    .pagination-custom-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 24px;
+        background: #ffffff;
+        border-top: 1px solid #e2e8f0;
+        flex-wrap: wrap;
+        gap: 14px;
+    }
+    .pagination-info-text {
+        font-size: 13px;
+        color: #64748b;
+        font-weight: 500;
+    }
+    .pagination-info-text strong {
+        color: #002855;
+        font-weight: 700;
+    }
+    .pagination-nav {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .page-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 34px;
+        height: 34px;
+        padding: 0 10px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #475569;
+        background: #f8fafc;
+        border: 1px solid #cbd5e1;
+        text-decoration: none;
+        transition: all 0.15s ease;
+    }
+    .page-btn:hover:not(.disabled):not(.active) {
+        background: #002855;
+        color: #ffffff;
+        border-color: #002855;
+    }
+    .page-btn.active {
+        background: #002855;
+        color: #ffffff;
+        border-color: #002855;
+        font-weight: 800;
+        box-shadow: 0 2px 6px rgba(0, 40, 85, 0.25);
+    }
+    .page-btn.disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+        background: #f1f5f9;
+        border-color: #e2e8f0;
+        color: #94a3b8;
+    }
+    .page-dots {
+        padding: 0 6px;
+        color: #94a3b8;
+        font-weight: 700;
+    }
+
+    /* Button Export Excel PUPR Theme */
+    .btn-export-excel {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, #107c41, #15803d);
+        color: #ffffff !important;
+        padding: 9px 18px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none !important;
+        box-shadow: 0 3px 10px rgba(16, 124, 65, 0.28);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        transition: all 0.2s ease;
+    }
+    .btn-export-excel:hover {
+        background: linear-gradient(135deg, #0e6b37, #166534);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(16, 124, 65, 0.38);
+        color: #ffffff !important;
+    }
+    .btn-export-excel i {
+        font-size: 15px;
+    }
+
+    /* Option Cards inside Export Modal */
+    .export-option-card {
+        display: block;
+        padding: 14px 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        background: #ffffff;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .export-option-card:hover {
+        border-color: #cbd5e1;
+        background: #f8fafc;
+    }
+    .export-option-card.active {
+        border-color: #107c41;
+        background: rgba(16, 124, 65, 0.04);
+        box-shadow: 0 2px 8px rgba(16, 124, 65, 0.12);
+    }
+
+    /* Modal Export Excel Fix Overflow */
+    #modalExportExcel .modal-box {
+        overflow: visible !important;
+    }
+    #modalExportExcel .modal-body {
+        overflow: visible !important;
+    }
+    #modalExportExcel .pupr-dropdown-menu {
+        z-index: 1050 !important;
+    }
+
     /* Responsive adjustments */
     @media (max-width: 1024px) {
         .stats-grid { grid-template-columns: repeat(2, 1fr); }
@@ -315,6 +441,7 @@
     @media (max-width: 640px) {
         .stats-grid { grid-template-columns: 1fr; }
         .filter-grid { flex-direction: column; }
+        .pagination-custom-bar { flex-direction: column; align-items: center; text-align: center; }
     }
 </style>
 @endpush
@@ -364,63 +491,145 @@
 
         <!-- Navigasi Tab Rekapitulasi -->
         <div class="laporan-tabs">
-            <a href="{{ route('laporan', array_merge(request()->query(), ['tab' => 'rekap'])) }}" class="laporan-tab-item {{ $tab === 'rekap' ? 'active' : '' }}">
-                <i class="fas fa-chart-pie"></i> Rekap Sesuai vs Tidak Sesuai (Per Desa/Kec)
+            <a href="{{ route('laporan', array_merge(request()->query(), ['tab' => 'rekap', 'page' => 1])) }}" class="laporan-tab-item {{ $tab === 'rekap' ? 'active' : '' }}">
+                <i class="fas fa-chart-pie"></i> Rekap Sesuai vs Tidak Sesuai (Per Desa)
             </a>
-            <a href="{{ route('laporan', array_merge(request()->query(), ['tab' => 'indikator'])) }}" class="laporan-tab-item {{ $tab === 'indikator' ? 'active' : '' }}">
-                <i class="fas fa-sliders"></i> Capaian Indikator RTLH
+            <a href="{{ route('laporan', array_merge(request()->query(), ['tab' => 'indikator', 'page' => 1])) }}" class="laporan-tab-item {{ $tab === 'indikator' ? 'active' : '' }}">
+                <i class="fas fa-sliders"></i> Capaian 6 Indikator RTLH
             </a>
-            <a href="{{ route('laporan', array_merge(request()->query(), ['tab' => 'galeri'])) }}" class="laporan-tab-item {{ $tab === 'galeri' ? 'active' : '' }}">
+            <a href="{{ route('laporan', array_merge(request()->query(), ['tab' => 'galeri', 'page' => 1])) }}" class="laporan-tab-item {{ $tab === 'galeri' ? 'active' : '' }}">
                 <i class="fas fa-images"></i> Galeri Foto Lapangan
             </a>
-            <a href="{{ route('laporan', array_merge(request()->query(), ['tab' => 'detail'])) }}" class="laporan-tab-item {{ $tab === 'detail' ? 'active' : '' }}">
+            <a href="{{ route('laporan', array_merge(request()->query(), ['tab' => 'detail', 'page' => 1])) }}" class="laporan-tab-item {{ $tab === 'detail' ? 'active' : '' }}">
                 <i class="fas fa-table-list"></i> Detail Data Penerima
             </a>
         </div>
 
         <!-- Filter & Search Section -->
         <div class="filter-card">
-            <form action="{{ route('laporan') }}" method="GET" class="filter-grid">
+            <form action="{{ route('laporan') }}" method="GET" id="formFilterLaporan" class="filter-grid">
                 <input type="hidden" name="tab" value="{{ $tab }}" />
 
                 <div class="filter-item" style="flex:2;min-width:220px;">
                     <div style="position:relative;">
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama penerima, NIK, KK, desa..." />
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama, NIK, KK, desa, kecamatan..." />
                         <i class="fas fa-search" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);color:#94a3b8;"></i>
                     </div>
                 </div>
 
-                {{-- Filter Kecamatan --}}
+                {{-- Filter Kecamatan dengan Custom PUPR Dropdown --}}
                 @if(!auth()->check() || !auth()->user()->isAdminKecamatan())
+                @php
+                    $selectedKec = request('kecamatan', 'all');
+                @endphp
                 <div class="filter-item">
-                    <select name="kecamatan" onchange="this.form.submit()">
-                        <option value="all">-- Semua Kecamatan --</option>
-                        @foreach($listKecamatan as $kec)
-                            <option value="{{ $kec }}" {{ request('kecamatan') == $kec ? 'selected' : '' }}>Kec. {{ $kec }}</option>
-                        @endforeach
-                    </select>
+                    <input type="hidden" name="kecamatan" id="filterKecamatan" value="{{ $selectedKec }}" />
+                    <div class="pupr-dropdown-wrapper" id="ddKecamatanWrapper" style="width:100%;">
+                        <button type="button" class="pupr-dropdown-toggle" style="width:100%;" onclick="window.PuprDropdown.toggle(document.getElementById('ddKecamatanWrapper'))">
+                            <span style="display:flex;align-items:center;gap:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                <i class="fas fa-building-flag" style="font-size:12px;opacity:0.6;"></i>
+                                <span class="selected-label">
+                                    {{ $selectedKec && $selectedKec !== 'all' ? 'Kec. ' . ucwords(strtolower($selectedKec)) : '-- Semua Kecamatan --' }}
+                                </span>
+                            </span>
+                            <i class="fas fa-chevron-down" style="font-size:10px;opacity:0.5;"></i>
+                        </button>
+                        <div class="pupr-dropdown-menu" style="min-width:220px;max-height:300px;overflow-y:auto;width:100%;">
+                            <div class="pupr-dropdown-item {{ (!request('kecamatan') || request('kecamatan') === 'all') ? 'active' : '' }}"
+                                 onclick="selectDropdown('filterKecamatan', 'ddKecamatanWrapper', 'all', '-- Semua Kecamatan --', 'formFilterLaporan')">
+                                <i class="fas fa-layer-group" style="font-size:11px;opacity:0.5;"></i> -- Semua Kecamatan --
+                            </div>
+                            @foreach($listKecamatan as $kec)
+                            <div class="pupr-dropdown-item {{ request('kecamatan') === $kec ? 'active' : '' }}"
+                                 onclick="selectDropdown('filterKecamatan', 'ddKecamatanWrapper', '{{ $kec }}', 'Kec. {{ ucwords(strtolower($kec)) }}', 'formFilterLaporan')">
+                                <i class="fas fa-map-pin" style="font-size:11px;opacity:0.5;"></i> Kec. {{ ucwords(strtolower($kec)) }}
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
                 </div>
                 @endif
 
-                {{-- Filter Desa --}}
+                {{-- Filter Status dengan Custom PUPR Dropdown --}}
+                @php
+                    $statusLabels = [
+                        'all' => '-- Semua Status --',
+                        'layak' => 'Hasil Sesuai (Layak)',
+                        'tidak_layak' => 'Hasil Tidak Sesuai',
+                        'sudah' => 'Sudah Survei',
+                        'belum' => 'Belum Survei',
+                    ];
+                    $currentStatusKey = request('status', 'all');
+                @endphp
                 <div class="filter-item">
-                    <select name="desa" onchange="this.form.submit()">
-                        <option value="all">-- Semua Desa / Kelurahan --</option>
-                        @foreach($listDesa as $d)
-                            <option value="{{ $d }}" {{ request('desa') == $d ? 'selected' : '' }}>Desa {{ $d }}</option>
-                        @endforeach
-                    </select>
+                    <input type="hidden" name="status" id="filterStatus" value="{{ $currentStatusKey }}" />
+                    <div class="pupr-dropdown-wrapper" id="ddStatusWrapper" style="width:100%;">
+                        <button type="button" class="pupr-dropdown-toggle" style="width:100%;" onclick="window.PuprDropdown.toggle(document.getElementById('ddStatusWrapper'))">
+                            <span style="display:flex;align-items:center;gap:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                <i class="fas fa-filter" style="font-size:12px;opacity:0.6;"></i>
+                                <span class="selected-label">
+                                    {{ $statusLabels[$currentStatusKey] ?? '-- Semua Status --' }}
+                                </span>
+                            </span>
+                            <i class="fas fa-chevron-down" style="font-size:10px;opacity:0.5;"></i>
+                        </button>
+                        <div class="pupr-dropdown-menu" style="min-width:200px;width:100%;">
+                            <div class="pupr-dropdown-item {{ $currentStatusKey === 'all' ? 'active' : '' }}"
+                                 onclick="selectDropdown('filterStatus', 'ddStatusWrapper', 'all', '-- Semua Status --', 'formFilterLaporan')">
+                                <i class="fas fa-list" style="font-size:11px;opacity:0.5;"></i> -- Semua Status --
+                            </div>
+                            <div class="pupr-dropdown-item {{ $currentStatusKey === 'layak' ? 'active' : '' }}"
+                                 onclick="selectDropdown('filterStatus', 'ddStatusWrapper', 'layak', 'Hasil Sesuai (Layak)', 'formFilterLaporan')">
+                                <i class="fas fa-circle-check" style="font-size:11px;color:#27ae60;"></i> Hasil Sesuai (Layak)
+                            </div>
+                            <div class="pupr-dropdown-item {{ $currentStatusKey === 'tidak_layak' ? 'active' : '' }}"
+                                 onclick="selectDropdown('filterStatus', 'ddStatusWrapper', 'tidak_layak', 'Hasil Tidak Sesuai', 'formFilterLaporan')">
+                                <i class="fas fa-circle-xmark" style="font-size:11px;color:#e74c3c;"></i> Hasil Tidak Sesuai
+                            </div>
+                            <div class="pupr-dropdown-item {{ $currentStatusKey === 'sudah' ? 'active' : '' }}"
+                                 onclick="selectDropdown('filterStatus', 'ddStatusWrapper', 'sudah', 'Sudah Survei', 'formFilterLaporan')">
+                                <i class="fas fa-clipboard-check" style="font-size:11px;color:#002855;"></i> Sudah Survei
+                            </div>
+                            <div class="pupr-dropdown-item {{ $currentStatusKey === 'belum' ? 'active' : '' }}"
+                                 onclick="selectDropdown('filterStatus', 'ddStatusWrapper', 'belum', 'Belum Survei', 'formFilterLaporan')">
+                                <i class="fas fa-clock" style="font-size:11px;color:#d69e00;"></i> Belum Survei
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                {{-- Filter Status --}}
-                <div class="filter-item">
-                    <select name="status" onchange="this.form.submit()">
-                        <option value="all">-- Semua Status --</option>
-                        <option value="layak" {{ request('status') == 'layak' ? 'selected' : '' }}>Hasil Sesuai (Layak)</option>
-                        <option value="tidak_layak" {{ request('status') == 'tidak_layak' ? 'selected' : '' }}>Hasil Tidak Sesuai</option>
-                        <option value="sudah" {{ request('status') == 'sudah' ? 'selected' : '' }}>Sudah Survei</option>
-                        <option value="belum" {{ request('status') == 'belum' ? 'selected' : '' }}>Belum Survei</option>
-                    </select>
+                {{-- Pilihan Per Halaman dengan Custom PUPR Dropdown --}}
+                @php
+                    $perPageLabels = [
+                        '15' => '15 Baris',
+                        '25' => '25 Baris',
+                        '50' => '50 Baris',
+                        '100' => '100 Baris',
+                        'all' => 'Semua Baris',
+                    ];
+                    $currentPerPage = request('per_page', '15');
+                @endphp
+                <div class="filter-item" style="max-width:140px;">
+                    <input type="hidden" name="per_page" id="filterPerPage" value="{{ $currentPerPage }}" />
+                    <div class="pupr-dropdown-wrapper" id="ddPerPageWrapper" style="width:100%;">
+                        <button type="button" class="pupr-dropdown-toggle" style="width:100%;" onclick="window.PuprDropdown.toggle(document.getElementById('ddPerPageWrapper'))">
+                            <span style="display:flex;align-items:center;gap:6px;">
+                                <i class="fas fa-bars-staggered" style="font-size:12px;opacity:0.6;"></i>
+                                <span class="selected-label">
+                                    {{ $perPageLabels[$currentPerPage] ?? '15 Baris' }}
+                                </span>
+                            </span>
+                            <i class="fas fa-chevron-down" style="font-size:10px;opacity:0.5;"></i>
+                        </button>
+                        <div class="pupr-dropdown-menu" style="min-width:150px;width:100%;">
+                            @foreach($perPageLabels as $k => $label)
+                            <div class="pupr-dropdown-item {{ $currentPerPage == $k ? 'active' : '' }}"
+                                 onclick="selectDropdown('filterPerPage', 'ddPerPageWrapper', '{{ $k }}', '{{ $label }}', 'formFilterLaporan')">
+                                <i class="fas fa-list-ol" style="font-size:11px;opacity:0.5;"></i> {{ $label }}
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
                 </div>
 
                 <div style="display:flex;gap:8px;">
@@ -444,13 +653,11 @@
                         <i class="fas fa-table-list" style="color:#8e44ad;margin-right:8px;"></i>Daftar Detail Hasil Verifikasi &amp; Validasi Penerima
                     @endif
                 </h3>
-                <div style="display:flex;gap:8px;">
-                    <a href="{{ route('laporan.export', request()->query()) }}" class="btn btn-success" style="padding:8px 14px;border-radius:8px;font-weight:700;text-decoration:none;">
-                        <i class="fas fa-file-excel"></i> Export Excel (.XLS)
-                    </a>
-                    <a href="{{ route('laporan.cetak', request()->query()) }}" target="_blank" class="btn btn-primary" style="padding:8px 14px;border-radius:8px;font-weight:700;text-decoration:none;">
-                        <i class="fas fa-print"></i> Cetak Laporan Resmi
-                    </a>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <button type="button" class="btn-export-excel" onclick="window.PuprModal.open('modalExportExcel')" title="Pilih opsi dan download data ke format Microsoft Excel" style="cursor:pointer;border:none;">
+                        <i class="fas fa-file-excel"></i>
+                        <span>Export Excel (.XLS)</span>
+                    </button>
                 </div>
             </div>
 
@@ -466,29 +673,21 @@
                                 <th style="text-align:center;">Total Target</th>
                                 <th style="text-align:center;">Sudah Survei</th>
                                 <th style="text-align:center;">Belum Survei</th>
-                                 <th style="text-align:center;">Hasil Sesuai (Layak)</th>
+                                <th style="text-align:center;">Hasil Sesuai (Layak)</th>
                                 <th style="text-align:center;">Hasil Tidak Sesuai</th>
                                 <th style="text-align:center;min-width:130px;">% Progres Survei</th>
                                 <th style="text-align:center;min-width:140px;">% Kesesuaian Hasil</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @php
-                                $sumTotal = 0; $sumSudah = 0; $sumBelum = 0; $sumLayak = 0; $sumTidakLayak = 0;
-                            @endphp
                             @forelse($rekapDesaKecamatan as $index => $row)
                                 @php
                                     $belumSurvei = max(0, $row->total_penerima - $row->total_sudah_survei);
                                     $pctSurvei = $row->total_penerima > 0 ? round(($row->total_sudah_survei / $row->total_penerima) * 100, 1) : 0;
                                     $pctKesesuaian = $row->total_sudah_survei > 0 ? round(($row->total_layak / $row->total_sudah_survei) * 100, 1) : 0;
-                                    $sumTotal += $row->total_penerima;
-                                    $sumSudah += $row->total_sudah_survei;
-                                    $sumBelum += $belumSurvei;
-                                    $sumLayak += $row->total_layak;
-                                    $sumTidakLayak += $row->total_tidak_layak;
                                 @endphp
                                 <tr>
-                                    <td style="text-align:center;">{{ $index + 1 }}</td>
+                                    <td style="text-align:center;">{{ $rekapDesaKecamatan->firstItem() + $index }}</td>
                                     <td><strong style="color:#002855;">{{ $row->kecamatan }}</strong></td>
                                     <td><strong style="color:#0f172a;">{{ $row->desa_kelurahan }}</strong></td>
                                     <td style="text-align:center;font-weight:700;">{{ number_format($row->total_penerima) }}</td>
@@ -518,27 +717,92 @@
                                 </tr>
                             @endforelse
                         </tbody>
-                        @if($rekapDesaKecamatan->count() > 0)
+                        @if($rekapDesaKecamatan->total() > 0)
                         <tfoot style="background:#f8fafc;font-weight:800;border-top:2px solid #cbd5e1;">
                             <tr>
-                                <td colspan="3" style="text-align:right;padding:14px;color:#002855;">TOTAL KESELURUHAN:</td>
-                                <td style="text-align:center;color:#002855;">{{ number_format($sumTotal) }}</td>
-                                <td style="text-align:center;color:#002855;">{{ number_format($sumSudah) }}</td>
-                                <td style="text-align:center;color:#b78100;">{{ number_format($sumBelum) }}</td>
-                                <td style="text-align:center;color:#27ae60;">{{ number_format($sumLayak) }}</td>
-                                <td style="text-align:center;color:#e74c3c;">{{ number_format($sumTidakLayak) }}</td>
+                                <td colspan="3" style="text-align:right;padding:14px;color:#002855;">TOTAL KESELURUHAN ({{ $rekapDesaKecamatan->total() }} DESA):</td>
+                                <td style="text-align:center;color:#002855;">{{ number_format($stats['total_penerima']) }}</td>
+                                <td style="text-align:center;color:#002855;">{{ number_format($stats['sudah_survei']) }}</td>
+                                <td style="text-align:center;color:#b78100;">{{ number_format($stats['belum_survei']) }}</td>
+                                <td style="text-align:center;color:#27ae60;">{{ number_format($stats['total_layak']) }}</td>
+                                <td style="text-align:center;color:#e74c3c;">{{ number_format($stats['total_tidak_layak']) }}</td>
                                 <td style="text-align:center;color:#002855;">
-                                    {{ $sumTotal > 0 ? round(($sumSudah / $sumTotal) * 100, 1) : 0 }}%
+                                    {{ $stats['total_penerima'] > 0 ? round(($stats['sudah_survei'] / $stats['total_penerima']) * 100, 1) : 0 }}%
                                 </td>
                                 <td style="text-align:center;color:#27ae60;">
-                                    {{ $sumSudah > 0 ? round(($sumLayak / $sumSudah) * 100, 1) : 0 }}%
+                                    {{ $stats['sudah_survei'] > 0 ? round(($stats['total_layak'] / $stats['sudah_survei']) * 100, 1) : 0 }}%
                                 </td>
-                            </tr>
                             </tr>
                         </tfoot>
                         @endif
                     </table>
                 </div>
+
+                {{-- Pagination Bar Tab 1 --}}
+                @if($rekapDesaKecamatan->hasPages() || $rekapDesaKecamatan->total() > 0)
+                <div class="pagination-custom-bar">
+                    <div class="pagination-info-text">
+                        Menampilkan <strong>{{ $rekapDesaKecamatan->firstItem() ?? 0 }}</strong> -
+                        <strong>{{ $rekapDesaKecamatan->lastItem() ?? 0 }}</strong> dari
+                        <strong>{{ number_format($rekapDesaKecamatan->total(), 0, ',', '.') }}</strong> desa/kelurahan
+                        @if($rekapDesaKecamatan->lastPage() > 1)
+                            (Halaman <strong>{{ $rekapDesaKecamatan->currentPage() }}</strong> dari <strong>{{ $rekapDesaKecamatan->lastPage() }}</strong>)
+                        @endif
+                    </div>
+
+                    @if($rekapDesaKecamatan->lastPage() > 1)
+                        @php
+                            $current = $rekapDesaKecamatan->currentPage();
+                            $last = $rekapDesaKecamatan->lastPage();
+                            $delta = 2;
+                            $left = $current - $delta;
+                            $right = $current + $delta + 1;
+                            $range = [];
+                            for ($i = 1; $i <= $last; $i++) {
+                                if ($i == 1 || $i == $last || ($i >= $left && $i < $right)) {
+                                    $range[] = $i;
+                                }
+                            }
+                            $rangeWithDots = [];
+                            $l = null;
+                            foreach ($range as $i) {
+                                if ($l) {
+                                    if ($i - $l === 2) {
+                                        $rangeWithDots[] = $l + 1;
+                                    } elseif ($i - $l !== 1) {
+                                        $rangeWithDots[] = '...';
+                                    }
+                                }
+                                $rangeWithDots[] = $i;
+                                $l = $i;
+                            }
+                        @endphp
+                        <ul class="pagination-nav">
+                            @if($rekapDesaKecamatan->onFirstPage())
+                                <li><span class="page-btn disabled"><i class="fas fa-chevron-left"></i></span></li>
+                            @else
+                                <li><a href="{{ $rekapDesaKecamatan->previousPageUrl() }}" class="page-btn"><i class="fas fa-chevron-left"></i></a></li>
+                            @endif
+
+                            @foreach($rangeWithDots as $page)
+                                @if($page === '...')
+                                    <li><span class="page-dots">...</span></li>
+                                @elseif($page == $current)
+                                    <li><span class="page-btn active">{{ $page }}</span></li>
+                                @else
+                                    <li><a href="{{ $rekapDesaKecamatan->url($page) }}" class="page-btn">{{ $page }}</a></li>
+                                @endif
+                            @endforeach
+
+                            @if($rekapDesaKecamatan->hasMorePages())
+                                <li><a href="{{ $rekapDesaKecamatan->nextPageUrl() }}" class="page-btn"><i class="fas fa-chevron-right"></i></a></li>
+                            @else
+                                <li><span class="page-btn disabled"><i class="fas fa-chevron-right"></i></span></li>
+                            @endif
+                        </ul>
+                    @endif
+                </div>
+                @endif
 
             @elseif($tab === 'indikator')
                 {{-- TAB 2: CAPAIAN 6 INDIKATOR RTLH PER DESA & KECAMATAN --}}
@@ -561,7 +825,7 @@
                         <tbody>
                             @forelse($rekapIndikator as $index => $row)
                                 <tr>
-                                    <td style="text-align:center;">{{ $index + 1 }}</td>
+                                    <td style="text-align:center;">{{ $rekapIndikator->firstItem() + $index }}</td>
                                     <td><strong style="color:#002855;">{{ $row->kecamatan }}</strong></td>
                                     <td><strong style="color:#0f172a;">{{ $row->desa_kelurahan }}</strong></td>
                                     <td style="text-align:center;font-weight:700;">{{ number_format($row->total_sudah_survei) }}</td>
@@ -575,13 +839,94 @@
                             @empty
                                 <tr>
                                     <td colspan="10" style="text-align:center;padding:40px;color:#94a3b8;">
+                                        <i class="fas fa-inbox" style="font-size:32px;display:block;margin-bottom:10px;opacity:0.4;"></i>
                                         Belum ada data indikator RTLH.
                                     </td>
                                 </tr>
                             @endforelse
                         </tbody>
+                        @if($rekapIndikator->total() > 0 && isset($indTotals))
+                        <tfoot style="background:#f8fafc;font-weight:800;border-top:2px solid #cbd5e1;">
+                            <tr>
+                                <td colspan="3" style="text-align:right;padding:14px;color:#002855;">TOTAL KESELURUHAN ({{ $rekapIndikator->total() }} DESA):</td>
+                                <td style="text-align:center;color:#002855;">{{ number_format($indTotals->total_sudah_survei ?? 0) }}</td>
+                                <td style="text-align:center;color:#e74c3c;">{{ number_format($indTotals->atap_rtlh ?? 0) }}</td>
+                                <td style="text-align:center;color:#e74c3c;">{{ number_format($indTotals->dinding_rtlh ?? 0) }}</td>
+                                <td style="text-align:center;color:#e74c3c;">{{ number_format($indTotals->lantai_rtlh ?? 0) }}</td>
+                                <td style="text-align:center;color:#e74c3c;">{{ number_format($indTotals->pondasi_rtlh ?? 0) }}</td>
+                                <td style="text-align:center;color:#e74c3c;">{{ number_format($indTotals->struktur_rtlh ?? 0) }}</td>
+                                <td style="text-align:center;color:#b78100;">{{ number_format($indTotals->penghasilan_rtlh ?? 0) }}</td>
+                            </tr>
+                        </tfoot>
+                        @endif
                     </table>
                 </div>
+
+                {{-- Pagination Bar Tab 2 --}}
+                @if($rekapIndikator->hasPages() || $rekapIndikator->total() > 0)
+                <div class="pagination-custom-bar">
+                    <div class="pagination-info-text">
+                        Menampilkan <strong>{{ $rekapIndikator->firstItem() ?? 0 }}</strong> -
+                        <strong>{{ $rekapIndikator->lastItem() ?? 0 }}</strong> dari
+                        <strong>{{ number_format($rekapIndikator->total(), 0, ',', '.') }}</strong> desa/kelurahan
+                        @if($rekapIndikator->lastPage() > 1)
+                            (Halaman <strong>{{ $rekapIndikator->currentPage() }}</strong> dari <strong>{{ $rekapIndikator->lastPage() }}</strong>)
+                        @endif
+                    </div>
+
+                    @if($rekapIndikator->lastPage() > 1)
+                        @php
+                            $current = $rekapIndikator->currentPage();
+                            $last = $rekapIndikator->lastPage();
+                            $delta = 2;
+                            $left = $current - $delta;
+                            $right = $current + $delta + 1;
+                            $range = [];
+                            for ($i = 1; $i <= $last; $i++) {
+                                if ($i == 1 || $i == $last || ($i >= $left && $i < $right)) {
+                                    $range[] = $i;
+                                }
+                            }
+                            $rangeWithDots = [];
+                            $l = null;
+                            foreach ($range as $i) {
+                                if ($l) {
+                                    if ($i - $l === 2) {
+                                        $rangeWithDots[] = $l + 1;
+                                    } elseif ($i - $l !== 1) {
+                                        $rangeWithDots[] = '...';
+                                    }
+                                }
+                                $rangeWithDots[] = $i;
+                                $l = $i;
+                            }
+                        @endphp
+                        <ul class="pagination-nav">
+                            @if($rekapIndikator->onFirstPage())
+                                <li><span class="page-btn disabled"><i class="fas fa-chevron-left"></i></span></li>
+                            @else
+                                <li><a href="{{ $rekapIndikator->previousPageUrl() }}" class="page-btn"><i class="fas fa-chevron-left"></i></a></li>
+                            @endif
+
+                            @foreach($rangeWithDots as $page)
+                                @if($page === '...')
+                                    <li><span class="page-dots">...</span></li>
+                                @elseif($page == $current)
+                                    <li><span class="page-btn active">{{ $page }}</span></li>
+                                @else
+                                    <li><a href="{{ $rekapIndikator->url($page) }}" class="page-btn">{{ $page }}</a></li>
+                                @endif
+                            @endforeach
+
+                            @if($rekapIndikator->hasMorePages())
+                                <li><a href="{{ $rekapIndikator->nextPageUrl() }}" class="page-btn"><i class="fas fa-chevron-right"></i></a></li>
+                            @else
+                                <li><span class="page-btn disabled"><i class="fas fa-chevron-right"></i></span></li>
+                            @endif
+                        </ul>
+                    @endif
+                </div>
+                @endif
 
             @elseif($tab === 'galeri')
                 {{-- TAB 3: GALERI & LAMPIRAN FOTO LAPANGAN --}}
@@ -639,9 +984,72 @@
                         </div>
                     @endforelse
                 </div>
-                <div style="padding:16px 24px;">
-                    {{ $penerimaList->links() }}
+
+                {{-- Pagination Bar Tab 3 --}}
+                @if($penerimaList->hasPages() || $penerimaList->total() > 0)
+                <div class="pagination-custom-bar">
+                    <div class="pagination-info-text">
+                        Menampilkan <strong>{{ $penerimaList->firstItem() ?? 0 }}</strong> -
+                        <strong>{{ $penerimaList->lastItem() ?? 0 }}</strong> dari
+                        <strong>{{ number_format($penerimaList->total(), 0, ',', '.') }}</strong> penerima
+                        @if($penerimaList->lastPage() > 1)
+                            (Halaman <strong>{{ $penerimaList->currentPage() }}</strong> dari <strong>{{ $penerimaList->lastPage() }}</strong>)
+                        @endif
+                    </div>
+
+                    @if($penerimaList->lastPage() > 1)
+                        @php
+                            $current = $penerimaList->currentPage();
+                            $last = $penerimaList->lastPage();
+                            $delta = 2;
+                            $left = $current - $delta;
+                            $right = $current + $delta + 1;
+                            $range = [];
+                            for ($i = 1; $i <= $last; $i++) {
+                                if ($i == 1 || $i == $last || ($i >= $left && $i < $right)) {
+                                    $range[] = $i;
+                                }
+                            }
+                            $rangeWithDots = [];
+                            $l = null;
+                            foreach ($range as $i) {
+                                if ($l) {
+                                    if ($i - $l === 2) {
+                                        $rangeWithDots[] = $l + 1;
+                                    } elseif ($i - $l !== 1) {
+                                        $rangeWithDots[] = '...';
+                                    }
+                                }
+                                $rangeWithDots[] = $i;
+                                $l = $i;
+                            }
+                        @endphp
+                        <ul class="pagination-nav">
+                            @if($penerimaList->onFirstPage())
+                                <li><span class="page-btn disabled"><i class="fas fa-chevron-left"></i></span></li>
+                            @else
+                                <li><a href="{{ $penerimaList->previousPageUrl() }}" class="page-btn"><i class="fas fa-chevron-left"></i></a></li>
+                            @endif
+
+                            @foreach($rangeWithDots as $page)
+                                @if($page === '...')
+                                    <li><span class="page-dots">...</span></li>
+                                @elseif($page == $current)
+                                    <li><span class="page-btn active">{{ $page }}</span></li>
+                                @else
+                                    <li><a href="{{ $penerimaList->url($page) }}" class="page-btn">{{ $page }}</a></li>
+                                @endif
+                            @endforeach
+
+                            @if($penerimaList->hasMorePages())
+                                <li><a href="{{ $penerimaList->nextPageUrl() }}" class="page-btn"><i class="fas fa-chevron-right"></i></a></li>
+                            @else
+                                <li><span class="page-btn disabled"><i class="fas fa-chevron-right"></i></span></li>
+                            @endif
+                        </ul>
+                    @endif
                 </div>
+                @endif
 
             @elseif($tab === 'detail')
                 {{-- TAB 4: DETAIL DATA PENERIMA --}}
@@ -706,6 +1114,7 @@
                             @empty
                                 <tr>
                                     <td colspan="7" style="text-align:center;padding:40px;color:#94a3b8;">
+                                        <i class="fas fa-inbox" style="font-size:32px;display:block;margin-bottom:10px;opacity:0.4;"></i>
                                         Belum ada data detail penerima.
                                     </td>
                                 </tr>
@@ -713,12 +1122,179 @@
                         </tbody>
                     </table>
                 </div>
-                <div style="padding:16px 24px;">
-                    {{ $penerimaList->links() }}
+
+                {{-- Pagination Bar Tab 4 --}}
+                @if($penerimaList->hasPages() || $penerimaList->total() > 0)
+                <div class="pagination-custom-bar">
+                    <div class="pagination-info-text">
+                        Menampilkan <strong>{{ $penerimaList->firstItem() ?? 0 }}</strong> -
+                        <strong>{{ $penerimaList->lastItem() ?? 0 }}</strong> dari
+                        <strong>{{ number_format($penerimaList->total(), 0, ',', '.') }}</strong> penerima
+                        @if($penerimaList->lastPage() > 1)
+                            (Halaman <strong>{{ $penerimaList->currentPage() }}</strong> dari <strong>{{ $penerimaList->lastPage() }}</strong>)
+                        @endif
+                    </div>
+
+                    @if($penerimaList->lastPage() > 1)
+                        @php
+                            $current = $penerimaList->currentPage();
+                            $last = $penerimaList->lastPage();
+                            $delta = 2;
+                            $left = $current - $delta;
+                            $right = $current + $delta + 1;
+                            $range = [];
+                            for ($i = 1; $i <= $last; $i++) {
+                                if ($i == 1 || $i == $last || ($i >= $left && $i < $right)) {
+                                    $range[] = $i;
+                                }
+                            }
+                            $rangeWithDots = [];
+                            $l = null;
+                            foreach ($range as $i) {
+                                if ($l) {
+                                    if ($i - $l === 2) {
+                                        $rangeWithDots[] = $l + 1;
+                                    } elseif ($i - $l !== 1) {
+                                        $rangeWithDots[] = '...';
+                                    }
+                                }
+                                $rangeWithDots[] = $i;
+                                $l = $i;
+                            }
+                        @endphp
+                        <ul class="pagination-nav">
+                            @if($penerimaList->onFirstPage())
+                                <li><span class="page-btn disabled"><i class="fas fa-chevron-left"></i></span></li>
+                            @else
+                                <li><a href="{{ $penerimaList->previousPageUrl() }}" class="page-btn"><i class="fas fa-chevron-left"></i></a></li>
+                            @endif
+
+                            @foreach($rangeWithDots as $page)
+                                @if($page === '...')
+                                    <li><span class="page-dots">...</span></li>
+                                @elseif($page == $current)
+                                    <li><span class="page-btn active">{{ $page }}</span></li>
+                                @else
+                                    <li><a href="{{ $penerimaList->url($page) }}" class="page-btn">{{ $page }}</a></li>
+                                @endif
+                            @endforeach
+
+                            @if($penerimaList->hasMorePages())
+                                <li><a href="{{ $penerimaList->nextPageUrl() }}" class="page-btn"><i class="fas fa-chevron-right"></i></a></li>
+                            @else
+                                <li><span class="page-btn disabled"><i class="fas fa-chevron-right"></i></span></li>
+                            @endif
+                        </ul>
+                    @endif
                 </div>
+                @endif
             @endif
         </div>
     </main>
+
+    <!-- Modal Export Excel (.XLS) Pilihan Lingkup -->
+    <div class="modal-overlay" id="modalExportExcel">
+        <div class="modal-box" style="max-width: 560px; overflow: visible !important;">
+            <div class="modal-header" style="border-top-left-radius: 12px; border-top-right-radius: 12px;">
+                <h3>
+                    <i class="fas fa-file-excel" style="color: #107c41;"></i>
+                    <span>Export Rekapitulasi BSPS (.XLS)</span>
+                </h3>
+                <button type="button" class="close-btn" onclick="window.PuprModal.close('modalExportExcel')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form action="{{ route('laporan.export') }}" method="GET" target="_blank" id="formExportExcelModal" data-no-loading="true" style="overflow: visible !important;">
+                <div class="modal-body" style="padding: 22px 24px; overflow: visible !important; min-height: 240px;">
+                    <p style="font-size: 13px; color: #64748b; margin-top: 0; margin-bottom: 18px; line-height: 1.5;">
+                        Silakan pilih lingkup wilayah rekapitulasi data BSPS yang ingin Anda unduh ke format Microsoft Excel:
+                    </p>
+
+                    <!-- Pilihan Lingkup Export -->
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <!-- Pilihan 1: Export Keseluruhan Kabupaten (Semua Desa) -->
+                        <div class="export-option-card active" id="optCardAll" onclick="setExportScope('all')">
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <input type="radio" name="export_scope" value="all" id="scopeAll" checked style="margin-top: 3px; cursor: pointer;" />
+                                <div>
+                                    <strong style="font-size: 13.5px; color: #002855; display: block;">
+                                        <i class="fas fa-globe-asia" style="color: #002855; margin-right: 6px;"></i>Export Seluruh Kabupaten (Semua Desa)
+                                    </strong>
+                                    <span style="font-size: 12px; color: #64748b; margin-top: 3px; display: block; line-height: 1.4;">
+                                        Mendownload data rekapitulasi lengkap dari seluruh desa/kelurahan di 31 kecamatan se-Kabupaten Jember.
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pilihan 2: Export Per Kecamatan Tertentu -->
+                        <div class="export-option-card" id="optCardKecamatan" onclick="setExportScope('kecamatan')">
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <input type="radio" name="export_scope" value="kecamatan" id="scopeKecamatan" style="margin-top: 3px; cursor: pointer;" />
+                                <div style="width: 100%;">
+                                    <strong style="font-size: 13.5px; color: #002855; display: block;">
+                                        <i class="fas fa-building-flag" style="color: #107c41; margin-right: 6px;"></i>Export Per Kecamatan Tertentu
+                                    </strong>
+                                    <span style="font-size: 12px; color: #64748b; margin-top: 3px; display: block; line-height: 1.4;">
+                                        Hanya mendownload seluruh desa/kelurahan dan calon penerima di dalam satu kecamatan yang dipilih.
+                                    </span>
+                                    
+                                    <!-- Dropdown Pilihan Kecamatan di dalam Modal Menggunakan PUPR Theme -->
+                                    <div id="wrapperPilihKecamatanModal" style="margin-top: 12px; display: none;" onclick="event.stopPropagation();">
+                                        <label style="font-size: 12px; font-weight: 700; color: #002855; display: block; margin-bottom: 6px;">
+                                            Pilih Kecamatan:
+                                        </label>
+                                        @if(auth()->check() && auth()->user()->isAdminKecamatan())
+                                            <input type="hidden" name="kecamatan" value="{{ auth()->user()->kecamatan }}" />
+                                            <div style="padding: 9px 14px; border-radius: 8px; background: #f1f5f9; border: 1px solid #cbd5e1; font-weight: 700; font-size: 13px; color: #002855; display: flex; align-items: center; gap: 8px;">
+                                                <i class="fas fa-building-flag" style="color: #002855;"></i>
+                                                <span>Kec. {{ ucwords(strtolower(auth()->user()->kecamatan)) }}</span>
+                                            </div>
+                                        @else
+                                            @php
+                                                $firstKec = $listKecamatan->first() ?? '';
+                                            @endphp
+                                            <input type="hidden" name="kecamatan" id="modalInputKecamatan" value="{{ $firstKec }}" disabled />
+                                            <div class="pupr-dropdown-wrapper" id="ddModalKecamatanWrapper" style="width: 100%;">
+                                                <button type="button" class="pupr-dropdown-toggle" style="width: 100%;" onclick="event.stopPropagation(); window.PuprDropdown.toggle(document.getElementById('ddModalKecamatanWrapper'))">
+                                                    <span style="display:flex;align-items:center;gap:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                                        <i class="fas fa-building-flag" style="font-size:12px;opacity:0.6;"></i>
+                                                        <span class="selected-label" id="modalSelectedKecLabel">
+                                                            Kec. {{ ucwords(strtolower($firstKec)) }}
+                                                        </span>
+                                                    </span>
+                                                    <i class="fas fa-chevron-down" style="font-size:10px;opacity:0.5;"></i>
+                                                </button>
+                                                <div class="pupr-dropdown-menu" style="min-width: 220px; max-height: 190px; overflow-y: auto; width: 100%; z-index: 1050; box-shadow: 0 12px 30px rgba(0, 40, 85, 0.22);">
+                                                    @foreach($listKecamatan as $kec)
+                                                    <div class="pupr-dropdown-item {{ $firstKec === $kec ? 'active' : '' }}"
+                                                         onclick="event.stopPropagation(); selectModalKecamatan('{{ $kec }}', 'Kec. {{ ucwords(strtolower($kec)) }}', this)">
+                                                        <i class="fas fa-map-pin" style="font-size:11px;opacity:0.5;"></i> Kec. {{ ucwords(strtolower($kec)) }}
+                                                    </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer" style="padding: 14px 24px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 10px; background: #f8fafc; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; position: relative; z-index: 2;">
+                    <button type="button" class="btn btn-outline" onclick="window.PuprModal.close('modalExportExcel')" style="padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 13px;">
+                        Batal
+                    </button>
+                    <button type="submit" class="btn-export-excel" onclick="setTimeout(() => { window.PuprModal.close('modalExportExcel'); if (window.PuprLoading) window.PuprLoading.hide(); }, 300)" style="padding: 8px 18px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; font-size: 13px;">
+                        <i class="fas fa-download"></i>
+                        <span>Download File Excel</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Modal Lightbox Viewer Foto -->
     <div class="lightbox-modal" id="lightboxModal">
@@ -736,6 +1312,45 @@
 
 @push('scripts')
 <script>
+    function setExportScope(scope) {
+        const optAll = document.getElementById('optCardAll');
+        const optKec = document.getElementById('optCardKecamatan');
+        const radioAll = document.getElementById('scopeAll');
+        const radioKec = document.getElementById('scopeKecamatan');
+        const wrapperKec = document.getElementById('wrapperPilihKecamatanModal');
+        const inputKec = document.getElementById('modalInputKecamatan');
+
+        if (scope === 'all') {
+            optAll.classList.add('active');
+            optKec.classList.remove('active');
+            radioAll.checked = true;
+            radioKec.checked = false;
+            if (wrapperKec) wrapperKec.style.display = 'none';
+            if (inputKec) inputKec.disabled = true;
+        } else {
+            optAll.classList.remove('active');
+            optKec.classList.add('active');
+            radioAll.checked = false;
+            radioKec.checked = true;
+            if (wrapperKec) wrapperKec.style.display = 'block';
+            if (inputKec) inputKec.disabled = false;
+        }
+    }
+
+    function selectModalKecamatan(val, label, el) {
+        const inputKec = document.getElementById('modalInputKecamatan');
+        const labelEl = document.getElementById('modalSelectedKecLabel');
+        const wrapper = document.getElementById('ddModalKecamatanWrapper');
+
+        if (inputKec) inputKec.value = val;
+        if (labelEl) labelEl.textContent = label;
+        if (wrapper) {
+            wrapper.querySelectorAll('.pupr-dropdown-item').forEach(i => i.classList.remove('active'));
+            if (el) el.classList.add('active');
+            wrapper.classList.remove('active');
+        }
+    }
+
     function openLightbox(src, title) {
         document.getElementById('lightboxImg').src = src;
         document.getElementById('lightboxTitle').innerText = title || 'Pratinjau Foto Lapangan';
