@@ -312,6 +312,12 @@
                     </tbody>
                 </table>
             </div>
+
+            <!-- Pagination Bar Custom -->
+            <div class="pagination-custom-bar" id="tablePagination" style="display:none;">
+                <div class="pagination-info-text" id="paginationInfo"></div>
+                <div class="pagination-nav" id="paginationNav"></div>
+            </div>
         </div>
     </main>
 @endsection
@@ -494,6 +500,10 @@
                 renderMarkerList(data);
             }
 
+            let currentPage = 1;
+            const itemsPerPage = 10;
+            let currentFilteredData = [];
+
             function renderMarkerList(data) {
                 const tbody = document.getElementById('markerTableBody');
                 const countSpan = document.getElementById('markerCount');
@@ -501,29 +511,39 @@
 
                 // Hanya tampilkan kegiatan survei pada tabel (lokasi petugas hanya tampil di Peta)
                 const surveyData = (data || []).filter(item => item.type !== 'petugas');
+                currentFilteredData = surveyData;
 
                 if (countSpan) countSpan.textContent = `${surveyData.length} titik`;
 
                 if (surveyData.length === 0) {
                     tbody.innerHTML = `
                         <tr>
-                            <td colspan="7" style="text-align:center;padding:32px;color:var(--text-muted);">
+                            <td colspan="8" style="text-align:center;padding:32px;color:var(--text-muted);">
                                 <i class="fas fa-map-pin" style="font-size:32px;display:block;margin-bottom:8px;opacity:0.5;"></i>
                                 Tidak ada data titik lokasi survei yang ditemukan.
                             </td>
                         </tr>
                     `;
+                    renderPaginationControls(0);
                     return;
                 }
 
+                const totalPages = Math.ceil(surveyData.length / itemsPerPage);
+                if (currentPage > totalPages) currentPage = 1;
+
+                const startIndex = (currentPage - 1) * itemsPerPage;
+                const endIndex = Math.min(startIndex + itemsPerPage, surveyData.length);
+                const paginatedData = surveyData.slice(startIndex, endIndex);
+
                 let html = '';
-                surveyData.forEach((item, index) => {
+                paginatedData.forEach((item, index) => {
+                    const rowNumber = startIndex + index + 1;
                     const colorMap = { green: '#15803d', orange: '#b45309', purple: '#7e22ce', blue: '#002855' };
                     const bgMap   = { green: 'rgba(39,174,96,0.12)', orange: 'rgba(255,184,0,0.15)', purple: 'rgba(142,68,173,0.12)', blue: 'rgba(0,40,85,0.08)' };
 
                     html += `
                         <tr>
-                            <td>${index + 1}</td>
+                            <td>${rowNumber}</td>
                             <td>
                                 <strong style="color:var(--primary-dark);font-size:13px;display:block;">${item.name}</strong>
                                 <span style="font-size:11px;color:var(--text-muted);"><i class="fas fa-clock"></i> ${item.tanggal}</span>
@@ -558,6 +578,90 @@
                     `;
                 });
                 tbody.innerHTML = html;
+
+                renderPaginationControls(surveyData.length);
+            }
+
+            function renderPaginationControls(totalItems) {
+                const paginationBar = document.getElementById('tablePagination');
+                const infoContainer = document.getElementById('paginationInfo');
+                const navContainer = document.getElementById('paginationNav');
+                if (!paginationBar || !infoContainer || !navContainer) return;
+
+                if (totalItems <= 0) {
+                    paginationBar.style.display = 'none';
+                    return;
+                }
+
+                paginationBar.style.display = 'flex';
+
+                const totalPages = Math.ceil(totalItems / itemsPerPage);
+                const startItem = (currentPage - 1) * itemsPerPage + 1;
+                const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+
+                infoContainer.innerHTML = `Menampilkan <strong>${startItem}</strong> - <strong>${endItem}</strong> dari <strong>${totalItems}</strong> titik (Halaman <strong>${currentPage}</strong> dari <strong>${totalPages}</strong>)`;
+
+                let navHtml = '';
+
+                // Tombol Previous
+                if (currentPage > 1) {
+                    navHtml += `<button type="button" class="pg-link" data-page="${currentPage - 1}" title="Sebelumnya"><i class="fas fa-chevron-left"></i></button>`;
+                } else {
+                    navHtml += `<span class="pg-link disabled"><i class="fas fa-chevron-left"></i></span>`;
+                }
+
+                // Generasi nomor halaman dengan smart ellipsis
+                const delta = 1;
+                const left = currentPage - delta;
+                const right = currentPage + delta + 1;
+                const range = [];
+                const rangeWithDots = [];
+                let l;
+
+                for (let i = 1; i <= totalPages; i++) {
+                    if (i === 1 || i === totalPages || (i >= left && i < right)) {
+                        range.push(i);
+                    }
+                }
+
+                for (let i of range) {
+                    if (l) {
+                        if (i - l === 2) {
+                            rangeWithDots.push(l + 1);
+                        } else if (i - l !== 1) {
+                            rangeWithDots.push('...');
+                        }
+                    }
+                    rangeWithDots.push(i);
+                    l = i;
+                }
+
+                rangeWithDots.forEach(page => {
+                    if (page === '...') {
+                        navHtml += `<span class="pg-dots">...</span>`;
+                    } else if (page === currentPage) {
+                        navHtml += `<span class="pg-link active">${page}</span>`;
+                    } else {
+                        navHtml += `<button type="button" class="pg-link" data-page="${page}">${page}</button>`;
+                    }
+                });
+
+                // Tombol Next
+                if (currentPage < totalPages) {
+                    navHtml += `<button type="button" class="pg-link" data-page="${currentPage + 1}" title="Berikutnya"><i class="fas fa-chevron-right"></i></button>`;
+                } else {
+                    navHtml += `<span class="pg-link disabled"><i class="fas fa-chevron-right"></i></span>`;
+                }
+
+                navContainer.innerHTML = navHtml;
+
+                // Attach click listeners to page buttons
+                navContainer.querySelectorAll('button[data-page]').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        currentPage = parseInt(this.getAttribute('data-page'));
+                        renderMarkerList(currentFilteredData);
+                    });
+                });
             }
 
             window.focusOnMapMarker = function(lat, lng) {
@@ -568,6 +672,7 @@
             const searchInput = document.getElementById('searchLocation');
             if (searchInput) {
                 searchInput.addEventListener('input', function() {
+                    currentPage = 1;
                     const query = this.value.toLowerCase().trim();
                     let filtered = markersData.filter(item =>
                         item.name.toLowerCase().includes(query) ||
@@ -583,6 +688,7 @@
             let selectedStatus = 'all';
 
             function filterMapMarkers() {
+                currentPage = 1;
                 let filtered = markersData;
                 if (selectedKategori !== 'all') {
                     filtered = filtered.filter(item => item.name.toLowerCase().includes(selectedKategori.toLowerCase()));
@@ -610,6 +716,7 @@
             const resetMapBtn = document.getElementById('resetMapFilterBtn');
             if (resetMapBtn) {
                 resetMapBtn.addEventListener('click', function() {
+                    currentPage = 1;
                     selectedKategori = 'all';
                     selectedStatus = 'all';
 
