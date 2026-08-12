@@ -511,21 +511,67 @@
             <form action="{{ route('survey.store', $vervalData->id) }}" method="POST" enctype="multipart/form-data" id="surveyForm" onsubmit="return validateSurveyForm(event)">
                 @csrf
 
-                <!-- 1. Data Tambahan & Lahan (Dengan Custom Dropdown PUPR) -->
+                <!-- 1. Identitas, Alamat & Kelaikan Hunian -->
                 <div class="form-section">
-                    <h4><i class="fas fa-user-pen"></i> 1. Data Tambahan &amp; Kelaikan Hunian</h4>
+                    <h4><i class="fas fa-user-pen"></i> 1. Identitas, Alamat Domisili &amp; Kelaikan Hunian</h4>
 
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
-                        <div class="form-group">
-                            <label>Tempat Lahir</label>
-                            <input type="text" name="tempat_lahir" class="form-control"
-                                value="{{ old('tempat_lahir', $vervalData->tempat_lahir) }}" placeholder="Contoh: Jember">
+                    <!-- Sub-Section A: Identitas Kependudukan & Alamat -->
+                    <div style="background: rgba(0, 40, 85, 0.02); border: 1px solid rgba(0, 40, 85, 0.08); border-radius: 10px; padding: 18px; margin-bottom: 20px;">
+                        <div style="font-size: 13.5px; font-weight: 800; color: var(--primary); margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-address-card"></i> Identitas Kependudukan &amp; Wilayah Domisili
                         </div>
-                        <div class="form-group">
-                            <label>Tanggal Lahir</label>
-                            <input type="date" name="tanggal_lahir" class="form-control"
-                                value="{{ old('tanggal_lahir', $vervalData->tanggal_lahir) }}">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label>NIK (No. KTP) <span style="font-size:11px; color:#e11d48; font-weight:600;">(Tidak Dapat Diubah)</span></label>
+                                <input type="text" value="{{ $vervalData->no_ktp }}" class="form-control" disabled readonly style="background: #e2e8f0; color: #475569; font-weight: 700; font-family: monospace; cursor: not-allowed;">
+                            </div>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label>Nomor KK</label>
+                                <input type="text" name="no_kk" class="form-control"
+                                    value="{{ old('no_kk', $vervalData->no_kk) }}" placeholder="Contoh: 3509171009150009">
+                            </div>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label>Jenis Kelamin</label>
+                                @php $curJk = old('jenis_kelamin', $vervalData->jenis_kelamin); @endphp
+                                <select name="jenis_kelamin" class="form-control" style="font-weight:600;">
+                                    <option value="">-- Pilih Jenis Kelamin --</option>
+                                    <option value="L" {{ $curJk == 'L' ? 'selected' : '' }}>Laki-Laki (L)</option>
+                                    <option value="P" {{ $curJk == 'P' ? 'selected' : '' }}>Perempuan (P)</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label>Tempat Lahir</label>
+                                <input type="text" name="tempat_lahir" class="form-control"
+                                    value="{{ old('tempat_lahir', $vervalData->tempat_lahir) }}" placeholder="Contoh: Banyuwangi">
+                            </div>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label>Tanggal Lahir</label>
+                                <input type="date" name="tanggal_lahir" class="form-control"
+                                    value="{{ old('tanggal_lahir', $vervalData->tanggal_lahir) }}">
+                            </div>
+                            <div class="form-group" style="margin-bottom:0; grid-column: 1 / -1;">
+                                <label>Alamat Lengkap</label>
+                                <input type="text" name="alamat" class="form-control"
+                                    value="{{ old('alamat', $vervalData->alamat) }}" placeholder="Contoh: DUSUN CURAH KATES RT 01 RW 26 AJUNG">
+                            </div>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label>Desa / Kelurahan</label>
+                                <input type="text" name="desa_kelurahan" class="form-control"
+                                    value="{{ old('desa_kelurahan', $vervalData->desa_kelurahan) }}" placeholder="Contoh: AJUNG">
+                            </div>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label>Kecamatan</label>
+                                <input type="text" name="kecamatan" class="form-control"
+                                    value="{{ old('kecamatan', $vervalData->kecamatan) }}" placeholder="Contoh: Kec. AJUNG">
+                            </div>
                         </div>
+                    </div>
+
+                    <!-- Sub-Section B: Data Lahan & Kelaikan Hunian -->
+                    <div style="font-size: 13.5px; font-weight: 800; color: var(--primary); margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-house-chimney-window"></i> Data Lahan &amp; Kelaikan Hunian
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
                         <div class="form-group">
                             <label>Penghasilan Per Bulan <span style="font-size:11.5px; color:#64748b; font-weight:normal;">(Opsional)</span></label>
                             <input type="text" name="penghasilan" class="form-control"
