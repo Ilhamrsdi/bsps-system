@@ -9,7 +9,7 @@
     /* Stats Grid */
     .stats-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(4, 1fr);
         gap: 18px;
         margin-bottom: 24px;
     }
@@ -413,7 +413,7 @@
                     <div class="stat-value">{{ number_format($backlog2Count, 0, ',', '.') }}</div>
                     <div class="stat-label">Backlog 2 Desil 1-4</div>
                     <div class="stat-change blue">
-                        <i class="fas fa-percent"></i> {{ round(($backlog2Count / $totalPenerima) * 100, 1) }}% Dominan (PK)
+                        <i class="fas fa-percent"></i> {{ $totalPenerima > 0 ? round(($backlog2Count / $totalPenerima) * 100, 1) : 0 }}% Dominan (PK)
                     </div>
                 </div>
             </div>
@@ -427,7 +427,21 @@
                     <div class="stat-value">{{ number_format($backlog1Count, 0, ',', '.') }}</div>
                     <div class="stat-label">Backlog 1 Desil 1-4</div>
                     <div class="stat-change up">
-                        <i class="fas fa-award"></i> {{ round(($backlog1Count / $totalPenerima) * 100, 1) }}% Prioritas Bantuan
+                        <i class="fas fa-award"></i> {{ $totalPenerima > 0 ? round(($backlog1Count / $totalPenerima) * 100, 1) : 0 }}% Prioritas Bantuan
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Usulan Baru Petugas -->
+            <div class="stat-card">
+                <div class="stat-icon orange">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value">{{ number_format($usulanBaruCount, 0, ',', '.') }}</div>
+                    <div class="stat-label">Usulan Baru Petugas</div>
+                    <div class="stat-change orange" style="color:#d69e00;">
+                        <i class="fas fa-file-signature"></i> {{ $totalPenerima > 0 ? round(($usulanBaruCount / $totalPenerima) * 100, 1) : 0 }}% Usulan Lapangan
                     </div>
                 </div>
             </div>

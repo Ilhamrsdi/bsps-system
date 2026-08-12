@@ -24,13 +24,17 @@ class DashboardController extends Controller
         $totalKecamatan = DataPenerima::distinct('kecamatan')->count('kecamatan');
         $totalDesa = DataPenerima::selectRaw("COUNT(DISTINCT CONCAT(kecamatan, ' - ', desa_kelurahan)) as total")->value('total');
 
-        // 2. Statistik Desil Global (Backlog 1 vs Backlog 2)
+        // 2. Statistik Desil Global (Backlog 1 vs Backlog 2 vs Usulan Baru Petugas)
         $desilStats = DataPenerima::selectRaw('pengelompokan_desil, count(*) as total')
             ->groupBy('pengelompokan_desil')
             ->pluck('total', 'pengelompokan_desil');
 
-        $backlog1Count = $desilStats['Backlog 1 Desil 1-4'] ?? 0;
-        $backlog2Count = $desilStats['Backlog 2 Desil 1-4'] ?? 0;
+        $backlog1Count   = $desilStats['Backlog 1 Desil 1-4'] ?? 0;
+        $backlog2Count   = $desilStats['Backlog 2 Desil 1-4'] ?? 0;
+        $usulanBaruCount = DataPenerima::where(function ($q) {
+            $q->where('pengelompokan_desil', 'like', '%Usulan%')
+              ->orWhere('status', 'Usulan Petugas');
+        })->count();
 
         // 3. Top Kecamatan dengan Usulan BSPS Terbanyak & Breakdown Desil per Kecamatan
         $rawKecamatan = DataPenerima::selectRaw('kecamatan, 
@@ -79,6 +83,7 @@ class DashboardController extends Controller
             'topDesa',
             'backlog1Count',
             'backlog2Count',
+            'usulanBaruCount',
             'lakiCount',
             'perempuanCount',
             'latestCandidates',
