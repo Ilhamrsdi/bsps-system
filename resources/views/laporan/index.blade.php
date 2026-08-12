@@ -1,12 +1,12 @@
 @extends('layouts.partial.app')
 
-@section('title', 'BSPS Verval - Laporan & Rekapitulasi')
+@section('title', 'BSPS Verval - Laporan Rekap Hasil & Capaian Indikator')
 @section('title_header', 'Laporan & Rekapitulasi BSPS')
-@section('subtitle_header', 'Rekapitulasi Laporan Verifikasi &amp; Validasi Calon Penerima Bantuan Stimulan Perumahan Swadaya')
+@section('subtitle_header', 'Rekapitulasi Hasil Verifikasi Sesuai / Tidak Sesuai per Desa & Kecamatan, Capaian Indikator RTLH, dan Lampiran Foto Lapangan')
 
 @push('styles')
 <style>
-    /* Stats Grid Laporan */
+    /* Grid Stat Cards PUPR Theme */
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
@@ -14,159 +14,307 @@
         margin-bottom: 24px;
     }
     .stat-card {
-        background: var(--bg-card);
-        border-radius: var(--radius-sm);
+        background: var(--bg-card, #ffffff);
+        border-radius: var(--radius-sm, 10px);
         padding: 18px 20px;
-        box-shadow: var(--shadow-sm);
-        border: 1px solid rgba(0, 40, 85, 0.06);
+        box-shadow: 0 2px 10px rgba(0, 40, 85, 0.05);
+        border: 1px solid rgba(0, 40, 85, 0.08);
         display: flex;
         align-items: center;
         gap: 14px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(0, 40, 85, 0.1);
     }
     .stat-card .icon {
-        width: 46px;
-        height: 46px;
-        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 20px;
+        font-size: 22px;
         flex-shrink: 0;
     }
-    .stat-card .icon.blue { background: rgba(0, 40, 85, 0.10); color: var(--primary); }
-    .stat-card .icon.green { background: rgba(39, 174, 96, 0.12); color: var(--success); }
+    .stat-card .icon.blue { background: rgba(0, 40, 85, 0.10); color: #002855; }
+    .stat-card .icon.green { background: rgba(39, 174, 96, 0.12); color: #27ae60; }
     .stat-card .icon.orange { background: rgba(255, 184, 0, 0.15); color: #d69e00; }
-    .stat-card .icon.red { background: rgba(231, 76, 60, 0.12); color: var(--danger); }
-    .stat-card .info .value { font-size: 24px; font-weight: 800; color: var(--primary-dark); }
-    .stat-card .info .label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+    .stat-card .icon.red { background: rgba(231, 76, 60, 0.12); color: #e74c3c; }
+    .stat-card .info .value { font-size: 26px; font-weight: 800; color: #002855; line-height: 1.1; }
+    .stat-card .info .label { font-size: 12px; color: #64748b; font-weight: 600; margin-top: 3px; }
 
     /* Navigasi Tab Rekapitulasi */
     .laporan-tabs {
         display: flex;
-        gap: 6px;
+        gap: 8px;
         margin-bottom: 20px;
-        background: var(--bg-card);
-        padding: 6px;
-        border-radius: var(--radius-sm);
-        border: 1px solid rgba(0, 40, 85, 0.06);
-        box-shadow: var(--shadow-sm);
+        background: #ffffff;
+        padding: 8px;
+        border-radius: 12px;
+        border: 1px solid rgba(0, 40, 85, 0.08);
+        box-shadow: 0 2px 8px rgba(0, 40, 85, 0.04);
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
     }
     .laporan-tabs::-webkit-scrollbar { display: none; }
     .laporan-tab-item {
-        padding: 10px 18px;
+        padding: 11px 20px;
         border-radius: 8px;
         font-size: 13.5px;
         font-weight: 600;
-        color: var(--text-secondary);
+        color: #475569;
         text-decoration: none;
         white-space: nowrap;
-        transition: var(--transition);
+        transition: all 0.2s ease;
         display: inline-flex;
         align-items: center;
         gap: 8px;
     }
-    .laporan-tab-item:hover { background: var(--bg-body); color: var(--primary); }
-    .laporan-tab-item.active { background: var(--primary); color: #ffffff; font-weight: 700; }
+    .laporan-tab-item:hover { background: rgba(0, 40, 85, 0.05); color: #002855; }
+    .laporan-tab-item.active { background: #002855; color: #ffffff; font-weight: 700; shadow: 0 3px 10px rgba(0,40,85,0.2); }
 
+    /* Filter Form PUPR Layout */
+    .filter-card {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 16px 20px;
+        border: 1px solid rgba(0, 40, 85, 0.08);
+        margin-bottom: 24px;
+        box-shadow: 0 2px 8px rgba(0, 40, 85, 0.04);
+    }
+    .filter-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+    }
+    .filter-item {
+        flex: 1;
+        min-width: 180px;
+    }
+    .filter-item input, .filter-item select {
+        width: 100%;
+        padding: 9px 14px;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        font-size: 13px;
+        color: #0f172a;
+        background-color: #f8fafc;
+        transition: border-color 0.2s;
+    }
+    .filter-item input:focus, .filter-item select:focus {
+        border-color: #002855;
+        outline: none;
+        background-color: #fff;
+    }
+
+    /* Table Container Styling */
     .table-card {
-        background: var(--bg-card);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow-sm);
-        border: 1px solid rgba(0, 40, 85, 0.06);
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 40, 85, 0.05);
+        border: 1px solid rgba(0, 40, 85, 0.08);
         overflow: hidden;
     }
-    .table-card .table-header {
+    .table-header {
         padding: 18px 24px;
-        border-bottom: 1px solid rgba(0, 40, 85, 0.06);
+        border-bottom: 1px solid rgba(0, 40, 85, 0.08);
         display: flex;
         align-items: center;
         justify-content: space-between;
         flex-wrap: wrap;
         gap: 12px;
     }
-    .table-card .table-header h3 { font-size: 16px; font-weight: 700; color: var(--primary); margin: 0; }
+    .table-header h3 { font-size: 16px; font-weight: 700; color: #002855; margin: 0; }
 
-    /* Button Detail Premium PUPR Theme */
-    .btn-detail-laporan {
+    .table-wrapper {
+        overflow-x: auto;
+        width: 100%;
+    }
+    table.pupr-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+    table.pupr-table thead {
+        background: #f8fafc;
+    }
+    table.pupr-table th {
+        padding: 12px 16px;
+        text-align: left;
+        font-weight: 700;
+        font-size: 11.5px;
+        text-transform: uppercase;
+        color: #475569;
+        border-bottom: 1px solid #e2e8f0;
+        white-space: nowrap;
+    }
+    table.pupr-table td {
+        padding: 12px 16px;
+        border-bottom: 1px solid #e2e8f0;
+        vertical-align: middle;
+    }
+    table.pupr-table tr:hover {
+        background-color: rgba(0, 40, 85, 0.02);
+    }
+
+    /* Progress & Badges */
+    .badge-status {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        padding: 7px 15px;
-        border-radius: 8px;
-        background: rgba(0, 40, 85, 0.08);
-        color: var(--primary);
+        gap: 5px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 11.5px;
         font-weight: 700;
-        font-size: 12.5px;
-        border: 1px solid rgba(0, 40, 85, 0.14);
+    }
+    .badge-status.success { background: rgba(39, 174, 96, 0.12); color: #27ae60; }
+    .badge-status.danger { background: rgba(231, 76, 60, 0.12); color: #e74c3c; }
+    .badge-status.warning { background: rgba(255, 184, 0, 0.18); color: #b78100; }
+    .badge-status.info { background: rgba(0, 40, 85, 0.1); color: #002855; }
+
+    .progress-bar-mini {
+        width: 100px;
+        height: 6px;
+        background: #e2e8f0;
+        border-radius: 4px;
+        overflow: hidden;
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 6px;
+    }
+    .progress-bar-fill {
+        height: 100%;
+        background: #27ae60;
+        border-radius: 4px;
+    }
+
+    /* Galeri Grid Cards */
+    .galeri-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 20px;
+        padding: 20px;
+    }
+    .galeri-card {
+        background: #ffffff;
+        border-radius: 12px;
+        border: 1px solid rgba(0, 40, 85, 0.1);
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .galeri-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 22px rgba(0, 40, 85, 0.12);
+    }
+    .galeri-card-header {
+        padding: 14px 16px;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+    .galeri-card-body {
+        padding: 14px 16px;
+    }
+    .photo-thumbs-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        margin-top: 10px;
+    }
+    .photo-thumb-item {
+        position: relative;
+        aspect-ratio: 4/3;
+        border-radius: 6px;
+        overflow: hidden;
+        border: 1px solid #cbd5e1;
         cursor: pointer;
-        transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-        text-decoration: none;
+        background: #f1f5f9;
     }
-    .btn-detail-laporan:hover {
-        background: var(--primary);
-        color: #ffffff;
-        border-color: var(--primary);
-        box-shadow: 0 4px 14px rgba(0, 40, 85, 0.25);
-        transform: translateY(-2px);
-    }
-    .btn-detail-laporan i {
-        font-size: 13px;
+    .photo-thumb-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
         transition: transform 0.2s ease;
     }
-    .btn-detail-laporan:hover i {
-        transform: scale(1.18);
+    .photo-thumb-item:hover img {
+        transform: scale(1.1);
+    }
+    .photo-thumb-label {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0, 40, 85, 0.75);
+        color: #fff;
+        font-size: 8.5px;
+        padding: 2px 4px;
+        text-align: center;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
-    /* Responsive Touch Table */
-    .table-wrapper {
-        overflow-x: auto !important;
-        overflow-y: hidden !important;
-        -webkit-overflow-scrolling: touch !important;
-        touch-action: pan-x pan-y !important;
-        overscroll-behavior-x: contain !important;
-        transform: translateZ(0);
-        width: 100% !important;
-        display: block !important;
+    /* Modal Lightbox Popup */
+    .lightbox-modal {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 24, 53, 0.88);
+        backdrop-filter: blur(5px);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
     }
-    .table-card table {
-        width: 100% !important;
-        min-width: 1000px !important;
-        border-collapse: collapse;
-        font-size: 13.5px;
-        white-space: nowrap !important;
+    .lightbox-modal.active {
+        display: flex;
     }
-    .table-card table thead { background: var(--bg-body); }
-    .table-card table thead th { padding: 12px 18px; text-align: left; font-weight: 600; font-size: 12px; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid rgba(0, 40, 85, 0.06); white-space: nowrap !important; }
-    .table-card table tbody td { padding: 12px 18px; border-bottom: 1px solid rgba(0, 40, 85, 0.06); vertical-align: middle; white-space: nowrap !important; }
-    .table-card table tr, .table-card table th, .table-card table td { transition: none !important; }
+    .lightbox-content {
+        max-width: 900px;
+        width: 100%;
+        background: #ffffff;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        display: flex;
+        flex-direction: column;
+        max-height: 90vh;
+    }
+    .lightbox-header {
+        padding: 14px 20px;
+        background: #002855;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .lightbox-body {
+        padding: 20px;
+        overflow-y: auto;
+        text-align: center;
+        background: #0f172a;
+    }
+    .lightbox-body img {
+        max-height: 60vh;
+        max-width: 100%;
+        border-radius: 8px;
+        object-fit: contain;
+    }
 
-    /* Responsive Laporan Layout */
+    /* Responsive adjustments */
     @media (max-width: 1024px) {
-        .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
-        .filter-section { padding: 16px; flex-direction: column; align-items: stretch; gap: 12px; }
-        .filter-section .filter-group { width: 100%; }
-        .filter-section .filter-group .pupr-search-group,
-        .filter-section .filter-group .pupr-dropdown-wrapper,
-        .filter-section .filter-group .pupr-dropdown-toggle { width: 100%; justify-content: space-between; }
-        .filter-section .filter-actions { width: 100%; margin-left: 0; flex-wrap: wrap; }
-        .filter-section .filter-actions .btn { flex: 1; min-width: 120px; justify-content: center; }
-        .table-card .table-header { flex-direction: column; align-items: stretch; gap: 12px; }
-        .table-card .table-header .table-actions { width: 100%; flex-wrap: wrap; }
-        .table-card .table-header .table-actions .btn { flex: 1; min-width: 140px; justify-content: center; }
+        .stats-grid { grid-template-columns: repeat(2, 1fr); }
     }
-
-    @media (max-width: 768px) {
-        .stat-card { padding: 14px 16px; }
-        .stat-card .info .value { font-size: 20px; }
-        .table-footer { flex-direction: column; align-items: center; text-align: center; gap: 10px; }
-    }
-
-    @media (max-width: 480px) {
-        .stats-grid { grid-template-columns: 1fr; gap: 10px; }
-        .dashboard-content { padding: 12px; }
-        .stat-card { padding: 12px 16px; }
+    @media (max-width: 640px) {
+        .stats-grid { grid-template-columns: 1fr; }
+        .filter-grid { flex-direction: column; }
     }
 </style>
 @endpush
@@ -176,473 +324,411 @@
 
     <main class="dashboard-content">
         <!-- Breadcrumb -->
-        <div class="breadcrumb" style="font-size:13px;color:var(--text-muted);margin-bottom:20px;display:flex;align-items:center;gap:8px;">
-            <a href="{{ url('/') }}" style="color:var(--primary);text-decoration:none;font-weight:500;"><i class="fas fa-home"></i> Home</a>
+        <div class="breadcrumb" style="font-size:13px;color:#64748b;margin-bottom:18px;display:flex;align-items:center;gap:8px;">
+            <a href="{{ url('/') }}" style="color:#002855;text-decoration:none;font-weight:600;"><i class="fas fa-home"></i> Home</a>
             <i class="fas fa-chevron-right" style="font-size:10px;"></i>
             <span>Laporan &amp; Rekapitulasi</span>
         </div>
 
-        <!-- 4 Stat Counters Dinamis Real-Time -->
+        <!-- 4 Stat Counters Dinamis dari Real Data -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="icon blue"><i class="fas fa-file-invoice"></i></div>
+                <div class="icon blue"><i class="fas fa-users-viewfinder"></i></div>
                 <div class="info">
-                    <div class="value">{{ $stats['total_kegiatan'] }}</div>
-                    <div class="label">Total Laporan Kegiatan</div>
+                    <div class="value">{{ number_format($stats['total_penerima']) }}</div>
+                    <div class="label">Total Calon Penerima</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="icon green"><i class="fas fa-file-circle-check"></i></div>
+                <div class="icon green"><i class="fas fa-clipboard-check"></i></div>
                 <div class="info">
-                    <div class="value">{{ $stats['bap_terbit'] }}</div>
-                    <div class="label">BAP Terbit / Resmi</div>
+                    <div class="value">{{ number_format($stats['sudah_survei']) }}</div>
+                    <div class="label">Sudah Disurvei Lapangan</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="icon orange"><i class="fas fa-clipboard-check"></i></div>
+                <div class="icon green"><i class="fas fa-circle-check"></i></div>
                 <div class="info">
-                    <div class="value">{{ $stats['survei_selesai'] }}</div>
-                    <div class="label">Survei Lapangan Selesai</div>
+                    <div class="value">{{ number_format($stats['total_layak']) }}</div>
+                    <div class="label">Hasil Sesuai (Layak)</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="icon red"><i class="fas fa-file-circle-exclamation"></i></div>
+                <div class="icon red"><i class="fas fa-circle-xmark"></i></div>
                 <div class="info">
-                    <div class="value">{{ $stats['belum_bap'] }}</div>
-                    <div class="label">Belum Memiliki BAP</div>
+                    <div class="value">{{ number_format($stats['total_tidak_layak']) }}</div>
+                    <div class="label">Hasil Tidak Sesuai</div>
                 </div>
             </div>
         </div>
 
-        <!-- Navigasi Tab Rekapitulasi Laporan -->
+        <!-- Navigasi Tab Rekapitulasi -->
         <div class="laporan-tabs">
-            <a href="{{ route('laporan', array_merge(request()->query(), ['tab' => 'progress'])) }}" class="laporan-tab-item {{ $tab === 'progress' ? 'active' : '' }}">
-                <i class="fas fa-chart-line"></i> Rekap Progress Pekerjaan
+            <a href="{{ route('laporan', array_merge(request()->query(), ['tab' => 'rekap'])) }}" class="laporan-tab-item {{ $tab === 'rekap' ? 'active' : '' }}">
+                <i class="fas fa-chart-pie"></i> Rekap Sesuai vs Tidak Sesuai (Per Desa/Kec)
             </a>
-            <a href="{{ route('laporan', array_merge(request()->query(), ['tab' => 'survei'])) }}" class="laporan-tab-item {{ $tab === 'survei' ? 'active' : '' }}">
-                <i class="fas fa-clipboard-check"></i> Rekap Hasil Survei
+            <a href="{{ route('laporan', array_merge(request()->query(), ['tab' => 'indikator'])) }}" class="laporan-tab-item {{ $tab === 'indikator' ? 'active' : '' }}">
+                <i class="fas fa-sliders"></i> Capaian Indikator RTLH
             </a>
-            <a href="{{ route('laporan', array_merge(request()->query(), ['tab' => 'bap'])) }}" class="laporan-tab-item {{ $tab === 'bap' ? 'active' : '' }}">
-                <i class="fas fa-file-pdf"></i> Rekap Status BAP
+            <a href="{{ route('laporan', array_merge(request()->query(), ['tab' => 'galeri'])) }}" class="laporan-tab-item {{ $tab === 'galeri' ? 'active' : '' }}">
+                <i class="fas fa-images"></i> Galeri Foto Lapangan
             </a>
-            <a href="{{ route('laporan', array_merge(request()->query(), ['tab' => 'petugas'])) }}" class="laporan-tab-item {{ $tab === 'petugas' ? 'active' : '' }}">
-                <i class="fas fa-user-shield"></i> Rekap Kinerja Petugas
+            <a href="{{ route('laporan', array_merge(request()->query(), ['tab' => 'detail'])) }}" class="laporan-tab-item {{ $tab === 'detail' ? 'active' : '' }}">
+                <i class="fas fa-table-list"></i> Detail Data Penerima
             </a>
         </div>
 
-        <!-- Filter & Search Section Form PUPR -->
-        <form action="{{ route('laporan') }}" method="GET" class="filter-section">
-            <input type="hidden" name="tab" value="{{ $tab }}" />
+        <!-- Filter & Search Section -->
+        <div class="filter-card">
+            <form action="{{ route('laporan') }}" method="GET" class="filter-grid">
+                <input type="hidden" name="tab" value="{{ $tab }}" />
 
-            <div class="filter-group">
-                <div class="pupr-search-group">
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama kegiatan, lokasi, kontraktor..." class="pupr-search-input" />
-                    <button type="submit" class="pupr-search-btn"><i class="fas fa-search"></i></button>
+                <div class="filter-item" style="flex:2;min-width:220px;">
+                    <div style="position:relative;">
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama penerima, NIK, KK, desa..." />
+                        <i class="fas fa-search" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);color:#94a3b8;"></i>
+                    </div>
                 </div>
-            </div>
 
-            {{-- Filter Kecamatan --}}
-            <div class="filter-group">
-                <div class="pupr-dropdown-wrapper">
-                    <button type="button" class="btn btn-outline pupr-dropdown-toggle" data-toggle="pupr-dropdown">
-                        <span class="selected-label">{{ request('kecamatan') && request('kecamatan') != 'all' ? 'Kec. ' . ucwords(str_replace('_',' ',request('kecamatan'))) : 'Semua Kecamatan' }}</span>
-                        <i class="fas fa-chevron-down" style="font-size:10px;margin-left:8px;"></i>
-                    </button>
-                    <div class="pupr-dropdown-menu" id="dropdownKecamatanMenu" style="max-height:220px;overflow-y:auto;">
-                        <div class="pupr-dropdown-item {{ !request('kecamatan') || request('kecamatan')=='all' ? 'active' : '' }}" data-value="all">Semua Kecamatan</div>
-                        @foreach(['Kaliwates','Sumbersari','Patrang','Ajung','Rambipuji','Balung','Ambulu','Wuluhan','Puger','Kencong','Silo','Mayang','Sukowono','Kalisat','Arjasa','Tanggul'] as $kec)
-                            <div class="pupr-dropdown-item {{ request('kecamatan') == strtolower(str_replace(' ','_',$kec)) ? 'active' : '' }}" data-value="{{ strtolower(str_replace(' ','_',$kec)) }}">Kec. {{ $kec }}</div>
+                {{-- Filter Kecamatan --}}
+                @if(!auth()->check() || !auth()->user()->isAdminKecamatan())
+                <div class="filter-item">
+                    <select name="kecamatan" onchange="this.form.submit()">
+                        <option value="all">-- Semua Kecamatan --</option>
+                        @foreach($listKecamatan as $kec)
+                            <option value="{{ $kec }}" {{ request('kecamatan') == $kec ? 'selected' : '' }}>Kec. {{ $kec }}</option>
                         @endforeach
-                    </div>
+                    </select>
                 </div>
-                <input type="hidden" name="kecamatan" id="inputFilterKecamatan" value="{{ request('kecamatan', 'all') }}" />
-            </div>
+                @endif
 
-            {{-- Filter Status BAP --}}
-            <div class="filter-group">
-                <div class="pupr-dropdown-wrapper">
-                    <button type="button" class="btn btn-outline pupr-dropdown-toggle" data-toggle="pupr-dropdown">
-                        <span class="selected-label">{{ request('status_bap') == 'terbit' ? 'BAP Terbit' : (request('status_bap') == 'draft' ? 'Draft BAP' : (request('status_bap') == 'belum' ? 'Belum BAP' : 'Semua Status BAP')) }}</span>
-                        <i class="fas fa-chevron-down" style="font-size:10px;margin-left:8px;"></i>
-                    </button>
-                    <div class="pupr-dropdown-menu" id="dropdownStatusBapMenu">
-                        <div class="pupr-dropdown-item {{ !request('status_bap') || request('status_bap')=='all' ? 'active' : '' }}" data-value="all">Semua Status BAP</div>
-                        <div class="pupr-dropdown-item {{ request('status_bap')=='terbit' ? 'active' : '' }}" data-value="terbit">BAP Terbit</div>
-                        <div class="pupr-dropdown-item {{ request('status_bap')=='draft' ? 'active' : '' }}" data-value="draft">Draft BAP</div>
-                        <div class="pupr-dropdown-item {{ request('status_bap')=='belum' ? 'active' : '' }}" data-value="belum">Belum Memiliki BAP</div>
-                    </div>
+                {{-- Filter Desa --}}
+                <div class="filter-item">
+                    <select name="desa" onchange="this.form.submit()">
+                        <option value="all">-- Semua Desa / Kelurahan --</option>
+                        @foreach($listDesa as $d)
+                            <option value="{{ $d }}" {{ request('desa') == $d ? 'selected' : '' }}>Desa {{ $d }}</option>
+                        @endforeach
+                    </select>
                 </div>
-                <input type="hidden" name="status_bap" id="inputFilterStatusBap" value="{{ request('status_bap', 'all') }}" />
-            </div>
 
-            <div class="filter-actions">
-                <a href="{{ route('laporan', ['tab' => $tab]) }}" class="btn btn-outline"><i class="fas fa-redo"></i> Reset</a>
-            </div>
-        </form>
+                {{-- Filter Status --}}
+                <div class="filter-item">
+                    <select name="status" onchange="this.form.submit()">
+                        <option value="all">-- Semua Status --</option>
+                        <option value="layak" {{ request('status') == 'layak' ? 'selected' : '' }}>Hasil Sesuai (Layak)</option>
+                        <option value="tidak_layak" {{ request('status') == 'tidak_layak' ? 'selected' : '' }}>Hasil Tidak Sesuai</option>
+                        <option value="sudah" {{ request('status') == 'sudah' ? 'selected' : '' }}>Sudah Survei</option>
+                        <option value="belum" {{ request('status') == 'belum' ? 'selected' : '' }}>Belum Survei</option>
+                    </select>
+                </div>
 
-        <!-- Tabel Data Rekapitulasi berdasarkan Tab -->
+                <div style="display:flex;gap:8px;">
+                    <button type="submit" class="btn btn-primary" style="padding:9px 16px;border-radius:8px;font-weight:700;"><i class="fas fa-filter"></i> Filter</button>
+                    <a href="{{ route('laporan', ['tab' => $tab]) }}" class="btn btn-outline" style="padding:9px 14px;border-radius:8px;"><i class="fas fa-redo"></i> Reset</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Card Container Content -->
         <div class="table-card">
             <div class="table-header">
                 <h3>
-                    @if($tab === 'progress')
-                        <i class="fas fa-chart-line" style="color:var(--primary);margin-right:8px;"></i>Rekapitulasi Progress Pekerjaan Lapangan
-                    @elseif($tab === 'survei')
-                        <i class="fas fa-clipboard-check" style="color:var(--success);margin-right:8px;"></i>Rekapitulasi Hasil Verifikasi Survei Lapangan
-                    @elseif($tab === 'bap')
-                        <i class="fas fa-file-pdf" style="color:var(--danger);margin-right:8px;"></i>Rekapitulasi Berita Acara Pemeriksaan (BAP)
-                    @elseif($tab === 'petugas')
-                        <i class="fas fa-user-shield" style="color:#8e44ad;margin-right:8px;"></i>Rekapitulasi Kinerja &amp; Penugasan Petugas
+                    @if($tab === 'rekap')
+                        <i class="fas fa-chart-pie" style="color:#002855;margin-right:8px;"></i>Rekapitulasi Hasil Sesuai / Tidak Sesuai per Desa &amp; Kecamatan
+                    @elseif($tab === 'indikator')
+                        <i class="fas fa-sliders" style="color:#27ae60;margin-right:8px;"></i>Rekapitulasi Capaian 6 Indikator RTLH per Desa &amp; Kecamatan
+                    @elseif($tab === 'galeri')
+                        <i class="fas fa-images" style="color:#d69e00;margin-right:8px;"></i>Galeri &amp; Dokumen Lampiran Foto Lapangan BSPS
+                    @elseif($tab === 'detail')
+                        <i class="fas fa-table-list" style="color:#8e44ad;margin-right:8px;"></i>Daftar Detail Hasil Verifikasi &amp; Validasi Penerima
                     @endif
                 </h3>
-                <div class="table-actions" style="display:flex;gap:8px;">
-                    <a href="{{ route('laporan.export', request()->query()) }}" class="btn btn-success" style="text-decoration:none;">
-                        <i class="fas fa-file-excel"></i> Export Excel (.CSV)
+                <div style="display:flex;gap:8px;">
+                    <a href="{{ route('laporan.export', request()->query()) }}" class="btn btn-success" style="padding:8px 14px;border-radius:8px;font-weight:700;text-decoration:none;">
+                        <i class="fas fa-file-excel"></i> Export Excel (.XLS)
                     </a>
-                    <a href="{{ route('laporan.cetak', request()->query()) }}" target="_blank" class="btn btn-primary" style="text-decoration:none;">
+                    <a href="{{ route('laporan.cetak', request()->query()) }}" target="_blank" class="btn btn-primary" style="padding:8px 14px;border-radius:8px;font-weight:700;text-decoration:none;">
                         <i class="fas fa-print"></i> Cetak Laporan Resmi
                     </a>
                 </div>
             </div>
 
-            <div class="table-wrapper">
-                @if($tab === 'progress')
-                    {{-- TAB 1: REKAP PROGRESS PEKERJAAN --}}
-                    <table>
+            @if($tab === 'rekap')
+                {{-- TAB 1: REKAP SESUAI VS TIDAK SESUAI PER DESA & KECAMATAN --}}
+                <div class="table-wrapper">
+                    <table class="pupr-table">
                         <thead>
                             <tr>
-                                <th style="width:50px;">No</th>
-                                <th style="min-width:240px;">Nama Kegiatan Lapangan</th>
-                                <th style="min-width:160px;">Lokasi &amp; Alamat</th>
-                                <th style="min-width:140px;">Nilai Kontrak</th>
-                                <th style="min-width:150px;">Kontraktor / Pelaksana</th>
-                                <th style="min-width:130px;">Survei Lapangan</th>
-                                <th style="min-width:130px;">Status BAP</th>
-                                <th style="width:100px;">Aksi</th>
+                                <th style="width:40px;text-align:center;">No</th>
+                                <th>Kecamatan</th>
+                                <th>Desa / Kelurahan</th>
+                                <th style="text-align:center;">Total Target</th>
+                                <th style="text-align:center;">Sudah Survei</th>
+                                <th style="text-align:center;">Belum Survei</th>
+                                 <th style="text-align:center;">Hasil Sesuai (Layak)</th>
+                                <th style="text-align:center;">Hasil Tidak Sesuai</th>
+                                <th style="text-align:center;min-width:130px;">% Progres Survei</th>
+                                <th style="text-align:center;min-width:140px;">% Kesesuaian Hasil</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($kegiatans as $index => $item)
+                            @php
+                                $sumTotal = 0; $sumSudah = 0; $sumBelum = 0; $sumLayak = 0; $sumTidakLayak = 0;
+                            @endphp
+                            @forelse($rekapDesaKecamatan as $index => $row)
+                                @php
+                                    $belumSurvei = max(0, $row->total_penerima - $row->total_sudah_survei);
+                                    $pctSurvei = $row->total_penerima > 0 ? round(($row->total_sudah_survei / $row->total_penerima) * 100, 1) : 0;
+                                    $pctKesesuaian = $row->total_sudah_survei > 0 ? round(($row->total_layak / $row->total_sudah_survei) * 100, 1) : 0;
+                                    $sumTotal += $row->total_penerima;
+                                    $sumSudah += $row->total_sudah_survei;
+                                    $sumBelum += $belumSurvei;
+                                    $sumLayak += $row->total_layak;
+                                    $sumTidakLayak += $row->total_tidak_layak;
+                                @endphp
                                 <tr>
-                                    <td>{{ $kegiatans->firstItem() + $index }}</td>
+                                    <td style="text-align:center;">{{ $index + 1 }}</td>
+                                    <td><strong style="color:#002855;">{{ $row->kecamatan }}</strong></td>
+                                    <td><strong style="color:#0f172a;">{{ $row->desa_kelurahan }}</strong></td>
+                                    <td style="text-align:center;font-weight:700;">{{ number_format($row->total_penerima) }}</td>
+                                    <td style="text-align:center;"><span class="badge-status info">{{ number_format($row->total_sudah_survei) }}</span></td>
+                                    <td style="text-align:center;"><span class="badge-status warning">{{ number_format($belumSurvei) }}</span></td>
+                                    <td style="text-align:center;"><span class="badge-status success"><i class="fas fa-check"></i> {{ number_format($row->total_layak) }}</span></td>
+                                    <td style="text-align:center;"><span class="badge-status danger"><i class="fas fa-xmark"></i> {{ number_format($row->total_tidak_layak) }}</span></td>
+                                    <td style="text-align:center;">
+                                        <div class="progress-bar-mini">
+                                            <div class="progress-bar-fill" style="width: {{ min(100, $pctSurvei) }}%;"></div>
+                                        </div>
+                                        <strong style="color:#002855;font-size:12px;">{{ $pctSurvei }}%</strong>
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <div class="progress-bar-mini">
+                                            <div class="progress-bar-fill" style="width: {{ min(100, $pctKesesuaian) }}%;background:#27ae60;"></div>
+                                        </div>
+                                        <strong style="color:#27ae60;font-size:12px;">{{ $pctKesesuaian }}%</strong>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="10" style="text-align:center;padding:40px;color:#94a3b8;">
+                                        <i class="fas fa-inbox" style="font-size:32px;display:block;margin-bottom:10px;opacity:0.4;"></i>
+                                        Belum ada data rekapitulasi desa &amp; kecamatan.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                        @if($rekapDesaKecamatan->count() > 0)
+                        <tfoot style="background:#f8fafc;font-weight:800;border-top:2px solid #cbd5e1;">
+                            <tr>
+                                <td colspan="3" style="text-align:right;padding:14px;color:#002855;">TOTAL KESELURUHAN:</td>
+                                <td style="text-align:center;color:#002855;">{{ number_format($sumTotal) }}</td>
+                                <td style="text-align:center;color:#002855;">{{ number_format($sumSudah) }}</td>
+                                <td style="text-align:center;color:#b78100;">{{ number_format($sumBelum) }}</td>
+                                <td style="text-align:center;color:#27ae60;">{{ number_format($sumLayak) }}</td>
+                                <td style="text-align:center;color:#e74c3c;">{{ number_format($sumTidakLayak) }}</td>
+                                <td style="text-align:center;color:#002855;">
+                                    {{ $sumTotal > 0 ? round(($sumSudah / $sumTotal) * 100, 1) : 0 }}%
+                                </td>
+                                <td style="text-align:center;color:#27ae60;">
+                                    {{ $sumSudah > 0 ? round(($sumLayak / $sumSudah) * 100, 1) : 0 }}%
+                                </td>
+                            </tr>
+                            </tr>
+                        </tfoot>
+                        @endif
+                    </table>
+                </div>
+
+            @elseif($tab === 'indikator')
+                {{-- TAB 2: CAPAIAN 6 INDIKATOR RTLH PER DESA & KECAMATAN --}}
+                <div class="table-wrapper">
+                    <table class="pupr-table">
+                        <thead>
+                            <tr>
+                                <th style="width:40px;text-align:center;">No</th>
+                                <th>Kecamatan</th>
+                                <th>Desa / Kelurahan</th>
+                                <th style="text-align:center;">Sudah Survei</th>
+                                <th style="text-align:center;">1. Atap Rusak</th>
+                                <th style="text-align:center;">2. Dinding Rusak</th>
+                                <th style="text-align:center;">3. Lantai Tanah</th>
+                                <th style="text-align:center;">4. Pondasi Rusak</th>
+                                <th style="text-align:center;">5. Struktur Rusak</th>
+                                <th style="text-align:center;">6. Penghasilan &lt; UMK</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($rekapIndikator as $index => $row)
+                                <tr>
+                                    <td style="text-align:center;">{{ $index + 1 }}</td>
+                                    <td><strong style="color:#002855;">{{ $row->kecamatan }}</strong></td>
+                                    <td><strong style="color:#0f172a;">{{ $row->desa_kelurahan }}</strong></td>
+                                    <td style="text-align:center;font-weight:700;">{{ number_format($row->total_sudah_survei) }}</td>
+                                    <td style="text-align:center;"><span class="badge-status danger">{{ number_format($row->atap_rtlh) }}</span></td>
+                                    <td style="text-align:center;"><span class="badge-status danger">{{ number_format($row->dinding_rtlh) }}</span></td>
+                                    <td style="text-align:center;"><span class="badge-status danger">{{ number_format($row->lantai_rtlh) }}</span></td>
+                                    <td style="text-align:center;"><span class="badge-status danger">{{ number_format($row->pondasi_rtlh) }}</span></td>
+                                    <td style="text-align:center;"><span class="badge-status danger">{{ number_format($row->struktur_rtlh) }}</span></td>
+                                    <td style="text-align:center;"><span class="badge-status warning">{{ number_format($row->penghasilan_rtlh) }}</span></td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="10" style="text-align:center;padding:40px;color:#94a3b8;">
+                                        Belum ada data indikator RTLH.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+            @elseif($tab === 'galeri')
+                {{-- TAB 3: GALERI & LAMPIRAN FOTO LAPANGAN --}}
+                <div class="galeri-grid">
+                    @forelse($penerimaList as $p)
+                        <div class="galeri-card">
+                            <div class="galeri-card-header">
+                                <div>
+                                    <strong style="font-size:14.5px;color:#002855;display:block;">{{ $p->nama }}</strong>
+                                    <span style="font-size:11.5px;color:#64748b;"><i class="fas fa-location-dot" style="color:#e74c3c;"></i> {{ $p->desa_kelurahan }}, Kec. {{ $p->kecamatan }}</span>
+                                </div>
+                                <div>
+                                    @if($p->status_kelayakan === 'Layak Diusulkan')
+                                        <span class="badge-status success"><i class="fas fa-check"></i> Sesuai</span>
+                                    @elseif($p->status_kelayakan === 'Tidak Layak Diusulkan')
+                                        <span class="badge-status danger"><i class="fas fa-times"></i> Tidak Sesuai</span>
+                                    @else
+                                        <span class="badge-status warning">Belum Survei</span>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="galeri-card-body">
+                                <div style="font-size:11.5px;color:#475569;margin-bottom:6px;">
+                                    <strong>NIK:</strong> <span style="font-family:monospace;">{{ $p->no_ktp ?: '-' }}</span> &bull; <strong>Alamat:</strong> {{ $p->alamat ?: '-' }}
+                                </div>
+
+                                <div class="photo-thumbs-grid">
+                                    {{-- Tampak Depan --}}
+                                    <div class="photo-thumb-item" onclick="openLightbox('{{ asset($p->foto_sudut_depan ?: 'logo.jpg') }}', '{{ $p->nama }} - Tampak Depan')">
+                                        <img src="{{ asset($p->foto_sudut_depan ?: 'logo.jpg') }}" alt="Depan" />
+                                        <span class="photo-thumb-label">Depan</span>
+                                    </div>
+                                    {{-- Dalam / Interior --}}
+                                    <div class="photo-thumb-item" onclick="openLightbox('{{ asset($p->foto_bagian_dalam ?: 'logo.jpg') }}', '{{ $p->nama }} - Interior')">
+                                        <img src="{{ asset($p->foto_bagian_dalam ?: 'logo.jpg') }}" alt="Dalam" />
+                                        <span class="photo-thumb-label">Dalam</span>
+                                    </div>
+                                    {{-- KTP --}}
+                                    <div class="photo-thumb-item" onclick="openLightbox('{{ asset($p->ktp ?: 'logo.jpg') }}', '{{ $p->nama }} - KTP')">
+                                        <img src="{{ asset($p->ktp ?: 'logo.jpg') }}" alt="KTP" />
+                                        <span class="photo-thumb-label">KTP</span>
+                                    </div>
+                                    {{-- KK --}}
+                                    <div class="photo-thumb-item" onclick="openLightbox('{{ asset($p->kk ?: 'logo.jpg') }}', '{{ $p->nama }} - Kartu Keluarga')">
+                                        <img src="{{ asset($p->kk ?: 'logo.jpg') }}" alt="KK" />
+                                        <span class="photo-thumb-label">KK</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div style="grid-column:1/-1;text-align:center;padding:40px;color:#94a3b8;">
+                            <i class="fas fa-images" style="font-size:36px;margin-bottom:10px;opacity:0.4;"></i>
+                            Tidak ada data galeri foto penerima.
+                        </div>
+                    @endforelse
+                </div>
+                <div style="padding:16px 24px;">
+                    {{ $penerimaList->links() }}
+                </div>
+
+            @elseif($tab === 'detail')
+                {{-- TAB 4: DETAIL DATA PENERIMA --}}
+                <div class="table-wrapper">
+                    <table class="pupr-table">
+                        <thead>
+                            <tr>
+                                <th style="width:40px;text-align:center;">No</th>
+                                <th>Nama Calon Penerima</th>
+                                <th>NIK / KK</th>
+                                <th>Kecamatan &amp; Desa</th>
+                                <th style="text-align:center;">Status Kelayakan</th>
+                                <th>Indikator RTLH Terpenuhi</th>
+                                <th style="text-align:center;">Foto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($penerimaList as $index => $p)
+                                <tr>
+                                    <td style="text-align:center;">{{ $penerimaList->firstItem() + $index }}</td>
                                     <td>
-                                        <strong style="color:var(--primary-dark);font-size:14px;display:block;margin-bottom:3px;">{{ $item->nama_kegiatan }}</strong>
-                                        <span style="font-size:12px;color:var(--text-muted);"><i class="fas fa-calendar-day"></i> {{ $item->tanggal ? $item->tanggal->format('d M Y') : '-' }} &bull; Minggu ke-{{ $item->minggu }}</span>
+                                        <strong style="color:#002855;font-size:14px;display:block;">{{ $p->nama }}</strong>
+                                        <span style="font-size:11.5px;color:#64748b;">{{ $p->alamat ?: '-' }}</span>
                                     </td>
                                     <td>
-                                        <div><i class="fas fa-location-dot" style="color:var(--primary);font-size:12px;"></i> Kec. {{ ucwords(str_replace('_',' ',$item->lokasi)) }}</div>
-                                        <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">{{ $item->alamat ?: '-' }}</div>
+                                        <div style="font-family:monospace;font-size:12px;">KTP: {{ $p->no_ktp ?: '-' }}</div>
+                                        <div style="font-family:monospace;font-size:11px;color:#64748b;">KK: {{ $p->no_kk ?: '-' }}</div>
                                     </td>
                                     <td>
-                                        @php
-                                            $valKontrak = is_numeric($item->nilai_kontrak) ? (float)$item->nilai_kontrak : (float)preg_replace('/[^0-9.]/', '', (string)$item->nilai_kontrak);
-                                        @endphp
-                                        <strong style="color:var(--primary);">{{ $valKontrak > 0 ? 'Rp ' . number_format($valKontrak, 0, ',', '.') : ($item->nilai_kontrak ?: '-') }}</strong>
+                                        <div><strong style="color:#0f172a;">{{ $p->desa_kelurahan }}</strong></div>
+                                        <div style="font-size:11.5px;color:#64748b;">Kec. {{ $p->kecamatan }}</div>
                                     </td>
-                                    <td><span style="font-weight:600;">{{ $item->kontraktor ?: '-' }}</span></td>
-                                    <td>
-                                        @if($item->surveys->count() > 0)
-                                            <span class="badge-status success"><i class="fas fa-check-circle"></i> {{ $item->surveys->count() }}x Survei</span>
+                                    <td style="text-align:center;">
+                                        @if($p->status_kelayakan === 'Layak Diusulkan')
+                                            <span class="badge-status success"><i class="fas fa-check-circle"></i> Layak (Sesuai)</span>
+                                        @elseif($p->status_kelayakan === 'Tidak Layak Diusulkan')
+                                            <span class="badge-status danger"><i class="fas fa-times-circle"></i> Tidak Layak</span>
                                         @else
                                             <span class="badge-status warning"><i class="fas fa-clock"></i> Belum Survei</span>
                                         @endif
                                     </td>
                                     <td>
-                                        @if($item->bap && $item->bap->status === 'terbit')
-                                            <span class="badge-status success"><i class="fas fa-shield-check"></i> BAP Terbit</span>
-                                        @elseif($item->bap && $item->bap->status === 'draft')
-                                            <span class="badge-status warning"><i class="fas fa-file-pen"></i> Draft BAP</span>
-                                        @else
-                                            <span class="badge-status danger"><i class="fas fa-circle-xmark"></i> Belum BAP</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <button type="button" class="btn-detail-laporan" onclick="openDetailModal({{ json_encode($item) }})">
-                                            <i class="fas fa-eye"></i> Detail
-                                        </button>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="8" style="text-align:center;padding:40px;color:var(--text-muted);">
-                                        <i class="fas fa-inbox" style="font-size:32px;display:block;margin-bottom:10px;opacity:0.4;"></i>
-                                        Belum ada data rekapitulasi kegiatan.
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                    <div class="table-footer">
-                        <span>Menampilkan {{ $kegiatans->firstItem() ?? 0 }}-{{ $kegiatans->lastItem() ?? 0 }} dari {{ $kegiatans->total() }} data kegiatan</span>
-                        @if($kegiatans->hasPages())
-                            <div class="pagination">
-                                @if($kegiatans->onFirstPage())
-                                    <span class="page disabled"><i class="fas fa-chevron-left"></i></span>
-                                @else
-                                    <a href="{{ $kegiatans->previousPageUrl() }}" class="page"><i class="fas fa-chevron-left"></i></a>
-                                @endif
-
-                                @foreach($kegiatans->getUrlRange(max(1, $kegiatans->currentPage() - 2), min($kegiatans->lastPage(), $kegiatans->currentPage() + 2)) as $page => $url)
-                                    @if($page == $kegiatans->currentPage())
-                                        <span class="page active">{{ $page }}</span>
-                                    @else
-                                        <a href="{{ $url }}" class="page">{{ $page }}</a>
-                                    @endif
-                                @endforeach
-
-                                @if($kegiatans->hasMorePages())
-                                    <a href="{{ $kegiatans->nextPageUrl() }}" class="page"><i class="fas fa-chevron-right"></i></a>
-                                @else
-                                    <span class="page disabled"><i class="fas fa-chevron-right"></i></span>
-                                @endif
-                            </div>
-                        @endif
-                    </div>
-
-                @elseif($tab === 'survei')
-                    {{-- TAB 2: REKAP HASIL SURVEI --}}
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style="width:50px;">No</th>
-                                <th style="min-width:220px;">Nama Kegiatan Lapangan</th>
-                                <th style="min-width:180px;">Petugas Survei</th>
-                                <th style="min-width:140px;">Tanggal Input</th>
-                                <th style="min-width:160px;">Koordinat GPS</th>
-                                <th style="min-width:140px;">Sampel Fisik</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($surveylist as $index => $s)
-                                <tr>
-                                    <td>{{ $surveylist->firstItem() + $index }}</td>
-                                    <td>
-                                        <strong style="color:var(--primary-dark);">{{ $s->dataMingguan->nama_kegiatan ?? '-' }}</strong>
-                                        <div style="font-size:12px;color:var(--text-muted);">Kec. {{ ucwords(str_replace('_',' ',$s->dataMingguan->lokasi ?? '')) }}</div>
-                                    </td>
-                                    <td>
-                                        <span style="font-weight:700;color:var(--primary);"><i class="fas fa-user-shield"></i> {{ $s->user->name ?? '-' }}</span>
-                                    </td>
-                                    <td>{{ $s->created_at ? $s->created_at->format('d M Y H:i') : '-' }}</td>
-                                    <td>
-                                        <span style="font-family:monospace;font-size:12px;"><i class="fas fa-location-crosshairs" style="color:var(--danger);"></i> {{ $s->latitude ?? '-' }}, {{ $s->longitude ?? '-' }}</span>
-                                    </td>
-                                    <td>
-                                        @php
-                                            $sampleCount = is_array($s->sampel_fisik) ? count($s->sampel_fisik) : 0;
-                                        @endphp
-                                        <span class="badge-status success"><i class="fas fa-list-check"></i> {{ $sampleCount }} Sampel Cek</span>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted);">Belum ada data survei lapangan.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                    <div class="table-footer">
-                        <span>Menampilkan {{ $surveylist->firstItem() ?? 0 }}-{{ $surveylist->lastItem() ?? 0 }} dari {{ $surveylist->total() }} survei</span>
-                        @if($surveylist->hasPages())
-                            <div class="pagination">
-                                @if($surveylist->onFirstPage())
-                                    <span class="page disabled"><i class="fas fa-chevron-left"></i></span>
-                                @else
-                                    <a href="{{ $surveylist->previousPageUrl() }}" class="page"><i class="fas fa-chevron-left"></i></a>
-                                @endif
-
-                                @foreach($surveylist->getUrlRange(max(1, $surveylist->currentPage() - 2), min($surveylist->lastPage(), $surveylist->currentPage() + 2)) as $page => $url)
-                                    @if($page == $surveylist->currentPage())
-                                        <span class="page active">{{ $page }}</span>
-                                    @else
-                                        <a href="{{ $url }}" class="page">{{ $page }}</a>
-                                    @endif
-                                @endforeach
-
-                                @if($surveylist->hasMorePages())
-                                    <a href="{{ $surveylist->nextPageUrl() }}" class="page"><i class="fas fa-chevron-right"></i></a>
-                                @else
-                                    <span class="page disabled"><i class="fas fa-chevron-right"></i></span>
-                                @endif
-                            </div>
-                        @endif
-                    </div>
-
-                @elseif($tab === 'bap')
-                    {{-- TAB 3: REKAP BAP --}}
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style="width:50px;">No</th>
-                                <th style="min-width:180px;">Nomor BAP</th>
-                                <th style="min-width:240px;">Nama Kegiatan Lapangan</th>
-                                <th style="min-width:140px;">Tanggal BAP</th>
-                                <th style="min-width:130px;">Status BAP</th>
-                                <th style="width:120px;">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($baplist as $index => $b)
-                                <tr>
-                                    <td>{{ $baplist->firstItem() + $index }}</td>
-                                    <td><strong style="color:var(--primary);font-family:monospace;">{{ $b->nomor_bap }}</strong></td>
-                                    <td>
-                                        <strong>{{ $b->dataMingguan->nama_kegiatan ?? '-' }}</strong>
-                                    </td>
-                                    <td>{{ $b->tanggal_bap ? $b->tanggal_bap->format('d M Y') : '-' }}</td>
-                                    <td>
-                                        <span class="badge-status {{ $b->status === 'terbit' ? 'success' : 'warning' }}">
-                                            {{ ucfirst($b->status) }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <a href="{{ route('bap.cetak', $b->id) }}" target="_blank" class="btn-icon edit" style="text-decoration:none;">
-                                            <i class="fas fa-print"></i> Cetak BAP
-                                        </a>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted);">Belum ada data BAP terbit.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                    <div class="table-footer">
-                        <span>Menampilkan {{ $baplist->firstItem() ?? 0 }}-{{ $baplist->lastItem() ?? 0 }} dari {{ $baplist->total() }} BAP</span>
-                        @if($baplist->hasPages())
-                            <div class="pagination">
-                                @if($baplist->onFirstPage())
-                                    <span class="page disabled"><i class="fas fa-chevron-left"></i></span>
-                                @else
-                                    <a href="{{ $baplist->previousPageUrl() }}" class="page"><i class="fas fa-chevron-left"></i></a>
-                                @endif
-
-                                @foreach($baplist->getUrlRange(max(1, $baplist->currentPage() - 2), min($baplist->lastPage(), $baplist->currentPage() + 2)) as $page => $url)
-                                    @if($page == $baplist->currentPage())
-                                        <span class="page active">{{ $page }}</span>
-                                    @else
-                                        <a href="{{ $url }}" class="page">{{ $page }}</a>
-                                    @endif
-                                @endforeach
-
-                                @if($baplist->hasMorePages())
-                                    <a href="{{ $baplist->nextPageUrl() }}" class="page"><i class="fas fa-chevron-right"></i></a>
-                                @else
-                                    <span class="page disabled"><i class="fas fa-chevron-right"></i></span>
-                                @endif
-                            </div>
-                        @endif
-                    </div>
-
-                @elseif($tab === 'petugas')
-                    {{-- TAB 4: REKAP KINERJA PETUGAS --}}
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style="width:50px;">No</th>
-                                <th style="min-width:200px;">Nama Petugas Lapangan</th>
-                                <th style="min-width:140px;">NIP</th>
-                                <th style="min-width:140px;">Wilayah Kecamatan</th>
-                                <th style="min-width:140px;">Total Penugasan</th>
-                                <th style="min-width:140px;">Survei Selesai</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($petugaslist as $index => $p)
-                                <tr>
-                                    <td>{{ $petugaslist->firstItem() + $index }}</td>
-                                    <td>
-                                        <div style="display:flex;align-items:center;gap:10px;">
-                                            <div style="width:34px;height:34px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;">
-                                                {{ strtoupper(substr($p->name, 0, 1)) }}
-                                            </div>
-                                            <div>
-                                                <strong style="color:var(--primary-dark);">{{ $p->name }}</strong>
-                                                <div style="font-size:11px;color:var(--text-muted);">{{ $p->email }}</div>
-                                            </div>
+                                        <div style="display:flex;gap:4px;flex-wrap:wrap;">
+                                            @if($p->indikator_atap === 'tidak_ada') <span class="badge-status danger" style="font-size:10px;padding:2px 6px;">Atap</span> @endif
+                                            @if($p->indikator_dinding === 'tidak_ada') <span class="badge-status danger" style="font-size:10px;padding:2px 6px;">Dinding</span> @endif
+                                            @if($p->indikator_lantai === 'tidak_ada') <span class="badge-status danger" style="font-size:10px;padding:2px 6px;">Lantai</span> @endif
+                                            @if($p->indikator_pondasi === 'tidak_ada') <span class="badge-status danger" style="font-size:10px;padding:2px 6px;">Pondasi</span> @endif
+                                            @if($p->indikator_struktur === 'tidak_ada') <span class="badge-status danger" style="font-size:10px;padding:2px 6px;">Struktur</span> @endif
+                                            @if($p->indikator_penghasilan === 'ada') <span class="badge-status warning" style="font-size:10px;padding:2px 6px;">Penghasilan</span> @endif
                                         </div>
                                     </td>
-                                    <td><span style="font-family:monospace;">{{ $p->nip ?? '-' }}</span></td>
-                                    <td><i class="fas fa-location-dot" style="color:var(--primary);"></i> {{ $p->kecamatan ?: '-' }}</td>
-                                    <td><span class="badge-status warning">{{ $p->kegiatans->count() }} Kegiatan</span></td>
-                                    <td><span class="badge-status success">{{ $p->surveys->count() }} Survei</span></td>
+                                    <td style="text-align:center;">
+                                        @if($p->foto_sudut_depan)
+                                            <button type="button" class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="openLightbox('{{ asset($p->foto_sudut_depan) }}', '{{ $p->nama }} - Tampak Depan')">
+                                                <i class="fas fa-camera"></i> Foto
+                                            </button>
+                                        @else
+                                            <span style="font-size:11px;color:#94a3b8;">-</span>
+                                        @endif
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted);">Belum ada data petugas.</td>
+                                    <td colspan="7" style="text-align:center;padding:40px;color:#94a3b8;">
+                                        Belum ada data detail penerima.
+                                    </td>
                                 </tr>
                             @endforelse
                         </tbody>
                     </table>
-                    <div class="table-footer">
-                        <span>Menampilkan {{ $petugaslist->firstItem() ?? 0 }}-{{ $petugaslist->lastItem() ?? 0 }} dari {{ $petugaslist->total() }} petugas</span>
-                        @if($petugaslist->hasPages())
-                            <div class="pagination">
-                                @if($petugaslist->onFirstPage())
-                                    <span class="page disabled"><i class="fas fa-chevron-left"></i></span>
-                                @else
-                                    <a href="{{ $petugaslist->previousPageUrl() }}" class="page"><i class="fas fa-chevron-left"></i></a>
-                                @endif
-
-                                @foreach($petugaslist->getUrlRange(max(1, $petugaslist->currentPage() - 2), min($petugaslist->lastPage(), $petugaslist->currentPage() + 2)) as $page => $url)
-                                    @if($page == $petugaslist->currentPage())
-                                        <span class="page active">{{ $page }}</span>
-                                    @else
-                                        <a href="{{ $url }}" class="page">{{ $page }}</a>
-                                    @endif
-                                @endforeach
-
-                                @if($petugaslist->hasMorePages())
-                                    <a href="{{ $petugaslist->nextPageUrl() }}" class="page"><i class="fas fa-chevron-right"></i></a>
-                                @else
-                                    <span class="page disabled"><i class="fas fa-chevron-right"></i></span>
-                                @endif
-                            </div>
-                        @endif
-                    </div>
-                @endif
-            </div>
+                </div>
+                <div style="padding:16px 24px;">
+                    {{ $penerimaList->links() }}
+                </div>
+            @endif
         </div>
     </main>
 
-    <!-- Modal Popup Detail Laporan (window.PuprModal) -->
-    <div class="modal-overlay" id="modalDetailLaporan">
-        <div class="modal-box" style="max-width:620px;">
-            <div class="modal-header">
-                <h3><i class="fas fa-file-invoice" style="color:var(--primary);margin-right:8px;"></i>Detail Laporan &amp; Kegiatan</h3>
-                <button class="close-btn" type="button" onclick="window.PuprModal.close('modalDetailLaporan')"><i class="fas fa-times"></i></button>
+    <!-- Modal Lightbox Viewer Foto -->
+    <div class="lightbox-modal" id="lightboxModal">
+        <div class="lightbox-content">
+            <div class="lightbox-header">
+                <strong id="lightboxTitle">Pratinjau Foto Lapangan</strong>
+                <button type="button" onclick="closeLightbox()" style="background:transparent;border:none;color:#fff;font-size:18px;cursor:pointer;"><i class="fas fa-times"></i></button>
             </div>
-            <div class="modal-body" style="padding:24px;">
-                <div style="background:rgba(0,40,85,0.04);border:1px solid rgba(0,40,85,0.08);border-radius:10px;padding:16px;margin-bottom:18px;">
-                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text-muted);letter-spacing:0.5px;">Nama Kegiatan Lapangan</div>
-                    <div style="font-size:16px;font-weight:800;color:var(--primary-dark);margin-top:2px;" id="detailNamaKegiatan">-</div>
-                    <div style="font-size:12.5px;color:var(--text-secondary);margin-top:6px;" id="detailLokasiKegiatan">-</div>
-                </div>
-
-                <div class="form-row" style="margin-bottom:14px;">
-                    <div>
-                        <div style="font-size:12px;color:var(--text-muted);font-weight:600;">Nilai Kontrak</div>
-                        <div style="font-size:14px;font-weight:700;color:var(--primary);" id="detailNilaiKontrak">-</div>
-                    </div>
-                    <div>
-                        <div style="font-size:12px;color:var(--text-muted);font-weight:600;">Kontraktor / Pelaksana</div>
-                        <div style="font-size:14px;font-weight:700;color:var(--text-primary);" id="detailKontraktor">-</div>
-                    </div>
-                </div>
-
-                <div class="form-row" style="margin-bottom:14px;">
-                    <div>
-                        <div style="font-size:12px;color:var(--text-muted);font-weight:600;">Tanggal &amp; Minggu Ke</div>
-                        <div style="font-size:13.5px;font-weight:600;color:var(--text-primary);" id="detailTanggalMinggu">-</div>
-                    </div>
-                    <div>
-                        <div style="font-size:12px;color:var(--text-muted);font-weight:600;">Status Berita Acara (BAP)</div>
-                        <div style="font-size:13.5px;font-weight:700;" id="detailStatusBap">-</div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer" style="padding:16px 24px;background:var(--bg-body);border-top:1px solid rgba(0,40,85,0.06);display:flex;justify-content:flex-end;gap:10px;">
-                <button type="button" class="btn btn-outline" onclick="window.PuprModal.close('modalDetailLaporan')">Tutup</button>
+            <div class="lightbox-body">
+                <img id="lightboxImg" src="" alt="Full Preview" />
             </div>
         </div>
     </div>
@@ -650,17 +736,20 @@
 
 @push('scripts')
 <script>
-    function openDetailModal(item) {
-        document.getElementById('detailNamaKegiatan').innerText = item.nama_kegiatan || '-';
-        document.getElementById('detailLokasiKegiatan').innerText = 'Kec. ' + (item.lokasi ? item.lokasi.replace('_', ' ') : '-') + ' • ' + (item.alamat || '-');
-        document.getElementById('detailNilaiKontrak').innerText = item.nilai_kontrak ? 'Rp ' + new Intl.NumberFormat('id-ID').format(item.nilai_kontrak) : '-';
-        document.getElementById('detailKontraktor').innerText = item.kontraktor || '-';
-        document.getElementById('detailTanggalMinggu').innerText = (item.tanggal ? item.tanggal : '-') + ' (Minggu ke-' + (item.minggu || 1) + ')';
-        
-        const bapStatus = item.bap ? item.bap.status.toUpperCase() + ' (' + item.bap.nomor_bap + ')' : 'BELUM MEMILIKI BAP';
-        document.getElementById('detailStatusBap').innerText = bapStatus;
-
-        window.PuprModal.open('modalDetailLaporan');
+    function openLightbox(src, title) {
+        document.getElementById('lightboxImg').src = src;
+        document.getElementById('lightboxTitle').innerText = title || 'Pratinjau Foto Lapangan';
+        document.getElementById('lightboxModal').classList.add('active');
     }
+
+    function closeLightbox() {
+        document.getElementById('lightboxModal').classList.remove('active');
+    }
+
+    document.getElementById('lightboxModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeLightbox();
+        }
+    });
 </script>
 @endpush

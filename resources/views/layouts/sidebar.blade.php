@@ -83,6 +83,10 @@
                 <i class="fas fa-clipboard-list"></i>
                 Data Verval
             </a>
+            <a class="menu-item {{ Request::is('laporan*') ? 'active' : '' }}" href="{{ url('/laporan') }}">
+                <i class="fas fa-file-invoice"></i>
+                Laporan &amp; Rekapitulasi
+            </a>
             @if(!auth()->check() || auth()->user()->isAdmin())
             <a class="menu-item {{ Request::is('pencocokan-data*') ? 'active' : '' }}" href="{{ url('/pencocokan-data') }}">
                 <i class="fas fa-id-card-clip"></i>

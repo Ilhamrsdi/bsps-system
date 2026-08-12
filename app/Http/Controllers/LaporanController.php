@@ -2,109 +2,363 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DataPenerima;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class LaporanController extends Controller
 {
+    /**
+     * Halaman Utama Rekapitulasi Laporan BSPS Verval
+     */
     public function index(Request $request)
     {
-        $tab = $request->get('tab', 'progress');
+        $tab = $request->get('tab', 'rekap'); // rekap, indikator, galeri, detail
         $search = $request->get('search');
-        $kecamatan = $request->get('kecamatan');
+        $kecamatan = $request->get('kecamatan', 'all');
+        $desa = $request->get('desa', 'all');
+        $status = $request->get('status', 'all');
+
+        $user = Auth::user();
+        if ($user && $user->isAdminKecamatan()) {
+            $kecamatan = $user->kecamatan;
+        }
+
+        // Base Query dengan Filter Role & Input User
+        $query = DataPenerima::query();
+
+        if ($user && $user->isAdminKecamatan()) {
+            $query->where('kecamatan', $user->kecamatan);
+        } elseif ($kecamatan && $kecamatan !== 'all') {
+            $query->where('kecamatan', $kecamatan);
+        }
+
+        if ($desa && $desa !== 'all') {
+            $query->where('desa_kelurahan', $desa);
+        }
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                  ->orWhere('no_ktp', 'like', "%{$search}%")
+                  ->orWhere('no_kk', 'like', "%{$search}%")
+                  ->orWhere('alamat', 'like', "%{$search}%")
+                  ->orWhere('desa_kelurahan', 'like', "%{$search}%");
+            });
+        }
+
+        if ($status === 'layak') {
+            $query->where('status_kelayakan', 'Layak Diusulkan');
+        } elseif ($status === 'tidak_layak') {
+            $query->where('status_kelayakan', 'Tidak Layak Diusulkan');
+        } elseif ($status === 'sudah') {
+            $query->sudahSurvei();
+        } elseif ($status === 'belum') {
+            $query->belumSurvei();
+        }
+
+        // 1. STATISTIK RINGKASAN UTAMA
+        $baseQuery = DataPenerima::query();
+        if ($user && $user->isAdminKecamatan()) {
+            $baseQuery->where('kecamatan', $user->kecamatan);
+        }
+
+        $totalPenerima = (clone $baseQuery)->count();
+        $totalSudahSurvei = (clone $baseQuery)->sudahSurvei()->count();
+        $totalBelumSurvei = (clone $baseQuery)->belumSurvei()->count();
+        $totalLayak = (clone $baseQuery)->where('status_kelayakan', 'Layak Diusulkan')->count();
+        $totalTidakLayak = (clone $baseQuery)->where('status_kelayakan', 'Tidak Layak Diusulkan')->count();
 
         $stats = [
-            'total_kegiatan' => 24,
-            'bap_terbit'     => 18,
-            'belum_bap'      => 6,
-            'survei_selesai' => 18,
+            'total_penerima'   => $totalPenerima,
+            'sudah_survei'     => $totalSudahSurvei,
+            'belum_survei'     => $totalBelumSurvei,
+            'total_layak'      => $totalLayak,
+            'total_tidak_layak'=> $totalTidakLayak,
+            'persen_layak'     => $totalSudahSurvei > 0 ? round(($totalLayak / $totalSudahSurvei) * 100, 1) : 0,
         ];
 
-        // Dummy Data Rekapitulasi Verval BSPS
-        $rawKegiatans = collect([
-            (object)[
-                'id' => 1,
-                'nama_kegiatan' => 'Verval Calon Penerima Bantuan BSPS - Bpk. Slamet Riyadi',
-                'lokasi' => 'Kaliwates',
-                'alamat' => 'Jl. Hayam Wuruk No. 45, Kel. Sempusari',
-                'nama_pemohon' => 'Bpk. Slamet Riyadi',
-                'status' => 'selesai',
-                'tanggal' => now()->subDays(2),
-                'bap' => (object)['nomor_bap' => 'BAP/BSPS/2026/001', 'status' => 'terbit'],
-                'surveys' => collect([(object)['id' => 101]]),
-                'petugas' => collect([(object)['name' => 'Ahmad Fauzi']]),
-            ],
-            (object)[
-                'id' => 2,
-                'nama_kegiatan' => 'Verifikasi Lapangan RTLH - Ibu Siti Aminah',
-                'lokasi' => 'Patrang',
-                'alamat' => 'Lingkungan Gebang Timur, Kel. Gebang',
-                'nama_pemohon' => 'Ibu Siti Aminah',
-                'status' => 'proses',
-                'tanggal' => now()->subDays(3),
-                'bap' => null,
-                'surveys' => collect([]),
-                'petugas' => collect([(object)['name' => 'Ahmad Fauzi']]),
-            ],
-            (object)[
-                'id' => 3,
-                'nama_kegiatan' => 'Verifikasi Validasi Rumah Swadaya - Bpk. Bambang Sutrisno',
-                'lokasi' => 'Sumbersari',
-                'alamat' => 'Dusun Antirogo Krajan, Kel. Antirogo',
-                'nama_pemohon' => 'Bpk. Bambang Sutrisno',
-                'status' => 'survei',
-                'tanggal' => now()->subDays(4),
-                'bap' => null,
-                'surveys' => collect([]),
-                'petugas' => collect([]),
-            ],
-            (object)[
-                'id' => 4,
-                'nama_kegiatan' => 'Survei Kelaikan Komponen Bangunan - Ibu Nurul Hidayati',
-                'lokasi' => 'Rambipuji',
-                'alamat' => 'Dusun Krajan, Desa Kaliwining',
-                'nama_pemohon' => 'Ibu Nurul Hidayati',
-                'status' => 'selesai',
-                'tanggal' => now()->subDays(5),
-                'bap' => (object)['nomor_bap' => 'BAP/BSPS/2026/002', 'status' => 'terbit'],
-                'surveys' => collect([(object)['id' => 102]]),
-                'petugas' => collect([(object)['name' => 'Budi Pratama']]),
-            ],
-            (object)[
-                'id' => 5,
-                'nama_kegiatan' => 'Verifikasi Data Usulan BSPS - Bpk. Joko Santoso',
-                'lokasi' => 'Arjasa',
-                'alamat' => 'Dusun Krajan, Desa Kemuning',
-                'nama_pemohon' => 'Bpk. Joko Santoso',
-                'status' => 'menunggu',
-                'tanggal' => now()->subDays(6),
-                'bap' => null,
-                'surveys' => collect([]),
-                'petugas' => collect([]),
-            ],
-        ]);
+        // 2. DROPDOWN LIST KECAMATAN & DESA
+        if ($user && $user->isAdminKecamatan()) {
+            $listKecamatan = collect([$user->kecamatan]);
+        } else {
+            $listKecamatan = DataPenerima::distinct()->orderBy('kecamatan', 'asc')->pluck('kecamatan')->filter()->values();
+        }
 
-        $currentPage = LengthAwarePaginator::resolveCurrentPage();
-        $perPage = 15;
-        $currentPageItems = $rawKegiatans->slice(($currentPage - 1) * $perPage, $perPage)->all();
-        $kegiatans = new LengthAwarePaginator($currentPageItems, count($rawKegiatans), $perPage, $currentPage, [
-            'path' => LengthAwarePaginator::resolveCurrentPath(),
-        ]);
+        $desaQuery = DataPenerima::distinct();
+        if ($kecamatan && $kecamatan !== 'all') {
+            $desaQuery->where('kecamatan', $kecamatan);
+        }
+        $listDesa = $desaQuery->orderBy('desa_kelurahan', 'asc')->pluck('desa_kelurahan')->filter()->values();
 
-        $surveylist = $kegiatans;
-        $baplist = $kegiatans;
-        $petugaslist = $kegiatans;
+        // 3. AGREGASI BERDASARKAN TAB
+        $rekapDesaKecamatan = collect();
+        $rekapIndikator = collect();
+        $penerimaList = collect();
 
-        return view('laporan.index', compact('stats', 'kegiatans', 'surveylist', 'baplist', 'petugaslist'));
+        if ($tab === 'rekap') {
+            // TAB 1: REKAP HASIL SESUAI VS TIDAK SESUAI PER DESA & KECAMATAN
+            $rekapQuery = DataPenerima::query();
+            if ($user && $user->isAdminKecamatan()) {
+                $rekapQuery->where('kecamatan', $user->kecamatan);
+            } elseif ($kecamatan && $kecamatan !== 'all') {
+                $rekapQuery->where('kecamatan', $kecamatan);
+            }
+            if ($desa && $desa !== 'all') {
+                $rekapQuery->where('desa_kelurahan', $desa);
+            }
+
+            $rekapDesaKecamatan = $rekapQuery
+                ->selectRaw("
+                    kecamatan,
+                    desa_kelurahan,
+                    COUNT(*) as total_penerima,
+                    SUM(CASE WHEN status_kelayakan = 'Layak Diusulkan' THEN 1 ELSE 0 END) as total_layak,
+                    SUM(CASE WHEN status_kelayakan = 'Tidak Layak Diusulkan' THEN 1 ELSE 0 END) as total_tidak_layak,
+                    SUM(CASE WHEN (foto_sudut_depan IS NOT NULL AND foto_sudut_depan != '') THEN 1 ELSE 0 END) as total_sudah_survei
+                ")
+                ->groupBy('kecamatan', 'desa_kelurahan')
+                ->orderBy('kecamatan')
+                ->orderBy('desa_kelurahan')
+                ->get();
+        } elseif ($tab === 'indikator') {
+            // TAB 2: CAPAIAN 6 INDIKATOR RTLH PER DESA & KECAMATAN
+            $indQuery = DataPenerima::query();
+            if ($user && $user->isAdminKecamatan()) {
+                $indQuery->where('kecamatan', $user->kecamatan);
+            } elseif ($kecamatan && $kecamatan !== 'all') {
+                $indQuery->where('kecamatan', $kecamatan);
+            }
+            if ($desa && $desa !== 'all') {
+                $indQuery->where('desa_kelurahan', $desa);
+            }
+
+            $rekapIndikator = $indQuery
+                ->selectRaw("
+                    kecamatan,
+                    desa_kelurahan,
+                    COUNT(*) as total_penerima,
+                    SUM(CASE WHEN (foto_sudut_depan IS NOT NULL AND foto_sudut_depan != '') THEN 1 ELSE 0 END) as total_sudah_survei,
+                    SUM(CASE WHEN indikator_atap = 'tidak_ada' THEN 1 ELSE 0 END) as atap_rtlh,
+                    SUM(CASE WHEN indikator_dinding = 'tidak_ada' THEN 1 ELSE 0 END) as dinding_rtlh,
+                    SUM(CASE WHEN indikator_lantai = 'tidak_ada' THEN 1 ELSE 0 END) as lantai_rtlh,
+                    SUM(CASE WHEN indikator_pondasi = 'tidak_ada' THEN 1 ELSE 0 END) as pondasi_rtlh,
+                    SUM(CASE WHEN indikator_struktur = 'tidak_ada' THEN 1 ELSE 0 END) as struktur_rtlh,
+                    SUM(CASE WHEN indikator_penghasilan = 'ada' THEN 1 ELSE 0 END) as penghasilan_rtlh
+                ")
+                ->groupBy('kecamatan', 'desa_kelurahan')
+                ->orderBy('kecamatan')
+                ->orderBy('desa_kelurahan')
+                ->get();
+        } else {
+            // TAB 3 (GALERI FOTO) & TAB 4 (DETAIL PENERIMA)
+            $penerimaList = $query->orderBy('nama', 'asc')->paginate(20)->withQueryString();
+        }
+
+        return view('laporan.index', compact(
+            'tab',
+            'stats',
+            'listKecamatan',
+            'listDesa',
+            'rekapDesaKecamatan',
+            'rekapIndikator',
+            'penerimaList'
+        ));
     }
 
+    /**
+     * Cetak Laporan Resmi A4 Landscape
+     */
     public function cetak(Request $request)
     {
-        return view('laporan.cetak');
+        $user = Auth::user();
+        $kecamatan = $request->get('kecamatan', 'all');
+        $desa = $request->get('desa', 'all');
+
+        if ($user && $user->isAdminKecamatan()) {
+            $kecamatan = $user->kecamatan;
+        }
+
+        $query = DataPenerima::query();
+        if ($user && $user->isAdminKecamatan()) {
+            $query->where('kecamatan', $user->kecamatan);
+        } elseif ($kecamatan && $kecamatan !== 'all') {
+            $query->where('kecamatan', $kecamatan);
+        }
+        if ($desa && $desa !== 'all') {
+            $query->where('desa_kelurahan', $desa);
+        }
+
+        $totalPenerima = (clone $query)->count();
+        $totalSudahSurvei = (clone $query)->sudahSurvei()->count();
+        $totalBelumSurvei = (clone $query)->belumSurvei()->count();
+        $totalLayak = (clone $query)->where('status_kelayakan', 'Layak Diusulkan')->count();
+        $totalTidakLayak = (clone $query)->where('status_kelayakan', 'Tidak Layak Diusulkan')->count();
+
+        $stats = [
+            'total'       => $totalPenerima,
+            'sudah'       => $totalSudahSurvei,
+            'belum'       => $totalBelumSurvei,
+            'layak'       => $totalLayak,
+            'tidak_layak' => $totalTidakLayak,
+        ];
+
+        $rekapDesaKecamatan = (clone $query)
+            ->selectRaw("
+                kecamatan,
+                desa_kelurahan,
+                COUNT(*) as total_penerima,
+                SUM(CASE WHEN (foto_sudut_depan IS NOT NULL AND foto_sudut_depan != '') THEN 1 ELSE 0 END) as total_sudah_survei,
+                SUM(CASE WHEN status_kelayakan = 'Layak Diusulkan' THEN 1 ELSE 0 END) as total_layak,
+                SUM(CASE WHEN status_kelayakan = 'Tidak Layak Diusulkan' THEN 1 ELSE 0 END) as total_tidak_layak,
+                SUM(CASE WHEN indikator_atap = 'tidak_ada' THEN 1 ELSE 0 END) as atap_rtlh,
+                SUM(CASE WHEN indikator_dinding = 'tidak_ada' THEN 1 ELSE 0 END) as dinding_rtlh,
+                SUM(CASE WHEN indikator_lantai = 'tidak_ada' THEN 1 ELSE 0 END) as lantai_rtlh,
+                SUM(CASE WHEN indikator_pondasi = 'tidak_ada' THEN 1 ELSE 0 END) as pondasi_rtlh,
+                SUM(CASE WHEN indikator_struktur = 'tidak_ada' THEN 1 ELSE 0 END) as struktur_rtlh,
+                SUM(CASE WHEN indikator_penghasilan = 'ada' THEN 1 ELSE 0 END) as penghasilan_rtlh
+            ")
+            ->groupBy('kecamatan', 'desa_kelurahan')
+            ->orderBy('kecamatan')
+            ->orderBy('desa_kelurahan')
+            ->get();
+
+        return view('laporan.cetak', compact('stats', 'rekapDesaKecamatan', 'kecamatan', 'desa'));
     }
 
+    /**
+     * Export Rekapitulasi Laporan ke Format Microsoft Excel (.XLS) dengan Styling Rapi & Foto Lapangan Embedded
+     */
     public function exportExcel(Request $request)
     {
-        return redirect()->back()->with('info', 'Fitur Export Laporan Excel telah disiapkan.');
+        $user = Auth::user();
+        $kecamatan = $request->get('kecamatan', 'all');
+        $desa = $request->get('desa', 'all');
+        $status = $request->get('status', 'all');
+        $search = $request->get('search');
+
+        if ($user && $user->isAdminKecamatan()) {
+            $kecamatan = $user->kecamatan;
+        }
+
+        $query = DataPenerima::query();
+        if ($user && $user->isAdminKecamatan()) {
+            $query->where('kecamatan', $user->kecamatan);
+        } elseif ($kecamatan && $kecamatan !== 'all') {
+            $query->where('kecamatan', $kecamatan);
+        }
+        if ($desa && $desa !== 'all') {
+            $query->where('desa_kelurahan', $desa);
+        }
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                  ->orWhere('no_ktp', 'like', "%{$search}%")
+                  ->orWhere('no_kk', 'like', "%{$search}%")
+                  ->orWhere('alamat', 'like', "%{$search}%")
+                  ->orWhere('desa_kelurahan', 'like', "%{$search}%");
+            });
+        }
+        if ($status === 'layak') {
+            $query->where('status_kelayakan', 'Layak Diusulkan');
+        } elseif ($status === 'tidak_layak') {
+            $query->where('status_kelayakan', 'Tidak Layak Diusulkan');
+        } elseif ($status === 'sudah') {
+            $query->sudahSurvei();
+        } elseif ($status === 'belum') {
+            $query->belumSurvei();
+        }
+
+        $totalPenerima = (clone $query)->count();
+        $totalSudahSurvei = (clone $query)->sudahSurvei()->count();
+        $totalBelumSurvei = (clone $query)->belumSurvei()->count();
+        $totalLayak = (clone $query)->where('status_kelayakan', 'Layak Diusulkan')->count();
+        $totalTidakLayak = (clone $query)->where('status_kelayakan', 'Tidak Layak Diusulkan')->count();
+
+        $stats = [
+            'total'       => $totalPenerima,
+            'sudah'       => $totalSudahSurvei,
+            'belum'       => $totalBelumSurvei,
+            'layak'       => $totalLayak,
+            'tidak_layak' => $totalTidakLayak,
+        ];
+
+        $rekapDesaKecamatan = (clone $query)
+            ->selectRaw("
+                kecamatan,
+                desa_kelurahan,
+                COUNT(*) as total_penerima,
+                SUM(CASE WHEN (foto_sudut_depan IS NOT NULL AND foto_sudut_depan != '') THEN 1 ELSE 0 END) as total_sudah_survei,
+                SUM(CASE WHEN status_kelayakan = 'Layak Diusulkan' THEN 1 ELSE 0 END) as total_layak,
+                SUM(CASE WHEN status_kelayakan = 'Tidak Layak Diusulkan' THEN 1 ELSE 0 END) as total_tidak_layak,
+                SUM(CASE WHEN indikator_atap = 'tidak_ada' THEN 1 ELSE 0 END) as atap_rtlh,
+                SUM(CASE WHEN indikator_dinding = 'tidak_ada' THEN 1 ELSE 0 END) as dinding_rtlh,
+                SUM(CASE WHEN indikator_lantai = 'tidak_ada' THEN 1 ELSE 0 END) as lantai_rtlh,
+                SUM(CASE WHEN indikator_pondasi = 'tidak_ada' THEN 1 ELSE 0 END) as pondasi_rtlh,
+                SUM(CASE WHEN indikator_struktur = 'tidak_ada' THEN 1 ELSE 0 END) as struktur_rtlh,
+                SUM(CASE WHEN indikator_penghasilan = 'ada' THEN 1 ELSE 0 END) as penghasilan_rtlh
+            ")
+            ->groupBy('kecamatan', 'desa_kelurahan')
+            ->orderBy('kecamatan')
+            ->orderBy('desa_kelurahan')
+            ->get();
+
+        // Data Detail Calon Penerima dengan Foto Lapangan
+        $detailPenerima = (clone $query)->orderBy('nama', 'asc')->get();
+
+        // Convert Foto ke Base64 Inline
+        $detailPenerima->transform(function ($item) {
+            $item->foto_depan_base64    = $this->fileToBase64($item->foto_sudut_depan);
+            $item->foto_dalam_base64    = $this->fileToBase64($item->foto_bagian_dalam);
+            $item->foto_ktp_base64      = $this->fileToBase64($item->ktp);
+            return $item;
+        });
+
+        $filename = 'rekap_bsps_verval_' . date('Ymd_His') . '.xls';
+
+        $content = view('laporan.excel', compact(
+            'stats',
+            'rekapDesaKecamatan',
+            'detailPenerima',
+            'kecamatan',
+            'desa'
+        ))->render();
+
+        return response($content, 200, [
+            'Content-Type'        => 'application/vnd.ms-excel; charset=utf-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            'Pragma'              => 'no-cache',
+            'Cache-Control'       => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires'             => '0',
+        ]);
+    }
+
+    /**
+     * Helper Konversi File Gambar Lokal / Uploads ke Base64 String
+     */
+    private function fileToBase64($path)
+    {
+        if (empty($path)) return null;
+
+        $possiblePaths = [
+            public_path(ltrim($path, '/')),
+            base_path(ltrim($path, '/')),
+            storage_path('app/public/' . ltrim($path, '/')),
+            storage_path('app/' . ltrim($path, '/')),
+        ];
+
+        foreach ($possiblePaths as $p) {
+            if (file_exists($p) && !is_dir($p)) {
+                $ext = strtolower(pathinfo($p, PATHINFO_EXTENSION));
+                $mime = $ext === 'png' ? 'image/png' : ($ext === 'webp' ? 'image/webp' : 'image/jpeg');
+                $data = @file_get_contents($p);
+                if ($data) {
+                    return 'data:' . $mime . ';base64,' . base64_encode($data);
+                }
+            }
+        }
+
+        return null;
     }
 }
