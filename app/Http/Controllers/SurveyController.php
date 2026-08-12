@@ -62,6 +62,8 @@ class SurveyController extends Controller
         $vervalData = DataPenerima::findOrFail($targetId);
 
         $request->validate([
+            'nama'                    => 'nullable|string|max:255',
+            'no_ktp'                  => 'nullable|string|max:255',
             'no_kk'                   => 'nullable|string|max:255',
             'jenis_kelamin'           => 'nullable|in:L,P',
             'tempat_lahir'            => 'required|string|max:255',
@@ -124,7 +126,7 @@ class SurveyController extends Controller
             'ktp', 'kk', 'sertifikat_tanah', 'surat_pernyataan',
             'foto_sudut_depan', 'foto_sudut_belakang', 'foto_bagian_dalam',
             'foto_sudut_kiri', 'foto_sudut_kanan',
-            '_token', '_method', 'id', 'no_ktp'
+            '_token', '_method', 'id'
         ]);
 
         $data['indikator_lantai']      = $request->input('indikator_lantai');

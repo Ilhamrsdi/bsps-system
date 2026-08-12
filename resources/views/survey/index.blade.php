@@ -543,8 +543,18 @@
                         </div>
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
                             <div class="form-group" style="margin-bottom:0;">
-                                <label>NIK (No. KTP) <span style="font-size:11px; color:#e11d48; font-weight:600;">(Tidak Dapat Diubah)</span></label>
-                                <input type="text" value="{{ $vervalData->no_ktp }}" class="form-control" disabled readonly style="background: #e2e8f0; color: #475569; font-weight: 700; font-family: monospace; cursor: not-allowed;">
+                                <label>Nama Lengkap Calon Penerima <span style="font-size:11px; color:#e11d48; font-weight:600;">*</span></label>
+                                <input type="text" name="nama" class="form-control"
+                                    value="{{ old('nama', $vervalData->nama) }}" placeholder="Contoh: SAMAD" required style="font-weight:700;">
+                            </div>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label>NIK (No. KTP) <span style="font-size:11px; color:#e11d48; font-weight:600;">*</span></label>
+                                @if(auth()->check() && auth()->user()->isAdmin())
+                                    <input type="text" name="no_ktp" class="form-control"
+                                        value="{{ old('no_ktp', $vervalData->no_ktp) }}" placeholder="Contoh: 3509171009150001" required style="font-weight:700; font-family:monospace;">
+                                @else
+                                    <input type="text" name="no_ktp" value="{{ $vervalData->no_ktp }}" class="form-control" readonly style="background: #e2e8f0; color: #475569; font-weight: 700; font-family: monospace; cursor: not-allowed;">
+                                @endif
                             </div>
                             <div class="form-group" style="margin-bottom:0;">
                                 <label>Nomor KK</label>
