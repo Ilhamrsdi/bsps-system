@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\DataPenerima;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -48,12 +49,28 @@ class DashboardController extends Controller
 
         $topKecamatan = $rawKecamatan;
 
-        // 4. Top Desa/Kelurahan dengan Usulan Terbanyak
-        $topDesa = DataPenerima::selectRaw('desa_kelurahan, kecamatan, count(*) as total')
-            ->groupBy('desa_kelurahan', 'kecamatan')
-            ->orderByDesc('total')
-            ->limit(6)
-            ->get();
+        $conds = [];
+        foreach (DataPenerima::$fieldWajibSurvei as $field) {
+            $conds[] = "({$field} IS NOT NULL AND TRIM({$field}) != '')";
+        }
+        $formLengkapSql = "(" . implode(" AND ", $conds) . ")";
+        $sudahSql = "(status IN ('meninggal', 'pindah', 'tidak diketahui') OR {$formLengkapSql})";
+
+        // 4. Top 6 Desa/Kelurahan dengan Capaian Layak Terbanyak
+        $topDesa = DataPenerima::selectRaw("
+            desa_kelurahan,
+            kecamatan,
+            COUNT(*) as total,
+            SUM(CASE WHEN {$sudahSql} THEN 1 ELSE 0 END) as sudah_survei,
+            SUM(CASE WHEN status_kelayakan = 'Layak Diusulkan' THEN 1 ELSE 0 END) as total_layak
+        ")
+        ->whereNotNull('desa_kelurahan')
+        ->where('desa_kelurahan', '!=', '')
+        ->groupBy('desa_kelurahan', 'kecamatan')
+        ->orderByDesc('total_layak')
+        ->orderByDesc('sudah_survei')
+        ->limit(6)
+        ->get();
 
         // 5. Statistik Jenis Kelamin Kepala Keluarga
         $genderStats = DataPenerima::selectRaw('jenis_kelamin, count(*) as total')
@@ -103,8 +120,8 @@ class DashboardController extends Controller
 
         // Agregasi Desa & Kecamatan Lengkap (Semua Kecamatan & Seluruh Desa se-Kabupaten Jember)
         $desaStats = DataPenerima::selectRaw("
-            kecamatan,
-            desa_kelurahan,
+            UPPER(TRIM(kecamatan)) as kecamatan,
+            UPPER(TRIM(desa_kelurahan)) as desa_kelurahan,
             COUNT(*) as total_target,
             SUM(CASE WHEN {$sudahSql} THEN 1 ELSE 0 END) as total_sudah,
             SUM(CASE WHEN status_kelayakan = 'Layak Diusulkan' THEN 1 ELSE 0 END) as total_layak,
@@ -114,9 +131,9 @@ class DashboardController extends Controller
         ->where('kecamatan', '!=', '')
         ->whereNotNull('desa_kelurahan')
         ->where('desa_kelurahan', '!=', '')
-        ->groupBy('kecamatan', 'desa_kelurahan')
-        ->orderBy('kecamatan')
-        ->orderBy('desa_kelurahan')
+        ->groupBy(DB::raw('UPPER(TRIM(kecamatan))'), DB::raw('UPPER(TRIM(desa_kelurahan))'))
+        ->orderBy(DB::raw('UPPER(TRIM(kecamatan))'))
+        ->orderBy(DB::raw('UPPER(TRIM(desa_kelurahan))'))
         ->get();
 
         $rekapPerKecamatan = $desaStats->groupBy('kecamatan')->map(function ($desas, $kecName) {
@@ -166,6 +183,14 @@ class DashboardController extends Controller
             ];
         });
 
+        // 9. Ranking Kecamatan Berdasarkan Capaian Layak Terbanyak (Seluruh 31 Kecamatan)
+        $rankingKecamatan = $rekapPerKecamatan->sortByDesc(function ($item) {
+            return ($item->total_layak * 1000000) + $item->total_sudah;
+        })->values();
+
+        $top1KecamatanCapaian = $rankingKecamatan->first();
+        $allKecamatanCapaian = $rankingKecamatan;
+
         return view('dashboard.index', compact(
             'totalPenerima',
             'totalKecamatan',
@@ -183,7 +208,10 @@ class DashboardController extends Controller
             'chartBacklog2Data',
             'chartTotalData',
             'globalVervalStats',
-            'rekapPerKecamatan'
+            'rekapPerKecamatan',
+            'rankingKecamatan',
+            'top1KecamatanCapaian',
+            'allKecamatanCapaian'
         ));
     }
 

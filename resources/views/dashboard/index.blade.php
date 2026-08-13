@@ -130,11 +130,26 @@
     }
 
     /* Dashboard Split Grid (Leaderboard & Breakdown) */
+    html, body, .main-wrapper, .dashboard-content {
+        overflow-x: clip !important;
+        overflow-y: visible !important;
+    }
+
     .dashboard-split-grid {
         display: grid;
         grid-template-columns: 1.4fr 1fr;
         gap: 20px;
         margin-bottom: 24px;
+        align-items: start;
+        position: relative;
+    }
+
+    .dashboard-sticky-right {
+        position: -webkit-sticky !important;
+        position: sticky !important;
+        top: 90px !important;
+        z-index: 10;
+        align-self: start;
     }
 
     .card-panel {
@@ -252,6 +267,45 @@
     .kec-bar-fill-b1 {
         height: 100%;
         background: var(--success);
+    }
+
+    .kec-bar-fill-layak {
+        height: 100%;
+        background: #16a34a;
+    }
+
+    .kec-bar-fill-tidak {
+        height: 100%;
+        background: #dc2626;
+    }
+
+    .pill-capaian-layak {
+        background: #dcfce7;
+        color: #15803d;
+        border: 1px solid #86efac;
+        padding: 2px 7px;
+        border-radius: 4px;
+        font-weight: 700;
+        font-size: 11px;
+    }
+
+    .pill-capaian-tidak {
+        background: #fee2e2;
+        color: #b91c1c;
+        border: 1px solid #fca5a5;
+        padding: 2px 7px;
+        border-radius: 4px;
+        font-weight: 700;
+        font-size: 11px;
+    }
+
+    .pill-capaian-survei {
+        background: rgba(0, 40, 85, 0.08);
+        color: #002855;
+        padding: 2px 7px;
+        border-radius: 4px;
+        font-weight: 600;
+        font-size: 11px;
     }
 
     /* Gender & Desil Mini Grid */
@@ -1000,18 +1054,28 @@
                 </div>
             </div>
 
-            <!-- 6. Usulan Terbanyak -->
-            <div class="stat-card">
+            <!-- 6. Capaian Layak Tertinggi -->
+            @php
+                $topKecName = $top1KecamatanCapaian->kecamatan ?? 'JOMBANG';
+                $topKecLayak = $top1KecamatanCapaian->total_layak ?? 0;
+                $topKecSudah = $top1KecamatanCapaian->total_sudah ?? 0;
+            @endphp
+            <div class="stat-card" onclick="window.location.href='{{ url('/dashboard-kecamatan?kecamatan=' . urlencode($topKecName)) }}'" style="cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);" title="Klik untuk membuka monitoring Kecamatan {{ $topKecName }}">
                 <div class="stat-icon purple">
                     <i class="fas fa-trophy"></i>
                 </div>
-                <div class="stat-info">
-                    <div class="stat-value" style="font-size:18px;">
-                        Kec. {{ ucwords(strtolower($topKecamatan[0]->kecamatan ?? 'Ledokombo')) }}
+                <div class="stat-info" style="width: 100%;">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <div class="stat-value" style="font-size:17px;">
+                            Kec. {{ ucwords(strtolower($topKecName)) }}
+                        </div>
+                        <span style="font-size: 10px; font-weight: 800; background: rgba(39, 174, 96, 0.12); color: #15803d; padding: 2px 7px; border-radius: 6px; border: 1px solid #86efac;">
+                            {{ number_format($topKecLayak) }} Layak
+                        </span>
                     </div>
-                    <div class="stat-label">Usulan Terbanyak ({{ number_format($topKecamatan[0]->total ?? 0, 0, ',', '.') }})</div>
-                    <div class="stat-change up">
-                        <i class="fas fa-arrow-trend-up"></i> Peringkat #1
+                    <div class="stat-label">Capaian Layak Tertinggi</div>
+                    <div class="stat-change up" style="color: #27ae60;">
+                        <i class="fas fa-arrow-trend-up"></i> Peringkat #1 ({{ number_format($topKecSudah) }} verval)
                     </div>
                 </div>
             </div>
@@ -1115,50 +1179,58 @@
 
         <!-- Leaderboard & Demographic Split Grid -->
         <div class="dashboard-split-grid">
-            <!-- Left: Top 10 Kecamatan Leaderboard with Desil breakdown -->
+            <!-- Left: Seluruh 31 Kecamatan Leaderboard based on Capaian Layak -->
             <div class="card-panel">
                 <div class="panel-header">
-                    <h3><i class="fas fa-ranking-star" style="color:#d69e00;"></i> Peringkat 10 Kecamatan &amp; Komposisi Desil</h3>
-                    <span style="font-size:12px;color:var(--text-muted);font-weight:600;">Kabupaten Jember</span>
+                    <div>
+                        <h3 style="margin: 0 0 2px 0;"><i class="fas fa-ranking-star" style="color:#d69e00;"></i> Peringkat Capaian Seluruh Kecamatan</h3>
+                        <span style="font-size:11.5px;color:var(--text-muted);">Diurutkan dari total calon penerima yang Layak Diusulkan di 31 Kecamatan</span>
+                    </div>
+                    <span style="font-size:11px;font-weight:800;background:rgba(39,174,96,0.1);color:#15803d;padding:3px 8px;border-radius:6px;border:1px solid #86efac;">
+                        {{ $allKecamatanCapaian->count() }} Kecamatan
+                    </span>
                 </div>
                 <div class="panel-body">
                     <div class="kecamatan-list">
                         @php
-                            $maxKecVal = $topKecamatan->max('total') ?: 1;
+                            $maxLayakVal = $allKecamatanCapaian->max('total_layak') ?: 1;
                         @endphp
-                        @foreach($topKecamatan as $idx => $kec)
+                        @foreach($allKecamatanCapaian as $idx => $kec)
                             @php
                                 $rank = $idx + 1;
-                                $pct = round(($kec->total / $totalPenerima) * 100, 1);
-                                $b2Pct = round(($kec->backlog_2 / $maxKecVal) * 100);
-                                $b1Pct = round(($kec->backlog_1 / $maxKecVal) * 100);
+                                $layakPct = $maxLayakVal > 0 ? round(($kec->total_layak / $maxLayakVal) * 100) : 0;
+                                $tidakPct = $kec->total_sudah > 0 ? round(($kec->total_tidak_layak / max(1, $kec->total_sudah)) * $layakPct) : 0;
                             @endphp
-                            <div class="kecamatan-item">
+                            <a href="{{ url('/dashboard-kecamatan?kecamatan=' . urlencode($kec->kecamatan)) }}" class="kecamatan-item" style="text-decoration: none; color: inherit; transition: var(--transition);" title="Buka Dashboard Kecamatan {{ $kec->kecamatan }}">
                                 <div class="kec-rank {{ $rank == 1 ? 'top-1' : ($rank == 2 ? 'top-2' : ($rank == 3 ? 'top-3' : '')) }}">
                                     {{ $rank }}
                                 </div>
                                 <div class="kec-info">
                                     <div class="kec-header">
-                                        <span>Kec. {{ ucwords(strtolower($kec->kecamatan)) }}</span>
-                                        <span>{{ number_format($kec->total, 0, ',', '.') }} data <span style="font-size:11px;color:var(--text-muted);font-weight:500;">({{ $pct }}%)</span></span>
+                                        <span style="font-weight: 700; color: var(--primary-dark);">Kec. {{ ucwords(strtolower($kec->kecamatan)) }}</span>
+                                        <span>
+                                            <strong style="color: #15803d; font-size: 13.5px;">{{ number_format($kec->total_layak, 0, ',', '.') }} KK Layak</strong>
+                                            <span style="font-size: 11px; color: var(--text-muted); font-weight: 500;">({{ $kec->layak_percent }}%)</span>
+                                        </span>
                                     </div>
                                     <div class="kec-bar-wrap">
-                                        <div class="kec-bar-fill-b2" style="width: {{ $b2Pct }}%;" title="Backlog 2: {{ $kec->backlog_2 }}"></div>
-                                        <div class="kec-bar-fill-b1" style="width: {{ $b1Pct }}%;" title="Backlog 1: {{ $kec->backlog_1 }}"></div>
+                                        <div class="kec-bar-fill-layak" style="width: {{ $layakPct }}%;" title="Layak Diusulkan: {{ $kec->total_layak }} KK"></div>
+                                        <div class="kec-bar-fill-tidak" style="width: {{ $tidakPct }}%;" title="Tidak Layak: {{ $kec->total_tidak_layak }} KK"></div>
                                     </div>
-                                    <div class="kec-desil-pills">
-                                        <span class="pill-desil-b2">Backlog 2: {{ number_format($kec->backlog_2, 0, ',', '.') }}</span>
-                                        <span class="pill-desil-b1">Backlog 1: {{ number_format($kec->backlog_1, 0, ',', '.') }}</span>
+                                    <div class="kec-desil-pills" style="margin-top: 4px;">
+                                        <span class="pill-capaian-layak"><i class="fas fa-check-circle"></i> Layak: {{ number_format($kec->total_layak, 0, ',', '.') }}</span>
+                                        <span class="pill-capaian-tidak"><i class="fas fa-times-circle"></i> Tidak: {{ number_format($kec->total_tidak_layak, 0, ',', '.') }}</span>
+                                        <span class="pill-capaian-survei"><i class="fas fa-clipboard-check"></i> {{ number_format($kec->total_sudah, 0, ',', '.') }}/{{ number_format($kec->total_target, 0, ',', '.') }} ({{ $kec->progres_percent }}%)</span>
                                     </div>
                                 </div>
-                            </div>
+                            </a>
                         @endforeach
                     </div>
                 </div>
             </div>
 
-            <!-- Right: Demografi & Top Desa -->
-            <div>
+            <!-- Right: Demografi & Top Desa (Sticky Floating on Scroll) -->
+            <div class="dashboard-sticky-right">
                 <!-- Demografi Kepala Keluarga (Gender) -->
                 <div class="card-panel" style="margin-bottom:20px;">
                     <div class="panel-header">
@@ -1180,10 +1252,13 @@
                     </div>
                 </div>
 
-                <!-- Top 6 Desa / Kelurahan -->
+                <!-- Top 6 Desa / Kelurahan Capaian Layak -->
                 <div class="card-panel">
-                    <div class="panel-header">
-                        <h3><i class="fas fa-tree-city" style="color:var(--success);"></i> Top Desa / Kelurahan Terbanyak</h3>
+                    <div class="panel-header" style="display: flex; align-items: center; justify-content: space-between;">
+                        <h3 style="margin: 0;"><i class="fas fa-tree-city" style="color:var(--success);"></i> Top Desa Capaian Layak</h3>
+                        <a href="{{ route('dashboard.rekap-desa') }}" style="font-size: 11px; font-weight: 700; color: var(--primary); text-decoration: none;">
+                            Lihat 248 Desa <i class="fas fa-chevron-right" style="font-size: 9px;"></i>
+                        </a>
                     </div>
                     <div class="panel-body" style="padding:10px 22px;">
                         @foreach($topDesa as $desa)
@@ -1193,10 +1268,12 @@
                                         <span>Desa {{ ucwords(strtolower($desa->desa_kelurahan)) }}</span>
                                         <i class="fas fa-arrow-up-right-from-square" style="font-size:10px;color:var(--primary);opacity:0.7;"></i>
                                     </div>
-                                    <div style="font-size:11px;color:var(--text-muted);">Kec. {{ ucwords(strtolower($desa->kecamatan)) }}</div>
+                                    <div style="font-size:11px;color:var(--text-muted);">
+                                        Kec. {{ ucwords(strtolower($desa->kecamatan)) }} &bull; {{ number_format($desa->sudah_survei) }}/{{ number_format($desa->total) }} verval
+                                    </div>
                                 </div>
-                                <span style="font-weight:800;color:var(--primary);background:rgba(0,40,85,0.06);padding:4px 10px;border-radius:12px;font-size:12px;">
-                                    {{ number_format($desa->total, 0, ',', '.') }} KK
+                                <span style="font-weight:800;color:#15803d;background:#dcfce7;border:1px solid #86efac;padding:3px 9px;border-radius:10px;font-size:11.5px;">
+                                    {{ number_format($desa->total_layak, 0, ',', '.') }} KK Layak
                                 </span>
                             </a>
                         @endforeach

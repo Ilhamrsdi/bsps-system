@@ -91,9 +91,15 @@ class SurveyController extends Controller
             'foto_bagian_dalam'       => 'nullable|image|max:5120',
             'foto_sudut_kiri'         => 'nullable|image|max:5120',
             'foto_sudut_kanan'        => 'nullable|image|max:5120',
+            'latitude'                => 'required|numeric',
+            'longitude'               => 'required|numeric',
         ], [
-            'required' => 'Kolom :attribute wajib diisi lengkap.',
-            'in'       => 'Pilihan :attribute tidak valid.',
+            'required'           => 'Kolom :attribute wajib diisi lengkap.',
+            'in'                 => 'Pilihan :attribute tidak valid.',
+            'latitude.required'  => 'Koordinat GPS (Latitude) wajib direkam dari lokasi rumah/petugas. Harap aktifkan lokasi (GPS) pada perangkat Anda.',
+            'longitude.required' => 'Koordinat GPS (Longitude) wajib direkam dari lokasi rumah/petugas. Harap aktifkan lokasi (GPS) pada perangkat Anda.',
+            'latitude.numeric'   => 'Format koordinat Latitude tidak valid.',
+            'longitude.numeric'  => 'Format koordinat Longitude tidak valid.',
         ]);
 
         // Cek kelengkapan 8 Berkas & Foto Lapangan
@@ -223,6 +229,15 @@ class SurveyController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Data Survei Lapangan berhasil disimpan.'
+        }
+              
+        // Perbarui catatan lokasi aktif akun petugas (last_location_at, last_ip, lat, lng)
+        if (Auth::check()) {
+            Auth::user()->update([
+                'latitude'         => $request->latitude,
+                'longitude'        => $request->longitude,
+                'last_ip'          => $request->ip(),
+                'last_location_at' => now(),
             ]);
         }
 

@@ -606,7 +606,15 @@
                                     {{ $item->alamat ?: '-' }}
                                 </td>
                                 <td style="padding:14px 18px;text-align:center;">
-                                    @if($item->foto_sudut_depan)
+                                    @if(in_array($item->status, ['meninggal', 'pindah', 'tidak diketahui']))
+                                        @php
+                                            $statusLabel = ['meninggal' => ['icon' => 'fa-heart-crack', 'text' => 'Meninggal', 'color' => '#dc2626', 'bg' => '#fee2e2'], 'pindah' => ['icon' => 'fa-house-chimney-crack', 'text' => 'Pindah', 'color' => '#d97706', 'bg' => '#fef3c7'], 'tidak diketahui' => ['icon' => 'fa-question-circle', 'text' => 'Tdk Diketahui', 'color' => '#6b7280', 'bg' => '#f3f4f6']];
+                                            $sl = $statusLabel[$item->status];
+                                        @endphp
+                                        <span class="badge-status-survey" style="background:{{ $sl['bg'] }};color:{{ $sl['color'] }};border-radius:20px;padding:4px 10px;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:5px;">
+                                            <i class="fas {{ $sl['icon'] }}"></i> {{ $sl['text'] }}
+                                        </span>
+                                    @elseif($item->isSudahSurvei())
                                         <span class="badge-status-survey sudah"><i class="fas fa-check-circle"></i> Sudah Survei</span>
                                     @else
                                         <span class="badge-status-survey belum"><i class="fas fa-clock"></i> Belum Survei</span>
@@ -616,7 +624,13 @@
                                     <div style="display:inline-flex;align-items:center;gap:6px;">
                                         <button type="button" class="btn-act survey btn-trigger-status-modal"
                                                 data-id="{{ $item->id }}" data-nama="{{ e($item->nama) }}" data-nik="{{ e($item->no_ktp ?: '-') }}" data-alamat="{{ e($item->alamat ?: '-') }}" data-status="{{ e($item->status) }}" data-url="{{ url('/survey/' . $item->id) }}">
-                                            <i class="fas fa-camera"></i> {{ $item->foto_sudut_depan ? 'Lihat / Edit' : 'Mulai Survei' }}
+                                            @if(in_array($item->status, ['meninggal', 'pindah', 'tidak diketahui']))
+                                                <i class="fas fa-info-circle"></i> Lihat Detail
+                                            @elseif($item->isSudahSurvei())
+                                                <i class="fas fa-camera"></i> Lihat / Edit
+                                            @else
+                                                <i class="fas fa-camera"></i> Mulai Survei
+                                            @endif
                                         </button>
                                         <a href="{{ route('verval-data.surat-pernyataan', $item->id) }}" target="_blank" class="btn-act" style="background:rgba(0,40,85,0.08);color:var(--primary-dark);padding:7px 10px;" title="Cetak Surat Pernyataan Satuan">
                                             <i class="fas fa-file-signature"></i>
@@ -1144,14 +1158,20 @@
             return;
         }
 
+        const SPECIAL_STATUSES = ['meninggal', 'pindah', 'tidak diketahui'];
+        const isSudahSurvei = (item) => {
+            if (SPECIAL_STATUSES.includes((item.status || '').toLowerCase())) return true;
+            return Boolean(item.foto_sudut_depan);
+        };
+
         const matches = ALL_DATA_DASH.filter(item => {
             const fullText = `${item.nama || ''} ${item.no_ktp || ''} ${item.no_kk || ''} ${item.alamat || ''}`.toLowerCase();
             const matchSearch = terms.length === 0 || terms.every(term => fullText.includes(term));
             let matchStatus = true;
             if (statusVal === 'sudah') {
-                matchStatus = Boolean(item.foto_sudut_depan);
+                matchStatus = isSudahSurvei(item);
             } else if (statusVal === 'belum') {
-                matchStatus = !item.foto_sudut_depan;
+                matchStatus = !isSudahSurvei(item);
             }
             return matchSearch && matchStatus;
         });
@@ -1162,10 +1182,31 @@
             let html = '';
             matches.forEach((item, idx) => {
                 const genderClass = (item.jenis_kelamin || '').toLowerCase();
-                const isSudah = Boolean(item.foto_sudut_depan);
-                const statusBadge = isSudah
-                    ? `<span class="badge-status-survey sudah"><i class="fas fa-check-circle"></i> Sudah Survei</span>`
-                    : `<span class="badge-status-survey belum"><i class="fas fa-clock"></i> Belum Survei</span>`;
+                const itemStatus = (item.status || '').toLowerCase();
+                const isSpecial = SPECIAL_STATUSES.includes(itemStatus);
+                const sudah = isSudahSurvei(item);
+
+                let statusBadge = '';
+                if (itemStatus === 'meninggal') {
+                    statusBadge = `<span class="badge-status-survey" style="background:#fee2e2;color:#dc2626;border-radius:20px;padding:4px 10px;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:5px;"><i class="fas fa-heart-crack"></i> Meninggal</span>`;
+                } else if (itemStatus === 'pindah') {
+                    statusBadge = `<span class="badge-status-survey" style="background:#fef3c7;color:#d97706;border-radius:20px;padding:4px 10px;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:5px;"><i class="fas fa-house-chimney-crack"></i> Pindah</span>`;
+                } else if (itemStatus === 'tidak diketahui') {
+                    statusBadge = `<span class="badge-status-survey" style="background:#f3f4f6;color:#6b7280;border-radius:20px;padding:4px 10px;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:5px;"><i class="fas fa-question-circle"></i> Tdk Diketahui</span>`;
+                } else if (sudah) {
+                    statusBadge = `<span class="badge-status-survey sudah"><i class="fas fa-check-circle"></i> Sudah Survei</span>`;
+                } else {
+                    statusBadge = `<span class="badge-status-survey belum"><i class="fas fa-clock"></i> Belum Survei</span>`;
+                }
+
+                let actionLabel = '';
+                if (isSpecial) {
+                    actionLabel = `<i class="fas fa-info-circle"></i> Lihat Detail`;
+                } else if (sudah) {
+                    actionLabel = `<i class="fas fa-camera"></i> Lihat / Edit`;
+                } else {
+                    actionLabel = `<i class="fas fa-camera"></i> Mulai Survei`;
+                }
 
                 html += `
                     <tr style="border-bottom:1px solid rgba(0,40,85,0.06);font-size:13px;">
@@ -1185,8 +1226,8 @@
                         <td style="padding:14px 18px;text-align:center;">
                             <div style="display:inline-flex;align-items:center;gap:6px;">
                                 <button type="button" class="btn-act survey btn-trigger-status-modal"
-                                        data-id="${item.id}" data-nama="${escapeHtml(item.nama)}" data-nik="${escapeHtml(item.no_ktp || '-')}" data-alamat="${escapeHtml(item.alamat || '-')}" data-status="${escapeHtml(item.status || 'belum_ditentukan')}" data-url="/survey/${item.id}">
-                                    <i class="fas fa-camera"></i> ${isSudah ? 'Lihat / Edit' : 'Mulai Survei'}
+                                        data-id="${item.id}" data-nama="${escapeHtml(item.nama)}" data-nik="${escapeHtml(item.no_ktp || '-')}" data-alamat="${escapeHtml(item.alamat || '-')}" data-status="${escapeHtml(item.status || '')}" data-url="/survey/${item.id}">
+                                    ${actionLabel}
                                 </button>
                                 <a href="/verval-data/surat-pernyataan/${item.id}" target="_blank" class="btn-act" style="background:rgba(0,40,85,0.08);color:var(--primary-dark);padding:7px 10px;" title="Cetak Surat Pernyataan Satuan">
                                     <i class="fas fa-file-signature"></i>
@@ -1252,6 +1293,19 @@
             function(position) {
                 if (window.PuprLoading) {
                     window.PuprLoading.show('Lokasi Terdeteksi, Membuka Form Survei...');
+                }
+                if (position && position.coords) {
+                    fetch("{{ route('petugas.update-location') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude
+                        })
+                    }).catch(err => console.warn('[GPS] Update officer location background failed:', err));
                 }
                 window.location.href = targetUrl;
             },
