@@ -1935,9 +1935,9 @@
 
             const surveyData = {
                 id: {{ $vervalData->id }},
-                nama: '{{ addslashes($vervalData->nama) }}',
-                nik: '{{ addslashes($vervalData->no_ktp) }}',
-                desa: '{{ addslashes($vervalData->desa_kelurahan) }}',
+                nama: {!! json_encode($vervalData->nama) !!},
+                nik: {!! json_encode($vervalData->no_ktp) !!},
+                desa: {!! json_encode($vervalData->desa_kelurahan) !!},
                 fields: fields,
                 photos: photos
             };
@@ -2135,9 +2135,8 @@
             const card = placeholder ? placeholder.closest('.camera-upload-card') : null;
             const urlInput = document.getElementById('url_' + field);
 
-            // Dapatkan URL instan untuk preview langsung tanpa menunggu kompresi
+            // Dapatkan URL instan untuk preview langsung
             const objectUrl = URL.createObjectURL(file);
-            if (urlInput) urlInput.value = objectUrl;
 
             // Tampilkan kotak terunggah & sembunyikan placeholder secara LANGSUNG
             if (placeholder) placeholder.style.display = 'none';
@@ -2147,8 +2146,14 @@
                 card.classList.remove('is-invalid-highlight');
             }
 
-            // Jika file PDF / Non-Gambar: tampilkan info berkas
+            // Jika file PDF / Non-Gambar: tampilkan info berkas dan konversi ke Base64 DataURL
             if (!file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    if (urlInput) urlInput.value = e.target.result;
+                };
+                reader.readAsDataURL(file);
+
                 if (thumbBox) {
                     thumbBox.innerHTML = '<div class="pdf-file-icon" style="padding:12px;font-weight:700;color:#e11d48;font-size:13px;display:flex;align-items:center;gap:6px;"><i class="fas fa-file-pdf"></i> Dokumen PDF Terpilih</div>';
                 }
@@ -2188,6 +2193,8 @@
                     canvas.height = h;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, w, h);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.72);
+                    if (urlInput) urlInput.value = dataUrl;
 
                     canvas.toBlob(function(blob) {
                         if (blob) {
