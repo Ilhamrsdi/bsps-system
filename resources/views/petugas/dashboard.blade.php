@@ -608,7 +608,7 @@
                                 <td style="padding:14px 18px;text-align:center;">
                                     @if(in_array($item->status, ['meninggal', 'pindah', 'tidak diketahui']))
                                         @php
-                                            $statusLabel = ['meninggal' => ['icon' => 'fa-cross', 'text' => 'Meninggal', 'color' => '#dc2626', 'bg' => '#fee2e2'], 'pindah' => ['icon' => 'fa-house-chimney-crack', 'text' => 'Pindah', 'color' => '#d97706', 'bg' => '#fef3c7'], 'tidak diketahui' => ['icon' => 'fa-question-circle', 'text' => 'Tdk Diketahui', 'color' => '#6b7280', 'bg' => '#f3f4f6']];
+                                            $statusLabel = ['meninggal' => ['icon' => 'fa-heart-crack', 'text' => 'Meninggal', 'color' => '#dc2626', 'bg' => '#fee2e2'], 'pindah' => ['icon' => 'fa-house-chimney-crack', 'text' => 'Pindah', 'color' => '#d97706', 'bg' => '#fef3c7'], 'tidak diketahui' => ['icon' => 'fa-question-circle', 'text' => 'Tdk Diketahui', 'color' => '#6b7280', 'bg' => '#f3f4f6']];
                                             $sl = $statusLabel[$item->status];
                                         @endphp
                                         <span class="badge-status-survey" style="background:{{ $sl['bg'] }};color:{{ $sl['color'] }};border-radius:20px;padding:4px 10px;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:5px;">
@@ -1188,7 +1188,7 @@
 
                 let statusBadge = '';
                 if (itemStatus === 'meninggal') {
-                    statusBadge = `<span class="badge-status-survey" style="background:#fee2e2;color:#dc2626;border-radius:20px;padding:4px 10px;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:5px;"><i class="fas fa-cross"></i> Meninggal</span>`;
+                    statusBadge = `<span class="badge-status-survey" style="background:#fee2e2;color:#dc2626;border-radius:20px;padding:4px 10px;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:5px;"><i class="fas fa-heart-crack"></i> Meninggal</span>`;
                 } else if (itemStatus === 'pindah') {
                     statusBadge = `<span class="badge-status-survey" style="background:#fef3c7;color:#d97706;border-radius:20px;padding:4px 10px;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:5px;"><i class="fas fa-house-chimney-crack"></i> Pindah</span>`;
                 } else if (itemStatus === 'tidak diketahui') {
