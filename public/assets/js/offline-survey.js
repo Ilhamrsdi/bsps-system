@@ -216,16 +216,19 @@ async function syncPendingSurveys() {
                 }
             }
 
-            // Masukkan foto Base64 / Blob
+            // Masukkan foto / dokumen Base64 (DataURL)
             for (const [photoKey, photoVal] of Object.entries(item.photos || {})) {
-                if (typeof photoVal === 'string' && photoVal.startsWith('data:image')) {
-                    const res = await fetch(photoVal);
+                const dataStr = typeof photoVal === 'string' ? photoVal : (photoVal && photoVal.dataUrl ? photoVal.dataUrl : '');
+                
+                if (dataStr && dataStr.startsWith('data:')) {
+                    const res = await fetch(dataStr);
                     const blob = await res.blob();
-                    formData.append(photoKey, blob, `${photoKey}_${item.id}.jpg`);
-                } else if (photoVal && photoVal.dataUrl && photoVal.dataUrl.startsWith('data:image')) {
-                    const res = await fetch(photoVal.dataUrl);
-                    const blob = await res.blob();
-                    formData.append(photoKey, blob, `${photoKey}_${item.id}.jpg`);
+                    
+                    let ext = 'jpg';
+                    if (dataStr.startsWith('data:application/pdf')) ext = 'pdf';
+                    else if (dataStr.startsWith('data:image/png')) ext = 'png';
+                    
+                    formData.append(photoKey, blob, `${photoKey}_${item.id}.${ext}`);
                 }
             }
 
@@ -233,11 +236,12 @@ async function syncPendingSurveys() {
                 method: 'POST',
                 body: formData,
                 headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
                 }
             });
 
-            if (response.ok || response.redirected) {
+            if (response.ok) {
                 await removeSurveyFromIndexedDB(item.id);
                 successCount++;
 

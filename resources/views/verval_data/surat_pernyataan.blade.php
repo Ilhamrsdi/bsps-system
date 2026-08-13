@@ -307,7 +307,17 @@
             // Penghasilan — format Rupiah
             $penghasilan = '..................................';
             if ($item->penghasilan) {
-                $penghasilan = 'Rp ' . number_format((float) $item->penghasilan, 0, ',', '.');
+                $val = trim((string)$item->penghasilan);
+                if (is_numeric($val)) {
+                    $penghasilan = 'Rp ' . number_format((float)$val, 0, ',', '.');
+                } else {
+                    $digitsOnly = preg_replace('/[^0-9]/', '', $val);
+                    if ($digitsOnly !== '' && is_numeric($digitsOnly)) {
+                        $penghasilan = 'Rp ' . number_format((float)$digitsOnly, 0, ',', '.');
+                    } else {
+                        $penghasilan = $val;
+                    }
+                }
             }
 
             // Luas Tanah

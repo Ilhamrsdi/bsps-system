@@ -400,6 +400,11 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@2.0.0/Control.FullScreen.js"></script>
 
+    <!-- Leaflet MarkerCluster -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
     <script>
         const markersData = @json($markers);
         const nonGpsData = @json($nonGpsMarkers);
@@ -511,7 +516,13 @@
                 });
             }
 
-            const markerGroup = L.layerGroup().addTo(map);
+            const markerGroup = L.markerClusterGroup({
+                chunkedLoading: true,
+                maxClusterRadius: 50,
+                spiderfyOnMaxZoom: true,
+                showCoverageOnHover: false
+            }).addTo(map);
+
             function renderMarkers(data) {
                 markerGroup.clearLayers();
                 if (!data || data.length === 0) {
