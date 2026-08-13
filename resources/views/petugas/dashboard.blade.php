@@ -1253,6 +1253,19 @@
                 if (window.PuprLoading) {
                     window.PuprLoading.show('Lokasi Terdeteksi, Membuka Form Survei...');
                 }
+                if (position && position.coords) {
+                    fetch("{{ route('petugas.update-location') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude
+                        })
+                    }).catch(err => console.warn('[GPS] Update officer location background failed:', err));
+                }
                 window.location.href = targetUrl;
             },
             function(error) {

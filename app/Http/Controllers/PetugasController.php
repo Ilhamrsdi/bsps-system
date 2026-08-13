@@ -154,10 +154,25 @@ class PetugasController extends Controller
     }
 
     /**
-     * Update Live GPS Location Petugas
+     * Update Live GPS Location Petugas via AJAX
      */
     public function updateLocation(Request $request)
     {
+        $request->validate([
+            'latitude'  => 'required|numeric',
+            'longitude' => 'required|numeric',
+        ]);
+
+        $user = Auth::user();
+        if ($user) {
+            $user->update([
+                'latitude'         => $request->latitude,
+                'longitude'        => $request->longitude,
+                'last_ip'          => $request->ip(),
+                'last_location_at' => now(),
+            ]);
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Koordinat GPS Petugas berhasil diperbarui.'

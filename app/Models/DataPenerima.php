@@ -40,6 +40,9 @@ class DataPenerima extends Model
         'kk',
         // 'sertifikat_tanah' => Opsional (tidak wajib)
         'surat_pernyataan',
+        // Geotagging GPS Lapangan
+        'latitude',
+        'longitude',
     ];
 
     /**

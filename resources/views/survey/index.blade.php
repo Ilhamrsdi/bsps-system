@@ -1417,15 +1417,29 @@
                                 <span style="color: var(--text-muted); font-size: 11px; display: block; font-weight: 600;">Kecamatan</span>
                                 <strong>Kec. {{ $vervalData->kecamatan ?: '-' }}</strong>
                             </div>
-                            <div style="background: #f8fafc; padding: 10px 14px; border-radius: 8px; border: 1px solid #f1f5f9; grid-column: 1 / -1;">
-                                <span style="color: var(--text-muted); font-size: 11px; display: block; font-weight: 600;">Geotagging GPS (Koordinat)</span>
-                                @if($vervalData->latitude && $vervalData->longitude)
-                                    <strong style="color: var(--success); font-family: monospace;">
-                                        <i class="fas fa-crosshairs"></i> {{ $vervalData->latitude }}, {{ $vervalData->longitude }}
-                                    </strong>
-                                @else
-                                    <span style="color: var(--text-muted); font-size: 12px;">Belum terdeteksi (Otomatis saat survei disimpan)</span>
-                                @endif
+                            <div id="gpsDisplayWrapper" style="background: #f8fafc; padding: 12px 16px; border-radius: 10px; border: 1px solid #e2e8f0; grid-column: 1 / -1; transition: all 0.3s ease;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                                    <div>
+                                        <span style="color: var(--text-muted); font-size: 11px; display: block; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Geotagging GPS Lapangan (Wajib Aktif)</span>
+                                        <div id="gpsDisplayBadge" style="margin-top: 4px;">
+                                            @if($vervalData->latitude && $vervalData->longitude)
+                                                <strong style="color: #16a34a; font-family: monospace; font-size: 13.5px; display: inline-flex; align-items: center; gap: 6px;">
+                                                    <i class="fas fa-location-dot"></i> {{ $vervalData->latitude }}, {{ $vervalData->longitude }}
+                                                </strong>
+                                                <a href="https://maps.google.com/?q={{ $vervalData->latitude }},{{ $vervalData->longitude }}" target="_blank" style="margin-left: 8px; font-size: 11px; color: var(--primary); text-decoration: none; font-weight: 600;">
+                                                    <i class="fas fa-arrow-up-right-from-square"></i> Buka Google Maps
+                                                </a>
+                                            @else
+                                                <span style="color: #e11d48; font-size: 12.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                                                    <i class="fas fa-triangle-exclamation"></i> GPS Belum Terdeteksi! (Wajib aktifkan lokasi)
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-outline" style="padding: 6px 12px; font-size: 12px;" onclick="requestLocation()">
+                                        <i class="fas fa-rotate"></i> Update Koordinat GPS
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1776,6 +1790,18 @@
                     registerMissing('4. Dokumentasi Foto Fisik RTLH (5 Sudut)', p.label, cardEl);
                 }
             });
+
+            // Section 5: Geotagging & Lokasi Presisi GPS Lapangan
+            const latVal = document.getElementById('latitude')?.value;
+            const lngVal = document.getElementById('longitude')?.value;
+            const gpsWrapper = document.getElementById('gpsDisplayWrapper');
+            if (!latVal || !lngVal || latVal === '' || lngVal === '' || latVal === '0') {
+                registerMissing('5. Geotagging & Lokasi Presisi GPS', 'Koordinat GPS Petugas Lapangan (Latitude & Longitude)', gpsWrapper);
+                if (window.PuprModal) {
+                    window.PuprModal.open('gpsModal');
+                }
+                requestLocation();
+            }
 
             // Hitung total item yang belum diisi
             let totalMissing = 0;
@@ -2159,9 +2185,15 @@
             }
         }
 
-        // GPS Geolocation Handler (Auto-fill hidden coordinates dengan fallback laptop/indoor)
+        // GPS Geolocation Handler (Auto-fill hidden coordinates dengan live UI update)
         function requestLocation() {
-            if (!navigator.geolocation) return;
+            if (!navigator.geolocation) {
+                const badge = document.getElementById('gpsDisplayBadge');
+                if (badge) {
+                    badge.innerHTML = `<span style="color: #e11d48; font-size: 12.5px; font-weight: 700;"><i class="fas fa-triangle-exclamation"></i> Browser/Perangkat Anda tidak mendukung fitur GPS Geolocation.</span>`;
+                }
+                return;
+            }
 
             const applyPosition = function (position) {
                 const lat = position.coords.latitude;
@@ -2172,8 +2204,41 @@
                 if (latInput) latInput.value = lat;
                 if (lngInput) lngInput.value = lng;
 
+                const badge = document.getElementById('gpsDisplayBadge');
+                const wrapper = document.getElementById('gpsDisplayWrapper');
+                if (badge) {
+                    badge.innerHTML = `<strong style="color: #16a34a; font-family: monospace; font-size: 13.5px; display: inline-flex; align-items: center; gap: 6px;">
+                        <i class="fas fa-circle-check"></i> Terdeteksi Presisi: ${lat.toFixed(6)}, ${lng.toFixed(6)}
+                    </strong>
+                    <a href="https://maps.google.com/?q=${lat},${lng}" target="_blank" style="margin-left: 8px; font-size: 11px; color: var(--primary); text-decoration: none; font-weight: 600;">
+                        <i class="fas fa-arrow-up-right-from-square"></i> Tes di Google Maps
+                    </a>`;
+                }
+                if (wrapper) {
+                    wrapper.style.borderColor = '#86efac';
+                    wrapper.style.background = '#f0fdf4';
+                    wrapper.classList.remove('is-invalid-highlight');
+                }
+
                 if (window.PuprModal) {
                     window.PuprModal.close('gpsModal');
+                }
+            };
+
+            const handleError = function (err) {
+                console.warn('GPS location request error:', err);
+                const badge = document.getElementById('gpsDisplayBadge');
+                const wrapper = document.getElementById('gpsDisplayWrapper');
+                const latVal = document.getElementById('latitude')?.value;
+
+                if (badge && !latVal) {
+                    badge.innerHTML = `<span style="color: #e11d48; font-size: 12.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                        <i class="fas fa-triangle-exclamation"></i> GPS Belum Aktif / Ditolak. (Wajib izinkan akses lokasi pada HP/Browser)
+                    </span>`;
+                }
+                if (wrapper && !latVal) {
+                    wrapper.style.borderColor = '#fca5a5';
+                    wrapper.style.background = '#fff1f2';
                 }
             };
 
@@ -2185,9 +2250,7 @@
                     // Percobaan 2: Fallback Low Accuracy / Wi-Fi Triangulation untuk Laptop/Indoor (20 detik, cache 5 min)
                     navigator.geolocation.getCurrentPosition(
                         applyPosition,
-                        function (fallbackErr) {
-                            console.warn('GPS location request final fallback error:', fallbackErr);
-                        },
+                        handleError,
                         {
                             enableHighAccuracy: false,
                             timeout: 20000,

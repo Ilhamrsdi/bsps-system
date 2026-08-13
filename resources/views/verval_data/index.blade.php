@@ -775,6 +775,7 @@
                             <th style="padding:14px 18px;">Alamat &amp; Dusun</th>
                             <th style="padding:14px 18px;">Desa / Kelurahan</th>
                             <th style="padding:14px 18px;">Kecamatan</th>
+                            <th style="padding:14px 18px;">Geotagging GPS</th>
                             <th style="padding:14px 18px;">Kelompok Desil</th>
                             <th style="padding:14px 18px;text-align:center;">Status</th>
                             <th style="padding:14px 18px;text-align:center;">Aksi</th>
@@ -816,6 +817,17 @@
                                 </td>
                                 <td style="padding:14px 18px;">
                                     <span style="font-weight:700;color:var(--primary);">Kec. {{ $item->kecamatan }}</span>
+                                </td>
+                                <td style="padding:14px 18px;">
+                                    @if($item->latitude && $item->longitude)
+                                        <a href="https://maps.google.com/?q={{ $item->latitude }},{{ $item->longitude }}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;background:#dcfce7;color:#15803d;border:1px solid #86efac;font-family:monospace;font-size:11.5px;font-weight:700;text-decoration:none;" title="Klik untuk melihat lokasi presisi di Google Maps">
+                                            <i class="fas fa-location-dot" style="font-size:10px;"></i> {{ number_format((float)$item->latitude, 4) }}, {{ number_format((float)$item->longitude, 4) }}
+                                        </a>
+                                    @else
+                                        <span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;background:#fff1f2;color:#e11d48;border:1px solid #fca5a5;font-size:11px;font-weight:600;" title="Koordinat GPS belum direkam">
+                                            <i class="fas fa-location-crosshairs" style="font-size:10px;"></i> Belum Ada GPS
+                                        </span>
+                                    @endif
                                 </td>
                                 <td style="padding:14px 18px;">
                                     <span
@@ -872,13 +884,18 @@
                                 </td>
                                 <td style="padding:14px 18px;text-align:center;">
                                     <div class="action-btn-group" style="justify-content:center;">
+                                        @if($item->latitude && $item->longitude)
+                                        <a href="https://maps.google.com/?q={{ $item->latitude }},{{ $item->longitude }}" target="_blank" class="btn-act map" style="background:rgba(39,174,96,0.15);color:var(--success);" title="Buka Titik Geotagging GPS di Google Maps">
+                                            <i class="fas fa-map-location-dot"></i>
+                                        </a>
+                                        @endif
                                         <a href="{{ route('verval-data.surat-pernyataan', $item->id) }}" target="_blank" class="btn-act print" style="background:rgba(255,184,0,0.15);color:#d69e00;" title="Cetak Surat Pernyataan Pemohon Ini">
                                             <i class="fas fa-file-signature"></i>
                                         </a>
                                         <a href="{{ route('verval-data.lampiran-foto', $item->id) }}" target="_blank" class="btn-act print" style="background:rgba(0,123,255,0.15);color:#007bff;" title="Cetak Lampiran Foto">
                                             <i class="fas fa-file-image"></i>
                                         </a>
-                                        <a href="{{ url('/survey/' . $item->id) }}" class="btn-act view" style="background:rgba(39,174,96,0.12);color:var(--success);" title="{{ auth()->check() && auth()->user()->isAdminKecamatan() ? 'Lihat Detail Data Verval (Read-Only)' : 'Buka Form Survei Lapangan & Lengkapi Data/Foto' }}">
+                                        <a href="{{ url('/survey/' . $item->id) }}" class="btn-act view" style="background:rgba(0,40,85,0.08);color:var(--primary);" title="{{ auth()->check() && auth()->user()->isAdminKecamatan() ? 'Lihat Detail Data Verval (Read-Only)' : 'Buka Form Survei Lapangan & Lengkapi Data/Foto' }}">
                                             <i class="fas {{ auth()->check() && auth()->user()->isAdminKecamatan() ? 'fa-eye' : 'fa-clipboard-check' }}"></i>
                                         </a>
                                     </div>
@@ -886,7 +903,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="10" style="text-align:center;padding:32px;color:var(--text-muted);">
+                                <td colspan="11" style="text-align:center;padding:32px;color:var(--text-muted);">
                                     <i class="fas fa-clipboard-question"
                                         style="font-size:28px;display:block;margin-bottom:8px;opacity:0.4;"></i>
                                     Tidak ada data calon penerima yang sesuai dengan kriteria saringan.
