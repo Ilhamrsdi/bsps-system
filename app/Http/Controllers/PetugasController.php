@@ -76,7 +76,9 @@ class PetugasController extends Controller
                 $q->where('nama', 'like', "%{$search}%")
                   ->orWhere('no_ktp', 'like', "%{$search}%")
                   ->orWhere('no_kk', 'like', "%{$search}%")
-                  ->orWhere('alamat', 'like', "%{$search}%");
+                  ->orWhere('alamat', 'like', "%{$search}%")
+                  ->orWhere('pengelompokan_desil', 'like', "%{$search}%")
+                  ->orWhere('status', 'like', "%{$search}%");
             });
         }
 
@@ -84,6 +86,11 @@ class PetugasController extends Controller
             $tableQuery->sudahSurvei();
         } elseif ($statusFilter === 'belum') {
             $tableQuery->belumSurvei();
+        } elseif ($statusFilter === 'usulan') {
+            $tableQuery->where(function ($q) {
+                $q->where('pengelompokan_desil', 'like', '%Usulan%')
+                  ->orWhere('status', 'Usulan Petugas');
+            });
         }
 
         $vervals = $tableQuery->orderBy('id', 'asc')->paginate(15)->withQueryString();
