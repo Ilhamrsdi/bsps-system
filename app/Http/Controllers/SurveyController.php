@@ -117,6 +117,12 @@ class SurveyController extends Controller
         }
 
         if (!empty($missingPhotos)) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Semua berkas dan 5 sudut foto fisik rumah wajib diisi lengkap.',
+                    'errors' => ['foto' => ['Yang belum diunggah: ' . implode(', ', $missingPhotos)]]
+                ], 422);
+            }
             return redirect()->back()
                 ->withInput()
                 ->withErrors(['foto' => 'Semua berkas dan 5 sudut foto fisik rumah wajib diisi lengkap. Yang belum diunggah: ' . implode(', ', $missingPhotos)]);
@@ -212,6 +218,13 @@ class SurveyController extends Controller
 
         $data['status'] = 'ditemukan';
         $vervalData->update($data);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Data Survei Lapangan berhasil disimpan.'
+            ]);
+        }
 
         if (Auth::user() && Auth::user()->role === 'petugas') {
             return redirect()->route('petugas.sudah-survei')
