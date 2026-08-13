@@ -1258,52 +1258,80 @@
                 </div>
 
                 <div class="modal-body" style="padding: 22px 24px;">
-                    {{-- Alert khusus kalau permission denied --}}
-                    <div id="gpsDeniedAlert" style="display:none; background:#fff1f2; border:1px solid #fca5a5; border-radius:10px; padding:12px 14px; margin-bottom:16px;">
-                        <div style="font-size:13px; font-weight:800; color:#dc2626; display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-                            <i class="fas fa-circle-xmark"></i> Akses Lokasi Sebelumnya Ditolak
-                        </div>
-                        <p style="font-size:12.5px; color:#7f1d1d; margin:0; line-height:1.6;">
-                            Browser Anda memblokir akses lokasi. Ikuti langkah di bawah untuk mengizinkan ulang, lalu klik <strong>"Coba Lagi"</strong>.
+
+                    {{-- STATE NORMAL: Belum pernah minta izin (prompt) --}}
+                    <div id="gpsStateNormal">
+                        <p style="font-size:13.5px; color:#374151; margin:0 0 14px; line-height:1.6;">
+                            Saat muncul dialog <strong>"Izinkan lokasi?"</strong> dari browser, pastikan klik tombol <strong style="color:#16a34a;">"Izinkan" / "Allow"</strong>.
                         </p>
-                    </div>
-
-                    {{-- Panduan utama --}}
-                    <p style="font-size:13.5px; color:#374151; margin:0 0 16px; line-height:1.6;">
-                        Aplikasi membutuhkan izin lokasi untuk menyimpan <strong>koordinat GPS</strong> rumah calon penerima BSPS secara otomatis.
-                    </p>
-
-                    {{-- Step-by-step Chrome --}}
-                    <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:10px; padding:14px 16px; margin-bottom:16px;">
-                        <div style="font-size:12px; font-weight:800; color:#0369a1; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
-                            <i class="fab fa-chrome"></i> Cara izinkan di Chrome / Browser:
+                        <div style="background:#f0fdf4; border:1px solid #86efac; border-radius:10px; padding:12px 14px; margin-bottom:14px; display:flex; align-items:center; gap:12px;">
+                            <div style="width:40px;height:40px;border-radius:50%;background:#dcfce7;color:#16a34a;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">
+                                <i class="fas fa-hand-pointer"></i>
+                            </div>
+                            <div>
+                                <div style="font-size:12.5px;font-weight:800;color:#15803d;margin-bottom:3px;">Klik "Izinkan" / "Allow" saat dialog muncul!</div>
+                                <div style="font-size:12px;color:#166534;">Dialog akan muncul dari browser, bukan dari halaman ini.</div>
+                            </div>
                         </div>
-                        <ol style="margin:0; padding-left:18px; font-size:12.5px; color:#1e40af; line-height:2;">
-                            <li>Lihat <strong>ikon kunci 🔒</strong> atau <strong>ikon lokasi 📍</strong> di <em>address bar</em> atas</li>
-                            <li>Klik ikon tersebut → pilih <strong>"Izin situs"</strong> atau <strong>"Site settings"</strong></li>
-                            <li>Cari <strong>"Lokasi"</strong> → ubah dari <em>Blokir</em> ke <strong style="color:#16a34a;">Izinkan</strong></li>
-                            <li>Klik <strong>"Muat ulang"</strong> / <em>Reload</em> halaman, lalu klik tombol di bawah</li>
-                        </ol>
+                        <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:10px; padding:12px 14px;">
+                            <div style="font-size:12px; font-weight:800; color:#0369a1; margin-bottom:6px;">
+                                <i class="fas fa-mobile-screen-button"></i> HP Android: Pastikan GPS aktif dulu!
+                            </div>
+                            <p style="font-size:12px; color:#1e40af; margin:0; line-height:1.7;">
+                                Tarik notifikasi atas → aktifkan ikon <strong>📍 Lokasi</strong> sebelum klik tombol di bawah.
+                            </p>
+                        </div>
                     </div>
 
-                    {{-- Panduan HP Android --}}
-                    <div style="background:#f0fdf4; border:1px solid #86efac; border-radius:10px; padding:12px 14px;">
-                        <div style="font-size:12px; font-weight:800; color:#15803d; margin-bottom:6px; display:flex; align-items:center; gap:6px;">
-                            <i class="fas fa-mobile-screen-button"></i> Pengguna HP (Android):
+                    {{-- STATE DENIED: Sudah pernah ditolak --}}
+                    <div id="gpsStateDenied" style="display:none;">
+                        <div style="background:#fff1f2; border:1px solid #fca5a5; border-radius:10px; padding:12px 14px; margin-bottom:14px; display:flex; align-items:center; gap:12px;">
+                            <div style="width:40px;height:40px;border-radius:50%;background:#fee2e2;color:#dc2626;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">
+                                <i class="fas fa-ban"></i>
+                            </div>
+                            <div>
+                                <div style="font-size:12.5px;font-weight:800;color:#dc2626;margin-bottom:3px;">Akses Lokasi Diblokir Browser</div>
+                                <div style="font-size:12px;color:#7f1d1d;">Browser tidak bisa memunculkan dialog izin lagi secara otomatis. Reset manual dulu.</div>
+                            </div>
                         </div>
-                        <p style="font-size:12px; color:#14532d; margin:0; line-height:1.7;">
-                            Pastikan <strong>GPS/Lokasi HP</strong> aktif (tarik notifikasi atas → aktifkan ikon 📍) dan izinkan browser mengakses lokasi saat muncul prompt dari Chrome.
-                        </p>
+                        <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:10px; padding:14px 16px;">
+                            <div style="font-size:12px; font-weight:800; color:#0369a1; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+                                <i class="fab fa-chrome"></i> Cara reset izin lokasi di Chrome:
+                            </div>
+                            <ol style="margin:0; padding-left:18px; font-size:12.5px; color:#1e40af; line-height:2.2;">
+                                <li>Lihat <strong>ikon 🔒 kunci</strong> di address bar browser atas</li>
+                                <li>Klik ikon itu → pilih <strong>"Izin situs"</strong> / <em>"Site settings"</em></li>
+                                <li>Cari <strong>"Lokasi"</strong> → ubah dari <span style="color:#dc2626;font-weight:700;">Blokir</span> ke <span style="color:#16a34a;font-weight:700;">Izinkan</span></li>
+                                <li>Setelah diubah, klik tombol <strong style="color:#1d4ed8;">"Sudah Izinkan → Muat Ulang"</strong> di bawah</li>
+                            </ol>
+                        </div>
                     </div>
+
                 </div>
 
-                <div class="modal-footer" style="padding: 14px 24px; background: var(--bg-body); border-top: 1px solid rgba(0, 40, 85, 0.06); display: flex; gap:10px; justify-content: flex-end;">
+                {{-- FOOTER STATE NORMAL --}}
+                <div id="gpsFooterNormal" class="modal-footer" style="padding: 14px 24px; background: var(--bg-body); border-top: 1px solid rgba(0, 40, 85, 0.06); display: flex; gap:10px; justify-content: flex-end;">
                     <button type="button" class="btn btn-outline" style="padding:9px 16px; font-size:13px;" onclick="window.PuprModal.close('gpsModal')">
                         Nanti Saja
                     </button>
                     <button type="button" class="btn btn-primary" style="padding:9px 18px; font-size:13px; font-weight:800; background:#1d4ed8; display:inline-flex; align-items:center; gap:8px;" onclick="requestLocation()">
-                        <i class="fas fa-rotate"></i> Coba Lagi Deteksi Lokasi
+                        <i class="fas fa-location-dot"></i> Izinkan & Deteksi Lokasi
                     </button>
+                </div>
+
+                {{-- FOOTER STATE DENIED --}}
+                <div id="gpsFooterDenied" class="modal-footer" style="display:none; padding: 14px 24px; background: var(--bg-body); border-top: 1px solid rgba(0, 40, 85, 0.06); flex-direction:column; gap:8px;">
+                    <div style="font-size:11.5px;color:var(--text-muted);text-align:center;">
+                        <i class="fas fa-info-circle"></i> Reset izin lokasi di browser dulu, lalu klik tombol ini:
+                    </div>
+                    <div style="display:flex;gap:10px;justify-content:flex-end;">
+                        <button type="button" class="btn btn-outline" style="padding:9px 16px; font-size:13px;" onclick="window.PuprModal.close('gpsModal')">
+                            Tutup
+                        </button>
+                        <button type="button" class="btn" style="padding:9px 18px; font-size:13px; font-weight:800; background:#16a34a; color:#fff; display:inline-flex; align-items:center; gap:8px; border:none; border-radius:var(--radius-sm); cursor:pointer;" onclick="window.location.reload()">
+                            <i class="fas fa-rotate-right"></i> Sudah Izinkan → Muat Ulang Halaman
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2226,8 +2254,17 @@
 
         // GPS Geolocation Handler (Auto-fill hidden coordinates dengan live UI update)
         function showGpsModal(isDenied = false) {
-            const deniedAlert = document.getElementById('gpsDeniedAlert');
-            if (deniedAlert) deniedAlert.style.display = isDenied ? 'block' : 'none';
+            // Toggle state normal vs denied
+            const stateNormal  = document.getElementById('gpsStateNormal');
+            const stateDenied  = document.getElementById('gpsStateDenied');
+            const footerNormal = document.getElementById('gpsFooterNormal');
+            const footerDenied = document.getElementById('gpsFooterDenied');
+
+            if (stateNormal)  stateNormal.style.display  = isDenied ? 'none'  : 'block';
+            if (stateDenied)  stateDenied.style.display  = isDenied ? 'block' : 'none';
+            if (footerNormal) footerNormal.style.display = isDenied ? 'none'  : 'flex';
+            if (footerDenied) footerDenied.style.display = isDenied ? 'flex'  : 'none';
+
             if (window.PuprModal) window.PuprModal.open('gpsModal');
         }
 
