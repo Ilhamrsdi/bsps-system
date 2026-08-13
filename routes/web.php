@@ -244,6 +244,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [PetugasController::class, 'dashboard'])->name('dashboard');
         Route::get('/belum-survei', [PetugasController::class, 'belumSurvei'])->name('belum-survei');
         Route::get('/sudah-survei', [PetugasController::class, 'sudahSurvei'])->name('sudah-survei');
+        Route::get('/usulan-baru', [PetugasController::class, 'usulanBaru'])->name('usulan-baru');
         Route::post('/usulkan-penerima', [PetugasController::class, 'storeUsulan'])->name('usulkan-penerima');
         Route::post('/update-location', [PetugasController::class, 'updateLocation'])->name('update-location');
     });

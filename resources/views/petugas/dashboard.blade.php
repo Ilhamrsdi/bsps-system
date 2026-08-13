@@ -432,21 +432,21 @@
                     <div class="stat-label">Total Penerima Desa</div>
                 </div>
             </a>
-            <a href="{{ route('petugas.dashboard', ['status' => 'belum']) }}" class="stat-card-petugas {{ $statusFilter === 'belum' ? 'active-card' : '' }}" title="Saring Tabel: Belum Di-survei">
+            <a href="{{ route('petugas.belum-survei') }}" class="stat-card-petugas" title="Buka Halaman Tugas Belum Di-survei">
                 <div class="stat-icon orange"><i class="fas fa-clipboard-question"></i></div>
                 <div class="stat-info">
                     <div class="stat-value" style="color:#d69e00;">{{ number_format($stats['belum_survei'], 0, ',', '.') }}</div>
                     <div class="stat-label">Belum Di-survei</div>
                 </div>
             </a>
-            <a href="{{ route('petugas.dashboard', ['status' => 'sudah']) }}" class="stat-card-petugas {{ $statusFilter === 'sudah' ? 'active-card' : '' }}" title="Saring Tabel: Sudah Selesai Survei">
+            <a href="{{ route('petugas.sudah-survei') }}" class="stat-card-petugas" title="Buka Halaman Tugas Sudah Selesai Survei">
                 <div class="stat-icon green"><i class="fas fa-clipboard-check"></i></div>
                 <div class="stat-info">
                     <div class="stat-value" style="color:#15803d;">{{ number_format($stats['sudah_survei'], 0, ',', '.') }}</div>
                     <div class="stat-label">Sudah Selesai Survei</div>
                 </div>
             </a>
-            <a href="{{ route('petugas.dashboard', ['status' => 'usulan']) }}" class="stat-card-petugas {{ $statusFilter === 'usulan' ? 'active-card' : '' }}" title="Saring Tabel: Usulan Baru Lapangan">
+            <a href="{{ route('petugas.usulan-baru') }}" class="stat-card-petugas" title="Buka Halaman Usulan Baru Lapangan">
                 <div class="stat-icon cyan"><i class="fas fa-user-plus"></i></div>
                 <div class="stat-info">
                     <div class="stat-value" style="color:#0891b2;">{{ number_format($stats['usulan_baru'], 0, ',', '.') }}</div>
