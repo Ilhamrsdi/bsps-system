@@ -1247,23 +1247,62 @@
 
         <!-- Modal GPS (Custom System Modal) -->
         <div class="modal-overlay" id="gpsModal">
-            <div class="modal-box" style="max-width: 440px;">
-                <div class="modal-header" style="background: #fff3cd; border-bottom-color: #ffeeba;">
-                    <h3 style="color: #856404; display: flex; align-items: center; gap: 10px; font-size: 16px;">
-                        <i class="fas fa-exclamation-triangle"></i> GPS/Lokasi Dibutuhkan
+            <div class="modal-box" style="max-width: 480px; border-radius: 16px; overflow: hidden;">
+                <div class="modal-header" style="background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%); border-bottom: none; padding: 20px 24px;">
+                    <h3 style="color: #fff; display: flex; align-items: center; gap: 10px; font-size: 16px; margin: 0;">
+                        <span style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.15);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="fas fa-location-dot"></i>
+                        </span>
+                        Izinkan Akses Lokasi GPS
                     </h3>
                 </div>
 
-                <div class="modal-body" style="padding: 24px; text-align: center;">
-                    <div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(220, 53, 69, 0.1); color: #dc3545; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 16px;">
-                        <i class="fas fa-map-marker-alt"></i>
+                <div class="modal-body" style="padding: 22px 24px;">
+                    {{-- Alert khusus kalau permission denied --}}
+                    <div id="gpsDeniedAlert" style="display:none; background:#fff1f2; border:1px solid #fca5a5; border-radius:10px; padding:12px 14px; margin-bottom:16px;">
+                        <div style="font-size:13px; font-weight:800; color:#dc2626; display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                            <i class="fas fa-circle-xmark"></i> Akses Lokasi Sebelumnya Ditolak
+                        </div>
+                        <p style="font-size:12.5px; color:#7f1d1d; margin:0; line-height:1.6;">
+                            Browser Anda memblokir akses lokasi. Ikuti langkah di bawah untuk mengizinkan ulang, lalu klik <strong>"Coba Lagi"</strong>.
+                        </p>
                     </div>
-                    <p style="font-size: 14px; margin-bottom: 0;">Aktifkan akses GPS (Lokasi) pada browser Anda untuk otomatis menyimpan koordinat Geotagging rumah calon penerima BSPS.</p>
+
+                    {{-- Panduan utama --}}
+                    <p style="font-size:13.5px; color:#374151; margin:0 0 16px; line-height:1.6;">
+                        Aplikasi membutuhkan izin lokasi untuk menyimpan <strong>koordinat GPS</strong> rumah calon penerima BSPS secara otomatis.
+                    </p>
+
+                    {{-- Step-by-step Chrome --}}
+                    <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:10px; padding:14px 16px; margin-bottom:16px;">
+                        <div style="font-size:12px; font-weight:800; color:#0369a1; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+                            <i class="fab fa-chrome"></i> Cara izinkan di Chrome / Browser:
+                        </div>
+                        <ol style="margin:0; padding-left:18px; font-size:12.5px; color:#1e40af; line-height:2;">
+                            <li>Lihat <strong>ikon kunci 🔒</strong> atau <strong>ikon lokasi 📍</strong> di <em>address bar</em> atas</li>
+                            <li>Klik ikon tersebut → pilih <strong>"Izin situs"</strong> atau <strong>"Site settings"</strong></li>
+                            <li>Cari <strong>"Lokasi"</strong> → ubah dari <em>Blokir</em> ke <strong style="color:#16a34a;">Izinkan</strong></li>
+                            <li>Klik <strong>"Muat ulang"</strong> / <em>Reload</em> halaman, lalu klik tombol di bawah</li>
+                        </ol>
+                    </div>
+
+                    {{-- Panduan HP Android --}}
+                    <div style="background:#f0fdf4; border:1px solid #86efac; border-radius:10px; padding:12px 14px;">
+                        <div style="font-size:12px; font-weight:800; color:#15803d; margin-bottom:6px; display:flex; align-items:center; gap:6px;">
+                            <i class="fas fa-mobile-screen-button"></i> Pengguna HP (Android):
+                        </div>
+                        <p style="font-size:12px; color:#14532d; margin:0; line-height:1.7;">
+                            Pastikan <strong>GPS/Lokasi HP</strong> aktif (tarik notifikasi atas → aktifkan ikon 📍) dan izinkan browser mengakses lokasi saat muncul prompt dari Chrome.
+                        </p>
+                    </div>
                 </div>
 
-                <div class="modal-footer" style="padding: 16px 20px; background: var(--bg-body); border-top: 1px solid rgba(0, 40, 85, 0.06); display: flex; justify-content: center;">
-                    <button type="button" class="btn btn-primary" onclick="requestLocation()">
-                        <i class="fas fa-sync-alt"></i> Coba Deteksi Lokasi
+                <div class="modal-footer" style="padding: 14px 24px; background: var(--bg-body); border-top: 1px solid rgba(0, 40, 85, 0.06); display: flex; gap:10px; justify-content: flex-end;">
+                    <button type="button" class="btn btn-outline" style="padding:9px 16px; font-size:13px;" onclick="window.PuprModal.close('gpsModal')">
+                        Nanti Saja
+                    </button>
+                    <button type="button" class="btn btn-primary" style="padding:9px 18px; font-size:13px; font-weight:800; background:#1d4ed8; display:inline-flex; align-items:center; gap:8px;" onclick="requestLocation()">
+                        <i class="fas fa-rotate"></i> Coba Lagi Deteksi Lokasi
                     </button>
                 </div>
             </div>
@@ -2186,6 +2225,12 @@
         }
 
         // GPS Geolocation Handler (Auto-fill hidden coordinates dengan live UI update)
+        function showGpsModal(isDenied = false) {
+            const deniedAlert = document.getElementById('gpsDeniedAlert');
+            if (deniedAlert) deniedAlert.style.display = isDenied ? 'block' : 'none';
+            if (window.PuprModal) window.PuprModal.open('gpsModal');
+        }
+
         function requestLocation() {
             if (!navigator.geolocation) {
                 const badge = document.getElementById('gpsDisplayBadge');
@@ -2231,6 +2276,13 @@
                 const wrapper = document.getElementById('gpsDisplayWrapper');
                 const latVal = document.getElementById('latitude')?.value;
 
+                // Kode 1 = PERMISSION_DENIED → tampilkan modal dengan alert merah
+                if (err.code === 1) {
+                    showGpsModal(true);
+                } else {
+                    showGpsModal(false);
+                }
+
                 if (badge && !latVal) {
                     badge.innerHTML = `<span style="color: #e11d48; font-size: 12.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
                         <i class="fas fa-triangle-exclamation"></i> GPS Belum Aktif / Ditolak. (Wajib izinkan akses lokasi pada HP/Browser)
@@ -2242,28 +2294,63 @@
                 }
             };
 
-            // Percobaan 1: High Accuracy GPS (8 detik)
-            navigator.geolocation.getCurrentPosition(
-                applyPosition,
-                function (error) {
-                    console.warn('GPS high-accuracy request timeout/failed, mencoba fallback low accuracy:', error);
-                    // Percobaan 2: Fallback Low Accuracy / Wi-Fi Triangulation untuk Laptop/Indoor (20 detik, cache 5 min)
-                    navigator.geolocation.getCurrentPosition(
-                        applyPosition,
-                        handleError,
-                        {
-                            enableHighAccuracy: false,
-                            timeout: 20000,
-                            maximumAge: 300000
+            const doGetPosition = function () {
+                // Percobaan 1: High Accuracy GPS (8 detik)
+                navigator.geolocation.getCurrentPosition(
+                    applyPosition,
+                    function (error) {
+                        console.warn('GPS high-accuracy request timeout/failed, mencoba fallback low accuracy:', error);
+                        // Percobaan 2: Fallback Low Accuracy / Wi-Fi Triangulation untuk Laptop/Indoor (20 detik, cache 5 min)
+                        navigator.geolocation.getCurrentPosition(
+                            applyPosition,
+                            handleError,
+                            {
+                                enableHighAccuracy: false,
+                                timeout: 20000,
+                                maximumAge: 300000
+                            }
+                        );
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 8000,
+                        maximumAge: 60000
+                    }
+                );
+            };
+
+            // Cek status permission dulu (Chrome/Firefox support permissions API)
+            if (navigator.permissions && navigator.permissions.query) {
+                navigator.permissions.query({ name: 'geolocation' }).then(function (result) {
+                    if (result.state === 'denied') {
+                        // Sudah pernah ditolak — langsung tampilkan modal panduan dengan alert merah
+                        showGpsModal(true);
+                    } else if (result.state === 'prompt') {
+                        // Belum pernah diminta — buka modal panduan dulu agar user siap klik "Izinkan" di browser
+                        showGpsModal(false);
+                        doGetPosition();
+                    } else {
+                        // 'granted' — langsung ambil lokasi tanpa tampilkan modal
+                        doGetPosition();
+                    }
+
+                    // Monitor perubahan status permission secara real-time
+                    result.onchange = function () {
+                        if (result.state === 'granted') {
+                            if (window.PuprModal) window.PuprModal.close('gpsModal');
+                            doGetPosition();
+                        } else if (result.state === 'denied') {
+                            showGpsModal(true);
                         }
-                    );
-                },
-                {
-                    enableHighAccuracy: true,
-                    timeout: 8000,
-                    maximumAge: 60000
-                }
-            );
+                    };
+                }).catch(function () {
+                    // Browser tidak support permissions API → langsung minta saja
+                    doGetPosition();
+                });
+            } else {
+                // Fallback untuk browser lama
+                doGetPosition();
+            }
         }
 
         // Recount & Update Status Kelayakan Usulan (Kriteria RTLH Terpenuhi)
