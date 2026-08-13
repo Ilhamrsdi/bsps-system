@@ -307,7 +307,7 @@
             // Penghasilan — format Rupiah
             $penghasilan = '..................................';
             if ($item->penghasilan) {
-                $penghasilan = 'Rp ' . number_format($item->penghasilan, 0, ',', '.');
+                $penghasilan = 'Rp ' . number_format((float) $item->penghasilan, 0, ',', '.');
             }
 
             // Luas Tanah
