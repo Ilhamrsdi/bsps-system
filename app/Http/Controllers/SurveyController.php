@@ -229,6 +229,7 @@ class SurveyController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Data Survei Lapangan berhasil disimpan.'
+            ]);
         }
               
         // Perbarui catatan lokasi aktif akun petugas (last_location_at, last_ip, lat, lng)
