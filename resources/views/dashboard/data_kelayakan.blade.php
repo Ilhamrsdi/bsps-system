@@ -1,0 +1,394 @@
+@extends('layouts.partial.app')
+
+@section('title', 'Data Calon Penerima ' . ($status === 'tidak_layak' ? 'Tidak Layak' : ($status === 'all' ? 'Hasil Verval' : 'Layak Diusulkan')))
+@section('title_header', 'Data Penerima BSPS (' . ($status === 'tidak_layak' ? 'Tidak Layak Diusulkan' : ($status === 'all' ? 'Semua Hasil Verval' : 'Layak Diusulkan')) . ')')
+@section('subtitle_header', 'Daftar By Name By Address (BNBA) Calon Penerima Bantuan Stimulan Perumahan Swadaya')
+
+@push('styles')
+<style>
+    /* Status Filter Pills */
+    .kelayakan-filter-pills {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .kelayakan-pill-btn {
+        padding: 12px 20px;
+        border-radius: 12px;
+        background: #ffffff;
+        border: 1.5px solid #e2e8f0;
+        color: #475569;
+        font-weight: 700;
+        font-size: 13.5px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.25s ease;
+        box-shadow: 0 2px 6px rgba(0, 40, 85, 0.04);
+    }
+
+    .kelayakan-pill-btn:hover {
+        border-color: #cbd5e1;
+        transform: translateY(-2px);
+    }
+
+    .kelayakan-pill-btn.active.pill-layak {
+        background: #15803d;
+        color: #ffffff;
+        border-color: #15803d;
+        box-shadow: 0 6px 18px rgba(21, 128, 61, 0.25);
+    }
+
+    .kelayakan-pill-btn.active.pill-tidak {
+        background: #b91c1c;
+        color: #ffffff;
+        border-color: #b91c1c;
+        box-shadow: 0 6px 18px rgba(185, 28, 28, 0.25);
+    }
+
+    .kelayakan-pill-btn.active.pill-all {
+        background: #002855;
+        color: #ffffff;
+        border-color: #002855;
+        box-shadow: 0 6px 18px rgba(0, 40, 85, 0.25);
+    }
+
+    .kelayakan-pill-btn .badge-pill-count {
+        font-size: 11px;
+        font-weight: 800;
+        padding: 2px 8px;
+        border-radius: 12px;
+        background: rgba(0, 40, 85, 0.08);
+        color: inherit;
+    }
+
+    .kelayakan-pill-btn.active .badge-pill-count {
+        background: rgba(255, 255, 255, 0.25);
+        color: #ffffff;
+    }
+
+    /* Filter Bar */
+    .filter-card-bar {
+        background: var(--bg-card);
+        border-radius: var(--radius);
+        padding: 16px 20px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid rgba(0, 40, 85, 0.06);
+        margin-bottom: 22px;
+    }
+
+    .filter-form-grid {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .filter-item-box {
+        flex: 1;
+        min-width: 180px;
+    }
+
+    /* Indikator mini pills inside table */
+    .ind-pill {
+        display: inline-block;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: 700;
+        margin: 1px;
+    }
+    .ind-pill.rusak { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+    .ind-pill.baik { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+</style>
+@endpush
+
+@section('content')
+    @include('layouts.navbar')
+
+    <main class="dashboard-content">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb" style="margin-bottom: 16px; font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
+            <a href="{{ route('dashboard') }}" style="color: var(--primary); text-decoration: none; font-weight: 600;"><i class="fas fa-th-large"></i> Dashboard Global</a>
+            <i class="fas fa-chevron-right" style="font-size: 10px;"></i>
+            <span>Data Kelayakan Penerima ({{ $status === 'tidak_layak' ? 'Tidak Layak' : ($status === 'all' ? 'Semua Verval' : 'Layak Diusulkan') }})</span>
+        </div>
+
+        <!-- 3 Tab Selector: Layak Diusulkan vs Tidak Layak vs Semua Verval -->
+        <div class="kelayakan-filter-pills">
+            <a href="{{ route('dashboard.data-kelayakan', ['status' => 'layak', 'kecamatan' => request('kecamatan'), 'desa' => request('desa')]) }}"
+               class="kelayakan-pill-btn pill-layak {{ $status === 'layak' ? 'active' : '' }}">
+                <i class="fas fa-circle-check"></i>
+                <span>Layak Diusulkan</span>
+                <span class="badge-pill-count">{{ number_format($totalLayakGlobal) }} KK</span>
+            </a>
+
+            <a href="{{ route('dashboard.data-kelayakan', ['status' => 'tidak_layak', 'kecamatan' => request('kecamatan'), 'desa' => request('desa')]) }}"
+               class="kelayakan-pill-btn pill-tidak {{ $status === 'tidak_layak' ? 'active' : '' }}">
+                <i class="fas fa-circle-xmark"></i>
+                <span>Tidak Layak</span>
+                <span class="badge-pill-count">{{ number_format($totalTidakLayakGlobal) }} KK</span>
+            </a>
+
+            <a href="{{ route('dashboard.data-kelayakan', ['status' => 'all', 'kecamatan' => request('kecamatan'), 'desa' => request('desa')]) }}"
+               class="kelayakan-pill-btn pill-all {{ $status === 'all' ? 'active' : '' }}">
+                <i class="fas fa-clipboard-check"></i>
+                <span>Semua Hasil Verval</span>
+                <span class="badge-pill-count">{{ number_format($totalSudahSurveiGlobal) }} KK</span>
+            </a>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-card-bar">
+            <form action="{{ route('dashboard.data-kelayakan') }}" method="GET" class="filter-form-grid" id="filterFormKelayakan">
+                <input type="hidden" name="status" value="{{ $status }}" />
+
+                <!-- Filter Kecamatan -->
+                @if(!auth()->check() || !auth()->user()->isAdminKecamatan())
+                <div class="filter-item-box" style="max-width: 220px;">
+                    <select name="kecamatan" class="form-control" onchange="this.form.submit()" style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; font-weight: 600; background: #fff;">
+                        <option value="all">-- Semua Kecamatan --</option>
+                        @foreach($listKecamatan as $kec)
+                            <option value="{{ $kec }}" {{ request('kecamatan') === $kec ? 'selected' : '' }}>
+                                Kec. {{ ucwords(strtolower($kec)) }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                @endif
+
+                <!-- Filter Desa -->
+                <div class="filter-item-box" style="max-width: 220px;">
+                    <select name="desa" class="form-control" onchange="this.form.submit()" style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; font-weight: 600; background: #fff;">
+                        <option value="all">-- Semua Desa --</option>
+                        @foreach($listDesa as $d)
+                            <option value="{{ $d }}" {{ request('desa') === $d ? 'selected' : '' }}>
+                                Desa {{ ucwords(strtolower($d)) }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Per Page -->
+                <div class="filter-item-box" style="max-width: 130px;">
+                    <select name="per_page" class="form-control" onchange="this.form.submit()" style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; font-weight: 600; background: #fff;">
+                        <option value="15" {{ request('per_page', '15') == '15' ? 'selected' : '' }}>15 Baris</option>
+                        <option value="25" {{ request('per_page') == '25' ? 'selected' : '' }}>25 Baris</option>
+                        <option value="50" {{ request('per_page') == '50' ? 'selected' : '' }}>50 Baris</option>
+                        <option value="100" {{ request('per_page') == '100' ? 'selected' : '' }}>100 Baris</option>
+                        <option value="all" {{ request('per_page') == 'all' ? 'selected' : '' }}>Semua</option>
+                    </select>
+                </div>
+
+                <!-- Search Input -->
+                <div class="filter-item-box" style="flex: 2; min-width: 220px;">
+                    <div style="position: relative;">
+                        <i class="fas fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 13px;"></i>
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama warga, NIK, KK, atau alamat..." style="width: 100%; padding: 8px 14px 8px 34px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; outline: none;" />
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div style="display: flex; gap: 8px;">
+                    <button type="submit" class="btn btn-primary" style="padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 700; border: none; cursor: pointer; background: #002855; color: #ffffff;">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+                    <a href="{{ route('dashboard.data-kelayakan', ['status' => $status]) }}" class="btn btn-outline" style="padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none; border: 1px solid #cbd5e1; color: #64748b; background: #ffffff;">
+                        <i class="fas fa-redo"></i> Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Tabel Data Calon Penerima -->
+        <div class="table-card">
+            <div class="table-header" style="padding: 16px 20px; border-bottom: 1px solid rgba(0, 40, 85, 0.08); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+                <h3 style="margin: 0; font-size: 15px; font-weight: 800; color: #002855; display: flex; align-items: center; gap: 8px;">
+                    @if($status === 'layak')
+                        <i class="fas fa-circle-check" style="color: #16a34a;"></i>
+                        <span>Daftar Calon Penerima Layak Diusulkan</span>
+                    @elseif($status === 'tidak_layak')
+                        <i class="fas fa-circle-xmark" style="color: #dc2626;"></i>
+                        <span>Daftar Calon Penerima Tidak Layak</span>
+                    @else
+                        <i class="fas fa-clipboard-list" style="color: #002855;"></i>
+                        <span>Daftar Seluruh Calon Penerima Selesai Verval</span>
+                    @endif
+                    <span style="font-size: 13px; color: #64748b; font-weight: 600;">({{ number_format($penerimaList->total()) }} data ditemukan)</span>
+                </h3>
+
+                <div style="display: flex; gap: 8px;">
+                    <a href="{{ route('laporan.export', ['status' => ($status === 'layak' ? 'layak' : ($status === 'tidak_layak' ? 'tidak_layak' : 'all')), 'kecamatan' => request('kecamatan', 'all')]) }}" class="btn btn-outline" style="padding: 6px 14px; font-size: 12px; font-weight: 700; border-radius: 6px; text-decoration: none; border: 1px solid #107c41; color: #107c41; background: #ffffff; display: inline-flex; align-items: center; gap: 6px;">
+                        <i class="fas fa-file-excel"></i> Export Excel
+                    </a>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="pupr-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 45px; text-align: center;">No</th>
+                            <th style="min-width: 180px;">Nama Calon Penerima</th>
+                            <th style="min-width: 160px;">NIK / No. KK</th>
+                            <th style="min-width: 170px;">Wilayah / Desa</th>
+                            <th style="min-width: 120px;">Desil</th>
+                            <th style="min-width: 200px;">Capaian Indikator RTLH</th>
+                            <th style="min-width: 140px; text-align: center;">Status Kelayakan</th>
+                            <th style="min-width: 140px;">Petugas Lapangan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($penerimaList as $index => $row)
+                        <tr>
+                            <td style="text-align: center;">{{ $penerimaList->firstItem() + $index }}</td>
+                            <td>
+                                <strong style="color: #002855; font-size: 13.5px; display: block;">{{ $row->nama }}</strong>
+                                <span style="font-size: 11px; color: #64748b;">
+                                    <i class="fas fa-clock"></i> {{ $row->updated_at ? $row->updated_at->setTimezone('Asia/Jakarta')->translatedFormat('d M Y, H:i') : '-' }} WIB
+                                </span>
+                            </td>
+                            <td>
+                                <div style="font-family: monospace; font-size: 12.5px; font-weight: 700; color: #0f172a;">{{ $row->no_ktp ?: '-' }}</div>
+                                <div style="font-family: monospace; font-size: 11px; color: #64748b;">KK: {{ $row->no_kk ?: '-' }}</div>
+                            </td>
+                            <td>
+                                <div style="font-weight: 700; font-size: 12.5px; color: #002855;">
+                                    <i class="fas fa-map-pin" style="font-size: 10px; opacity: 0.7;"></i> Desa {{ ucwords(strtolower($row->desa_kelurahan ?: '-')) }}
+                                </div>
+                                <div style="font-size: 11px; color: #64748b;">
+                                    Kec. {{ ucwords(strtolower($row->kecamatan ?: '-')) }}
+                                </div>
+                                <div style="font-size: 10.5px; color: #94a3b8; margin-top: 2px;">
+                                    {{ $row->alamat ?: '-' }}
+                                </div>
+                            </td>
+                            <td>
+                                <span style="font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; background: rgba(0, 40, 85, 0.08); color: #002855;">
+                                    {{ $row->pengelompokan_desil ?: '-' }}
+                                </span>
+                            </td>
+                            <td>
+                                <div style="display: flex; flex-wrap: wrap; gap: 2px;">
+                                    <span class="ind-pill {{ $row->indikator_atap === 'tidak_ada' ? 'rusak' : 'baik' }}" title="Atap">
+                                        Atap: {{ $row->indikator_atap === 'tidak_ada' ? 'Rusak' : 'Baik' }}
+                                    </span>
+                                    <span class="ind-pill {{ $row->indikator_dinding === 'tidak_ada' ? 'rusak' : 'baik' }}" title="Dinding">
+                                        Dinding: {{ $row->indikator_dinding === 'tidak_ada' ? 'Rusak' : 'Baik' }}
+                                    </span>
+                                    <span class="ind-pill {{ $row->indikator_lantai === 'tidak_ada' ? 'rusak' : 'baik' }}" title="Lantai">
+                                        Lantai: {{ $row->indikator_lantai === 'tidak_ada' ? 'Tanah' : 'Baik' }}
+                                    </span>
+                                    <span class="ind-pill {{ $row->indikator_pondasi === 'tidak_ada' ? 'rusak' : 'baik' }}" title="Pondasi">
+                                        Pondasi: {{ $row->indikator_pondasi === 'tidak_ada' ? 'Rusak' : 'Baik' }}
+                                    </span>
+                                    <span class="ind-pill {{ $row->indikator_struktur === 'tidak_ada' ? 'rusak' : 'baik' }}" title="Struktur">
+                                        Struktur: {{ $row->indikator_struktur === 'tidak_ada' ? 'Rusak' : 'Baik' }}
+                                    </span>
+                                </div>
+                            </td>
+                            <td style="text-align: center;">
+                                @if($row->status_kelayakan === 'Layak Diusulkan')
+                                    <span style="font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 12px; background: #dcfce7; color: #15803d; border: 1px solid #86efac; display: inline-flex; align-items: center; gap: 4px;">
+                                        <i class="fas fa-check-circle"></i> Layak Diusulkan
+                                    </span>
+                                @elseif($row->status_kelayakan === 'Tidak Layak Diusulkan')
+                                    <span style="font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 12px; background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; display: inline-flex; align-items: center; gap: 4px;">
+                                        <i class="fas fa-times-circle"></i> Tidak Layak
+                                    </span>
+                                @else
+                                    <span style="font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 12px; background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1;">
+                                        {{ ucfirst($row->status ?: 'Belum Survei') }}
+                                    </span>
+                                @endif
+                            </td>
+                            <td>
+                                <div style="font-size: 12px; font-weight: 700; color: #002855;">
+                                    <i class="fas fa-user-hard-hat" style="color: #d69e00; font-size: 11px;"></i>
+                                    {{ $row->petugas ? $row->petugas->name : 'Petugas Lapangan' }}
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="8" style="text-align: center; padding: 40px; color: #94a3b8;">
+                                <i class="fas fa-inbox" style="font-size: 32px; display: block; margin-bottom: 10px; opacity: 0.4;"></i>
+                                Tidak ada data penerima yang cocok dengan kriteria pencarian/filter.
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Bar Custom -->
+            @if($penerimaList->hasPages() || $penerimaList->total() > 0)
+            <div class="pagination-custom-bar" style="padding: 14px 20px; border-top: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; background: #f8fafc;">
+                <div class="pagination-info-text" style="font-size: 12.5px; color: #64748b;">
+                    Menampilkan <strong>{{ $penerimaList->firstItem() ?? 0 }}</strong> -
+                    <strong>{{ $penerimaList->lastItem() ?? 0 }}</strong> dari
+                    <strong>{{ number_format($penerimaList->total(), 0, ',', '.') }}</strong> calon penerima
+                    @if($penerimaList->lastPage() > 1)
+                        (Halaman <strong>{{ $penerimaList->currentPage() }}</strong> dari <strong>{{ $penerimaList->lastPage() }}</strong>)
+                    @endif
+                </div>
+
+                @if($penerimaList->lastPage() > 1)
+                    @php
+                        $current = $penerimaList->currentPage();
+                        $last = $penerimaList->lastPage();
+                        $delta = 2;
+                        $left = $current - $delta;
+                        $right = $current + $delta + 1;
+                        $range = [];
+                        for ($i = 1; $i <= $last; $i++) {
+                            if ($i == 1 || $i == $last || ($i >= $left && $i < $right)) {
+                                $range[] = $i;
+                            }
+                        }
+                        $rangeWithDots = [];
+                        $l = null;
+                        foreach ($range as $i) {
+                            if ($l) {
+                                if ($i - $l === 2) {
+                                    $rangeWithDots[] = $l + 1;
+                                } elseif ($i - $l !== 1) {
+                                    $rangeWithDots[] = '...';
+                                }
+                            }
+                            $rangeWithDots[] = $i;
+                            $l = $i;
+                        }
+                    @endphp
+                    <ul class="pagination-nav" style="display: flex; gap: 4px; list-style: none; margin: 0; padding: 0;">
+                        @if($penerimaList->onFirstPage())
+                            <li><span class="page-btn disabled" style="padding: 6px 10px; border-radius: 6px; border: 1px solid #cbd5e1; color: #cbd5e1; display: inline-block;"><i class="fas fa-chevron-left"></i></span></li>
+                        @else
+                            <li><a href="{{ $penerimaList->previousPageUrl() }}" class="page-btn" style="padding: 6px 10px; border-radius: 6px; border: 1px solid #cbd5e1; color: #002855; text-decoration: none; display: inline-block;"><i class="fas fa-chevron-left"></i></a></li>
+                        @endif
+
+                        @foreach($rangeWithDots as $page)
+                            @if($page === '...')
+                                <li><span class="page-dots" style="padding: 6px 8px; color: #94a3b8; display: inline-block;">...</span></li>
+                            @elseif($page == $current)
+                                <li><span class="page-btn active" style="padding: 6px 12px; border-radius: 6px; background: #002855; color: #ffffff; font-weight: 700; display: inline-block;">{{ $page }}</span></li>
+                            @else
+                                <li><a href="{{ $penerimaList->url($page) }}" class="page-btn" style="padding: 6px 12px; border-radius: 6px; border: 1px solid #cbd5e1; color: #002855; text-decoration: none; font-weight: 600; display: inline-block;">{{ $page }}</a></li>
+                            @endif
+                        @endforeach
+
+                        @if($penerimaList->hasMorePages())
+                            <li><a href="{{ $penerimaList->nextPageUrl() }}" class="page-btn" style="padding: 6px 10px; border-radius: 6px; border: 1px solid #cbd5e1; color: #002855; text-decoration: none; display: inline-block;"><i class="fas fa-chevron-right"></i></a></li>
+                        @else
+                            <li><span class="page-btn disabled" style="padding: 6px 10px; border-radius: 6px; border: 1px solid #cbd5e1; color: #cbd5e1; display: inline-block;"><i class="fas fa-chevron-right"></i></span></li>
+                        @endif
+                    </ul>
+                @endif
+            </div>
+            @endif
+        </div>
+    </main>
+@endsection

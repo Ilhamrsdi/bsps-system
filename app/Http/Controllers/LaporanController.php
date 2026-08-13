@@ -71,7 +71,9 @@ class LaporanController extends Controller
 
         // 1. STATISTIK RINGKASAN UTAMA
         $baseQuery = DataPenerima::query();
-        if ($kecamatan && $kecamatan !== 'all') {
+        if ($user && $user->isAdminKecamatan() && $user->kecamatan) {
+            $baseQuery->whereRaw('LOWER(TRIM(kecamatan)) = ?', [strtolower(trim($user->kecamatan))]);
+        } elseif ($kecamatan && $kecamatan !== 'all') {
             $baseQuery->whereRaw('LOWER(TRIM(kecamatan)) = ?', [strtolower(trim($kecamatan))]);
         }
         if ($desa && $desa !== 'all') {
@@ -121,6 +123,17 @@ class LaporanController extends Controller
             $desaQuery->whereRaw('LOWER(TRIM(kecamatan)) = ?', [strtolower(trim($kecamatan))]);
         }
         $listDesa = $desaQuery->whereNotNull('desa_kelurahan')->where('desa_kelurahan', '!=', '')->orderBy('desa_kelurahan', 'asc')->pluck('desa_kelurahan')->filter()->values();
+
+        // Mapping Seluruh Desa per Kecamatan untuk Modal Cetak PDF
+        $allDesaByKecamatan = DataPenerima::select('kecamatan', 'desa_kelurahan')
+            ->distinct()
+            ->orderBy('kecamatan', 'asc')
+            ->orderBy('desa_kelurahan', 'asc')
+            ->get()
+            ->groupBy('kecamatan')
+            ->map(function ($items) {
+                return $items->pluck('desa_kelurahan')->values();
+            });
 
         // 3. AGREGASI BERDASARKAN TAB
         $rekapDesaKecamatan = null;
@@ -212,6 +225,7 @@ class LaporanController extends Controller
             'indTotals',
             'listKecamatan',
             'listDesa',
+            'allDesaByKecamatan',
             'rekapDesaKecamatan',
             'rekapIndikator',
             'penerimaList',
@@ -300,6 +314,11 @@ class LaporanController extends Controller
         $user = Auth::user();
         $scope = $request->get('export_scope', 'all');
         $kecamatan = $request->get('kecamatan', 'all');
+        
+        if ($scope === 'all' && (!$user || !$user->isAdminKecamatan())) {
+            $kecamatan = 'all';
+        }
+
         $desa = $request->get('desa', 'all');
         $status = $request->get('status', 'all');
         $search = $request->get('search');
@@ -413,6 +432,9 @@ class LaporanController extends Controller
         } else {
             $prefix = 'rekap_bsps_kab_jember_semua_desa';
         }
+        $prefix = ($kecamatan && $kecamatan !== 'all') 
+            ? 'rekap_bsps_kec_' . strtolower(str_replace([' ', '/', '\\'], '_', $kecamatan)) 
+            : 'rekap_bsps_kab_jember_semua_desa';
         $filename = $prefix . '_' . date('Ymd_His') . '.xls';
 
         $content = view('laporan.excel', compact(
@@ -434,6 +456,8 @@ class LaporanController extends Controller
 
     /**
      * Helper Resolving Informasi Gambar (HTTP URL, Local File URI, & Base64)
+    /**
+     * Helper Konversi File Gambar Lokal / Uploads ke Base64 String
      */
     private function getPhotoInfo($path)
     {

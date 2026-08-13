@@ -197,6 +197,9 @@ Route::middleware(['auth'])->group(function () {
 
     // Admin Dashboard System (Kabupaten & Kecamatan)
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/data-kelayakan', [DashboardController::class, 'dataKelayakan'])->name('dashboard.data-kelayakan');
+    Route::get('/dashboard/rekap-desa', [DashboardController::class, 'rekapDesa'])->name('dashboard.rekap-desa');
+    Route::get('/dashboard/desa', [DashboardController::class, 'desa'])->name('dashboard.desa');
     Route::get('/dashboard-kecamatan', [DashboardKecamatanController::class, 'index'])
         ->middleware('role:admin,admin_kecamatan')
         ->name('dashboard.kecamatan');

@@ -655,10 +655,12 @@
                 </h3>
                 <div style="display:flex;align-items:center;gap:8px;">
                     @if(auth()->check() && auth()->user()->isAdmin())
-                    <button type="button" class="btn-export-excel" onclick="window.PuprModal.open('modalExportExcel')" title="Pilih opsi dan download data ke format Microsoft Excel" style="cursor:pointer;border:none;">
-                        <i class="fas fa-file-excel"></i>
-                        <span>Export Excel (.XLS)</span>
-                    </button>
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                        <button type="button" class="btn-export-excel" onclick="window.PuprModal.open('modalExportExcel')" title="Pilih opsi dan download data ke format Microsoft Excel" style="cursor:pointer;border:none;">
+                            <i class="fas fa-file-excel"></i>
+                            <span>Export Excel (.XLS)</span>
+                        </button>
+                    </div>
                     @endif
                 </div>
             </div>
@@ -1286,12 +1288,59 @@
                                             <label style="font-size: 12px; font-weight: 700; color: #002855; display: block; margin-bottom: 6px;">
                                                 Pilih Kecamatan:
                                             </label>
+                <div class="modal-body" style="padding: 22px 24px; overflow: visible !important; min-height: 240px;">
+                    <p style="font-size: 13px; color: #64748b; margin-top: 0; margin-bottom: 18px; line-height: 1.5;">
+                        Silakan pilih lingkup wilayah rekapitulasi data BSPS yang ingin Anda unduh ke format Microsoft Excel:
+                    </p>
+
+                    <!-- Pilihan Lingkup Export -->
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <!-- Pilihan 1: Export Keseluruhan Kabupaten (Semua Desa) -->
+                        <div class="export-option-card active" id="optCardAll" onclick="setExportScope('all')">
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <input type="radio" name="export_scope" value="all" id="scopeAll" checked style="margin-top: 3px; cursor: pointer;" />
+                                <div>
+                                    <strong style="font-size: 13.5px; color: #002855; display: block;">
+                                        <i class="fas fa-globe-asia" style="color: #002855; margin-right: 6px;"></i>Export Seluruh Kabupaten (Semua Desa)
+                                    </strong>
+                                    <span style="font-size: 12px; color: #64748b; margin-top: 3px; display: block; line-height: 1.4;">
+                                        Mendownload data rekapitulasi lengkap dari seluruh desa/kelurahan di 31 kecamatan se-Kabupaten Jember.
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pilihan 2: Export Per Kecamatan Tertentu -->
+                        <div class="export-option-card" id="optCardKecamatan" onclick="setExportScope('kecamatan')">
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <input type="radio" name="export_scope" value="kecamatan" id="scopeKecamatan" style="margin-top: 3px; cursor: pointer;" />
+                                <div style="width: 100%;">
+                                    <strong style="font-size: 13.5px; color: #002855; display: block;">
+                                        <i class="fas fa-building-flag" style="color: #107c41; margin-right: 6px;"></i>Export Per Kecamatan Tertentu
+                                    </strong>
+                                    <span style="font-size: 12px; color: #64748b; margin-top: 3px; display: block; line-height: 1.4;">
+                                        Hanya mendownload seluruh desa/kelurahan dan calon penerima di dalam satu kecamatan yang dipilih.
+                                    </span>
+                                    
+                                    <!-- Dropdown Pilihan Kecamatan di dalam Modal Menggunakan PUPR Theme -->
+                                    <div id="wrapperPilihKecamatanModal" style="margin-top: 12px; display: none;" onclick="event.stopPropagation();">
+                                        <label style="font-size: 12px; font-weight: 700; color: #002855; display: block; margin-bottom: 6px;">
+                                            Pilih Kecamatan:
+                                        </label>
+                                        @if(auth()->check() && auth()->user()->isAdminKecamatan())
+                                            <input type="hidden" name="kecamatan" value="{{ auth()->user()->kecamatan }}" />
+                                            <div style="padding: 9px 14px; border-radius: 8px; background: #f1f5f9; border: 1px solid #cbd5e1; font-weight: 700; font-size: 13px; color: #002855; display: flex; align-items: center; gap: 8px;">
+                                                <i class="fas fa-building-flag" style="color: #002855;"></i>
+                                                <span>Kec. {{ ucwords(strtolower(auth()->user()->kecamatan)) }}</span>
+                                            </div>
+                                        @else
                                             @php
                                                 $firstKec = $listKecamatan->first() ?? '';
                                             @endphp
                                             <input type="hidden" name="kecamatan" id="modalInputKecamatan" value="{{ $firstKec }}" disabled />
                                             <div class="pupr-dropdown-wrapper" id="ddModalKecamatanWrapper" style="width: 100%;">
                                                 <button type="button" class="pupr-dropdown-toggle" style="width: 100%;" onclick="event.stopPropagation(); window.PuprDropdown.toggle(document.getElementById('ddModalKecamatanWrapper')); setTimeout(() => { const s = document.getElementById('inputSearchKecamatanModal'); if(s) s.focus(); }, 100);">
+                                                <button type="button" class="pupr-dropdown-toggle" style="width: 100%;" onclick="event.stopPropagation(); window.PuprDropdown.toggle(document.getElementById('ddModalKecamatanWrapper'))">
                                                     <span style="display:flex;align-items:center;gap:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
                                                         <i class="fas fa-building-flag" style="font-size:12px;opacity:0.6;"></i>
                                                         <span class="selected-label" id="modalSelectedKecLabel">
@@ -1319,11 +1368,22 @@
                                                 </div>
                                             </div>
                                         </div>
+                                                <div class="pupr-dropdown-menu" style="min-width: 220px; max-height: 190px; overflow-y: auto; width: 100%; z-index: 1050; box-shadow: 0 12px 30px rgba(0, 40, 85, 0.22);">
+                                                    @foreach($listKecamatan as $kec)
+                                                    <div class="pupr-dropdown-item {{ $firstKec === $kec ? 'active' : '' }}"
+                                                         onclick="event.stopPropagation(); selectModalKecamatan('{{ $kec }}', 'Kec. {{ ucwords(strtolower($kec)) }}', this)">
+                                                        <i class="fas fa-map-pin" style="font-size:11px;opacity:0.5;"></i> Kec. {{ ucwords(strtolower($kec)) }}
+                                                    </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
                         </div>
                     @endif
+                    </div>
                 </div>
 
                 <div class="modal-footer" style="padding: 14px 24px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 10px; background: #f8fafc; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; position: relative; z-index: 2;">

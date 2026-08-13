@@ -24,57 +24,66 @@
         .breadcrumb a { color: var(--primary); text-decoration: none; font-weight: 500; }
         .breadcrumb a:hover { color: var(--secondary); }
 
-        /* Filter Map Bar */
-        .map-filter-bar {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            padding: 16px 24px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid rgba(0, 40, 85, 0.06);
-            margin-bottom: 20px;
+        /* Geo Mode Nav Tabs */
+        .geo-tabs-nav {
             display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
         }
-        .map-filter-bar .filter-left { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
-        .map-filter-bar .filter-item { display: flex; align-items: center; gap: 8px; }
-        .map-filter-bar .filter-item label { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
-        .map-filter-bar .filter-item select,
-        .map-filter-bar .filter-item input {
-            padding: 8px 14px;
-            border-radius: var(--radius-sm);
-            border: 1px solid rgba(0, 40, 85, 0.12);
-            font-family: inherit;
-            font-size: 13px;
-            background: var(--bg-body);
-            color: var(--text-primary);
-            outline: none;
-            transition: var(--transition);
-        }
-        .map-filter-bar .filter-item select:focus,
-        .map-filter-bar .filter-item input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(0, 40, 85, 0.08);
-            background: var(--bg-card);
-        }
-        .map-filter-bar .filter-right { display: flex; gap: 10px; }
-        .map-filter-bar .btn {
-            padding: 8px 18px;
-            border-radius: var(--radius-sm);
-            border: none;
-            font-family: inherit;
-            font-weight: 600;
-            font-size: 13px;
+
+        .geo-tab-btn {
+            padding: 12px 20px;
+            border-radius: 12px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #475569;
+            font-weight: 700;
+            font-size: 13.5px;
             cursor: pointer;
-            transition: var(--transition);
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            transition: all 0.25s ease;
+            box-shadow: 0 2px 6px rgba(0, 40, 85, 0.04);
         }
-        .map-filter-bar .btn-primary { background: var(--primary); color: #fff; }
-        .map-filter-bar .btn-outline { background: transparent; color: var(--text-secondary); border: 1px solid rgba(0, 40, 85, 0.12); }
+
+        .geo-tab-btn:hover {
+            border-color: #cbd5e1;
+            transform: translateY(-1px);
+        }
+
+        .geo-tab-btn.active {
+            background: #002855;
+            color: #ffffff;
+            border-color: #002855;
+            box-shadow: 0 6px 18px rgba(0, 40, 85, 0.18);
+        }
+
+        .geo-tab-btn .badge-pill {
+            font-size: 11px;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: rgba(0, 40, 85, 0.08);
+            color: #002855;
+        }
+
+        .geo-tab-btn.active .badge-pill {
+            background: #ffb800;
+            color: #002855;
+        }
+
+        .geo-tab-btn.tab-warning.active {
+            background: #b45309;
+            border-color: #b45309;
+            box-shadow: 0 6px 18px rgba(180, 83, 9, 0.22);
+        }
+
+        .geo-tab-btn.tab-warning.active .badge-pill {
+            background: #fef3c7;
+            color: #92400e;
+        }
 
         /* Map Container Layout */
         .map-container-layout {
@@ -138,36 +147,64 @@
             filter: none !important;
         }
 
-        /* Sidebar Marker Info */
-        .map-sidebar { display: flex; flex-direction: column; gap: 16px; }
-        .map-sidebar .card { background: var(--bg-card); border-radius: var(--radius); border: 1px solid rgba(0, 40, 85, 0.06); padding: 18px 20px; box-shadow: var(--shadow-sm); }
-        .map-sidebar .card-header { padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid rgba(0, 40, 85, 0.06); display: flex; justify-content: space-between; align-items: center; }
-        .map-sidebar .card-header h3 { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+        /* Notice Banner Non-GPS */
+        .non-gps-banner {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: var(--radius);
+            padding: 18px 22px;
+            margin-bottom: 22px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
 
-        .marker-list { max-height: 480px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
-        .marker-item { padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid rgba(0, 40, 85, 0.06); cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 10px; }
-        .marker-item:hover { background: rgba(0, 40, 85, 0.04); border-color: var(--primary); }
-        .marker-item .marker-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
-        .marker-item .marker-dot.green { background: var(--success); }
-        .marker-item .marker-dot.orange { background: var(--warning); }
-        .marker-item .marker-dot.blue { background: var(--primary); }
-        .marker-item .marker-dot.purple { background: var(--purple); }
-        .marker-item .marker-dot.red { background: var(--danger); }
+        .non-gps-banner .icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: #fef3c7;
+            color: #b45309;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
 
-        .marker-item .marker-info { flex: 1; }
-        .marker-item .marker-info .name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
-        .marker-item .marker-info .location { font-size: 11px; color: var(--text-muted); }
+        .non-gps-banner .text-box h4 {
+            font-size: 15px;
+            font-weight: 800;
+            color: #92400e;
+            margin: 0 0 4px 0;
+        }
+
+        .non-gps-banner .text-box p {
+            font-size: 13px;
+            color: #78350f;
+            margin: 0 0 10px 0;
+            line-height: 1.5;
+        }
+
+        .non-gps-pills {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .non-gps-pill {
+            font-size: 11.5px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
 
         /* Responsive Geo Maps Layout */
         @media (max-width: 1024px) {
             .map-container-layout { grid-template-columns: 1fr; }
-            .map-filter-bar { padding: 16px; flex-direction: column; align-items: stretch; gap: 12px; }
-            .map-filter-bar .filter-left { flex-direction: column; width: 100%; gap: 10px; }
-            .map-filter-bar .filter-item { width: 100%; }
-            .map-filter-bar .filter-item .pupr-dropdown-wrapper,
-            .map-filter-bar .filter-item .pupr-dropdown-toggle { width: 100%; justify-content: space-between; }
-            .map-filter-bar .filter-right { width: 100%; }
-            .map-filter-bar .filter-right .btn { flex: 1; justify-content: center; }
             .table-card .table-header { flex-direction: column; align-items: stretch; gap: 12px; }
             .table-card .table-header > div { max-width: 100% !important; }
         }
@@ -223,100 +260,136 @@
             <span>Geo Maps</span>
         </div>
 
-        <!-- Filter Map Bar Custom Dropdown -->
-        <div class="map-filter-bar">
-            <div class="filter-left">
-                <div class="filter-item">
-                    <div class="pupr-dropdown-wrapper">
-                        <button type="button" class="btn btn-outline pupr-dropdown-toggle" data-toggle="pupr-dropdown">
-                            <span class="selected-label">Semua Kegiatan</span>
-                            <i class="fas fa-chevron-down" style="font-size:10px;margin-left:8px;"></i>
-                        </button>
-                        <div class="pupr-dropdown-menu" id="dropdownKategoriMenu">
-                            <div class="pupr-dropdown-item active" data-value="all">Semua Kegiatan</div>
-                            <div class="pupr-dropdown-item" data-value="Jalan">Perbaikan Jalan</div>
-                            <div class="pupr-dropdown-item" data-value="Drainase">Drainase & Irigasi</div>
-                            <div class="pupr-dropdown-item" data-value="Jembatan">Jembatan</div>
-                            <div class="pupr-dropdown-item" data-value="Sungai">Normalisasi Sungai</div>
+        <!-- 2 Tab Mode: Titik Lokasi GPS vs Tanpa Lokasi GPS -->
+        <div class="geo-tabs-nav">
+            <button type="button" class="geo-tab-btn active" id="tabGpsBtn" onclick="switchGeoTab('gps')">
+                <i class="fas fa-map-location-dot"></i>
+                <span>Titik Lokasi GPS Aktif (Di Peta)</span>
+                <span class="badge-pill">{{ number_format($totalGps) }} Titik</span>
+            </button>
+            <button type="button" class="geo-tab-btn tab-warning" id="tabNonGpsBtn" onclick="switchGeoTab('nongps')">
+                <i class="fas fa-location-crosshairs-slash"></i>
+                <span>Belum Rekam GPS / Lokasi Mati</span>
+                <span class="badge-pill">{{ number_format($totalNonGps) }} Data</span>
+            </button>
+        </div>
+
+        <!-- ======================= SECTION 1: TITIK GPS AKTIF (MAPS & TABEL) ======================= -->
+        <div id="sectionGpsContent">
+            <!-- Map Wrapper Full Width -->
+            <div class="map-wrapper-card" style="margin-bottom:24px;">
+                <div class="map-header">
+                    <h3><i class="fab fa-google" style="color:var(--secondary);margin-right:8px;"></i>Google Maps - Persebaran Titik Survei Lapangan BSPS Verval ({{ number_format($totalGps) }} Titik)</h3>
+                    <div class="layer-toggle">
+                        <button class="layer-btn active" data-layer="google_street"><i class="fab fa-google"></i> Google Jalan</button>
+                        <button class="layer-btn" data-layer="google_hybrid"><i class="fas fa-globe-asia"></i> Google Satelit</button>
+                        <button class="layer-btn" data-layer="google_terrain"><i class="fas fa-mountain"></i> Google Medan</button>
+                        <button class="layer-btn" data-layer="dark"><i class="fas fa-moon"></i> Google Malam</button>
+                    </div>
+                </div>
+                <div id="map" style="height: 520px;"></div>
+            </div>
+
+            <!-- Tabel Daftar Titik Lokasi Survei -->
+            <div class="table-card">
+                <div class="table-header" style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:16px 20px;">
+                    <h3 style="margin:0;font-size:15px;font-weight:800;color:var(--primary-dark);display:flex;align-items:center;gap:8px;">
+                        <i class="fas fa-map-location-dot" style="color:var(--secondary);"></i> Daftar Titik Lokasi GPS (<span id="markerCount" style="color:var(--primary);">{{ $totalGps }} titik</span>)
+                    </h3>
+                    <div style="max-width:340px;width:100%;">
+                        <div class="pupr-search-group" style="margin:0;">
+                            <input type="text" id="searchLocation" placeholder="Cari nama warga, desa, atau petugas..." class="pupr-search-input" />
+                            <button type="button" class="pupr-search-btn"><i class="fas fa-search"></i></button>
                         </div>
                     </div>
                 </div>
-                <div class="filter-item">
-                    <div class="pupr-dropdown-wrapper">
-                        <button type="button" class="btn btn-outline pupr-dropdown-toggle" data-toggle="pupr-dropdown">
-                            <span class="selected-label">Semua Status</span>
-                            <i class="fas fa-chevron-down" style="font-size:10px;margin-left:8px;"></i>
-                        </button>
-                        <div class="pupr-dropdown-menu" id="dropdownStatusMenu">
-                            <div class="pupr-dropdown-item active" data-value="all">Semua Status</div>
-                            <div class="pupr-dropdown-item" data-value="petugas_aktif"><i class="fas fa-user-shield" style="color:#00d2d3;margin-right:6px;"></i> Petugas Aktif</div>
-                            <div class="pupr-dropdown-item" data-value="selesai">Selesai</div>
-                            <div class="pupr-dropdown-item" data-value="proses">Dalam Proses</div>
-                            <div class="pupr-dropdown-item" data-value="menunggu">Menunggu</div>
-                            <div class="pupr-dropdown-item" data-value="survei">Survei</div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width:50px;">No</th>
+                                <th style="min-width:200px;">Nama Calon Penerima</th>
+                                <th style="min-width:160px;">NIK / No. KK</th>
+                                <th style="min-width:160px;">Lokasi / Desa</th>
+                                <th style="min-width:160px;">Petugas Survei</th>
+                                <th style="min-width:130px;">Koordinat GPS</th>
+                                <th style="min-width:130px;">Status Kelayakan</th>
+                                <th style="width:120px;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="markerTableBody">
+                            <!-- Diisi secara dinamis oleh JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination Bar Custom -->
+                <div class="pagination-custom-bar" id="tablePagination" style="display:none;">
+                    <div class="pagination-info-text" id="paginationInfo"></div>
+                    <div class="pagination-nav" id="paginationNav"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================= SECTION 2: DAFTAR DATA TANPA LOKASI GPS ======================= -->
+        <div id="sectionNonGpsContent" style="display: none;">
+            <!-- Notice Banner Non-GPS -->
+            <div class="non-gps-banner">
+                <div class="icon-box">
+                    <i class="fas fa-triangle-exclamation"></i>
+                </div>
+                <div class="text-box">
+                    <h4>Rekapitulasi Data Tanpa Rekaman Titik Lokasi GPS ({{ number_format($totalNonGps) }} Data)</h4>
+                    <p>
+                        Daftar calon penerima di bawah ini telah diverifikasi/disurvei di lapangan, namun koordinat GPS rumah belum terekam di sistem karena GPS HP petugas belum aktif / izin lokasi ditolak saat pengambilan data, atau berstatus khusus lapangan.
+                    </p>
+                    <div class="non-gps-pills">
+                        <span class="non-gps-pill"><i class="fas fa-location-slash"></i> GPS Tidak Aktif Saat Input: <strong>{{ number_format($countGpsMati) }} KK</strong></span>
+                        <span class="non-gps-pill"><i class="fas fa-users-slash"></i> Status Khusus (Meninggal/Pindah/Tidak Diketahui): <strong>{{ number_format($countKhusus) }} KK</strong></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabel Daftar Data Non-GPS -->
+            <div class="table-card">
+                <div class="table-header" style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:16px 20px;">
+                    <h3 style="margin:0;font-size:15px;font-weight:800;color:#92400e;display:flex;align-items:center;gap:8px;">
+                        <i class="fas fa-location-crosshairs-slash"></i> Daftar Penerima Tanpa Koordinat GPS (<span id="nonGpsCountDisplay">{{ $totalNonGps }} data</span>)
+                    </h3>
+                    <div style="max-width:340px;width:100%;">
+                        <div class="pupr-search-group" style="margin:0;">
+                            <input type="text" id="searchNonGpsLocation" placeholder="Cari nama warga, desa, atau status..." class="pupr-search-input" />
+                            <button type="button" class="pupr-search-btn"><i class="fas fa-search"></i></button>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="filter-right">
-                <button class="btn btn-outline" id="resetMapFilterBtn"><i class="fas fa-redo"></i> Reset</button>
-                <button class="btn btn-primary" id="applyMapFilterBtn"><i class="fas fa-search"></i> Terapkan Filter</button>
-            </div>
-        </div>
-
-        <!-- Map Wrapper Full Width -->
-        <div class="map-wrapper-card" style="margin-bottom:24px;">
-            <div class="map-header">
-                <h3><i class="fab fa-google" style="color:var(--secondary);margin-right:8px;"></i>Google Maps - Persebaran Titik Survei Lapangan BSPS Verval</h3>
-                <div class="layer-toggle">
-                    <button class="layer-btn active" data-layer="google_street"><i class="fab fa-google"></i> Google Jalan</button>
-                    <button class="layer-btn" data-layer="google_hybrid"><i class="fas fa-globe-asia"></i> Google Satelit</button>
-                    <button class="layer-btn" data-layer="google_terrain"><i class="fas fa-mountain"></i> Google Medan</button>
-                    <button class="layer-btn" data-layer="dark"><i class="fas fa-moon"></i> Google Malam</button>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width:50px;">No</th>
+                                <th style="min-width:200px;">Nama Calon Penerima</th>
+                                <th style="min-width:160px;">NIK / No. KK</th>
+                                <th style="min-width:160px;">Lokasi / Desa</th>
+                                <th style="min-width:160px;">Petugas Survei</th>
+                                <th style="min-width:140px;">Keterangan GPS</th>
+                                <th style="min-width:130px;">Status Kelayakan</th>
+                                <th style="width:130px;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="nonGpsTableBody">
+                            <!-- Diisi secara dinamis oleh JavaScript -->
+                        </tbody>
+                    </table>
                 </div>
-            </div>
-            <div id="map" style="height: 520px;"></div>
-        </div>
 
-        <!-- Tabel Daftar Titik Lokasi Survei -->
-        <div class="table-card">
-            <div class="table-header" style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:16px 20px;">
-                <h3 style="margin:0;font-size:15px;font-weight:800;color:var(--primary-dark);display:flex;align-items:center;gap:8px;">
-                    <i class="fas fa-map-location-dot" style="color:var(--secondary);"></i> Daftar Titik Lokasi (<span id="markerCount" style="color:var(--primary);">0 titik</span>)
-                </h3>
-                <div style="max-width:340px;width:100%;">
-                    <div class="pupr-search-group" style="margin:0;">
-                        <input type="text" id="searchLocation" placeholder="Cari nama lokasi, kegiatan, atau petugas..." class="pupr-search-input" />
-                        <button type="button" class="pupr-search-btn"><i class="fas fa-search"></i></button>
-                    </div>
+                <!-- Pagination Bar Non-GPS -->
+                <div class="pagination-custom-bar" id="nonGpsPagination" style="display:none;">
+                    <div class="pagination-info-text" id="nonGpsPaginationInfo"></div>
+                    <div class="pagination-nav" id="nonGpsPaginationNav"></div>
                 </div>
-            </div>
-
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th style="width:50px;">No</th>
-                            <th style="min-width:200px;">Nama Calon Penerima</th>
-                            <th style="min-width:160px;">NIK / No. KK</th>
-                            <th style="min-width:160px;">Lokasi / Desa</th>
-                            <th style="min-width:160px;">Petugas Survei</th>
-                            <th style="min-width:130px;">Koordinat GPS</th>
-                            <th style="min-width:130px;">Status Kelayakan</th>
-                            <th style="width:120px;">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="markerTableBody">
-                        <!-- Diisi secara dinamis oleh JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Pagination Bar Custom -->
-            <div class="pagination-custom-bar" id="tablePagination" style="display:none;">
-                <div class="pagination-info-text" id="paginationInfo"></div>
-                <div class="pagination-nav" id="paginationNav"></div>
             </div>
         </div>
     </main>
@@ -328,18 +401,45 @@
     <script src="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@2.0.0/Control.FullScreen.js"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const markersData = @json($markers);
+        const markersData = @json($markers);
+        const nonGpsData = @json($nonGpsMarkers);
 
+        // Tab Switching Handler
+        function switchGeoTab(tab) {
+            const btnGps = document.getElementById('tabGpsBtn');
+            const btnNonGps = document.getElementById('tabNonGpsBtn');
+            const secGps = document.getElementById('sectionGpsContent');
+            const secNonGps = document.getElementById('sectionNonGpsContent');
+
+            if (tab === 'gps') {
+                btnGps.classList.add('active');
+                btnNonGps.classList.remove('active');
+                secGps.style.display = 'block';
+                secNonGps.style.display = 'none';
+                if (window.leafletMapInstance) {
+                    setTimeout(() => window.leafletMapInstance.invalidateSize(), 200);
+                }
+            } else {
+                btnNonGps.classList.add('active');
+                btnGps.classList.remove('active');
+                secGps.style.display = 'none';
+                secNonGps.style.display = 'block';
+                renderNonGpsList(nonGpsData);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
             const defaultCenter = markersData.length > 0 && markersData[0].lat && markersData[0].lng
                 ? [markersData[0].lat, markersData[0].lng]
                 : [-8.1724, 113.6983];
 
             const map = L.map('map', { center: defaultCenter, zoom: 13, zoomControl: false });
+            window.leafletMapInstance = map;
+
             L.control.zoom({ position: 'topright' }).addTo(map);
             L.control.fullscreen({ position: 'topright' }).addTo(map);
 
-            // Google Maps Tile Layers Collection (All 100% Authentic Google Maps)
+            // Google Maps Tile Layers Collection
             const tileLayers = {
                 google_street: L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', { maxZoom: 20, attribution: '&copy; Google Maps' }),
                 google_hybrid: L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { maxZoom: 20, attribution: '&copy; Google Maps' }),
@@ -357,15 +457,12 @@
                 }
             }
 
-            // Detect current theme mode for initial map layer
             const initialTheme = document.documentElement.getAttribute('data-theme') || 'pupr';
             let currentLayer = initialTheme === 'dark' ? 'dark' : 'google_street';
 
-            // Add active Google Maps layer to map
             tileLayers[currentLayer].addTo(map);
             updateGoogleNightMode(currentLayer);
 
-            // Update UI Layer Buttons active state
             function setLayerActiveUI(layerName) {
                 document.querySelectorAll('.layer-btn').forEach(btn => {
                     if (btn.dataset.layer === layerName) {
@@ -377,7 +474,6 @@
             }
             setLayerActiveUI(currentLayer);
 
-            // Layer button click handler
             document.querySelectorAll('.layer-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const layer = this.dataset.layer;
@@ -390,24 +486,6 @@
                     }
                 });
             });
-
-            // Listen to Theme Changes dynamically
-            const themeObserver = new MutationObserver(function(mutations) {
-                mutations.forEach(function(mutation) {
-                    if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
-                        const newTheme = document.documentElement.getAttribute('data-theme');
-                        const targetLayer = newTheme === 'dark' ? 'dark' : 'google_street';
-                        if (targetLayer !== currentLayer && tileLayers[targetLayer]) {
-                            map.removeLayer(tileLayers[currentLayer]);
-                            tileLayers[targetLayer].addTo(map);
-                            currentLayer = targetLayer;
-                            setLayerActiveUI(targetLayer);
-                        }
-                        updateGoogleNightMode(currentLayer);
-                    }
-                });
-            });
-            themeObserver.observe(document.documentElement, { attributes: true });
 
             function getCssVar(varName, defaultVal) {
                 return getComputedStyle(document.documentElement).getPropertyValue(varName).trim() || defaultVal;
@@ -509,7 +587,6 @@
                 const countSpan = document.getElementById('markerCount');
                 if (!tbody) return;
 
-                // Hanya tampilkan kegiatan survei pada tabel (lokasi petugas hanya tampil di Peta)
                 const surveyData = (data || []).filter(item => item.type !== 'petugas');
                 currentFilteredData = surveyData;
 
@@ -571,7 +648,7 @@
                             </td>
                             <td>
                                 <button type="button" class="btn btn-primary" style="padding:6px 12px;font-size:11px;border-radius:4px;font-weight:700;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:4px;" onclick="focusOnMapMarker(${item.lat}, ${item.lng})">
-                                    <i class="fas fa-crosshairs"></i> Lihat
+                                    <i class="fas fa-crosshairs"></i> Lihat di Peta
                                 </button>
                             </td>
                         </tr>
@@ -602,15 +679,12 @@
                 infoContainer.innerHTML = `Menampilkan <strong>${startItem}</strong> - <strong>${endItem}</strong> dari <strong>${totalItems}</strong> titik (Halaman <strong>${currentPage}</strong> dari <strong>${totalPages}</strong>)`;
 
                 let navHtml = '';
-
-                // Tombol Previous
                 if (currentPage > 1) {
                     navHtml += `<button type="button" class="pg-link" data-page="${currentPage - 1}" title="Sebelumnya"><i class="fas fa-chevron-left"></i></button>`;
                 } else {
                     navHtml += `<span class="pg-link disabled"><i class="fas fa-chevron-left"></i></span>`;
                 }
 
-                // Generasi nomor halaman dengan smart ellipsis
                 const delta = 1;
                 const left = currentPage - delta;
                 const right = currentPage + delta + 1;
@@ -646,7 +720,6 @@
                     }
                 });
 
-                // Tombol Next
                 if (currentPage < totalPages) {
                     navHtml += `<button type="button" class="pg-link" data-page="${currentPage + 1}" title="Berikutnya"><i class="fas fa-chevron-right"></i></button>`;
                 } else {
@@ -655,7 +728,6 @@
 
                 navContainer.innerHTML = navHtml;
 
-                // Attach click listeners to page buttons
                 navContainer.querySelectorAll('button[data-page]').forEach(btn => {
                     btn.addEventListener('click', function() {
                         currentPage = parseInt(this.getAttribute('data-page'));
@@ -684,65 +756,183 @@
                 });
             }
 
-            let selectedKategori = 'all';
-            let selectedStatus = 'all';
-
-            function filterMapMarkers() {
-                currentPage = 1;
-                let filtered = markersData;
-                if (selectedKategori !== 'all') {
-                    filtered = filtered.filter(item => item.name.toLowerCase().includes(selectedKategori.toLowerCase()));
-                }
-                if (selectedStatus !== 'all') {
-                    filtered = filtered.filter(item => item.status === selectedStatus);
-                }
-                renderMarkers(filtered);
-            }
-
-            document.querySelectorAll('#dropdownKategoriMenu .pupr-dropdown-item').forEach(item => {
-                item.addEventListener('click', function() {
-                    selectedKategori = this.dataset.value;
-                    filterMapMarkers();
-                });
-            });
-
-            document.querySelectorAll('#dropdownStatusMenu .pupr-dropdown-item').forEach(item => {
-                item.addEventListener('click', function() {
-                    selectedStatus = this.dataset.value;
-                    filterMapMarkers();
-                });
-            });
-
-            const resetMapBtn = document.getElementById('resetMapFilterBtn');
-            if (resetMapBtn) {
-                resetMapBtn.addEventListener('click', function() {
-                    currentPage = 1;
-                    selectedKategori = 'all';
-                    selectedStatus = 'all';
-
-                    const katMenu = document.getElementById('dropdownKategoriMenu');
-                    if (katMenu) {
-                        const wrapper = katMenu.closest('.pupr-dropdown-wrapper');
-                        wrapper.querySelector('.selected-label').textContent = 'Semua Kegiatan';
-                        wrapper.querySelectorAll('.pupr-dropdown-item').forEach(i => i.classList.remove('active'));
-                        wrapper.querySelector('[data-value="all"]').classList.add('active');
-                    }
-
-                    const statMenu = document.getElementById('dropdownStatusMenu');
-                    if (statMenu) {
-                        const wrapper = statMenu.closest('.pupr-dropdown-wrapper');
-                        wrapper.querySelector('.selected-label').textContent = 'Semua Status';
-                        wrapper.querySelectorAll('.pupr-dropdown-item').forEach(i => i.classList.remove('active'));
-                        wrapper.querySelector('[data-value="all"]').classList.add('active');
-                    }
-
-                    if (searchInput) searchInput.value = '';
-                    renderMarkers(markersData);
-                });
-            }
-
             renderMarkers(markersData);
             setTimeout(() => map.invalidateSize(), 300);
         });
+
+        /* ============================================================
+           NON-GPS TABLE RENDERING & PAGINATION HANDLER
+           ============================================================ */
+        let nonGpsCurrentPage = 1;
+        const nonGpsPerPage = 10;
+        let nonGpsFilteredData = nonGpsData;
+
+        function renderNonGpsList(data) {
+            const tbody = document.getElementById('nonGpsTableBody');
+            const countDisplay = document.getElementById('nonGpsCountDisplay');
+            if (!tbody) return;
+
+            nonGpsFilteredData = data || [];
+            if (countDisplay) countDisplay.textContent = `${nonGpsFilteredData.length} data`;
+
+            if (nonGpsFilteredData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align:center;padding:32px;color:var(--text-muted);">
+                            <i class="fas fa-circle-check" style="font-size:32px;display:block;margin-bottom:8px;color:#27ae60;opacity:0.6;"></i>
+                            Semua data survei telah memiliki koordinat GPS!
+                        </td>
+                    </tr>
+                `;
+                renderNonGpsPagination(0);
+                return;
+            }
+
+            const totalPages = Math.ceil(nonGpsFilteredData.length / nonGpsPerPage);
+            if (nonGpsCurrentPage > totalPages) nonGpsCurrentPage = 1;
+
+            const startIndex = (nonGpsCurrentPage - 1) * nonGpsPerPage;
+            const endIndex = Math.min(startIndex + nonGpsPerPage, nonGpsFilteredData.length);
+            const paginatedData = nonGpsFilteredData.slice(startIndex, endIndex);
+
+            let html = '';
+            paginatedData.forEach((item, index) => {
+                const rowNum = startIndex + index + 1;
+                const isGpsMati = item.keteranganGps === 'GPS Tidak Aktif saat Survei';
+                const badgeKeterangan = isGpsMati
+                    ? `<span style="font-size:11px;font-weight:700;padding:3px 9px;border-radius:10px;background:#fef3c7;color:#b45309;border:1px solid #fde68a;"><i class="fas fa-location-slash"></i> GPS Belum Aktif</span>`
+                    : `<span style="font-size:11px;font-weight:700;padding:3px 9px;border-radius:10px;background:#f3e8ff;color:#7e22ce;border:1px solid #d8b4fe;"><i class="fas fa-tag"></i> ${item.statusLabel}</span>`;
+
+                const surveyRoute = `{{ url('/survey') }}?id=${item.id}`;
+
+                html += `
+                    <tr>
+                        <td>${rowNum}</td>
+                        <td>
+                            <strong style="color:var(--primary-dark);font-size:13px;display:block;">${item.nama}</strong>
+                            <span style="font-size:11px;color:var(--text-muted);"><i class="fas fa-clock"></i> ${item.tanggal}</span>
+                        </td>
+                        <td>
+                            <div style="font-family:monospace;font-size:12px;"><strong>NIK:</strong> ${item.nik}</div>
+                            <div style="font-family:monospace;font-size:11px;color:var(--text-muted);">KK: ${item.no_kk}</div>
+                        </td>
+                        <td>
+                            <div style="font-size:12.5px;"><i class="fas fa-map-marker-alt" style="color:#b45309;font-size:11px;"></i> ${item.location}</div>
+                            <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${item.alamat || '-'}</div>
+                        </td>
+                        <td>
+                            <div style="font-weight:700;font-size:12.5px;"><i class="fas fa-user-hard-hat" style="font-size:11px;color:#d69e00;"></i> ${item.petugas || '-'}</div>
+                        </td>
+                        <td>${badgeKeterangan}</td>
+                        <td>
+                            <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:12px;background:${item.badgeColor === 'green' ? 'rgba(39,174,96,0.12)' : (item.badgeColor === 'orange' ? 'rgba(255,184,0,0.15)' : 'rgba(142,68,173,0.12)')};color:${item.badgeColor === 'green' ? '#15803d' : (item.badgeColor === 'orange' ? '#b45309' : '#7e22ce')};">
+                                ${item.statusLabel}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="${surveyRoute}" class="btn btn-outline" style="padding:6px 12px;font-size:11px;border-radius:6px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:5px;border:1px solid #002855;color:#002855;background:#ffffff;" title="Buka Form Survei untuk melengkapi koordinat GPS">
+                                <i class="fas fa-pen-to-square"></i> Lengkapi GPS
+                            </a>
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+
+            renderNonGpsPagination(nonGpsFilteredData.length);
+        }
+
+        function renderNonGpsPagination(totalItems) {
+            const paginationBar = document.getElementById('nonGpsPagination');
+            const infoContainer = document.getElementById('nonGpsPaginationInfo');
+            const navContainer = document.getElementById('nonGpsPaginationNav');
+            if (!paginationBar || !infoContainer || !navContainer) return;
+
+            if (totalItems <= 0) {
+                paginationBar.style.display = 'none';
+                return;
+            }
+
+            paginationBar.style.display = 'flex';
+
+            const totalPages = Math.ceil(totalItems / nonGpsPerPage);
+            const startItem = (nonGpsCurrentPage - 1) * nonGpsPerPage + 1;
+            const endItem = Math.min(nonGpsCurrentPage * nonGpsPerPage, totalItems);
+
+            infoContainer.innerHTML = `Menampilkan <strong>${startItem}</strong> - <strong>${endItem}</strong> dari <strong>${totalItems}</strong> data (Halaman <strong>${nonGpsCurrentPage}</strong> dari <strong>${totalPages}</strong>)`;
+
+            let navHtml = '';
+            if (nonGpsCurrentPage > 1) {
+                navHtml += `<button type="button" class="pg-link" data-page="${nonGpsCurrentPage - 1}" title="Sebelumnya"><i class="fas fa-chevron-left"></i></button>`;
+            } else {
+                navHtml += `<span class="pg-link disabled"><i class="fas fa-chevron-left"></i></span>`;
+            }
+
+            const delta = 1;
+            const left = nonGpsCurrentPage - delta;
+            const right = nonGpsCurrentPage + delta + 1;
+            const range = [];
+            const rangeWithDots = [];
+            let l;
+
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= left && i < right)) {
+                    range.push(i);
+                }
+            }
+
+            for (let i of range) {
+                if (l) {
+                    if (i - l === 2) {
+                        rangeWithDots.push(l + 1);
+                    } else if (i - l !== 1) {
+                        rangeWithDots.push('...');
+                    }
+                }
+                rangeWithDots.push(i);
+                l = i;
+            }
+
+            rangeWithDots.forEach(page => {
+                if (page === '...') {
+                    navHtml += `<span class="pg-dots">...</span>`;
+                } else if (page === nonGpsCurrentPage) {
+                    navHtml += `<span class="pg-link active">${page}</span>`;
+                } else {
+                    navHtml += `<button type="button" class="pg-link" data-page="${page}">${page}</button>`;
+                }
+            });
+
+            if (nonGpsCurrentPage < totalPages) {
+                navHtml += `<button type="button" class="pg-link" data-page="${nonGpsCurrentPage + 1}" title="Berikutnya"><i class="fas fa-chevron-right"></i></button>`;
+            } else {
+                navHtml += `<span class="pg-link disabled"><i class="fas fa-chevron-right"></i></span>`;
+            }
+
+            navContainer.innerHTML = navHtml;
+
+            navContainer.querySelectorAll('button[data-page]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    nonGpsCurrentPage = parseInt(this.getAttribute('data-page'));
+                    renderNonGpsList(nonGpsFilteredData);
+                });
+            });
+        }
+
+        const searchNonGpsInput = document.getElementById('searchNonGpsLocation');
+        if (searchNonGpsInput) {
+            searchNonGpsInput.addEventListener('input', function() {
+                nonGpsCurrentPage = 1;
+                const query = this.value.toLowerCase().trim();
+                let filtered = nonGpsData.filter(item =>
+                    item.nama.toLowerCase().includes(query) ||
+                    item.location.toLowerCase().includes(query) ||
+                    (item.alamat && item.alamat.toLowerCase().includes(query)) ||
+                    (item.petugas && item.petugas.toLowerCase().includes(query)) ||
+                    item.statusLabel.toLowerCase().includes(query)
+                );
+                renderNonGpsList(filtered);
+            });
+        }
     </script>
 @endpush

@@ -551,9 +551,12 @@
                         <tr>
                             <td style="text-align:center;font-weight:700;color:var(--text-muted);">{{ $index + 1 }}</td>
                             <td>
-                                <strong style="color:var(--primary-dark);font-size:13.5px;">
-                                    {{ ucwords(strtolower($row->desa_kelurahan)) }}
-                                </strong>
+                                <a href="{{ route('dashboard.desa', ['kecamatan' => $kecamatanSelected, 'desa' => $row->desa_kelurahan]) }}" style="text-decoration: none;" title="Buka Halaman Monitoring Desa {{ $row->desa_kelurahan }}">
+                                    <strong style="color:var(--primary-dark);font-size:13.5px;">
+                                        {{ ucwords(strtolower($row->desa_kelurahan)) }}
+                                    </strong>
+                                    <i class="fas fa-arrow-up-right-from-square" style="font-size: 10px; color: var(--primary); margin-left: 4px;"></i>
+                                </a>
                             </td>
                             <td style="text-align:center;font-weight:800;color:var(--primary-dark);">
                                 {{ number_format($row->total, 0, ',', '.') }}
@@ -589,9 +592,9 @@
                                 </span>
                             </td>
                             <td style="text-align:center;">
-                                <a href="{{ url('/verval-data?kecamatan=' . urlencode($kecamatanSelected) . '&desa=' . urlencode($row->desa_kelurahan)) }}" 
-                                   style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;background:rgba(0,40,85,0.06);color:var(--primary);font-size:11.5px;font-weight:700;text-decoration:none;transition:var(--transition);">
-                                    <i class="fas fa-filter"></i> Filter
+                                <a href="{{ route('dashboard.desa', ['kecamatan' => $kecamatanSelected, 'desa' => $row->desa_kelurahan]) }}" 
+                                   style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:6px;background:#002855;color:#ffffff;font-size:11.5px;font-weight:700;text-decoration:none;transition:var(--transition);" title="Lihat Capaian & Kelayakan Desa Ini">
+                                    <i class="fas fa-chart-pie"></i> Monitoring Desa
                                 </a>
                             </td>
                         </tr>
