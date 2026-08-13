@@ -606,7 +606,15 @@
                                     {{ $item->alamat ?: '-' }}
                                 </td>
                                 <td style="padding:14px 18px;text-align:center;">
-                                    @if($item->foto_sudut_depan)
+                                    @if(in_array($item->status, ['meninggal', 'pindah', 'tidak diketahui']))
+                                        @php
+                                            $statusLabel = ['meninggal' => ['icon' => 'fa-cross', 'text' => 'Meninggal', 'color' => '#dc2626', 'bg' => '#fee2e2'], 'pindah' => ['icon' => 'fa-house-chimney-crack', 'text' => 'Pindah', 'color' => '#d97706', 'bg' => '#fef3c7'], 'tidak diketahui' => ['icon' => 'fa-question-circle', 'text' => 'Tdk Diketahui', 'color' => '#6b7280', 'bg' => '#f3f4f6']];
+                                            $sl = $statusLabel[$item->status];
+                                        @endphp
+                                        <span class="badge-status-survey" style="background:{{ $sl['bg'] }};color:{{ $sl['color'] }};border-radius:20px;padding:4px 10px;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:5px;">
+                                            <i class="fas {{ $sl['icon'] }}"></i> {{ $sl['text'] }}
+                                        </span>
+                                    @elseif($item->isSudahSurvei())
                                         <span class="badge-status-survey sudah"><i class="fas fa-check-circle"></i> Sudah Survei</span>
                                     @else
                                         <span class="badge-status-survey belum"><i class="fas fa-clock"></i> Belum Survei</span>
@@ -616,7 +624,13 @@
                                     <div style="display:inline-flex;align-items:center;gap:6px;">
                                         <button type="button" class="btn-act survey btn-trigger-status-modal"
                                                 data-id="{{ $item->id }}" data-nama="{{ e($item->nama) }}" data-nik="{{ e($item->no_ktp ?: '-') }}" data-alamat="{{ e($item->alamat ?: '-') }}" data-status="{{ e($item->status) }}" data-url="{{ url('/survey/' . $item->id) }}">
-                                            <i class="fas fa-camera"></i> {{ $item->foto_sudut_depan ? 'Lihat / Edit' : 'Mulai Survei' }}
+                                            @if(in_array($item->status, ['meninggal', 'pindah', 'tidak diketahui']))
+                                                <i class="fas fa-info-circle"></i> Lihat Detail
+                                            @elseif($item->isSudahSurvei())
+                                                <i class="fas fa-camera"></i> Lihat / Edit
+                                            @else
+                                                <i class="fas fa-camera"></i> Mulai Survei
+                                            @endif
                                         </button>
                                         <a href="{{ route('verval-data.surat-pernyataan', $item->id) }}" target="_blank" class="btn-act" style="background:rgba(0,40,85,0.08);color:var(--primary-dark);padding:7px 10px;" title="Cetak Surat Pernyataan Satuan">
                                             <i class="fas fa-file-signature"></i>
