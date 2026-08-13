@@ -432,7 +432,7 @@
             <div class="signature-section">
                 <div class="sig-col">
                     <div class="sig-title">Mengetahui,</div>
-                    <div class="sig-title">{{ $item->jabatan_kades ?: 'Kepala Desa/Lurah/Nama lain yang setingkat' }},</div>
+                    <div class="sig-title">{{ trim(preg_replace('/\bPAW\b/i', '', $item->jabatan_kades)) ?: 'Kepala Desa/Lurah/Nama lain yang setingkat' }},</div>
                     <div class="sig-space"></div>
                     <div class="sig-note">tanda tangan dan stempel</div>
                     <div class="sig-space" style="height: 15px;"></div>

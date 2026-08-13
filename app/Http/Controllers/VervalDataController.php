@@ -303,8 +303,9 @@ class VervalDataController extends Controller
         foreach ($allKades as $kd) {
             $kecKey = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', $kd->kecamatan ?? ''));
             $desaKey = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', $kd->desa_kelurahan ?? ''));
+            $jabatanClean = trim(preg_replace('/\bPAW\b/i', '', $kd->jabatan ?? 'KEPALA DESA'));
             $kadesMap[$kecKey . '|||' . $desaKey] = [
-                'jabatan' => $kd->jabatan,
+                'jabatan' => $jabatanClean,
                 'nama'    => $kd->nama,
             ];
         }
@@ -315,7 +316,7 @@ class VervalDataController extends Controller
             $lookupKey = $kecKey . '|||' . $desaKey;
 
             if (isset($kadesMap[$lookupKey])) {
-                $item->jabatan_kades = $kadesMap[$lookupKey]['jabatan'];
+                $item->jabatan_kades = trim(preg_replace('/\bPAW\b/i', '', $kadesMap[$lookupKey]['jabatan']));
                 $item->nama_kades = $kadesMap[$lookupKey]['nama'];
             } else {
                 $isKota = in_array(strtoupper($item->kecamatan ?? ''), ['KALIWATES', 'PATRANG', 'SUMBERSARI']);

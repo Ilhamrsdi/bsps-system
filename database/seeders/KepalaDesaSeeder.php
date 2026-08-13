@@ -35,7 +35,7 @@ class KepalaDesaSeeder extends Seeder
             $rows[] = [
                 'kecamatan'      => $item['kecamatan'] ?? '',
                 'desa_kelurahan' => $item['desa'] ?? '',
-                'jabatan'        => $item['jabatan'] ?? 'KEPALA DESA',
+                'jabatan'        => trim(preg_replace('/\bPAW\b/i', '', $item['jabatan'] ?? 'KEPALA DESA')),
                 'nama'           => $item['nama'] ?? '',
                 'nomor_telepon'  => $item['telp'] ?? null,
                 'created_at'     => $now,
