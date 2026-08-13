@@ -117,16 +117,16 @@
 @endpush
 
 @section('content')
-<div class="container-fluid">
-    {{-- Header Navigation Back --}}
-    <div style="margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-        <a href="{{ route('petugas.dashboard') }}" class="btn btn-outline" style="padding:8px 14px;font-size:12.5px;font-weight:700;display:inline-flex;align-items:center;gap:6px;">
-            <i class="fas fa-arrow-left"></i> Kembali ke Dashboard Petugas
-        </a>
-        <button type="button" class="btn" style="padding:9px 16px;font-size:13px;font-weight:800;background:#22c55e;color:#fff;border:none;border-radius:var(--radius-sm);cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 3px 10px rgba(34,197,94,0.3);" onclick="window.PuprModal.open('modalTambahUsulan')">
-            <i class="fas fa-user-plus"></i> + Tambah Usulan Baru
-        </button>
-    </div>
+    <!-- Navbar Component -->
+    @include('layouts.navbar')
+
+    <main class="dashboard-content">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb" style="font-size:13px;color:var(--text-muted);margin-bottom:20px;display:flex;align-items:center;gap:8px;">
+            <a href="{{ route('petugas.dashboard') }}" style="color:var(--primary);text-decoration:none;font-weight:600;"><i class="fas fa-home"></i> Dashboard Petugas</a>
+            <i class="fas fa-chevron-right" style="font-size:10px;"></i>
+            <span>Usulan Baru Lapangan (Desa {{ $user->desa ?: '-' }})</span>
+        </div>
 
     {{-- Alert Offline Status --}}
     <div id="offlinePetugasAlert" style="display:none;background:#fffbe6;border:1px solid #ffe58f;border-radius:10px;padding:12px 16px;margin-bottom:16px;">
@@ -310,8 +310,7 @@
                 </div>
             </div>
         </div>
-    </div>
-</div>
+    </main>
 
 <!-- Modal Pilihan Verifikasi / Keberadaan Penerima -->
 <div class="modal-overlay" id="modalStatusVerification">
