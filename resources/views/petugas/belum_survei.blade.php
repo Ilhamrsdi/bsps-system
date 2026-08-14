@@ -280,7 +280,7 @@
                     </thead>
                     <tbody>
                         @forelse($penerimas as $index => $item)
-                            <tr data-id="{{ $item->id }}" style="border-bottom:1px solid rgba(0,40,85,0.06);font-size:13px;">
+                            <tr data-id="{{ $item->id }}" style="border-bottom:1px solid rgba(0,40,85,0.06);font-size:13px; {{ $item->isRevisi() ? 'background-color: #fef2f2;' : '' }}">
                                 <td style="padding:14px 18px;font-weight:700;color:var(--text-muted);">
                                     {{ $penerimas->firstItem() + $index }}
                                 </td>
