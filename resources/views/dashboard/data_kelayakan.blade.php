@@ -610,6 +610,7 @@
             { key: 'ktp', label: 'KTP' },
             { key: 'kk', label: 'Kartu Keluarga' },
             { key: 'surat_pernyataan', label: 'Surat Pernyataan' },
+            { key: 'sertifikat_tanah', label: 'Bukti Lahan' },
             { key: 'foto_sudut_depan', label: 'S. Depan' },
             { key: 'foto_sudut_belakang', label: 'S. Belakang' },
             { key: 'foto_bagian_dalam', label: 'B. Dalam' },
