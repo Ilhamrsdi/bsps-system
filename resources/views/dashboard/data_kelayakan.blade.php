@@ -609,6 +609,7 @@
         const fotoFields = [
             { key: 'ktp', label: 'KTP' },
             { key: 'kk', label: 'Kartu Keluarga' },
+            { key: 'surat_pernyataan', label: 'Surat Pernyataan' },
             { key: 'foto_sudut_depan', label: 'S. Depan' },
             { key: 'foto_sudut_belakang', label: 'S. Belakang' },
             { key: 'foto_bagian_dalam', label: 'B. Dalam' },
@@ -656,9 +657,14 @@
                 item.style.border = '1px solid #e2e8f0';
                 item.style.borderRadius = '8px';
                 item.style.background = '#f8fafc';
+                let isPdf = url.toLowerCase().endsWith('.pdf');
+                let mediaHtml = isPdf ? 
+                    `<div style="width:100%; height:100px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#f8fafc; border-radius:4px; border:1px dashed #cbd5e1; color:#e11d48; font-size:24px;"><i class="fas fa-file-pdf"></i><span style="font-size:10px; font-weight:700; color:#64748b; margin-top:4px;">PDF</span></div>` : 
+                    `<img src="${url}" alt="${f.label}" style="width:100%; height:100px; object-fit:cover; border-radius:4px; border:1px solid #cbd5e1;"/>`;
+
                 item.innerHTML = `
-                    <a href="${url}" target="_blank" style="display:block; margin-bottom:4px;">
-                        <img src="${url}" alt="${f.label}" style="width:100%; height:100px; object-fit:cover; border-radius:4px; border:1px solid #cbd5e1;"/>
+                    <a href="${url}" target="_blank" style="display:block; margin-bottom:4px; text-decoration:none;">
+                        ${mediaHtml}
                     </a>
                     <span style="font-size:11px; font-weight:700; color:#002855; display:block; margin-bottom:4px;">${f.label}</span>
                     ${extraHtml}
