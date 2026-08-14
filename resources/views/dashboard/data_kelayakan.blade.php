@@ -483,6 +483,10 @@
                             <div id="mdl_lama_menempati" style="font-size: 13px; font-weight: 600; color: #0f172a;">-</div>
                         </div>
                         <div>
+                            <div style="font-size: 11px; color: #64748b; font-weight: 600;">Penghasilan / Pekerjaan</div>
+                            <div id="mdl_penghasilan" style="font-size: 13px; font-weight: 600; color: #0f172a;">-</div>
+                        </div>
+                        <div style="grid-column: span 2;">
                             <div style="font-size: 11px; color: #64748b; font-weight: 600;">Titik Koordinat (Lat, Long)</div>
                             <div id="mdl_koordinat" style="font-size: 13px; font-weight: 600; color: #0f172a;">-</div>
                         </div>
@@ -579,6 +583,13 @@
         document.getElementById('mdl_status_tanah').textContent = data.status_tanah || '-';
         document.getElementById('mdl_luas_tanah').textContent = data.luas_tanah ? data.luas_tanah + ' m²' : '-';
         document.getElementById('mdl_lama_menempati').textContent = data.telah_ditempati_selama ? data.telah_ditempati_selama + ' Tahun' : '-';
+        
+        let teksPenghasilan = data.penghasilan || '-';
+        if (data.pekerjaan && data.pekerjaan !== '-') {
+            teksPenghasilan += ' / ' + data.pekerjaan;
+        }
+        document.getElementById('mdl_penghasilan').textContent = teksPenghasilan;
+
         document.getElementById('mdl_koordinat').innerHTML = (data.latitude && data.longitude) ? `<a href="https://maps.google.com/?q=${data.latitude},${data.longitude}" target="_blank" style="color:var(--primary);text-decoration:none;"><i class="fas fa-map-marker-alt"></i> ${data.latitude}, ${data.longitude}</a>` : '-';
 
         
