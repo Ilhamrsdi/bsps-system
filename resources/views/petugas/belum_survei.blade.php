@@ -211,6 +211,34 @@
             </div>
         @endif
 
+        {{-- Alert Revisi --}}
+        @php
+            $revisiCount = 0;
+            if (isset($allPenerimas)) {
+                $revisiCount = collect($allPenerimas)->filter(function($item) {
+                    return 
+                        ($item->status_foto_sudut_depan ?? '') === 'tidak layak' || 
+                        ($item->status_foto_sudut_belakang ?? '') === 'tidak layak' || 
+                        ($item->status_foto_bagian_dalam ?? '') === 'tidak layak' || 
+                        ($item->status_foto_sudut_kiri ?? '') === 'tidak layak' || 
+                        ($item->status_foto_sudut_kanan ?? '') === 'tidak layak';
+                })->count();
+            } else {
+                $revisiCount = $penerimas->filter(function($p) { return $p->isRevisi(); })->count();
+            }
+        @endphp
+
+        @if($revisiCount > 0)
+            <div class="alert alert-warning" style="background:#fef2f2;border:1px solid #fecaca;color:#991b1b;border-radius:12px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:14px;box-shadow:0 4px 16px rgba(239,68,68,0.12);animation:fadeIn 0.4s ease;">
+                <div style="width:36px;height:36px;border-radius:50%;background:rgba(239,68,68,0.18);color:#ef4444;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div style="font-weight:700;font-size:14px;line-height:1.4;">
+                    Perhatian! Anda memiliki <strong>{{ $revisiCount }} data</strong> survei yang dikembalikan (Perlu Revisi) karena ditolak oleh Administrator. Silakan periksa kembali foto yang diinputkan.
+                </div>
+            </div>
+        @endif
+
         {{-- Filter & Search --}}
         <form action="{{ route('petugas.belum-survei') }}" method="GET" class="filter-section" id="filterFormPetugasBelum">
             <div class="search-input-wrap">
