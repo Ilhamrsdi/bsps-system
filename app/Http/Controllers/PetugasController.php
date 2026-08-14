@@ -76,7 +76,9 @@ class PetugasController extends Controller
                 $q->where('nama', 'like', "%{$search}%")
                   ->orWhere('no_ktp', 'like', "%{$search}%")
                   ->orWhere('no_kk', 'like', "%{$search}%")
-                  ->orWhere('alamat', 'like', "%{$search}%");
+                  ->orWhere('alamat', 'like', "%{$search}%")
+                  ->orWhere('pengelompokan_desil', 'like', "%{$search}%")
+                  ->orWhere('status', 'like', "%{$search}%");
             });
         }
 
@@ -84,6 +86,11 @@ class PetugasController extends Controller
             $tableQuery->sudahSurvei();
         } elseif ($statusFilter === 'belum') {
             $tableQuery->belumSurvei();
+        } elseif ($statusFilter === 'usulan') {
+            $tableQuery->where(function ($q) {
+                $q->where('pengelompokan_desil', 'like', '%Usulan%')
+                  ->orWhere('status', 'Usulan Petugas');
+            });
         }
 
         $vervals = $tableQuery->orderBy('id', 'asc')->paginate(15)->withQueryString();
@@ -151,6 +158,41 @@ class PetugasController extends Controller
             ->get();
 
         return view('petugas.sudah_survei', compact('user', 'penerimas', 'allPenerimas', 'search'));
+    }
+
+    /**
+     * Halaman Tugas Usulan Baru Lapangan
+     */
+    public function usulanBaru(Request $request)
+    {
+        $user = Auth::user();
+        $search = $request->get('search');
+
+        $query = $this->getPetugasQuery()->where(function ($q) {
+            $q->where('pengelompokan_desil', 'like', '%Usulan%')
+              ->orWhere('status', 'Usulan Petugas');
+        });
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                  ->orWhere('no_ktp', 'like', "%{$search}%")
+                  ->orWhere('no_kk', 'like', "%{$search}%")
+                  ->orWhere('alamat', 'like', "%{$search}%");
+            });
+        }
+
+        $penerimas = $query->orderBy('id', 'desc')->paginate(20)->withQueryString();
+        $allPenerimas = (clone $this->getPetugasQuery())
+            ->where(function ($q) {
+                $q->where('pengelompokan_desil', 'like', '%Usulan%')
+                  ->orWhere('status', 'Usulan Petugas');
+            })
+            ->select('id', 'nama', 'no_ktp', 'no_kk', 'alamat', 'jenis_kelamin', 'pengelompokan_desil', 'status', 'foto_sudut_depan')
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return view('petugas.usulan_baru', compact('user', 'penerimas', 'allPenerimas', 'search'));
     }
 
     /**

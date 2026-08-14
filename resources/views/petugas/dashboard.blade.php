@@ -423,36 +423,36 @@
             </div>
         </div>
 
-        <!-- 5 Stats Cards -->
+        <!-- 5 Stats Cards (Clickable Filter Shortcuts) -->
         <div class="stats-grid-petugas">
-            <div class="stat-card-petugas">
+            <a href="{{ route('petugas.dashboard', ['status' => 'all']) }}" class="stat-card-petugas {{ $statusFilter === 'all' ? 'active-card' : '' }}" title="Tampilkan Semua Data Penerima">
                 <div class="stat-icon blue"><i class="fas fa-users-viewfinder"></i></div>
                 <div class="stat-info">
                     <div class="stat-value">{{ number_format($stats['total_tugas'], 0, ',', '.') }}</div>
                     <div class="stat-label">Total Penerima Desa</div>
                 </div>
-            </div>
-            <a href="{{ url('/petugas/belum-survei') }}" class="stat-card-petugas">
+            </a>
+            <a href="{{ route('petugas.belum-survei') }}" class="stat-card-petugas" title="Buka Halaman Tugas Belum Di-survei">
                 <div class="stat-icon orange"><i class="fas fa-clipboard-question"></i></div>
                 <div class="stat-info">
                     <div class="stat-value" style="color:#d69e00;">{{ number_format($stats['belum_survei'], 0, ',', '.') }}</div>
                     <div class="stat-label">Belum Di-survei</div>
                 </div>
             </a>
-            <a href="{{ url('/petugas/sudah-survei') }}" class="stat-card-petugas">
+            <a href="{{ route('petugas.sudah-survei') }}" class="stat-card-petugas" title="Buka Halaman Tugas Sudah Selesai Survei">
                 <div class="stat-icon green"><i class="fas fa-clipboard-check"></i></div>
                 <div class="stat-info">
                     <div class="stat-value" style="color:#15803d;">{{ number_format($stats['sudah_survei'], 0, ',', '.') }}</div>
                     <div class="stat-label">Sudah Selesai Survei</div>
                 </div>
             </a>
-            <div class="stat-card-petugas">
+            <a href="{{ route('petugas.usulan-baru') }}" class="stat-card-petugas" title="Buka Halaman Usulan Baru Lapangan">
                 <div class="stat-icon cyan"><i class="fas fa-user-plus"></i></div>
                 <div class="stat-info">
                     <div class="stat-value" style="color:#0891b2;">{{ number_format($stats['usulan_baru'], 0, ',', '.') }}</div>
                     <div class="stat-label">Usulan Baru Lapangan</div>
                 </div>
-            </div>
+            </a>
             <div class="stat-card-petugas">
                 <div class="stat-icon purple"><i class="fas fa-chart-pie"></i></div>
                 <div class="stat-info">
@@ -526,6 +526,7 @@
                     <span class="selected-label">
                         @if($statusFilter === 'sudah') Sudah Selesai Survei
                         @elseif($statusFilter === 'belum') Belum Di-survei
+                        @elseif($statusFilter === 'usulan') Usulan Baru Lapangan
                         @else Semua Status Survei
                         @endif
                     </span>
@@ -544,6 +545,10 @@
                     <div class="pupr-dropdown-item {{ $statusFilter === 'sudah' ? 'active' : '' }}"
                          onclick="selectDropdown('hiddenStatusPetugas', 'ddStatusPetugasWrapper', 'sudah', 'Sudah Selesai Survei', 'filterFormPetugasDash')">
                         <i class="fas fa-check-circle" style="font-size:11px;color:var(--success);"></i> Sudah Selesai Survei
+                    </div>
+                    <div class="pupr-dropdown-item {{ $statusFilter === 'usulan' ? 'active' : '' }}"
+                         onclick="selectDropdown('hiddenStatusPetugas', 'ddStatusPetugasWrapper', 'usulan', 'Usulan Baru Lapangan', 'filterFormPetugasDash')">
+                        <i class="fas fa-user-plus" style="font-size:11px;color:#0891b2;"></i> Usulan Baru Lapangan
                     </div>
                 </div>
             </div>
@@ -1165,13 +1170,17 @@
         };
 
         const matches = ALL_DATA_DASH.filter(item => {
-            const fullText = `${item.nama || ''} ${item.no_ktp || ''} ${item.no_kk || ''} ${item.alamat || ''}`.toLowerCase();
+            const fullText = `${item.nama || ''} ${item.no_ktp || ''} ${item.no_kk || ''} ${item.alamat || ''} ${item.pengelompokan_desil || ''} ${item.status || ''}`.toLowerCase();
             const matchSearch = terms.length === 0 || terms.every(term => fullText.includes(term));
             let matchStatus = true;
             if (statusVal === 'sudah') {
                 matchStatus = isSudahSurvei(item);
             } else if (statusVal === 'belum') {
                 matchStatus = !isSudahSurvei(item);
+            } else if (statusVal === 'usulan') {
+                const desil = (item.pengelompokan_desil || '').toLowerCase();
+                const st = (item.status || '').toLowerCase();
+                matchStatus = desil.includes('usulan') || st.includes('usulan');
             }
             return matchSearch && matchStatus;
         });
