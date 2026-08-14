@@ -13,7 +13,7 @@ class DataPenerima extends Model
 
     /**
      * Daftar kolom WAJIB yang harus terisi agar dianggap "Sudah Survei / Selesai".
-     * Sesuaikan jika ada penambahan field baru di form survei.
+     * (Catatan: latitude & longitude/peta lokasi dikecualikan karena bisa menyusul).
      */
     public static array $fieldWajibSurvei = [
         // Data Tambahan & Kelaikan Hunian
@@ -38,22 +38,20 @@ class DataPenerima extends Model
         // Berkas Dokumen Administrasi
         'ktp',
         'kk',
-        // 'sertifikat_tanah' => Opsional (tidak wajib)
         'surat_pernyataan',
-        // Geotagging GPS Lapangan
-        'latitude',
-        'longitude',
+        // 'latitude' & 'longitude' dikecualikan dari syarat wajib
     ];
 
     /**
-     * Scope: Data yang SUDAH survei / diverifikasi (status khusus meninggal/pindah/tidak diketahui atau form fisik lengkap).
+     * Scope: Data yang SUDAH survei / diverifikasi (seluruh 18 field wajib terisi atau status khusus).
      */
     public function scopeSudahSurvei($query)
     {
-        return $query->where(function ($q) {
+        $fields = self::$fieldWajibSurvei;
+        return $query->where(function ($q) use ($fields) {
             $q->whereIn('status', ['meninggal', 'pindah', 'tidak diketahui'])
-              ->orWhere(function ($sub) {
-                  foreach (self::$fieldWajibSurvei as $field) {
+              ->orWhere(function ($sub) use ($fields) {
+                  foreach ($fields as $field) {
                       $sub->whereNotNull($field);
                       if ($field !== 'tanggal_lahir') {
                           $sub->where($field, '!=', '');
@@ -64,7 +62,7 @@ class DataPenerima extends Model
     }
 
     /**
-     * Scope: Data yang BELUM survei (belum dikunjungi/ditindaklanjuti).
+     * Scope: Data yang BELUM survei (ada field wajib yang belum terisi).
      */
     public function scopeBelumSurvei($query)
     {

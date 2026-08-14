@@ -195,11 +195,35 @@
         .non-gps-pill {
             font-size: 11.5px;
             font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 6px;
+            padding: 6px 12px;
+            border-radius: 8px;
             background: #fef3c7;
             color: #92400e;
             border: 1px solid #fde68a;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            user-select: none;
+        }
+
+        .non-gps-pill:hover {
+            background: #fde68a;
+            color: #78350f;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(180, 83, 9, 0.15);
+        }
+
+        .non-gps-pill.active {
+            background: #92400e;
+            color: #ffffff;
+            border-color: #92400e;
+            box-shadow: 0 3px 10px rgba(146, 64, 14, 0.3);
+        }
+
+        .non-gps-pill.active strong {
+            color: #ffedd5 !important;
         }
 
         /* Responsive Geo Maps Layout */
@@ -345,8 +369,15 @@
                         Daftar calon penerima di bawah ini telah diverifikasi/disurvei di lapangan, namun koordinat GPS rumah belum terekam di sistem karena GPS HP petugas belum aktif / izin lokasi ditolak saat pengambilan data, atau berstatus khusus lapangan.
                     </p>
                     <div class="non-gps-pills">
-                        <span class="non-gps-pill"><i class="fas fa-location-slash"></i> GPS Tidak Aktif Saat Input: <strong>{{ number_format($countGpsMati) }} KK</strong></span>
-                        <span class="non-gps-pill"><i class="fas fa-users-slash"></i> Status Khusus (Meninggal/Pindah/Tidak Diketahui): <strong>{{ number_format($countKhusus) }} KK</strong></span>
+                        <span class="non-gps-pill active" id="pillNonGpsAll" onclick="filterNonGpsCategory('all')" title="Klik untuk menampilkan seluruh 250 data tanpa GPS">
+                            <i class="fas fa-list-ul"></i> Semua Data: <strong>{{ number_format($totalNonGps) }} KK</strong>
+                        </span>
+                        <span class="non-gps-pill" id="pillNonGpsMati" onclick="filterNonGpsCategory('gps_mati')" title="Klik untuk menyaring: GPS Tidak Aktif Saat Input">
+                            <i class="fas fa-location-slash"></i> GPS Tidak Aktif Saat Input: <strong>{{ number_format($countGpsMati) }} KK</strong>
+                        </span>
+                        <span class="non-gps-pill" id="pillNonGpsKhusus" onclick="filterNonGpsCategory('khusus')" title="Klik untuk menyaring: Status Khusus (Meninggal/Pindah/Tidak Diketahui)">
+                            <i class="fas fa-users-slash"></i> Status Khusus (Meninggal/Pindah/Tidak Diketahui): <strong>{{ number_format($countKhusus) }} KK</strong>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -930,19 +961,56 @@
             });
         }
 
+        let activeNonGpsCategory = 'all';
+
+        function filterNonGpsCategory(cat) {
+            activeNonGpsCategory = cat;
+
+            document.querySelectorAll('.non-gps-pill').forEach(p => p.classList.remove('active'));
+            if (cat === 'gps_mati') {
+                document.getElementById('pillNonGpsMati')?.classList.add('active');
+            } else if (cat === 'khusus') {
+                document.getElementById('pillNonGpsKhusus')?.classList.add('active');
+            } else {
+                document.getElementById('pillNonGpsAll')?.classList.add('active');
+            }
+
+            nonGpsCurrentPage = 1;
+            applyNonGpsFilters();
+        }
+
+        function applyNonGpsFilters() {
+            const query = (document.getElementById('searchNonGpsLocation')?.value || '').toLowerCase().trim();
+            
+            let filtered = nonGpsData.filter(item => {
+                const isGpsMati = item.keteranganGps === 'GPS Tidak Aktif saat Survei';
+                let matchCat = true;
+                if (activeNonGpsCategory === 'gps_mati') {
+                    matchCat = isGpsMati;
+                } else if (activeNonGpsCategory === 'khusus') {
+                    matchCat = !isGpsMati;
+                }
+
+                let matchSearch = true;
+                if (query) {
+                    matchSearch = item.nama.toLowerCase().includes(query) ||
+                        item.location.toLowerCase().includes(query) ||
+                        (item.alamat && item.alamat.toLowerCase().includes(query)) ||
+                        (item.petugas && item.petugas.toLowerCase().includes(query)) ||
+                        item.statusLabel.toLowerCase().includes(query);
+                }
+
+                return matchCat && matchSearch;
+            });
+
+            renderNonGpsList(filtered);
+        }
+
         const searchNonGpsInput = document.getElementById('searchNonGpsLocation');
         if (searchNonGpsInput) {
             searchNonGpsInput.addEventListener('input', function() {
                 nonGpsCurrentPage = 1;
-                const query = this.value.toLowerCase().trim();
-                let filtered = nonGpsData.filter(item =>
-                    item.nama.toLowerCase().includes(query) ||
-                    item.location.toLowerCase().includes(query) ||
-                    (item.alamat && item.alamat.toLowerCase().includes(query)) ||
-                    (item.petugas && item.petugas.toLowerCase().includes(query)) ||
-                    item.statusLabel.toLowerCase().includes(query)
-                );
-                renderNonGpsList(filtered);
+                applyNonGpsFilters();
             });
         }
     </script>
