@@ -124,7 +124,8 @@ class PetugasController extends Controller
         $penerimas = $query->orderBy('id', 'asc')->paginate(20)->withQueryString();
         $allPenerimas = (clone $this->getPetugasQuery())
             ->belumSurvei()
-            ->select('id', 'nama', 'no_ktp', 'no_kk', 'alamat', 'jenis_kelamin', 'pengelompokan_desil', 'status')
+            ->select('id', 'nama', 'no_ktp', 'no_kk', 'alamat', 'jenis_kelamin', 'pengelompokan_desil', 'status', 
+                     'status_foto_sudut_depan', 'status_foto_sudut_belakang', 'status_foto_bagian_dalam', 'status_foto_sudut_kiri', 'status_foto_sudut_kanan')
             ->orderBy('id', 'asc')
             ->get();
 
