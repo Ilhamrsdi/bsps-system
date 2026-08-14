@@ -239,6 +239,7 @@
                             <th style="min-width: 200px;">Capaian Indikator RTLH</th>
                             <th style="min-width: 140px; text-align: center;">Status Kelayakan</th>
                             <th style="min-width: 140px;">Petugas Lapangan</th>
+                            <th style="min-width: 100px; text-align: center;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -311,10 +312,15 @@
                                     {{ $row->petugas ? $row->petugas->name : 'Petugas Lapangan' }}
                                 </div>
                             </td>
+                            <td style="text-align: center;">
+                                <button type="button" class="btn btn-outline" style="padding: 4px 10px; font-size: 11px; font-weight: 700; border-radius: 6px; border: 1px solid #002855; color: #002855; background: #ffffff; cursor: pointer;" data-row="{{ json_encode($row) }}" onclick="openDetailKelayakanModal(JSON.parse(this.getAttribute('data-row')))">
+                                    <i class="fas fa-eye"></i> Detail
+                                </button>
+                            </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="8" style="text-align: center; padding: 40px; color: #94a3b8;">
+                            <td colspan="9" style="text-align: center; padding: 40px; color: #94a3b8;">
                                 <i class="fas fa-inbox" style="font-size: 32px; display: block; margin-bottom: 10px; opacity: 0.4;"></i>
                                 Tidak ada data penerima yang cocok dengan kriteria pencarian/filter.
                             </td>
@@ -391,4 +397,207 @@
             @endif
         </div>
     </main>
+
+    <!-- Modal Detail Kelayakan -->
+    <div class="modal-overlay" id="modalDetailKelayakan">
+        <div class="modal-box" style="max-width: 700px; border-radius: 12px;">
+            <div class="modal-header" style="border-bottom: 1px solid rgba(0,40,85,0.1); padding: 16px 24px;">
+                <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: #002855;">
+                    <i class="fas fa-file-invoice" style="color: var(--primary); margin-right: 8px;"></i>
+                    Detail Data Kelayakan
+                </h3>
+                <button class="close-btn" type="button" onclick="window.PuprModal.close('modalDetailKelayakan')" style="background: none; border: none; font-size: 16px; cursor: pointer; color: #64748b;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" style="padding: 24px; max-height: 70vh; overflow-y: auto;">
+                <div class="info-section" style="margin-bottom: 20px;">
+                    <h4 style="font-size: 14px; font-weight: 700; color: #002855; margin-bottom: 12px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px;">Informasi Warga</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div>
+                            <div style="font-size: 11px; color: #64748b; font-weight: 600;">Nama Lengkap</div>
+                            <div id="mdl_nama" style="font-size: 13px; font-weight: 700; color: #0f172a;">-</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: #64748b; font-weight: 600;">NIK</div>
+                            <div id="mdl_nik" style="font-size: 13px; font-weight: 700; color: #0f172a; font-family: monospace;">-</div>
+                        </div>
+                        <div style="grid-column: span 2;">
+                            <div style="font-size: 11px; color: #64748b; font-weight: 600;">Alamat Lengkap</div>
+                            <div id="mdl_alamat" style="font-size: 13px; font-weight: 600; color: #0f172a;">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-section" style="margin-bottom: 20px;">
+                    <h4 style="font-size: 14px; font-weight: 700; color: #002855; margin-bottom: 12px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px;">Dokumen & Foto Lapangan</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px;" id="mdl_photos_container">
+                        <!-- Photos will be injected here -->
+                    </div>
+                </div>
+
+                @if(auth()->check() && auth()->user()->isAdmin())
+                <div class="info-section">
+                    <h4 style="font-size: 14px; font-weight: 700; color: #002855; margin-bottom: 12px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px;">Update Indikator Kelayakan</h4>
+                    <form id="formUpdateKelayakan">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" id="mdl_id_penerima" name="id">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                            <div>
+                                <label style="font-size: 11px; font-weight: 700; color: #64748b;">Atap</label>
+                                <select id="mdl_ind_atap" name="indikator_atap" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 13px;">
+                                    <option value="ada">Baik</option>
+                                    <option value="tidak_ada">Rusak</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="font-size: 11px; font-weight: 700; color: #64748b;">Dinding</label>
+                                <select id="mdl_ind_dinding" name="indikator_dinding" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 13px;">
+                                    <option value="ada">Baik</option>
+                                    <option value="tidak_ada">Rusak</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="font-size: 11px; font-weight: 700; color: #64748b;">Lantai</label>
+                                <select id="mdl_ind_lantai" name="indikator_lantai" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 13px;">
+                                    <option value="ada">Baik</option>
+                                    <option value="tidak_ada">Tanah/Rusak</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="font-size: 11px; font-weight: 700; color: #64748b;">Pondasi</label>
+                                <select id="mdl_ind_pondasi" name="indikator_pondasi" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 13px;">
+                                    <option value="ada">Baik</option>
+                                    <option value="tidak_ada">Rusak</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="font-size: 11px; font-weight: 700; color: #64748b;">Struktur</label>
+                                <select id="mdl_ind_struktur" name="indikator_struktur" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 13px;">
+                                    <option value="ada">Baik</option>
+                                    <option value="tidak_ada">Rusak</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="font-size: 11px; font-weight: 700; color: #64748b;">Penghasilan (Dibawah UMK)</label>
+                                <select id="mdl_ind_penghasilan" name="indikator_penghasilan" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 13px;">
+                                    <option value="ada">Ya (< UMK)</option>
+                                    <option value="tidak_ada">Tidak (> UMK)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <button type="button" id="btnUpdateKelayakan" class="btn btn-primary" style="padding: 10px 20px; border-radius: 8px; background: #002855; color: white; border: none; font-weight: 700; cursor: pointer;">
+                                Simpan Perubahan Indikator
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                @endif
+            </div>
+        </div>
+    </div>
 @endsection
+
+@push('scripts')
+<script>
+    function openDetailKelayakanModal(data) {
+        document.getElementById('mdl_nama').textContent = data.nama || '-';
+        document.getElementById('mdl_nik').textContent = data.no_ktp || '-';
+        document.getElementById('mdl_alamat').textContent = (data.alamat || '-') + ', Ds. ' + (data.desa_kelurahan || '-') + ', Kec. ' + (data.kecamatan || '-');
+        
+        @if(auth()->check() && auth()->user()->isAdmin())
+        document.getElementById('mdl_id_penerima').value = data.id;
+        document.getElementById('mdl_ind_atap').value = data.indikator_atap || 'ada';
+        document.getElementById('mdl_ind_dinding').value = data.indikator_dinding || 'ada';
+        document.getElementById('mdl_ind_lantai').value = data.indikator_lantai || 'ada';
+        document.getElementById('mdl_ind_pondasi').value = data.indikator_pondasi || 'ada';
+        document.getElementById('mdl_ind_struktur').value = data.indikator_struktur || 'ada';
+        document.getElementById('mdl_ind_penghasilan').value = data.indikator_penghasilan || 'ada';
+        @endif
+
+        const photosContainer = document.getElementById('mdl_photos_container');
+        photosContainer.innerHTML = '';
+        
+        const fotoFields = [
+            { key: 'ktp', label: 'KTP' },
+            { key: 'kk', label: 'Kartu Keluarga' },
+            { key: 'foto_sudut_depan', label: 'S. Depan' },
+            { key: 'foto_sudut_belakang', label: 'S. Belakang' },
+            { key: 'foto_bagian_dalam', label: 'B. Dalam' },
+            { key: 'foto_sudut_kiri', label: 'S. Kiri' },
+            { key: 'foto_sudut_kanan', label: 'S. Kanan' }
+        ];
+
+        fotoFields.forEach(f => {
+            if (data[f.key]) {
+                // Determine base URL, assuming it starts with 'uploads/'
+                let url = data[f.key];
+                if (!url.startsWith('http')) {
+                    url = '/' + url;
+                }
+                const item = document.createElement('div');
+                item.style.textAlign = 'center';
+                item.innerHTML = `
+                    <a href="${url}" target="_blank" style="display:block; margin-bottom:4px;">
+                        <img src="${url}" alt="${f.label}" style="width:100%; height:80px; object-fit:cover; border-radius:8px; border:1px solid #e2e8f0;"/>
+                    </a>
+                    <span style="font-size:10px; font-weight:700; color:#475569;">${f.label}</span>
+                `;
+                photosContainer.appendChild(item);
+            }
+        });
+
+        if(photosContainer.innerHTML === '') {
+            photosContainer.innerHTML = '<div style="grid-column: span 3; font-size:12px; color:#94a3b8; font-style:italic;">Belum ada foto/dokumen.</div>';
+        }
+
+        window.PuprModal.open('modalDetailKelayakan');
+    }
+
+    @if(auth()->check() && auth()->user()->isAdmin())
+    document.getElementById('btnUpdateKelayakan').addEventListener('click', function() {
+        const btn = this;
+        const id = document.getElementById('mdl_id_penerima').value;
+        const payload = {
+            indikator_atap: document.getElementById('mdl_ind_atap').value,
+            indikator_dinding: document.getElementById('mdl_ind_dinding').value,
+            indikator_lantai: document.getElementById('mdl_ind_lantai').value,
+            indikator_pondasi: document.getElementById('mdl_ind_pondasi').value,
+            indikator_struktur: document.getElementById('mdl_ind_struktur').value,
+            indikator_penghasilan: document.getElementById('mdl_ind_penghasilan').value
+        };
+        
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+
+        fetch(`/dashboard/data-kelayakan/${id}/status`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(res => {
+            if(res.success) {
+                alert('Indikator berhasil diupdate!');
+                window.location.reload();
+            } else {
+                alert('Gagal update indikator: ' + (res.message || 'Error'));
+                btn.disabled = false;
+                btn.innerHTML = 'Simpan Perubahan Indikator';
+            }
+        })
+        .catch(err => {
+            alert('Terjadi kesalahan koneksi.');
+            btn.disabled = false;
+            btn.innerHTML = 'Simpan Perubahan Indikator';
+        });
+    });
+    @endif
+</script>
+@endpush

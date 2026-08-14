@@ -300,6 +300,53 @@ class DashboardController extends Controller
     }
 
     /**
+     * Update Status Kelayakan & Indikator
+     */
+    public function updateStatusKelayakan(Request $request, $id)
+    {
+        $user = Auth::user();
+        if (!$user || !$user->isAdmin()) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        $request->validate([
+            'indikator_atap' => 'required|in:ada,tidak_ada',
+            'indikator_dinding' => 'required|in:ada,tidak_ada',
+            'indikator_lantai' => 'required|in:ada,tidak_ada',
+            'indikator_pondasi' => 'required|in:ada,tidak_ada',
+            'indikator_struktur' => 'required|in:ada,tidak_ada',
+            'indikator_penghasilan' => 'required|in:ada,tidak_ada',
+        ]);
+
+        $penerima = DataPenerima::findOrFail($id);
+
+        $totalIndikatorRtlh = 0;
+        if ($request->indikator_lantai === 'tidak_ada') $totalIndikatorRtlh++;
+        if ($request->indikator_pondasi === 'tidak_ada') $totalIndikatorRtlh++;
+        if ($request->indikator_dinding === 'tidak_ada') $totalIndikatorRtlh++;
+        if ($request->indikator_struktur === 'tidak_ada') $totalIndikatorRtlh++;
+        if ($request->indikator_atap === 'tidak_ada') $totalIndikatorRtlh++;
+        if ($request->indikator_penghasilan === 'ada') $totalIndikatorRtlh++;
+
+        $status_kelayakan = $totalIndikatorRtlh >= 2 ? 'Layak Diusulkan' : 'Tidak Layak Diusulkan';
+
+        $penerima->update([
+            'indikator_atap' => $request->indikator_atap,
+            'indikator_dinding' => $request->indikator_dinding,
+            'indikator_lantai' => $request->indikator_lantai,
+            'indikator_pondasi' => $request->indikator_pondasi,
+            'indikator_struktur' => $request->indikator_struktur,
+            'indikator_penghasilan' => $request->indikator_penghasilan,
+            'status_kelayakan' => $status_kelayakan,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Indikator dan status kelayakan berhasil diperbarui'
+        ]);
+    }
+
+    /**
      * Halaman Monitoring Progress & Kelayakan Khusus Tingkat Desa / Kelurahan
      */
     public function desa(Request $request)
