@@ -1169,8 +1169,12 @@
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
                         {{-- 1. Sudut Depan --}}
                         <div>
-                            <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">1. Tampak
-                                Depan</label>
+                            <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">1. Tampak Depan</label>
+                            @if($vervalData->status_foto_sudut_depan === 'tidak layak')
+                                <div style="background:#fef2f2; border:1px solid #fecaca; color:#991b1b; padding:8px 12px; border-radius:6px; font-size:12px; margin-bottom:8px; line-height:1.4;">
+                                    <strong><i class="fas fa-exclamation-triangle"></i> Ditolak:</strong> {{ $vervalData->catatan_foto_sudut_depan ?: 'Tanpa catatan' }}
+                                </div>
+                            @endif
                             <div class="camera-upload-card {{ $vervalData->foto_sudut_depan ? 'has-image' : '' }}"
                                 id="card_foto_sudut_depan">
                                 <input type="file" id="input_foto_sudut_depan" name="foto_sudut_depan"
@@ -1223,8 +1227,12 @@
 
                         {{-- 2. Sudut Belakang --}}
                         <div>
-                            <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">2. Tampak
-                                Belakang</label>
+                            <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">2. Tampak Belakang</label>
+                            @if($vervalData->status_foto_sudut_belakang === 'tidak layak')
+                                <div style="background:#fef2f2; border:1px solid #fecaca; color:#991b1b; padding:8px 12px; border-radius:6px; font-size:12px; margin-bottom:8px; line-height:1.4;">
+                                    <strong><i class="fas fa-exclamation-triangle"></i> Ditolak:</strong> {{ $vervalData->catatan_foto_sudut_belakang ?: 'Tanpa catatan' }}
+                                </div>
+                            @endif
                             <div class="camera-upload-card {{ $vervalData->foto_sudut_belakang ? 'has-image' : '' }}"
                                 id="card_foto_sudut_belakang">
                                 <input type="file" id="input_foto_sudut_belakang" name="foto_sudut_belakang"
@@ -1277,8 +1285,12 @@
 
                         {{-- 3. Bagian Dalam / Interior --}}
                         <div>
-                            <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">3. Bagian Dalam /
-                                Interior</label>
+                            <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">3. Bagian Dalam / Interior</label>
+                            @if($vervalData->status_foto_bagian_dalam === 'tidak layak')
+                                <div style="background:#fef2f2; border:1px solid #fecaca; color:#991b1b; padding:8px 12px; border-radius:6px; font-size:12px; margin-bottom:8px; line-height:1.4;">
+                                    <strong><i class="fas fa-exclamation-triangle"></i> Ditolak:</strong> {{ $vervalData->catatan_foto_bagian_dalam ?: 'Tanpa catatan' }}
+                                </div>
+                            @endif
                             <div class="camera-upload-card {{ $vervalData->foto_bagian_dalam ? 'has-image' : '' }}"
                                 id="card_foto_bagian_dalam">
                                 <input type="file" id="input_foto_bagian_dalam" name="foto_bagian_dalam"
@@ -1331,8 +1343,12 @@
 
                         {{-- 4. Samping Kiri --}}
                         <div>
-                            <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">4. Samping
-                                Kiri</label>
+                            <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">4. Samping Kiri</label>
+                            @if($vervalData->status_foto_sudut_kiri === 'tidak layak')
+                                <div style="background:#fef2f2; border:1px solid #fecaca; color:#991b1b; padding:8px 12px; border-radius:6px; font-size:12px; margin-bottom:8px; line-height:1.4;">
+                                    <strong><i class="fas fa-exclamation-triangle"></i> Ditolak:</strong> {{ $vervalData->catatan_foto_sudut_kiri ?: 'Tanpa catatan' }}
+                                </div>
+                            @endif
                             <div class="camera-upload-card {{ $vervalData->foto_sudut_kiri ? 'has-image' : '' }}"
                                 id="card_foto_sudut_kiri">
                                 <input type="file" id="input_foto_sudut_kiri" name="foto_sudut_kiri"
@@ -1385,8 +1401,12 @@
 
                         {{-- 5. Samping Kanan --}}
                         <div>
-                            <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">5. Samping
-                                Kanan</label>
+                            <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">5. Samping Kanan</label>
+                            @if($vervalData->status_foto_sudut_kanan === 'tidak layak')
+                                <div style="background:#fef2f2; border:1px solid #fecaca; color:#991b1b; padding:8px 12px; border-radius:6px; font-size:12px; margin-bottom:8px; line-height:1.4;">
+                                    <strong><i class="fas fa-exclamation-triangle"></i> Ditolak:</strong> {{ $vervalData->catatan_foto_sudut_kanan ?: 'Tanpa catatan' }}
+                                </div>
+                            @endif
                             <div class="camera-upload-card {{ $vervalData->foto_sudut_kanan ? 'has-image' : '' }}"
                                 id="card_foto_sudut_kanan">
                                 <input type="file" id="input_foto_sudut_kanan" name="foto_sudut_kanan"
