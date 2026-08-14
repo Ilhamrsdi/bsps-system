@@ -273,26 +273,46 @@
                                 </span>
                             </td>
                             <td>
-                                <div style="display: flex; flex-wrap: wrap; gap: 2px;">
-                                    <span class="ind-pill {{ $row->indikator_atap === 'tidak_ada' ? 'rusak' : 'baik' }}" title="Atap">
-                                        Atap: {{ $row->indikator_atap === 'tidak_ada' ? 'Rusak' : 'Baik' }}
+                                @if(in_array($row->status, ['meninggal', 'pindah', 'tidak diketahui']))
+                                    @php
+                                        $specLabel = ['meninggal' => ['icon' => 'fa-heart-crack', 'text' => 'Meninggal Dunia', 'color' => '#dc2626', 'bg' => '#fee2e2'], 'pindah' => ['icon' => 'fa-house-chimney-crack', 'text' => 'Pindah Alamat', 'color' => '#d97706', 'bg' => '#fef3c7'], 'tidak diketahui' => ['icon' => 'fa-question-circle', 'text' => 'Tidak Diketahui', 'color' => '#6b7280', 'bg' => '#f3f4f6']];
+                                        $sl = $specLabel[$row->status] ?? $specLabel['tidak diketahui'];
+                                    @endphp
+                                    <span style="font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 12px; background: {{ $sl['bg'] }}; color: {{ $sl['color'] }}; display: inline-flex; align-items: center; gap: 5px;">
+                                        <i class="fas {{ $sl['icon'] }}"></i> {{ $sl['text'] }}
                                     </span>
-                                    <span class="ind-pill {{ $row->indikator_dinding === 'tidak_ada' ? 'rusak' : 'baik' }}" title="Dinding">
-                                        Dinding: {{ $row->indikator_dinding === 'tidak_ada' ? 'Rusak' : 'Baik' }}
-                                    </span>
-                                    <span class="ind-pill {{ $row->indikator_lantai === 'tidak_ada' ? 'rusak' : 'baik' }}" title="Lantai">
-                                        Lantai: {{ $row->indikator_lantai === 'tidak_ada' ? 'Tanah' : 'Baik' }}
-                                    </span>
-                                    <span class="ind-pill {{ $row->indikator_pondasi === 'tidak_ada' ? 'rusak' : 'baik' }}" title="Pondasi">
-                                        Pondasi: {{ $row->indikator_pondasi === 'tidak_ada' ? 'Rusak' : 'Baik' }}
-                                    </span>
-                                    <span class="ind-pill {{ $row->indikator_struktur === 'tidak_ada' ? 'rusak' : 'baik' }}" title="Struktur">
-                                        Struktur: {{ $row->indikator_struktur === 'tidak_ada' ? 'Rusak' : 'Baik' }}
-                                    </span>
-                                </div>
+                                @elseif($row->indikator_atap || $row->indikator_dinding || $row->indikator_lantai || $row->status_kelayakan)
+                                    <div style="display: flex; flex-wrap: wrap; gap: 2px;">
+                                        <span class="ind-pill {{ $row->indikator_atap === 'tidak_ada' ? 'rusak' : 'baik' }}" title="Atap">
+                                            Atap: {{ $row->indikator_atap === 'tidak_ada' ? 'Rusak' : 'Baik' }}
+                                        </span>
+                                        <span class="ind-pill {{ $row->indikator_dinding === 'tidak_ada' ? 'rusak' : 'baik' }}" title="Dinding">
+                                            Dinding: {{ $row->indikator_dinding === 'tidak_ada' ? 'Rusak' : 'Baik' }}
+                                        </span>
+                                        <span class="ind-pill {{ $row->indikator_lantai === 'tidak_ada' ? 'rusak' : 'baik' }}" title="Lantai">
+                                            Lantai: {{ $row->indikator_lantai === 'tidak_ada' ? 'Tanah' : 'Baik' }}
+                                        </span>
+                                        <span class="ind-pill {{ $row->indikator_pondasi === 'tidak_ada' ? 'rusak' : 'baik' }}" title="Pondasi">
+                                            Pondasi: {{ $row->indikator_pondasi === 'tidak_ada' ? 'Rusak' : 'Baik' }}
+                                        </span>
+                                        <span class="ind-pill {{ $row->indikator_struktur === 'tidak_ada' ? 'rusak' : 'baik' }}" title="Struktur">
+                                            Struktur: {{ $row->indikator_struktur === 'tidak_ada' ? 'Rusak' : 'Baik' }}
+                                        </span>
+                                    </div>
+                                @else
+                                    <span style="font-size: 12px; color: #94a3b8; font-style: italic;">Belum Diisi</span>
+                                @endif
                             </td>
                             <td style="text-align: center;">
-                                @if($row->status_kelayakan === 'Layak Diusulkan')
+                                @if(in_array($row->status, ['meninggal', 'pindah', 'tidak diketahui']))
+                                    @php
+                                        $statusLabel = ['meninggal' => ['icon' => 'fa-heart-crack', 'text' => 'Meninggal', 'color' => '#dc2626', 'bg' => '#fee2e2'], 'pindah' => ['icon' => 'fa-house-chimney-crack', 'text' => 'Pindah', 'color' => '#d97706', 'bg' => '#fef3c7'], 'tidak diketahui' => ['icon' => 'fa-question-circle', 'text' => 'Tdk Diketahui', 'color' => '#6b7280', 'bg' => '#f3f4f6']];
+                                        $sl = $statusLabel[$row->status];
+                                    @endphp
+                                    <span style="font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 12px; background: {{ $sl['bg'] }}; color: {{ $sl['color'] }}; border: 1px solid {{ $sl['color'] }}40; display: inline-flex; align-items: center; gap: 4px;">
+                                        <i class="fas {{ $sl['icon'] }}"></i> {{ $sl['text'] }}
+                                    </span>
+                                @elseif($row->status_kelayakan === 'Layak Diusulkan')
                                     <span style="font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 12px; background: #dcfce7; color: #15803d; border: 1px solid #86efac; display: inline-flex; align-items: center; gap: 4px;">
                                         <i class="fas fa-check-circle"></i> Layak Diusulkan
                                     </span>
@@ -301,8 +321,8 @@
                                         <i class="fas fa-times-circle"></i> Tidak Layak
                                     </span>
                                 @else
-                                    <span style="font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 12px; background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1;">
-                                        {{ ucfirst($row->status ?: 'Belum Survei') }}
+                                    <span style="font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 12px; background: #fef3c7; color: #b45309; border: 1px solid #fde68a;">
+                                        <i class="fas fa-clock"></i> Belum Survei
                                     </span>
                                 @endif
                             </td>
