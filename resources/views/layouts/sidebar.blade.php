@@ -83,6 +83,10 @@
                 <i class="fas fa-clipboard-list"></i>
                 Data Verval
             </a>
+            <a class="menu-item {{ Request::is('dashboard/data-kelayakan*') ? 'active' : '' }}" href="{{ route('dashboard.data-kelayakan', ['status' => 'layak']) }}">
+                <i class="fas fa-check-double"></i>
+                Verifikasi Kelayakan
+            </a>
             <a class="menu-item {{ Request::is('laporan*') ? 'active' : '' }}" href="{{ url('/laporan') }}">
                 <i class="fas fa-file-invoice"></i>
                 Laporan &amp; Rekapitulasi

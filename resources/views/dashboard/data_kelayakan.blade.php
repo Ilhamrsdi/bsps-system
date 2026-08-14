@@ -537,15 +537,64 @@
                 if (!url.startsWith('http')) {
                     url = '/' + url;
                 }
+                const isSudut = f.key.startsWith('foto_');
+                
+                let extraHtml = '';
+                @if(auth()->check() && auth()->user()->isAdmin())
+                if(isSudut) {
+                    const statusKey = 'status_' + f.key;
+                    const catatanKey = 'catatan_' + f.key;
+                    const currentStatus = data[statusKey] || '';
+                    const currentCatatan = data[catatanKey] || '';
+                    
+                    extraHtml = `
+                        <div style="margin-top: 8px; text-align: left;">
+                            <label style="font-size:10px; font-weight:700; color:#64748b;">Status</label>
+                            <select id="mdl_ind_${statusKey}" style="width:100%; font-size:11px; padding:4px; border-radius:4px; border:1px solid #cbd5e1; margin-bottom:4px;">
+                                <option value="">- Pilih Status -</option>
+                                <option value="layak" ${currentStatus === 'layak' ? 'selected' : ''}>Terverifikasi</option>
+                                <option value="tidak layak" ${currentStatus === 'tidak layak' ? 'selected' : ''}>Ditolak</option>
+                            </select>
+                            <div id="wrapper_${catatanKey}" style="display: ${currentStatus === 'tidak layak' ? 'block' : 'none'};">
+                                <label style="font-size:10px; font-weight:700; color:#64748b;">Catatan Ditolak</label>
+                                <textarea id="mdl_ind_${catatanKey}" style="width:100%; font-size:11px; padding:4px; border-radius:4px; border:1px solid #cbd5e1; resize:none;" rows="2">${currentCatatan}</textarea>
+                            </div>
+                        </div>
+                    `;
+                }
+                @endif
+
                 const item = document.createElement('div');
                 item.style.textAlign = 'center';
+                item.style.padding = '8px';
+                item.style.border = '1px solid #e2e8f0';
+                item.style.borderRadius = '8px';
+                item.style.background = '#f8fafc';
                 item.innerHTML = `
                     <a href="${url}" target="_blank" style="display:block; margin-bottom:4px;">
-                        <img src="${url}" alt="${f.label}" style="width:100%; height:80px; object-fit:cover; border-radius:8px; border:1px solid #e2e8f0;"/>
+                        <img src="${url}" alt="${f.label}" style="width:100%; height:100px; object-fit:cover; border-radius:4px; border:1px solid #cbd5e1;"/>
                     </a>
-                    <span style="font-size:10px; font-weight:700; color:#475569;">${f.label}</span>
+                    <span style="font-size:11px; font-weight:700; color:#002855; display:block; margin-bottom:4px;">${f.label}</span>
+                    ${extraHtml}
                 `;
                 photosContainer.appendChild(item);
+                
+                @if(auth()->check() && auth()->user()->isAdmin())
+                if(isSudut) {
+                    const selectEl = document.getElementById('mdl_ind_status_' + f.key);
+                    const wrapperEl = document.getElementById('wrapper_catatan_' + f.key);
+                    if(selectEl) {
+                        selectEl.addEventListener('change', function() {
+                            if(this.value === 'tidak layak') {
+                                wrapperEl.style.display = 'block';
+                            } else {
+                                wrapperEl.style.display = 'none';
+                                document.getElementById('mdl_ind_catatan_' + f.key).value = '';
+                            }
+                        });
+                    }
+                }
+                @endif
             }
         });
 
@@ -569,6 +618,16 @@
             indikator_penghasilan: document.getElementById('mdl_ind_penghasilan').value
         };
         
+        const fotoFieldsKeys = ['foto_sudut_depan', 'foto_sudut_belakang', 'foto_bagian_dalam', 'foto_sudut_kiri', 'foto_sudut_kanan'];
+        fotoFieldsKeys.forEach(k => {
+            const statusEl = document.getElementById('mdl_ind_status_' + k);
+            const catatanEl = document.getElementById('mdl_ind_catatan_' + k);
+            if(statusEl) {
+                payload['status_' + k] = statusEl.value;
+                payload['catatan_' + k] = catatanEl ? catatanEl.value : '';
+            }
+        });
+
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
 

@@ -316,6 +316,16 @@ class DashboardController extends Controller
             'indikator_pondasi' => 'required|in:ada,tidak_ada',
             'indikator_struktur' => 'required|in:ada,tidak_ada',
             'indikator_penghasilan' => 'required|in:ada,tidak_ada',
+            'status_foto_sudut_depan' => 'nullable|in:layak,tidak layak',
+            'status_foto_sudut_belakang' => 'nullable|in:layak,tidak layak',
+            'status_foto_bagian_dalam' => 'nullable|in:layak,tidak layak',
+            'status_foto_sudut_kiri' => 'nullable|in:layak,tidak layak',
+            'status_foto_sudut_kanan' => 'nullable|in:layak,tidak layak',
+            'catatan_foto_sudut_depan' => 'nullable|string',
+            'catatan_foto_sudut_belakang' => 'nullable|string',
+            'catatan_foto_bagian_dalam' => 'nullable|string',
+            'catatan_foto_sudut_kiri' => 'nullable|string',
+            'catatan_foto_sudut_kanan' => 'nullable|string',
         ]);
 
         $penerima = DataPenerima::findOrFail($id);
@@ -338,6 +348,16 @@ class DashboardController extends Controller
             'indikator_struktur' => $request->indikator_struktur,
             'indikator_penghasilan' => $request->indikator_penghasilan,
             'status_kelayakan' => $status_kelayakan,
+            'status_foto_sudut_depan' => $request->status_foto_sudut_depan,
+            'status_foto_sudut_belakang' => $request->status_foto_sudut_belakang,
+            'status_foto_bagian_dalam' => $request->status_foto_bagian_dalam,
+            'status_foto_sudut_kiri' => $request->status_foto_sudut_kiri,
+            'status_foto_sudut_kanan' => $request->status_foto_sudut_kanan,
+            'catatan_foto_sudut_depan' => $request->catatan_foto_sudut_depan,
+            'catatan_foto_sudut_belakang' => $request->catatan_foto_sudut_belakang,
+            'catatan_foto_bagian_dalam' => $request->catatan_foto_bagian_dalam,
+            'catatan_foto_sudut_kiri' => $request->catatan_foto_sudut_kiri,
+            'catatan_foto_sudut_kanan' => $request->catatan_foto_sudut_kanan,
         ]);
 
         return response()->json([
