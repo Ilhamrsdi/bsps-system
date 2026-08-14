@@ -713,8 +713,12 @@
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
                         {{-- Upload KTP --}}
                         <div>
-                            <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">Foto / Scan
-                                KTP</label>
+                            <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">Foto / Scan KTP</label>
+                            @if($vervalData->status_ktp === 'tidak layak')
+                                <div style="background:#fef2f2; border:1px solid #fecaca; color:#991b1b; padding:8px 12px; border-radius:6px; font-size:12px; margin-bottom:8px; line-height:1.4;">
+                                    <strong><i class="fas fa-exclamation-triangle"></i> Ditolak:</strong> {{ $vervalData->catatan_ktp ?: 'Tanpa catatan' }}
+                                </div>
+                            @endif
                             <div class="camera-upload-card {{ $vervalData->ktp ? 'has-image' : '' }}" id="card_ktp">
                                 <input type="file" id="input_ktp" name="ktp" class="camera-file-input" accept="image/*"
                                     onchange="previewPhoto(this, 'ktp')">
@@ -763,8 +767,12 @@
 
                         {{-- Upload KK --}}
                         <div>
-                            <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">Foto / Scan Kartu
-                                Keluarga (KK)</label>
+                            <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">Foto / Scan Kartu Keluarga (KK)</label>
+                            @if($vervalData->status_kk === 'tidak layak')
+                                <div style="background:#fef2f2; border:1px solid #fecaca; color:#991b1b; padding:8px 12px; border-radius:6px; font-size:12px; margin-bottom:8px; line-height:1.4;">
+                                    <strong><i class="fas fa-exclamation-triangle"></i> Ditolak:</strong> {{ $vervalData->catatan_kk ?: 'Tanpa catatan' }}
+                                </div>
+                            @endif
                             <div class="camera-upload-card {{ $vervalData->kk ? 'has-image' : '' }}" id="card_kk">
                                 <input type="file" id="input_kk" name="kk" class="camera-file-input" accept="image/*"
                                     onchange="previewPhoto(this, 'kk')">
@@ -866,8 +874,12 @@
 
                         {{-- Upload Surat Pernyataan --}}
                         <div>
-                            <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">Foto / PDF Surat
-                                Pernyataan</label>
+                            <label style="font-weight:700;font-size:13px;display:block;margin-bottom:8px;">Foto / PDF Surat Pernyataan</label>
+                            @if($vervalData->status_surat_pernyataan === 'tidak layak')
+                                <div style="background:#fef2f2; border:1px solid #fecaca; color:#991b1b; padding:8px 12px; border-radius:6px; font-size:12px; margin-bottom:8px; line-height:1.4;">
+                                    <strong><i class="fas fa-exclamation-triangle"></i> Ditolak:</strong> {{ $vervalData->catatan_surat_pernyataan ?: 'Tanpa catatan' }}
+                                </div>
+                            @endif
                             <div class="camera-upload-card {{ $vervalData->surat_pernyataan ? 'has-image' : '' }}"
                                 id="card_surat_pernyataan">
                                 <input type="file" id="input_surat_pernyataan" name="surat_pernyataan"

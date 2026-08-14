@@ -53,7 +53,10 @@ class DataPenerima extends Model
             'status_foto_sudut_belakang',
             'status_foto_bagian_dalam',
             'status_foto_sudut_kiri',
-            'status_foto_sudut_kanan'
+            'status_foto_sudut_kanan',
+            'status_ktp',
+            'status_kk',
+            'status_surat_pernyataan'
         ];
 
         return $query->where(function ($q) use ($fields, $fotoFields) {
@@ -86,7 +89,10 @@ class DataPenerima extends Model
             'status_foto_sudut_belakang',
             'status_foto_bagian_dalam',
             'status_foto_sudut_kiri',
-            'status_foto_sudut_kanan'
+            'status_foto_sudut_kanan',
+            'status_ktp',
+            'status_kk',
+            'status_surat_pernyataan'
         ];
 
         return $query->where(function ($q) use ($fields, $fotoFields) {
@@ -126,7 +132,10 @@ class DataPenerima extends Model
             'status_foto_sudut_belakang',
             'status_foto_bagian_dalam',
             'status_foto_sudut_kiri',
-            'status_foto_sudut_kanan'
+            'status_foto_sudut_kanan',
+            'status_ktp',
+            'status_kk',
+            'status_surat_pernyataan'
         ];
         foreach ($fotoFields as $ff) {
             if ($this->{$ff} === 'tidak layak') return false;
@@ -145,7 +154,10 @@ class DataPenerima extends Model
             'status_foto_sudut_belakang',
             'status_foto_bagian_dalam',
             'status_foto_sudut_kiri',
-            'status_foto_sudut_kanan'
+            'status_foto_sudut_kanan',
+            'status_ktp',
+            'status_kk',
+            'status_surat_pernyataan'
         ];
         foreach ($fotoFields as $ff) {
             if ($this->{$ff} === 'tidak layak') return true;

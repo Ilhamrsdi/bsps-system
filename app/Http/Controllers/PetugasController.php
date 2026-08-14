@@ -125,7 +125,8 @@ class PetugasController extends Controller
         $allPenerimas = (clone $this->getPetugasQuery())
             ->belumSurvei()
             ->select('id', 'nama', 'no_ktp', 'no_kk', 'alamat', 'jenis_kelamin', 'pengelompokan_desil', 'status', 
-                     'status_foto_sudut_depan', 'status_foto_sudut_belakang', 'status_foto_bagian_dalam', 'status_foto_sudut_kiri', 'status_foto_sudut_kanan')
+                     'status_foto_sudut_depan', 'status_foto_sudut_belakang', 'status_foto_bagian_dalam', 'status_foto_sudut_kiri', 'status_foto_sudut_kanan',
+                     'status_ktp', 'status_kk', 'status_surat_pernyataan')
             ->orderBy('id', 'asc')
             ->get();
 

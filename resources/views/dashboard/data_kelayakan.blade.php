@@ -623,11 +623,11 @@
                 if (!url.startsWith('http')) {
                     url = '/' + url;
                 }
-                const isSudut = f.key.startsWith('foto_');
+                const isVerifiable = f.key.startsWith('foto_') || f.key === 'ktp' || f.key === 'kk' || f.key === 'surat_pernyataan';
                 
                 let extraHtml = '';
                 @if(auth()->check() && auth()->user()->isAdmin())
-                if(isSudut) {
+                if(isVerifiable) {
                     const statusKey = 'status_' + f.key;
                     const catatanKey = 'catatan_' + f.key;
                     const currentStatus = data[statusKey] || '';
@@ -666,7 +666,7 @@
                 photosContainer.appendChild(item);
                 
                 @if(auth()->check() && auth()->user()->isAdmin())
-                if(isSudut) {
+                if(isVerifiable) {
                     const selectEl = document.getElementById('mdl_ind_status_' + f.key);
                     const wrapperEl = document.getElementById('wrapper_catatan_' + f.key);
                     if(selectEl) {
@@ -704,7 +704,7 @@
             indikator_penghasilan: document.getElementById('mdl_ind_penghasilan').value
         };
         
-        const fotoFieldsKeys = ['foto_sudut_depan', 'foto_sudut_belakang', 'foto_bagian_dalam', 'foto_sudut_kiri', 'foto_sudut_kanan'];
+        const fotoFieldsKeys = ['foto_sudut_depan', 'foto_sudut_belakang', 'foto_bagian_dalam', 'foto_sudut_kiri', 'foto_sudut_kanan', 'ktp', 'kk', 'surat_pernyataan'];
         fotoFieldsKeys.forEach(k => {
             const statusEl = document.getElementById('mdl_ind_status_' + k);
             const catatanEl = document.getElementById('mdl_ind_catatan_' + k);

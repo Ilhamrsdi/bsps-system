@@ -326,6 +326,12 @@ class DashboardController extends Controller
             'catatan_foto_bagian_dalam' => 'nullable|string',
             'catatan_foto_sudut_kiri' => 'nullable|string',
             'catatan_foto_sudut_kanan' => 'nullable|string',
+            'status_ktp' => 'nullable|in:layak,tidak layak',
+            'catatan_ktp' => 'nullable|string',
+            'status_kk' => 'nullable|in:layak,tidak layak',
+            'catatan_kk' => 'nullable|string',
+            'status_surat_pernyataan' => 'nullable|in:layak,tidak layak',
+            'catatan_surat_pernyataan' => 'nullable|string',
         ]);
 
         $penerima = DataPenerima::findOrFail($id);
@@ -358,6 +364,12 @@ class DashboardController extends Controller
             'catatan_foto_bagian_dalam' => $request->catatan_foto_bagian_dalam,
             'catatan_foto_sudut_kiri' => $request->catatan_foto_sudut_kiri,
             'catatan_foto_sudut_kanan' => $request->catatan_foto_sudut_kanan,
+            'status_ktp' => $request->status_ktp,
+            'catatan_ktp' => $request->catatan_ktp,
+            'status_kk' => $request->status_kk,
+            'catatan_kk' => $request->catatan_kk,
+            'status_surat_pernyataan' => $request->status_surat_pernyataan,
+            'catatan_surat_pernyataan' => $request->catatan_surat_pernyataan,
         ]);
 
         return response()->json([

@@ -221,7 +221,10 @@
                         ($item->status_foto_sudut_belakang ?? '') === 'tidak layak' || 
                         ($item->status_foto_bagian_dalam ?? '') === 'tidak layak' || 
                         ($item->status_foto_sudut_kiri ?? '') === 'tidak layak' || 
-                        ($item->status_foto_sudut_kanan ?? '') === 'tidak layak';
+                        ($item->status_foto_sudut_kanan ?? '') === 'tidak layak' ||
+                        ($item->status_ktp ?? '') === 'tidak layak' ||
+                        ($item->status_kk ?? '') === 'tidak layak' ||
+                        ($item->status_surat_pernyataan ?? '') === 'tidak layak';
                 })->count();
             } else {
                 $revisiCount = $penerimas->filter(function($p) { return $p->isRevisi(); })->count();
