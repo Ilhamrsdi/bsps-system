@@ -48,35 +48,63 @@ class DataPenerima extends Model
     public function scopeSudahSurvei($query)
     {
         $fields = self::$fieldWajibSurvei;
-        return $query->where(function ($q) use ($fields) {
+        $fotoFields = [
+            'status_foto_sudut_depan',
+            'status_foto_sudut_belakang',
+            'status_foto_bagian_dalam',
+            'status_foto_sudut_kiri',
+            'status_foto_sudut_kanan'
+        ];
+
+        return $query->where(function ($q) use ($fields, $fotoFields) {
             $q->whereIn('status', ['meninggal', 'pindah', 'tidak diketahui'])
-              ->orWhere(function ($sub) use ($fields) {
+              ->orWhere(function ($sub) use ($fields, $fotoFields) {
                   foreach ($fields as $field) {
                       $sub->whereNotNull($field);
                       if ($field !== 'tanggal_lahir') {
                           $sub->where($field, '!=', '');
                       }
                   }
+                  // Pastikan tidak ada foto yang ditolak
+                  foreach ($fotoFields as $ff) {
+                      $sub->where(function ($qff) use ($ff) {
+                          $qff->whereNull($ff)->orWhere($ff, '!=', 'tidak layak');
+                      });
+                  }
               });
         });
     }
 
     /**
-     * Scope: Data yang BELUM survei (ada field wajib yang belum terisi).
+     * Scope: Data yang BELUM survei (ada field wajib yang belum terisi) ATAU REVISI (ada foto ditolak).
      */
     public function scopeBelumSurvei($query)
     {
         $fields = self::$fieldWajibSurvei;
-        return $query->where(function ($q) use ($fields) {
+        $fotoFields = [
+            'status_foto_sudut_depan',
+            'status_foto_sudut_belakang',
+            'status_foto_bagian_dalam',
+            'status_foto_sudut_kiri',
+            'status_foto_sudut_kanan'
+        ];
+
+        return $query->where(function ($q) use ($fields, $fotoFields) {
             $q->whereNull('status')
               ->orWhereNotIn('status', ['meninggal', 'pindah', 'tidak diketahui']);
-        })->where(function ($q) use ($fields) {
-            foreach ($fields as $field) {
-                $q->orWhereNull($field);
-                if ($field !== 'tanggal_lahir') {
-                    $q->orWhere($field, '=', '');
+        })->where(function ($q) use ($fields, $fotoFields) {
+            $q->where(function ($sub1) use ($fields) {
+                foreach ($fields as $field) {
+                    $sub1->orWhereNull($field);
+                    if ($field !== 'tanggal_lahir') {
+                        $sub1->orWhere($field, '=', '');
+                    }
                 }
-            }
+            })->orWhere(function ($sub2) use ($fotoFields) {
+                foreach ($fotoFields as $ff) {
+                    $sub2->orWhere($ff, '=', 'tidak layak');
+                }
+            });
         });
     }
 
@@ -92,7 +120,37 @@ class DataPenerima extends Model
         foreach (self::$fieldWajibSurvei as $field) {
             if (empty($this->{$field})) return false;
         }
+
+        $fotoFields = [
+            'status_foto_sudut_depan',
+            'status_foto_sudut_belakang',
+            'status_foto_bagian_dalam',
+            'status_foto_sudut_kiri',
+            'status_foto_sudut_kanan'
+        ];
+        foreach ($fotoFields as $ff) {
+            if ($this->{$ff} === 'tidak layak') return false;
+        }
+
         return true;
+    }
+
+    /**
+     * Helper: Cek apakah ada indikator/foto yang ditolak (Revisi).
+     */
+    public function isRevisi(): bool
+    {
+        $fotoFields = [
+            'status_foto_sudut_depan',
+            'status_foto_sudut_belakang',
+            'status_foto_bagian_dalam',
+            'status_foto_sudut_kiri',
+            'status_foto_sudut_kanan'
+        ];
+        foreach ($fotoFields as $ff) {
+            if ($this->{$ff} === 'tidak layak') return true;
+        }
+        return false;
     }
 
     /**

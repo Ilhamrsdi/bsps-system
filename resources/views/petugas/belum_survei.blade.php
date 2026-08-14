@@ -295,6 +295,11 @@
                                               data-id="{{ $item->id }}" data-nama="{{ e($item->nama) }}" data-nik="{{ e($item->no_ktp ?: '-') }}" data-alamat="{{ e($item->alamat ?: '-') }}" data-status="{{ e($item->status) }}" data-url="{{ url('/survey/' . $item->id) }}" title="Klik untuk ubah status">
                                             <i class="fas fa-question-circle"></i> Tidak Diketahui
                                         </span>
+                                    @elseif($item->isRevisi())
+                                        <span class="badge btn-trigger-status-modal" style="background:#fef2f2;color:#dc2626;padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:800;cursor:pointer;border:1px solid #fecaca;"
+                                              data-id="{{ $item->id }}" data-nama="{{ e($item->nama) }}" data-nik="{{ e($item->no_ktp ?: '-') }}" data-alamat="{{ e($item->alamat ?: '-') }}" data-status="{{ e($item->status) }}" data-url="{{ url('/survey/' . $item->id) }}" title="Klik untuk update status">
+                                            <i class="fas fa-exclamation-triangle"></i> Perlu Revisi
+                                        </span>
                                     @else
                                         <span class="badge-status-belum btn-trigger-status-modal" style="cursor:pointer;"
                                               data-id="{{ $item->id }}" data-nama="{{ e($item->nama) }}" data-nik="{{ e($item->no_ktp ?: '-') }}" data-alamat="{{ e($item->alamat ?: '-') }}" data-status="{{ e($item->status) }}" data-url="{{ url('/survey/' . $item->id) }}" title="Klik untuk update status">
@@ -694,8 +699,10 @@
                     statusBadge = `<span class="badge btn-trigger-status-modal" style="background:#fee2e2;color:#b91c1c;padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:800;cursor:pointer;" data-id="${item.id}" data-nama="${escapeHtml(item.nama)}" data-nik="${escapeHtml(item.no_ktp || '-')}" data-alamat="${escapeHtml(item.alamat || '-')}" data-status="${escapeHtml(item.status)}" data-url="/survey/${item.id}"><i class="fas fa-times-circle"></i> Meninggal</span>`;
                 } else if (item.status === 'pindah') {
                     statusBadge = `<span class="badge btn-trigger-status-modal" style="background:#ffedd5;color:#c2410c;padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:800;cursor:pointer;" data-id="${item.id}" data-nama="${escapeHtml(item.nama)}" data-nik="${escapeHtml(item.no_ktp || '-')}" data-alamat="${escapeHtml(item.alamat || '-')}" data-status="${escapeHtml(item.status)}" data-url="/survey/${item.id}"><i class="fas fa-truck-moving"></i> Pindah</span>`;
+                } else if (item.status_foto_sudut_depan === 'tidak layak' || item.status_foto_sudut_belakang === 'tidak layak' || item.status_foto_bagian_dalam === 'tidak layak' || item.status_foto_sudut_kiri === 'tidak layak' || item.status_foto_sudut_kanan === 'tidak layak') {
+                    statusBadge = `<span class="badge btn-trigger-status-modal" style="background:#fef2f2;color:#dc2626;padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:800;cursor:pointer;border:1px solid #fecaca;" data-id="${item.id}" data-nama="${escapeHtml(item.nama)}" data-nik="${escapeHtml(item.no_ktp || '-')}" data-alamat="${escapeHtml(item.alamat || '-')}" data-status="${escapeHtml(item.status || 'belum_ditentukan')}" data-url="/survey/${item.id}"><i class="fas fa-exclamation-triangle"></i> Perlu Revisi</span>`;
                 } else {
-                    statusBadge = `<span class="badge btn-trigger-status-modal" style="background:#f1f5f9;color:#64748b;padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:800;cursor:pointer;" data-id="${item.id}" data-nama="${escapeHtml(item.nama)}" data-nik="${escapeHtml(item.no_ktp || '-')}" data-alamat="${escapeHtml(item.alamat || '-')}" data-status="${escapeHtml(item.status || 'belum_ditentukan')}" data-url="/survey/${item.id}"><i class="fas fa-question-circle"></i> Belum Verifikasi</span>`;
+                    statusBadge = `<span class="badge btn-trigger-status-modal" style="background:#f1f5f9;color:#64748b;padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:800;cursor:pointer;" data-id="${item.id}" data-nama="${escapeHtml(item.nama)}" data-nik="${escapeHtml(item.no_ktp || '-')}" data-alamat="${escapeHtml(item.alamat || '-')}" data-status="${escapeHtml(item.status || 'belum_ditentukan')}" data-url="/survey/${item.id}"><i class="fas fa-clock"></i> Belum Survei</span>`;
                 }
 
                 html += `
