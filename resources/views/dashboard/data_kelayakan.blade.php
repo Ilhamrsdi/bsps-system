@@ -236,6 +236,7 @@
                             <th style="min-width: 160px;">NIK / No. KK</th>
                             <th style="min-width: 170px;">Wilayah / Desa</th>
                             <th style="min-width: 120px;">Desil</th>
+                            <th style="min-width: 130px; text-align: center;">Status Verval</th>
                             <th style="min-width: 200px;">Capaian Indikator RTLH</th>
                             <th style="min-width: 140px; text-align: center;">Status Kelayakan</th>
                             <th style="min-width: 140px;">Petugas Lapangan</th>
@@ -272,16 +273,31 @@
                                     {{ $row->pengelompokan_desil ?: '-' }}
                                 </span>
                             </td>
-                            <td>
-                                @if(in_array($row->status, ['meninggal', 'pindah', 'tidak diketahui']))
-                                    @php
-                                        $specLabel = ['meninggal' => ['icon' => 'fa-heart-crack', 'text' => 'Meninggal Dunia', 'color' => '#dc2626', 'bg' => '#fee2e2'], 'pindah' => ['icon' => 'fa-house-chimney-crack', 'text' => 'Pindah Alamat', 'color' => '#d97706', 'bg' => '#fef3c7'], 'tidak diketahui' => ['icon' => 'fa-question-circle', 'text' => 'Tidak Diketahui', 'color' => '#6b7280', 'bg' => '#f3f4f6']];
-                                        $sl = $specLabel[$row->status] ?? $specLabel['tidak diketahui'];
-                                    @endphp
-                                    <span style="font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 12px; background: {{ $sl['bg'] }}; color: {{ $sl['color'] }}; display: inline-flex; align-items: center; gap: 5px;">
-                                        <i class="fas {{ $sl['icon'] }}"></i> {{ $sl['text'] }}
+                            <td style="text-align: center;">
+                                @if($row->status === 'ditemukan')
+                                    <span style="font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 12px; background: #dcfce7; color: #15803d; border: 1px solid #86efac; display: inline-flex; align-items: center; gap: 4px;">
+                                        <i class="fas fa-check-circle"></i> Ditemukan
                                     </span>
-                                @elseif($row->indikator_atap || $row->indikator_dinding || $row->indikator_lantai || $row->status_kelayakan)
+                                @elseif($row->status === 'meninggal')
+                                    <span style="font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 12px; background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; display: inline-flex; align-items: center; gap: 4px;">
+                                        <i class="fas fa-heart-crack"></i> Meninggal
+                                    </span>
+                                @elseif($row->status === 'pindah')
+                                    <span style="font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 12px; background: #ffedd5; color: #c2410c; border: 1px solid #fed7aa; display: inline-flex; align-items: center; gap: 4px;">
+                                        <i class="fas fa-truck-moving"></i> Pindah
+                                    </span>
+                                @elseif($row->status === 'tidak diketahui')
+                                    <span style="font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 12px; background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; display: inline-flex; align-items: center; gap: 4px;">
+                                        <i class="fas fa-question-circle"></i> Tdk Diketahui
+                                    </span>
+                                @else
+                                    <span style="font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 12px; background: #f8fafc; color: #94a3b8; border: 1px solid #f1f5f9; display: inline-flex; align-items: center; gap: 4px;">
+                                        <i class="fas fa-minus"></i> Belum Verval
+                                    </span>
+                                @endif
+                            </td>
+                            <td>
+                                @if($row->indikator_atap || $row->indikator_dinding || $row->indikator_lantai || $row->status_kelayakan)
                                     <div style="display: flex; flex-wrap: wrap; gap: 2px;">
                                         <span class="ind-pill {{ $row->indikator_atap === 'tidak_ada' ? 'rusak' : 'baik' }}" title="Atap">
                                             Atap: {{ $row->indikator_atap === 'tidak_ada' ? 'Rusak' : 'Baik' }}
@@ -305,12 +321,8 @@
                             </td>
                             <td style="text-align: center;">
                                 @if(in_array($row->status, ['meninggal', 'pindah', 'tidak diketahui']))
-                                    @php
-                                        $statusLabel = ['meninggal' => ['icon' => 'fa-heart-crack', 'text' => 'Meninggal', 'color' => '#dc2626', 'bg' => '#fee2e2'], 'pindah' => ['icon' => 'fa-house-chimney-crack', 'text' => 'Pindah', 'color' => '#d97706', 'bg' => '#fef3c7'], 'tidak diketahui' => ['icon' => 'fa-question-circle', 'text' => 'Tdk Diketahui', 'color' => '#6b7280', 'bg' => '#f3f4f6']];
-                                        $sl = $statusLabel[$row->status];
-                                    @endphp
-                                    <span style="font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 12px; background: {{ $sl['bg'] }}; color: {{ $sl['color'] }}; border: 1px solid {{ $sl['color'] }}40; display: inline-flex; align-items: center; gap: 4px;">
-                                        <i class="fas {{ $sl['icon'] }}"></i> {{ $sl['text'] }}
+                                    <span style="font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 12px; background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; display: inline-flex; align-items: center; gap: 4px;">
+                                        <i class="fas fa-times"></i> Gugur
                                     </span>
                                 @elseif($row->status_kelayakan === 'Layak Diusulkan')
                                     <span style="font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 12px; background: #dcfce7; color: #15803d; border: 1px solid #86efac; display: inline-flex; align-items: center; gap: 4px;">
@@ -434,7 +446,7 @@
                 <div class="info-section" style="margin-bottom: 20px;">
                     <h4 style="font-size: 14px; font-weight: 700; color: #002855; margin-bottom: 12px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px;">Informasi Warga</h4>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                        <div>
+                        <div style="grid-column: span 2;">
                             <div style="font-size: 11px; color: #64748b; font-weight: 600;">Nama Lengkap</div>
                             <div id="mdl_nama" style="font-size: 13px; font-weight: 700; color: #0f172a;">-</div>
                         </div>
@@ -442,9 +454,37 @@
                             <div style="font-size: 11px; color: #64748b; font-weight: 600;">NIK</div>
                             <div id="mdl_nik" style="font-size: 13px; font-weight: 700; color: #0f172a; font-family: monospace;">-</div>
                         </div>
+                        <div>
+                            <div style="font-size: 11px; color: #64748b; font-weight: 600;">No. KK</div>
+                            <div id="mdl_kk" style="font-size: 13px; font-weight: 700; color: #0f172a; font-family: monospace;">-</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: #64748b; font-weight: 600;">Tempat, Tanggal Lahir</div>
+                            <div id="mdl_ttl" style="font-size: 13px; font-weight: 600; color: #0f172a;">-</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: #64748b; font-weight: 600;">Jenis Kelamin</div>
+                            <div id="mdl_jk" style="font-size: 13px; font-weight: 600; color: #0f172a;">-</div>
+                        </div>
                         <div style="grid-column: span 2;">
                             <div style="font-size: 11px; color: #64748b; font-weight: 600;">Alamat Lengkap</div>
                             <div id="mdl_alamat" style="font-size: 13px; font-weight: 600; color: #0f172a;">-</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: #64748b; font-weight: 600;">Status Tanah</div>
+                            <div id="mdl_status_tanah" style="font-size: 13px; font-weight: 600; color: #0f172a;">-</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: #64748b; font-weight: 600;">Luas Tanah</div>
+                            <div id="mdl_luas_tanah" style="font-size: 13px; font-weight: 600; color: #0f172a;">-</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: #64748b; font-weight: 600;">Telah Ditempati Selama</div>
+                            <div id="mdl_lama_menempati" style="font-size: 13px; font-weight: 600; color: #0f172a;">-</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: #64748b; font-weight: 600;">Titik Koordinat (Lat, Long)</div>
+                            <div id="mdl_koordinat" style="font-size: 13px; font-weight: 600; color: #0f172a;">-</div>
                         </div>
                     </div>
                 </div>
@@ -525,7 +565,22 @@
     function openDetailKelayakanModal(data) {
         document.getElementById('mdl_nama').textContent = data.nama || '-';
         document.getElementById('mdl_nik').textContent = data.no_ktp || '-';
+        document.getElementById('mdl_kk').textContent = data.no_kk || '-';
+        
+        let tglLahir = data.tanggal_lahir || '-';
+        if (data.tanggal_lahir) {
+            // Optional: format date if needed, otherwise just display
+            tglLahir = data.tanggal_lahir;
+        }
+        document.getElementById('mdl_ttl').textContent = (data.tempat_lahir || '-') + ', ' + tglLahir;
+        
+        document.getElementById('mdl_jk').textContent = data.jenis_kelamin === 'L' ? 'Laki-Laki' : (data.jenis_kelamin === 'P' ? 'Perempuan' : '-');
         document.getElementById('mdl_alamat').textContent = (data.alamat || '-') + ', Ds. ' + (data.desa_kelurahan || '-') + ', Kec. ' + (data.kecamatan || '-');
+        document.getElementById('mdl_status_tanah').textContent = data.status_tanah || '-';
+        document.getElementById('mdl_luas_tanah').textContent = data.luas_tanah ? data.luas_tanah + ' m²' : '-';
+        document.getElementById('mdl_lama_menempati').textContent = data.telah_ditempati_selama ? data.telah_ditempati_selama + ' Tahun' : '-';
+        document.getElementById('mdl_koordinat').innerHTML = (data.latitude && data.longitude) ? `<a href="https://maps.google.com/?q=${data.latitude},${data.longitude}" target="_blank" style="color:var(--primary);text-decoration:none;"><i class="fas fa-map-marker-alt"></i> ${data.latitude}, ${data.longitude}</a>` : '-';
+
         
         @if(auth()->check() && auth()->user()->isAdmin())
         document.getElementById('mdl_id_penerima').value = data.id;
