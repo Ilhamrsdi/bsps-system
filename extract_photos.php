@@ -14,7 +14,7 @@ if (!File::exists($outputPath)) {
     File::makeDirectory($outputPath, 0755, true);
 }
 
-$niksJsonPath = 'C:\\Users\\ilham\\.gemini\\antigravity-ide\\brain\\ce54535e-ff3a-48cf-9418-dc874f725cc9\\scratch\\excel_extract\\niks.json';
+$niksJsonPath = __DIR__ . '/niks.json';
 if (!File::exists($niksJsonPath)) {
     die("niks.json not found!");
 }
