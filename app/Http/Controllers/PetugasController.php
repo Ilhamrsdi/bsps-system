@@ -271,7 +271,10 @@ class PetugasController extends Controller
             if ($request->wantsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => "NIK {$noKtp} sudah terdaftar dalam sistem atas nama {$existing->nama} (Desa {$existing->desa_kelurahan})."
+                    'message' => "NIK {$noKtp} sudah terdaftar dalam sistem atas nama {$existing->nama} (Desa {$existing->desa_kelurahan}).",
+                    'errors'  => [
+                        'no_ktp' => ["NIK {$noKtp} sudah terdaftar dalam sistem atas nama {$existing->nama} (Desa {$existing->desa_kelurahan})."]
+                    ]
                 ], 422);
             }
             return redirect()->back()->withInput()->with('error', "NIK {$noKtp} sudah terdaftar dalam sistem atas nama {$existing->nama} (Desa {$existing->desa_kelurahan}).");

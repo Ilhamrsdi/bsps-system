@@ -411,7 +411,7 @@
                 </p>
             </div>
             <div class="welcome-actions">
-                <button type="button" class="btn" style="background:#22c55e;color:#fff;font-weight:800;padding:10.5px 18px;border-radius:8px;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 14px rgba(34,197,94,0.35);" onclick="window.PuprModal.open('modalTambahUsulan')" title="Tambah Usulan Calon Penerima Baru di Desa {{ $user->desa ?: '-' }}">
+                <button type="button" class="btn" style="background:#22c55e;color:#fff;font-weight:800;padding:10.5px 18px;border-radius:8px;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 14px rgba(34,197,94,0.35);" onclick="openTambahUsulanModal()" title="Tambah Usulan Calon Penerima Baru di Desa {{ $user->desa ?: '-' }}">
                     <i class="fas fa-plus-circle"></i> Tambah Usulan
                 </button>
                 <a href="{{ route('verval-data.surat-pernyataan-kolektif', array_merge(['desa' => $user->desa], request()->all())) }}" target="_blank" class="btn" style="background:#ffb800;color:#002855;font-weight:800;padding:10.5px 18px;border-radius:8px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 12px rgba(255,184,0,0.3);" title="Cetak Surat Pernyataan secara kolektif untuk Desa {{ $user->desa ?: '-' }}">
@@ -510,6 +510,50 @@
             </div>
         </div>
 
+        <!-- Section Khusus: Daftar Usulan Baru Offline (Menunggu Sinkronisasi) -->
+        <div id="offlineUsulanSection" class="offline-usulan-container" style="display: none; background: #ffffff; border: 1.5px solid #f59e0b; border-radius: 12px; padding: 18px 20px; margin-bottom: 24px; box-shadow: 0 4px 16px rgba(245, 158, 11, 0.12); animation: fadeIn 0.3s ease;">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; border-bottom: 1px solid #fef3c7; padding-bottom: 12px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 36px; height: 36px; border-radius: 50%; background: #fef3c7; color: #d97706; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
+                        <i class="fas fa-tower-broadcast"></i>
+                    </div>
+                    <div>
+                        <h4 style="margin: 0; font-size: 15px; font-weight: 800; color: #002855; display: flex; align-items: center; gap: 8px;">
+                            Daftar Usulan Baru Lapangan (Mode Offline)
+                            <span id="offlineUsulanBadgeCount" style="background: #f59e0b; color: #fff; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 12px;">0 Antrian</span>
+                        </h4>
+                        <p style="margin: 2px 0 0 0; font-size: 12px; color: #64748b;">
+                            Data tersimpan di memori perangkat Anda dan otomatis dikirim saat online, atau klik <strong>Sinkronkan Sekarang</strong>.
+                        </p>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button type="button" class="btn" id="btnSyncAllUsulan" style="background: #002855; color: #fff; font-size: 12.5px; font-weight: 800; padding: 8px 14px; border-radius: 8px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(0,40,85,0.25);" onclick="window.BspsOffline && window.BspsOffline.syncPendingUsulan(true)">
+                        <i class="fas fa-rotate" id="iconSyncAllUsulan"></i> Sinkronkan Sekarang
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-responsive" style="overflow-x: auto;">
+                <table class="table-data" style="width: 100%; font-size: 12.5px; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0; color: #475569; font-weight: 800; text-align: left;">
+                            <th style="padding: 10px 12px; width: 40px;">No</th>
+                            <th style="padding: 10px 12px;">Nama Calon Penerima</th>
+                            <th style="padding: 10px 12px;">NIK / No. KK</th>
+                            <th style="padding: 10px 12px;">Wilayah / Alamat</th>
+                            <th style="padding: 10px 12px;">Waktu Simpan</th>
+                            <th style="padding: 10px 12px; text-align: center;">Status Sinkronisasi</th>
+                            <th style="padding: 10px 12px; text-align: center; width: 130px;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="offlineUsulanTableBody">
+                        <!-- Rendered dynamically by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         {{-- Filter & Search Bar --}}
         <form action="{{ route('petugas.dashboard') }}" method="GET" class="filter-section" id="filterFormPetugasDash">
             <div class="search-input-wrap">
@@ -564,7 +608,7 @@
             <div class="table-header-bar">
                 <h3><i class="fas fa-clipboard-list"></i> Daftar Calon Penerima BSPS — Desa {{ $user->desa ?: '-' }}</h3>
                 <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-                    <button type="button" class="btn" style="padding:8px 14px;font-size:12.5px;font-weight:800;background:#22c55e;color:#fff;border:none;border-radius:var(--radius-sm);cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(34,197,94,0.3);" onclick="window.PuprModal.open('modalTambahUsulan')">
+                    <button type="button" class="btn" style="padding:8px 14px;font-size:12.5px;font-weight:800;background:#22c55e;color:#fff;border:none;border-radius:var(--radius-sm);cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(34,197,94,0.3);" onclick="openTambahUsulanModal()">
                         <i class="fas fa-user-plus"></i> + Tambah Usulan
                     </button>
                     <a href="{{ route('verval-data.surat-pernyataan-kolektif', array_merge(['desa' => $user->desa], request()->all())) }}" target="_blank" class="btn" style="padding:8px 14px;font-size:12.5px;font-weight:800;background:#ffb800;color:#002855;text-decoration:none;border-radius:var(--radius-sm);display:inline-flex;align-items:center;gap:6px;" title="Cetak Surat Pernyataan Kolektif per Desa">
@@ -861,11 +905,11 @@
             <div class="modal-header" style="background: linear-gradient(135deg, #002855 0%, #001835 100%); color: #fff; padding: 18px 22px; display: flex; align-items: center; justify-content: space-between;">
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(34, 197, 94, 0.2); color: #22c55e; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;">
-                        <i class="fas fa-user-plus"></i>
+                        <i class="fas fa-user-plus" id="modalTambahUsulanIcon"></i>
                     </div>
                     <div>
-                        <h3 style="font-size: 16px; font-weight: 800; margin: 0; color: #fff;">Usulkan Calon Penerima Baru</h3>
-                        <p style="font-size: 12px; color: rgba(255, 255, 255, 0.75); margin: 2px 0 0 0;">
+                        <h3 id="modalTambahUsulanTitle" style="font-size: 16px; font-weight: 800; margin: 0; color: #fff;">Usulkan Calon Penerima Baru</h3>
+                        <p id="modalTambahUsulanSubtitle" style="font-size: 12px; color: rgba(255, 255, 255, 0.75); margin: 2px 0 0 0;">
                             Desa <strong>{{ $user->desa ?: '-' }}</strong> &bull; Kec. <strong>{{ $user->kecamatan ?: '-' }}</strong>
                         </p>
                     </div>
@@ -875,6 +919,7 @@
 
             <form action="{{ route('petugas.usulkan-penerima') }}" method="POST" id="formTambahUsulan">
                 @csrf
+                <input type="hidden" name="offline_usulan_id" id="editOfflineUsulanId" value="">
                 <div class="modal-body" style="padding: 22px; max-height: 75vh; overflow-y: auto;">
                     {{-- Alert Info Desa --}}
                     <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 8px; padding: 12px 14px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between;">
@@ -965,11 +1010,52 @@
                     <button type="button" class="btn btn-outline" style="padding: 9px 16px;" onclick="window.PuprModal.close('modalTambahUsulan')">
                         Batal
                     </button>
-                    <button type="submit" class="btn btn-primary" style="padding: 9px 18px; font-weight: 800; background: #002855; color: #fff; display: inline-flex; align-items: center; gap: 6px;">
-                        <i class="fas fa-save"></i> Simpan Usulan
+                    <button type="submit" id="btnSubmitUsulan" class="btn btn-primary" style="padding: 9px 18px; font-weight: 800; background: #002855; color: #fff; display: inline-flex; align-items: center; gap: 6px;">
+                        <i class="fas fa-save" id="btnSubmitUsulanIcon"></i> <span id="btnSubmitUsulanText">Simpan Usulan</span>
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Modal Detail Gagal Validasi Usulan Offline (PUPR Style) -->
+    <div class="modal-overlay" id="modalSyncUsulanError">
+        <div class="modal-box" style="max-width: 520px; border-radius: 14px; overflow: hidden; box-shadow: 0 20px 40px rgba(0, 40, 85, 0.25);">
+            <div class="modal-header" style="background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%); color: #fff; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.2); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                        <i class="fas fa-triangle-exclamation"></i>
+                    </div>
+                    <div>
+                        <h3 style="font-size: 15px; font-weight: 800; margin: 0; color: #fff;">Detail Gagal Validasi Usulan</h3>
+                        <p style="font-size: 11.5px; color: rgba(255, 255, 255, 0.8); margin: 2px 0 0 0;">Penolakan data dari server database</p>
+                    </div>
+                </div>
+                <button type="button" style="background: transparent; border: none; color: rgba(255,255,255,0.8); font-size: 22px; cursor: pointer;" onclick="window.PuprModal.close('modalSyncUsulanError')">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 20px;">
+                <div style="background: #fff1f2; border: 1px solid #fecaca; border-radius: 10px; padding: 14px; margin-bottom: 16px;">
+                    <div style="font-size: 13.5px; font-weight: 800; color: #991b1b; margin-bottom: 6px;" id="modalSyncErrorNama">-</div>
+                    <div style="font-size: 12.5px; color: #7f1d1d; line-height: 1.5;" id="modalSyncErrorMessage">-</div>
+                </div>
+                <p style="font-size: 12px; color: #64748b; margin: 0; line-height: 1.4;">
+                    <i class="fas fa-circle-info" style="color: #002855; margin-right: 4px;"></i>
+                    Data ini tidak dapat disimpan ke server karena melanggar aturan validasi di atas. Anda dapat <strong>memperbaiki/edit</strong> NIK/KK jika salah ketik, atau <strong>menghapusnya</strong> dari memori lokal.
+                </p>
+            </div>
+            <div class="modal-footer" style="padding: 12px 20px; background: var(--bg-body); border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" class="btn" style="background: #002855; color: #fff; font-size: 12.5px; font-weight: 700; padding: 8px 14px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;" onclick="openEditOfflineUsulanModal(selectedErrorUsulanId)">
+                        <i class="fas fa-pen-to-square"></i> Perbaiki / Edit Data
+                    </button>
+                    <button type="button" class="btn" style="background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; font-size: 12.5px; font-weight: 700; padding: 8px 14px; border-radius: 8px; cursor: pointer;" id="btnDeleteErrorItem">
+                        <i class="fas fa-trash-can"></i> Hapus
+                    </button>
+                </div>
+                <button type="button" class="btn btn-outline" style="padding: 8px 16px; font-size: 12.5px;" onclick="window.PuprModal.close('modalSyncUsulanError')">
+                    Tutup
+                </button>
+            </div>
         </div>
     </div>
 @endsection
@@ -1535,12 +1621,274 @@
         }
     }
 
-    // Handling submit Form Tambah Usulan (Support Offline Mode PWA - Anti Dinosaur Page)
+    // =========================================================================
+    // FITUR OFFLINE MODE & SINKRONISASI USULAN BARU LAPANGAN (PWA / INDEXEDDB)
+    // =========================================================================
+    let currentOfflineUsulanList = [];
+    let selectedErrorUsulanId = null;
+
+    async function renderOfflineUsulanList() {
+        if (!window.BspsOffline || !window.BspsOffline.getAllPendingUsulan) return;
+
+        const container = document.getElementById('offlineUsulanSection');
+        const tbody = document.getElementById('offlineUsulanTableBody');
+        const badgeCount = document.getElementById('offlineUsulanBadgeCount');
+
+        if (!container || !tbody) return;
+
+        try {
+            const list = await window.BspsOffline.getAllPendingUsulan();
+            currentOfflineUsulanList = list;
+
+            if (list.length === 0) {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.style.display = 'block';
+            if (badgeCount) {
+                badgeCount.textContent = `${list.length} Antrian Offline`;
+            }
+
+            let html = '';
+            list.forEach((item, index) => {
+                const dateStr = item.saved_at ? new Date(item.saved_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+                const dusunRtRw = [item.dusun, item.rt ? 'RT ' + item.rt : '', item.rw ? 'RW ' + item.rw : ''].filter(Boolean).join(', ') || '-';
+                const alamatFull = item.alamat ? `${item.alamat} (${dusunRtRw})` : dusunRtRw;
+
+                let statusBadge = '';
+                if (item.sync_status === 'error') {
+                    statusBadge = `
+                        <button type="button" class="btn" style="padding: 4px 10px; font-size: 11px; font-weight: 800; background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; border-radius: 20px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;" onclick="showSingleUsulanError('${item.id}')" title="Klik untuk melihat detail alasan penolakan">
+                            <i class="fas fa-triangle-exclamation"></i> Gagal Validasi <i class="fas fa-circle-info"></i>
+                        </button>
+                    `;
+                } else {
+                    statusBadge = `
+                        <span style="padding: 4px 10px; font-size: 11px; font-weight: 700; background: #fef3c7; color: #92400e; border: 1px solid #fde68a; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px;">
+                            <i class="fas fa-clock"></i> Menunggu Koneksi
+                        </span>
+                    `;
+                }
+
+                let errorNotice = '';
+                if (item.sync_status === 'error' && item.sync_error) {
+                    errorNotice = `
+                        <div style="font-size: 11px; color: #b91c1c; font-weight: 700; margin-top: 5px; background: #fff1f2; padding: 4px 8px; border-radius: 6px; border: 1px solid #fecaca; line-height: 1.35;">
+                            <i class="fas fa-circle-exclamation"></i> ${escapeHtml(item.sync_error)}
+                        </div>
+                    `;
+                }
+
+                html += `
+                    <tr style="border-bottom: 1px solid #f1f5f9; ${item.sync_status === 'error' ? 'background: rgba(254, 242, 242, 0.4);' : ''}">
+                        <td style="padding: 10px 12px; font-weight: 700; color: #64748b;">${index + 1}</td>
+                        <td style="padding: 10px 12px;">
+                            <div style="font-weight: 800; color: #002855;">${escapeHtml(item.nama || '-')}</div>
+                            <div style="font-size: 11px; color: #64748b;">Jenis Kelamin: ${item.jenis_kelamin === 'P' ? 'Perempuan' : 'Laki-laki'}</div>
+                        </td>
+                        <td style="padding: 10px 12px;">
+                            <div style="font-family: monospace; font-weight: 700; color: #1e293b;">NIK: ${escapeHtml(item.no_ktp || '-')}</div>
+                            <div style="font-family: monospace; font-size: 11px; color: #64748b;">KK: ${escapeHtml(item.no_kk || '-')}</div>
+                            ${errorNotice}
+                        </td>
+                        <td style="padding: 10px 12px; max-width: 220px; word-break: break-word;">
+                            <div style="color: #334155;">${escapeHtml(alamatFull)}</div>
+                        </td>
+                        <td style="padding: 10px 12px; font-size: 11.5px; color: #64748b; white-space: nowrap;">
+                            ${dateStr}
+                        </td>
+                        <td style="padding: 10px 12px; text-align: center;">
+                            ${statusBadge}
+                        </td>
+                        <td style="padding: 10px 12px; text-align: center;">
+                            <div style="display: flex; gap: 6px; justify-content: center; align-items: center;">
+                                <button type="button" class="btn" style="padding: 6px 10px; font-size: 11.5px; background: #f59e0b; color: #fff; border-radius: 6px; border: none; cursor: pointer; display: inline-flex; align-items: center;" onclick="openEditOfflineUsulanModal('${item.id}')" title="Edit / perbaiki data usulan ini">
+                                    <i class="fas fa-pen-to-square"></i>
+                                </button>
+                                <button type="button" class="btn" style="padding: 6px 10px; font-size: 11.5px; background: #002855; color: #fff; border-radius: 6px; border: none; cursor: pointer; display: inline-flex; align-items: center;" onclick="syncSingleOfflineUsulan('${item.id}')" title="Kirim usulan ini ke server sekarang">
+                                    <i class="fas fa-upload"></i>
+                                </button>
+                                <button type="button" class="btn" style="padding: 6px 10px; font-size: 11.5px; background: #fff1f2; color: #e11d48; border: 1px solid #fecaca; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center;" onclick="deleteOfflineUsulan('${item.id}', '${escapeHtml(item.nama || '')}')" title="Hapus dari memori lokal HP">
+                                    <i class="fas fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+        } catch (e) {
+            console.error('[Dashboard] Error renderOfflineUsulanList:', e);
+        }
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function openTambahUsulanModal() {
+        const form = document.getElementById('formTambahUsulan');
+        if (form) form.reset();
+
+        const editId = document.getElementById('editOfflineUsulanId');
+        if (editId) editId.value = '';
+
+        const title = document.getElementById('modalTambahUsulanTitle');
+        const subtitle = document.getElementById('modalTambahUsulanSubtitle');
+        const btnText = document.getElementById('btnSubmitUsulanText');
+        const btnIcon = document.getElementById('btnSubmitUsulanIcon');
+        const modalIcon = document.getElementById('modalTambahUsulanIcon');
+
+        if (title) title.textContent = 'Usulkan Calon Penerima Baru';
+        if (subtitle) subtitle.innerHTML = 'Desa <strong>{{ $user->desa ?: "-" }}</strong> &bull; Kec. <strong>{{ $user->kecamatan ?: "-" }}</strong>';
+        if (btnText) btnText.textContent = 'Simpan Usulan';
+        if (btnIcon) btnIcon.className = 'fas fa-save';
+        if (modalIcon) modalIcon.className = 'fas fa-user-plus';
+
+        if (window.PuprModal) window.PuprModal.open('modalTambahUsulan');
+    }
+
+    function openEditOfflineUsulanModal(id) {
+        if (!id) return;
+        const item = currentOfflineUsulanList.find(x => x.id === id);
+        if (!item) return;
+
+        if (window.PuprModal) window.PuprModal.close('modalSyncUsulanError');
+
+        const form = document.getElementById('formTambahUsulan');
+        if (form) {
+            form.reset();
+            const setVal = (name, val) => {
+                const input = form.querySelector(`[name="${name}"]`);
+                if (input) input.value = val || '';
+            };
+
+            setVal('nama', item.nama);
+            setVal('no_ktp', item.no_ktp);
+            setVal('no_kk', item.no_kk);
+            setVal('jenis_kelamin', item.jenis_kelamin || 'L');
+            setVal('dusun', item.dusun);
+            setVal('rt', item.rt);
+            setVal('rw', item.rw);
+            setVal('alamat', item.alamat);
+
+            const editId = document.getElementById('editOfflineUsulanId');
+            if (editId) editId.value = item.id;
+        }
+
+        const title = document.getElementById('modalTambahUsulanTitle');
+        const subtitle = document.getElementById('modalTambahUsulanSubtitle');
+        const btnText = document.getElementById('btnSubmitUsulanText');
+        const btnIcon = document.getElementById('btnSubmitUsulanIcon');
+        const modalIcon = document.getElementById('modalTambahUsulanIcon');
+
+        if (title) title.textContent = 'Perbaiki / Edit Usulan Offline';
+        if (subtitle) subtitle.innerHTML = '<span style="color:#fbbf24;"><i class="fas fa-pen-to-square"></i> Perbaiki NIK / No KK / Nama yang ditolak server</span>';
+        if (btnText) btnText.textContent = 'Simpan Perubahan';
+        if (btnIcon) btnIcon.className = 'fas fa-check';
+        if (modalIcon) modalIcon.className = 'fas fa-pen-to-square';
+
+        if (window.PuprModal) window.PuprModal.open('modalTambahUsulan');
+    }
+
+    function showSingleUsulanError(id) {
+        selectedErrorUsulanId = id;
+        const item = currentOfflineUsulanList.find(x => x.id === id);
+        if (!item) return;
+
+        const elNama = document.getElementById('modalSyncErrorNama');
+        const elMsg = document.getElementById('modalSyncErrorMessage');
+
+        if (elNama) elNama.textContent = `Calon Penerima: ${item.nama} (NIK: ${item.no_ktp})`;
+        if (elMsg) elMsg.textContent = item.sync_error || 'Gagal validasi data pada server.';
+
+        const btnDel = document.getElementById('btnDeleteErrorItem');
+        if (btnDel) {
+            btnDel.onclick = async function () {
+                await deleteOfflineUsulan(id, item.nama);
+                if (window.PuprModal) window.PuprModal.close('modalSyncUsulanError');
+            };
+        }
+
+        if (window.PuprModal) window.PuprModal.open('modalSyncUsulanError');
+    }
+
+    async function deleteOfflineUsulan(id, nama) {
+        if (!confirm(`Apakah Anda yakin ingin menghapus usulan offline "${nama || 'ini'}" dari memori perangkat?`)) {
+            return;
+        }
+
+        if (window.BspsOffline && window.BspsOffline.removeUsulanFromIndexedDB) {
+            const ok = await window.BspsOffline.removeUsulanFromIndexedDB(id);
+            if (ok) {
+                if (window.BspsOffline.showPuprToast) {
+                    window.BspsOffline.showPuprToast(`Usulan "${nama}" berhasil dihapus dari memori lokal.`, 'info');
+                }
+                renderOfflineUsulanList();
+            }
+        }
+    }
+
+    async function syncSingleOfflineUsulan(id) {
+        if (!navigator.onLine) {
+            if (window.BspsOffline && window.BspsOffline.showPuprToast) {
+                window.BspsOffline.showPuprToast('⚠️ Perangkat Anda masih offline. Aktifkan internet untuk sinkronisasi.', 'warning');
+            } else {
+                alert('Perangkat Anda masih offline.');
+            }
+            return;
+        }
+
+        if (window.BspsOffline && window.BspsOffline.syncPendingUsulan) {
+            await window.BspsOffline.syncPendingUsulan(true);
+        }
+    }
+
+    // Listen events dari offline-survey.js
+    window.addEventListener('offlineUsulanUpdated', function () {
+        renderOfflineUsulanList();
+    });
+
+    window.addEventListener('offlineUsulanSyncError', function (e) {
+        const errors = e.detail;
+        renderOfflineUsulanList();
+        if (errors && errors.length > 0 && errors[0].id) {
+            showSingleUsulanError(errors[0].id);
+        }
+    });
+
+    window.addEventListener('online', function () {
+        renderOfflineUsulanList();
+    });
+
+    // Handling submit Form Tambah / Edit Usulan (Support Offline Mode PWA)
     document.getElementById('formTambahUsulan')?.addEventListener('submit', async function (e) {
         const isOffline = !navigator.onLine;
+        const editIdInput = this.querySelector('#editOfflineUsulanId');
+        const editIdVal = editIdInput ? editIdInput.value.trim() : '';
+
+        const namaInput = this.querySelector('input[name="nama"]');
+        const namaVal = namaInput ? namaInput.value.trim() : '';
 
         const noKtpInput = this.querySelector('input[name="no_ktp"]');
         const noKtpVal = noKtpInput ? noKtpInput.value.trim() : '';
+
+        const noKkInput = this.querySelector('input[name="no_kk"]');
+        const noKkVal = noKkInput ? noKkInput.value.trim() : '';
+
+        if (!namaVal) {
+            e.preventDefault();
+            alert('Nama lengkap calon penerima wajib diisi!');
+            return;
+        }
 
         if (noKtpVal.length !== 16 || isNaN(noKtpVal)) {
             e.preventDefault();
@@ -1548,12 +1896,24 @@
             return;
         }
 
-        if (isOffline) {
+        if (noKkVal && (noKkVal.length !== 16 || isNaN(noKkVal))) {
+            e.preventDefault();
+            alert('Nomor Kartu Keluarga (KK) jika diisi harus berupa 16 digit angka!');
+            return;
+        }
+
+        // Jika ini adalah mode EDIT data offline (atau dalam keadaan offline)
+        if (editIdVal || isOffline) {
             e.preventDefault();
 
             const formData = new FormData(this);
+            const isEditing = Boolean(editIdVal);
+            const targetId = editIdVal || ('usulan_off_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5));
+
+            const existingItem = currentOfflineUsulanList.find(x => x.id === targetId) || {};
             const usulanData = {
-                id: 'usulan_off_' + Date.now(),
+                ...existingItem,
+                id: targetId,
                 nama: formData.get('nama') || '',
                 no_ktp: formData.get('no_ktp') || '',
                 no_kk: formData.get('no_kk') || '',
@@ -1563,30 +1923,52 @@
                 rt: formData.get('rt') || '',
                 rw: formData.get('rw') || '',
                 alamat: formData.get('alamat') || '',
-                saved_at: new Date().toISOString()
+                sync_status: 'pending',
+                saved_at: existingItem.saved_at || new Date().toISOString(),
+                updated_at: new Date().toISOString()
             };
+            delete usulanData.sync_error;
 
-            if (window.BspsOffline && window.BspsOffline.saveUsulanToIndexedDB) {
-                const saved = await window.BspsOffline.saveUsulanToIndexedDB(usulanData);
+            if (window.BspsOffline) {
+                let saved = false;
+                if (isEditing && window.BspsOffline.updateUsulanInIndexedDB) {
+                    saved = await window.BspsOffline.updateUsulanInIndexedDB(usulanData);
+                } else if (window.BspsOffline.saveUsulanToIndexedDB) {
+                    saved = await window.BspsOffline.saveUsulanToIndexedDB(usulanData);
+                }
+
                 if (saved) {
                     if (window.BspsOffline.showPuprToast) {
-                        window.BspsOffline.showPuprToast(`📲 Mode Offline: Usulan "${usulanData.nama}" tersimpan di memori HP! Data akan terunggah otomatis saat online.`, 'warning');
+                        const msg = isEditing 
+                            ? `✨ Data usulan "${usulanData.nama}" berhasil diperbarui! Siap untuk disinkronkan.`
+                            : `📲 Mode Offline: Usulan "${usulanData.nama}" tersimpan di memori HP! Data akan terunggah otomatis saat online.`;
+                        window.BspsOffline.showPuprToast(msg, 'success');
                     } else {
-                        alert(`Mode Offline: Usulan "${usulanData.nama}" berhasil disimpan sementara di HP!`);
+                        alert(`Data usulan "${usulanData.nama}" berhasil disimpan di perangkat.`);
                     }
+
                     if (window.PuprModal) window.PuprModal.close('modalTambahUsulan');
                     this.reset();
+                    if (editIdInput) editIdInput.value = '';
+                    renderOfflineUsulanList();
+
+                    // Jika saat edit perangkat sedang online, langsung coba sinkronkan
+                    if (navigator.onLine && isEditing && window.BspsOffline.syncPendingUsulan) {
+                        setTimeout(() => window.BspsOffline.syncPendingUsulan(true), 600);
+                    }
                 }
-            } else {
-                alert('Mode Offline: Data usulan berhasil disimpan sementara.');
             }
         }
     });
 
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initPetugasCharts);
+        document.addEventListener('DOMContentLoaded', function () {
+            initPetugasCharts();
+            renderOfflineUsulanList();
+        });
     } else {
         initPetugasCharts();
+        renderOfflineUsulanList();
     }
 </script>
 @endpush
