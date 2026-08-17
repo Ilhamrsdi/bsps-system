@@ -402,7 +402,7 @@ class VervalDataController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|string|in:ditemukan,meninggal,pindah,tidak diketahui'
+            'status' => 'required|string|in:ditemukan,meninggal,pindah,tidak diketahui,menolak disurvey'
         ]);
         
         $vervalData = \App\Models\DataPenerima::findOrFail($id);

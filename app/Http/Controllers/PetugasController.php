@@ -229,7 +229,7 @@ class PetugasController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|in:ditemukan,meninggal,pindah,tidak diketahui',
+            'status' => 'required|in:ditemukan,meninggal,pindah,tidak diketahui,menolak disurvey',
         ]);
 
         $penerima = DataPenerima::findOrFail($id);
