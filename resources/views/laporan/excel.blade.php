@@ -78,27 +78,29 @@
                 <th class="th-main" style="width:40px;">NO</th>
                 <th class="th-main" style="width:160px;">KECAMATAN</th>
                 <th class="th-main" style="width:160px;">DESA / KELURAHAN</th>
-                <th class="th-main" style="width:110px;">TOTAL TARGET</th>
+                <th class="th-main" style="width:110px;">TOTAL USULAN</th>
                 <th class="th-main" style="width:110px;">SUDAH SURVEI</th>
                 <th class="th-main" style="width:110px;">BELUM SURVEI</th>
-                <th class="th-main" style="width:140px;">HASIL SESUAI (LAYAK)</th>
-                <th class="th-main" style="width:140px;">HASIL TIDAK SESUAI</th>
+                <th class="th-main" style="width:140px;">USULAN BARU</th>
+                <th class="th-main" style="width:140px;">BACKLOG 1</th>
+                <th class="th-main" style="width:140px;">BACKLOG 2</th>
                 <th class="th-main" style="width:120px;">% PROGRES SURVEI</th>
-                <th class="th-main" style="width:130px;">% KESESUAIAN HASIL</th>
             </tr>
         </thead>
         <tbody>
-            @php $sumTotal=0; $sumSudah=0; $sumBelum=0; $sumLayak=0; $sumTidak=0; @endphp
+            @php 
+                $sumTotal=0; $sumSudah=0; $sumBelum=0; 
+                $sumUsulanBaru=0; $sumBacklog1=0; $sumBacklog2=0; 
+            @endphp
             @foreach($rekapDesaKecamatan as $idx => $r)
                 @php
                     $b = max(0, $r->total_penerima - $r->total_sudah_survei);
-                    $pctSurvei = $r->total_penerima > 0 ? round(($r->total_sudah_survei / $r->total_penerima)*100, 1) : 0;
-                    $pctKesesuaian = $r->total_sudah_survei > 0 ? round(($r->total_layak / $r->total_sudah_survei)*100, 1) : 0;
                     $sumTotal += $r->total_penerima;
                     $sumSudah += $r->total_sudah_survei;
                     $sumBelum += $b;
-                    $sumLayak += $r->total_layak;
-                    $sumTidak += $r->total_tidak_layak;
+                    $sumUsulanBaru += $r->usulan_baru ?? 0;
+                    $sumBacklog1 += $r->backlog_1 ?? 0;
+                    $sumBacklog2 += $r->backlog_2 ?? 0;
                 @endphp
                 <tr>
                     <td class="td-center">{{ $idx + 1 }}</td>
@@ -107,10 +109,10 @@
                     <td class="td-center" style="font-weight:bold;">{{ $r->total_penerima }}</td>
                     <td class="td-center">{{ $r->total_sudah_survei }}</td>
                     <td class="td-center" style="color:#b78100;">{{ $b }}</td>
-                    <td class="td-center badge-layak">{{ $r->total_layak }}</td>
-                    <td class="td-center badge-tidak">{{ $r->total_tidak_layak }}</td>
-                    <td class="td-center" style="font-weight:bold;">{{ $pctSurvei }}%</td>
-                    <td class="td-center" style="font-weight:bold;color:#166534;">{{ $pctKesesuaian }}%</td>
+                    <td class="td-center">{{ $r->usulan_baru ?? 0 }}</td>
+                    <td class="td-center">{{ $r->backlog_1 ?? 0 }}</td>
+                    <td class="td-center">{{ $r->backlog_2 ?? 0 }}</td>
+                    <td class="td-center" style="font-weight:bold;">{{ $r->progres_survei }}%</td>
                 </tr>
             @endforeach
             <tr style="background-color:#e2e8f0;font-weight:bold;">
@@ -118,10 +120,10 @@
                 <td class="td-center">{{ $sumTotal }}</td>
                 <td class="td-center">{{ $sumSudah }}</td>
                 <td class="td-center">{{ $sumBelum }}</td>
-                <td class="td-center" style="color:#166534;">{{ $sumLayak }}</td>
-                <td class="td-center" style="color:#991b1b;">{{ $sumTidak }}</td>
+                <td class="td-center">{{ $sumUsulanBaru }}</td>
+                <td class="td-center">{{ $sumBacklog1 }}</td>
+                <td class="td-center">{{ $sumBacklog2 }}</td>
                 <td class="td-center">{{ $sumTotal > 0 ? round(($sumSudah/$sumTotal)*100,1) : 0 }}%</td>
-                <td class="td-center" style="color:#166534;">{{ $sumSudah > 0 ? round(($sumLayak/$sumSudah)*100,1) : 0 }}%</td>
             </tr>
         </tbody>
     </table>

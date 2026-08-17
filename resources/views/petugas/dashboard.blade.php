@@ -611,9 +611,9 @@
                                     {{ $item->alamat ?: '-' }}
                                 </td>
                                 <td style="padding:14px 18px;text-align:center;">
-                                    @if(in_array($item->status, ['meninggal', 'pindah', 'tidak diketahui']))
+                                    @if(in_array($item->status, ['meninggal', 'pindah', 'tidak diketahui', 'menolak disurvey']))
                                         @php
-                                            $statusLabel = ['meninggal' => ['icon' => 'fa-heart-crack', 'text' => 'Meninggal', 'color' => '#dc2626', 'bg' => '#fee2e2'], 'pindah' => ['icon' => 'fa-house-chimney-crack', 'text' => 'Pindah', 'color' => '#d97706', 'bg' => '#fef3c7'], 'tidak diketahui' => ['icon' => 'fa-question-circle', 'text' => 'Tdk Diketahui', 'color' => '#6b7280', 'bg' => '#f3f4f6']];
+                                            $statusLabel = ['meninggal' => ['icon' => 'fa-heart-crack', 'text' => 'Meninggal', 'color' => '#dc2626', 'bg' => '#fee2e2'], 'pindah' => ['icon' => 'fa-house-chimney-crack', 'text' => 'Pindah', 'color' => '#d97706', 'bg' => '#fef3c7'], 'tidak diketahui' => ['icon' => 'fa-question-circle', 'text' => 'Tdk Diketahui', 'color' => '#6b7280', 'bg' => '#f3f4f6'], 'menolak disurvey' => ['icon' => 'fa-hand-paper', 'text' => 'Menolak Disurvey', 'color' => '#ea580c', 'bg' => '#fff7ed']];
                                             $sl = $statusLabel[$item->status];
                                         @endphp
                                         <span class="badge-status-survey" style="background:{{ $sl['bg'] }};color:{{ $sl['color'] }};border-radius:20px;padding:4px 10px;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:5px;">
@@ -629,7 +629,7 @@
                                     <div style="display:inline-flex;align-items:center;gap:6px;">
                                         <button type="button" class="btn-act survey btn-trigger-status-modal"
                                                 data-id="{{ $item->id }}" data-nama="{{ e($item->nama) }}" data-nik="{{ e($item->no_ktp ?: '-') }}" data-alamat="{{ e($item->alamat ?: '-') }}" data-status="{{ e($item->status) }}" data-url="{{ url('/survey/' . $item->id) }}">
-                                            @if(in_array($item->status, ['meninggal', 'pindah', 'tidak diketahui']))
+                                            @if(in_array($item->status, ['meninggal', 'pindah', 'tidak diketahui', 'menolak disurvey']))
                                                 <i class="fas fa-info-circle"></i> Lihat Detail
                                             @elseif($item->isSudahSurvei())
                                                 <i class="fas fa-camera"></i> Lihat / Edit
@@ -829,6 +829,18 @@
                             </div>
                         </div>
                     </label>
+
+                    <label class="status-option-card opt-menolak-disurvey" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1px solid #cbd5e1; border-radius: 10px; cursor: pointer; transition: all 0.2s;">
+                        <input type="radio" name="modal_verval_status" value="menolak disurvey" onchange="onModalStatusChange('menolak disurvey')" style="accent-color: #ea580c; width: 18px; height: 18px;">
+                        <div style="flex: 1;">
+                            <div style="font-size: 13.5px; font-weight: 800; color: #ea580c; display: flex; align-items: center; gap: 6px;">
+                                <i class="fas fa-hand-paper"></i> Menolak Disurvey
+                            </div>
+                            <div style="font-size: 11.5px; color: #475569; margin-top: 2px;">
+                                Penerima menolak untuk dilakukan survei
+                            </div>
+                        </div>
+                    </label>
                 </div>
             </div>
 
@@ -1002,7 +1014,7 @@
         if (elNik) elNik.textContent = nik || '-';
         if (elAlamat) elAlamat.textContent = alamat || '-';
 
-        const statusToSelect = (currentStatus && ['ditemukan', 'meninggal', 'pindah', 'tidak diketahui'].includes(currentStatus)) ? currentStatus : 'ditemukan';
+        const statusToSelect = (currentStatus && ['ditemukan', 'meninggal', 'pindah', 'tidak diketahui', 'menolak disurvey'].includes(currentStatus)) ? currentStatus : 'ditemukan';
         const radio = document.querySelector(`input[name="modal_verval_status"][value="${statusToSelect}"]`);
         if (radio) {
             radio.checked = true;
@@ -1023,6 +1035,16 @@
             btn.style.background = 'var(--primary)';
             btn.style.color = '#fff';
             btn.innerHTML = '<i class="fas fa-location-crosshairs"></i> Simpan &amp; Lanjutkan Survei';
+        } else if (statusVal === 'tidak diketahui') {
+            btn.className = 'btn btn-primary';
+            btn.style.background = '#475569';
+            btn.style.color = '#fff';
+            btn.innerHTML = '<i class="fas fa-question-circle"></i> Simpan Status Tidak Diketahui';
+        } else if (statusVal === 'menolak disurvey') {
+            btn.className = 'btn btn-primary';
+            btn.style.background = '#ea580c';
+            btn.style.color = '#fff';
+            btn.innerHTML = '<i class="fas fa-hand-paper"></i> Simpan Status Menolak Disurvey';
         } else {
             btn.className = 'btn btn-warning';
             btn.style.background = '#d97706';
@@ -1163,7 +1185,7 @@
             return;
         }
 
-        const SPECIAL_STATUSES = ['meninggal', 'pindah', 'tidak diketahui'];
+        const SPECIAL_STATUSES = ['meninggal', 'pindah', 'tidak diketahui', 'menolak disurvey'];
         const isSudahSurvei = (item) => {
             if (SPECIAL_STATUSES.includes((item.status || '').toLowerCase())) return true;
             return Boolean(item.foto_sudut_depan);
@@ -1200,6 +1222,8 @@
                     statusBadge = `<span class="badge-status-survey" style="background:#fee2e2;color:#dc2626;border-radius:20px;padding:4px 10px;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:5px;"><i class="fas fa-heart-crack"></i> Meninggal</span>`;
                 } else if (itemStatus === 'pindah') {
                     statusBadge = `<span class="badge-status-survey" style="background:#fef3c7;color:#d97706;border-radius:20px;padding:4px 10px;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:5px;"><i class="fas fa-house-chimney-crack"></i> Pindah</span>`;
+                } else if (itemStatus === 'menolak disurvey') {
+                    statusBadge = `<span class="badge-status-survey" style="background:#fff7ed;color:#ea580c;border-radius:20px;padding:4px 10px;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:5px;"><i class="fas fa-hand-paper"></i> Menolak Disurvey</span>`;
                 } else if (itemStatus === 'tidak diketahui') {
                     statusBadge = `<span class="badge-status-survey" style="background:#f3f4f6;color:#6b7280;border-radius:20px;padding:4px 10px;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:5px;"><i class="fas fa-question-circle"></i> Tdk Diketahui</span>`;
                 } else if (sudah) {

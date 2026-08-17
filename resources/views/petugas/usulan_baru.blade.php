@@ -201,9 +201,9 @@
                                 {{ $item->alamat ?: '-' }}
                             </td>
                             <td style="padding:14px 18px;text-align:center;">
-                                @if(in_array($item->status, ['meninggal', 'pindah', 'tidak diketahui']))
+                                @if(in_array($item->status, ['meninggal', 'pindah', 'tidak diketahui', 'menolak disurvey']))
                                     @php
-                                        $statusLabel = ['meninggal' => ['icon' => 'fa-heart-crack', 'text' => 'Meninggal', 'color' => '#dc2626', 'bg' => '#fee2e2'], 'pindah' => ['icon' => 'fa-house-chimney-crack', 'text' => 'Pindah', 'color' => '#d97706', 'bg' => '#fef3c7'], 'tidak diketahui' => ['icon' => 'fa-question-circle', 'text' => 'Tdk Diketahui', 'color' => '#6b7280', 'bg' => '#f3f4f6']];
+                                        $statusLabel = ['meninggal' => ['icon' => 'fa-heart-crack', 'text' => 'Meninggal', 'color' => '#dc2626', 'bg' => '#fee2e2'], 'pindah' => ['icon' => 'fa-house-chimney-crack', 'text' => 'Pindah', 'color' => '#d97706', 'bg' => '#fef3c7'], 'tidak diketahui' => ['icon' => 'fa-question-circle', 'text' => 'Tdk Diketahui', 'color' => '#6b7280', 'bg' => '#f3f4f6'], 'menolak disurvey' => ['icon' => 'fa-hand-paper', 'text' => 'Menolak Disurvey', 'color' => '#ea580c', 'bg' => '#fff7ed']];
                                         $sl = $statusLabel[$item->status];
                                     @endphp
                                     <span class="badge-status-survey" style="background:{{ $sl['bg'] }};color:{{ $sl['color'] }};border-radius:20px;padding:4px 10px;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:5px;">
@@ -223,7 +223,7 @@
                                 <div style="display:inline-flex;align-items:center;gap:6px;">
                                     <button type="button" class="btn-mulai-survey btn-trigger-status-modal"
                                             data-id="{{ $item->id }}" data-nama="{{ e($item->nama) }}" data-nik="{{ e($item->no_ktp ?: '-') }}" data-alamat="{{ e($item->alamat ?: '-') }}" data-status="{{ e($item->status) }}" data-url="{{ url('/survey/' . $item->id) }}">
-                                        @if(in_array($item->status, ['meninggal', 'pindah', 'tidak diketahui']))
+                                        @if(in_array($item->status, ['meninggal', 'pindah', 'tidak diketahui', 'menolak disurvey']))
                                             <i class="fas fa-info-circle"></i> Lihat Detail
                                         @elseif($item->isSudahSurvei())
                                             <i class="fas fa-camera"></i> Lihat / Edit
@@ -386,6 +386,18 @@
                         </div>
                         <div style="font-size: 11.5px; color: #475569; margin-top: 2px;">
                             Keberadaan penerima tidak ditemukan / tidak diketahui
+                        </div>
+                    </div>
+                </label>
+
+                <label class="status-option-card opt-menolak-disurvey" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1px solid #cbd5e1; border-radius: 10px; cursor: pointer; transition: all 0.2s;">
+                    <input type="radio" name="modal_verval_status" value="menolak disurvey" onchange="onModalStatusChange('menolak disurvey')" style="accent-color: #ea580c; width: 18px; height: 18px;">
+                    <div style="flex: 1;">
+                        <div style="font-size: 13.5px; font-weight: 800; color: #ea580c; display: flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-hand-paper"></i> Menolak Disurvey
+                        </div>
+                        <div style="font-size: 11.5px; color: #475569; margin-top: 2px;">
+                            Penerima menolak untuk dilakukan survei
                         </div>
                     </div>
                 </label>
@@ -555,7 +567,7 @@
         if (elNik) elNik.textContent = nik || '-';
         if (elAlamat) elAlamat.textContent = alamat || '-';
 
-        const statusToSelect = (currentStatus && ['ditemukan', 'meninggal', 'pindah', 'tidak diketahui'].includes(currentStatus)) ? currentStatus : 'ditemukan';
+        const statusToSelect = (currentStatus && ['ditemukan', 'meninggal', 'pindah', 'tidak diketahui', 'menolak disurvey'].includes(currentStatus)) ? currentStatus : 'ditemukan';
         const radio = document.querySelector(`input[name="modal_verval_status"][value="${statusToSelect}"]`);
         if (radio) {
             radio.checked = true;
@@ -587,6 +599,9 @@
                 } else if (val === 'tidak diketahui') {
                     parentCard.style.border = '2px solid #475569';
                     parentCard.style.background = 'rgba(71, 85, 105, 0.04)';
+                } else if (val === 'menolak disurvey') {
+                    parentCard.style.border = '2px solid #ea580c';
+                    parentCard.style.background = 'rgba(234, 88, 12, 0.04)';
                 }
             }
         }
@@ -596,6 +611,12 @@
             if (val === 'ditemukan') {
                 btnSubmit.innerHTML = `<i class="fas fa-location-crosshairs"></i> Simpan & Lanjutkan Survei`;
                 btnSubmit.style.background = 'var(--primary)';
+            } else if (val === 'menolak disurvey') {
+                btnSubmit.innerHTML = `<i class="fas fa-hand-paper"></i> Simpan Status Menolak Disurvey`;
+                btnSubmit.style.background = '#ea580c';
+            } else if (val === 'tidak diketahui') {
+                btnSubmit.innerHTML = `<i class="fas fa-question-circle"></i> Simpan Status Tdk Diketahui`;
+                btnSubmit.style.background = '#475569';
             } else {
                 btnSubmit.innerHTML = `<i class="fas fa-save"></i> Simpan Status Lapangan`;
                 btnSubmit.style.background = '#002855';
@@ -679,7 +700,7 @@
             matches.forEach((item, idx) => {
                 const genderClass = (item.jenis_kelamin || '').toLowerCase();
                 const itemStatus = (item.status || '').toLowerCase();
-                const isSpecial = ['meninggal', 'pindah', 'tidak diketahui'].includes(itemStatus);
+                const isSpecial = ['meninggal', 'pindah', 'tidak diketahui', 'menolak disurvey'].includes(itemStatus);
                 const isSudah = Boolean(item.foto_sudut_depan);
 
                 let statusBadge = '';
@@ -689,6 +710,8 @@
                     statusBadge = `<span class="badge-status-survey" style="background:#fef3c7;color:#d97706;border-radius:20px;padding:4px 10px;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:5px;"><i class="fas fa-house-chimney-crack"></i> Pindah</span>`;
                 } else if (itemStatus === 'tidak diketahui') {
                     statusBadge = `<span class="badge-status-survey" style="background:#f3f4f6;color:#6b7280;border-radius:20px;padding:4px 10px;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:5px;"><i class="fas fa-question-circle"></i> Tdk Diketahui</span>`;
+                } else if (itemStatus === 'menolak disurvey') {
+                    statusBadge = `<span class="badge-status-survey" style="background:#fff7ed;color:#ea580c;border-radius:20px;padding:4px 10px;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:5px;"><i class="fas fa-hand-paper"></i> Menolak Disurvey</span>`;
                 } else if (isSudah) {
                     statusBadge = `<span class="badge-status-survey sudah" style="background:rgba(34,197,94,0.12);color:#16a34a;padding:4px 10px;border-radius:20px;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:4px;"><i class="fas fa-check-circle"></i> Sudah Survei</span>`;
                 } else {
@@ -753,6 +776,47 @@
         if (!navigator.onLine) {
             const alert = document.getElementById('offlinePetugasAlert');
             if (alert) alert.style.display = 'block';
+        }
+
+        const formUsulan = document.getElementById('formTambahUsulan');
+        if (formUsulan) {
+            formUsulan.addEventListener('submit', async function(e) {
+                if (!navigator.onLine) {
+                    e.preventDefault();
+                    
+                    const fd = new FormData(formUsulan);
+                    const usulanData = {
+                        id: 'OFFLINE_USULAN_' + Date.now(),
+                        nama: fd.get('nama'),
+                        no_ktp: fd.get('no_ktp'),
+                        no_kk: fd.get('no_kk'),
+                        jenis_kelamin: fd.get('jenis_kelamin'),
+                        pengelompokan_desil: fd.get('pengelompokan_desil'),
+                        dusun: fd.get('dusun'),
+                        rt: fd.get('rt'),
+                        rw: fd.get('rw'),
+                        alamat: fd.get('alamat')
+                    };
+
+                    if (window.BspsOffline && window.BspsOffline.saveUsulanToIndexedDB) {
+                        const success = await window.BspsOffline.saveUsulanToIndexedDB(usulanData);
+                        if (success) {
+                            if (window.BspsOffline.showPuprToast) {
+                                window.BspsOffline.showPuprToast('Usulan baru berhasil disimpan secara offline!', 'success');
+                            }
+                            if (window.PuprModal) window.PuprModal.close('modalTambahUsulan');
+                            
+                            ALL_DATA_USULAN.unshift(usulanData);
+                            filterUsulanTableOffline();
+                            formUsulan.reset();
+                        } else {
+                            alert('Gagal menyimpan usulan ke penyimpanan lokal (offline).');
+                        }
+                    } else {
+                        alert('Sistem offline belum siap. Mohon refresh halaman jika ada koneksi.');
+                    }
+                }
+            });
         }
     });
 </script>

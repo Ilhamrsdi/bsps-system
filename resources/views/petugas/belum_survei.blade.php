@@ -326,6 +326,11 @@
                                               data-id="{{ $item->id }}" data-nama="{{ e($item->nama) }}" data-nik="{{ e($item->no_ktp ?: '-') }}" data-alamat="{{ e($item->alamat ?: '-') }}" data-status="{{ e($item->status) }}" data-url="{{ url('/survey/' . $item->id) }}" title="Klik untuk ubah status">
                                             <i class="fas fa-question-circle"></i> Tidak Diketahui
                                         </span>
+                                    @elseif($item->status == 'menolak disurvey')
+                                        <span class="badge btn-trigger-status-modal" style="background:#fff7ed;color:#ea580c;padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:800;cursor:pointer;"
+                                              data-id="{{ $item->id }}" data-nama="{{ e($item->nama) }}" data-nik="{{ e($item->no_ktp ?: '-') }}" data-alamat="{{ e($item->alamat ?: '-') }}" data-status="{{ e($item->status) }}" data-url="{{ url('/survey/' . $item->id) }}" title="Klik untuk ubah status">
+                                            <i class="fas fa-hand-paper"></i> Menolak Disurvey
+                                        </span>
                                     @elseif($item->isRevisi())
                                         <span class="badge btn-trigger-status-modal" style="background:#fef2f2;color:#dc2626;padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:800;cursor:pointer;border:1px solid #fecaca;"
                                               data-id="{{ $item->id }}" data-nama="{{ e($item->nama) }}" data-nik="{{ e($item->no_ktp ?: '-') }}" data-alamat="{{ e($item->alamat ?: '-') }}" data-status="{{ e($item->status) }}" data-url="{{ url('/survey/' . $item->id) }}" title="Klik untuk update status">
@@ -530,6 +535,18 @@
                             </div>
                         </div>
                     </label>
+
+                    <label class="status-option-card opt-menolak-disurvey" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1px solid #cbd5e1; border-radius: 10px; cursor: pointer; transition: all 0.2s;">
+                        <input type="radio" name="modal_verval_status" value="menolak disurvey" onchange="onModalStatusChange('menolak disurvey')" style="accent-color: #ea580c; width: 18px; height: 18px;">
+                        <div style="flex: 1;">
+                            <div style="font-size: 13.5px; font-weight: 800; color: #ea580c; display: flex; align-items: center; gap: 6px;">
+                                <i class="fas fa-hand-paper"></i> Menolak Disurvey
+                            </div>
+                            <div style="font-size: 11.5px; color: #475569; margin-top: 2px;">
+                                Penerima menolak untuk dilakukan survei
+                            </div>
+                        </div>
+                    </label>
                 </div>
             </div>
 
@@ -580,7 +597,7 @@
         document.getElementById('statusModalNik').textContent = nik || '-';
         document.getElementById('statusModalAlamat').textContent = alamat || '-';
 
-        const statusToSelect = (currentStatus && ['ditemukan', 'meninggal', 'pindah', 'tidak diketahui'].includes(currentStatus)) ? currentStatus : 'ditemukan';
+        const statusToSelect = (currentStatus && ['ditemukan', 'meninggal', 'pindah', 'tidak diketahui', 'menolak disurvey'].includes(currentStatus)) ? currentStatus : 'ditemukan';
         const radio = document.querySelector(`input[name="modal_verval_status"][value="${statusToSelect}"]`);
         if (radio) {
             radio.checked = true;
@@ -601,6 +618,16 @@
             btn.style.background = 'var(--primary)';
             btn.style.color = '#fff';
             btn.innerHTML = '<i class="fas fa-location-crosshairs"></i> Simpan &amp; Lanjutkan Survei';
+        } else if (statusVal === 'tidak diketahui') {
+            btn.className = 'btn btn-primary';
+            btn.style.background = '#475569';
+            btn.style.color = '#fff';
+            btn.innerHTML = '<i class="fas fa-question-circle"></i> Simpan Status Tidak Diketahui';
+        } else if (statusVal === 'menolak disurvey') {
+            btn.className = 'btn btn-primary';
+            btn.style.background = '#ea580c';
+            btn.style.color = '#fff';
+            btn.innerHTML = '<i class="fas fa-hand-paper"></i> Simpan Status Menolak Disurvey';
         } else {
             btn.className = 'btn btn-warning';
             btn.style.background = '#d97706';
@@ -730,6 +757,8 @@
                     statusBadge = `<span class="badge btn-trigger-status-modal" style="background:#fee2e2;color:#b91c1c;padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:800;cursor:pointer;" data-id="${item.id}" data-nama="${escapeHtml(item.nama)}" data-nik="${escapeHtml(item.no_ktp || '-')}" data-alamat="${escapeHtml(item.alamat || '-')}" data-status="${escapeHtml(item.status)}" data-url="/survey/${item.id}"><i class="fas fa-times-circle"></i> Meninggal</span>`;
                 } else if (item.status === 'pindah') {
                     statusBadge = `<span class="badge btn-trigger-status-modal" style="background:#ffedd5;color:#c2410c;padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:800;cursor:pointer;" data-id="${item.id}" data-nama="${escapeHtml(item.nama)}" data-nik="${escapeHtml(item.no_ktp || '-')}" data-alamat="${escapeHtml(item.alamat || '-')}" data-status="${escapeHtml(item.status)}" data-url="/survey/${item.id}"><i class="fas fa-truck-moving"></i> Pindah</span>`;
+                } else if (item.status === 'menolak disurvey') {
+                    statusBadge = `<span class="badge btn-trigger-status-modal" style="background:#fff7ed;color:#ea580c;padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:800;cursor:pointer;" data-id="${item.id}" data-nama="${escapeHtml(item.nama)}" data-nik="${escapeHtml(item.no_ktp || '-')}" data-alamat="${escapeHtml(item.alamat || '-')}" data-status="${escapeHtml(item.status)}" data-url="/survey/${item.id}"><i class="fas fa-hand-paper"></i> Menolak Disurvey</span>`;
                 } else if (item.status_foto_sudut_depan === 'tidak layak' || item.status_foto_sudut_belakang === 'tidak layak' || item.status_foto_bagian_dalam === 'tidak layak' || item.status_foto_sudut_kiri === 'tidak layak' || item.status_foto_sudut_kanan === 'tidak layak') {
                     statusBadge = `<span class="badge btn-trigger-status-modal" style="background:#fef2f2;color:#dc2626;padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:800;cursor:pointer;border:1px solid #fecaca;" data-id="${item.id}" data-nama="${escapeHtml(item.nama)}" data-nik="${escapeHtml(item.no_ktp || '-')}" data-alamat="${escapeHtml(item.alamat || '-')}" data-status="${escapeHtml(item.status || 'belum_ditentukan')}" data-url="/survey/${item.id}"><i class="fas fa-exclamation-triangle"></i> Perlu Revisi</span>`;
                 } else {

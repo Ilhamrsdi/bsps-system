@@ -387,71 +387,66 @@ class LaporanController extends Controller
                 desa_kelurahan,
                 COUNT(*) as total_penerima,
                 SUM(CASE WHEN {$sudahSql} THEN 1 ELSE 0 END) as total_sudah_survei,
-                SUM(CASE WHEN status_kelayakan = 'Layak Diusulkan' THEN 1 ELSE 0 END) as total_layak,
-                SUM(CASE WHEN status_kelayakan = 'Tidak Layak Diusulkan' THEN 1 ELSE 0 END) as total_tidak_layak,
-                SUM(CASE WHEN indikator_atap = 'tidak_ada' THEN 1 ELSE 0 END) as atap_rtlh,
-                SUM(CASE WHEN indikator_dinding = 'tidak_ada' THEN 1 ELSE 0 END) as dinding_rtlh,
-                SUM(CASE WHEN indikator_lantai = 'tidak_ada' THEN 1 ELSE 0 END) as lantai_rtlh,
-                SUM(CASE WHEN indikator_pondasi = 'tidak_ada' THEN 1 ELSE 0 END) as pondasi_rtlh,
-                SUM(CASE WHEN indikator_struktur = 'tidak_ada' THEN 1 ELSE 0 END) as struktur_rtlh,
-                SUM(CASE WHEN indikator_penghasilan = 'ada' THEN 1 ELSE 0 END) as penghasilan_rtlh
+                SUM(CASE WHEN pengelompokan_desil LIKE '%Usulan Baru%' THEN 1 ELSE 0 END) as usulan_baru,
+                SUM(CASE WHEN pengelompokan_desil LIKE '%Backlog 1%' THEN 1 ELSE 0 END) as backlog_1,
+                SUM(CASE WHEN pengelompokan_desil LIKE '%Backlog 2%' THEN 1 ELSE 0 END) as backlog_2
             ")
             ->groupBy('kecamatan', 'desa_kelurahan')
-            ->orderBy('kecamatan')
-            ->orderBy('desa_kelurahan')
             ->get();
 
-        // Data Detail Calon Penerima dengan Foto Lapangan
-        $detailPenerima = (clone $query)->orderBy('kecamatan', 'asc')->orderBy('desa_kelurahan', 'asc')->orderBy('nama', 'asc')->get();
-
-        // Resolve URL, File URI, dan Base64 untuk Foto Lapangan Excel
-        $detailPenerima->transform(function ($item) {
-            $depanData = $this->getPhotoInfo($item->foto_sudut_depan);
-            $dalamData = $this->getPhotoInfo($item->foto_bagian_dalam);
-            $ktpData   = $this->getPhotoInfo($item->ktp);
-
-            $item->foto_depan_url    = $depanData['url'];
-            $item->foto_depan_file_uri = $depanData['file_uri'];
-            $item->foto_depan_base64 = $depanData['base64'];
-
-            $item->foto_dalam_url    = $dalamData['url'];
-            $item->foto_dalam_file_uri = $dalamData['file_uri'];
-            $item->foto_dalam_base64 = $dalamData['base64'];
-
-            $item->foto_ktp_url      = $ktpData['url'];
-            $item->foto_ktp_file_uri   = $ktpData['file_uri'];
-            $item->foto_ktp_base64   = $ktpData['base64'];
-
+        // Hitung progress dan urutkan berdasarkan progress tertinggi
+        $rekapDesaKecamatan = $rekapDesaKecamatan->map(function($item) {
+            $item->progres_survei = $item->total_penerima > 0 ? round(($item->total_sudah_survei / $item->total_penerima) * 100, 1) : 0;
             return $item;
-        });
+        })->sortByDesc('progres_survei')->values();
 
-        if ($desa && $desa !== 'all') {
-            $prefix = 'rekap_bsps_desa_' . strtolower(str_replace([' ', '/', '\\'], '_', $desa));
-        } elseif ($kecamatan && $kecamatan !== 'all') {
-            $prefix = 'rekap_bsps_kec_' . strtolower(str_replace([' ', '/', '\\'], '_', $kecamatan));
-        } else {
-            $prefix = 'rekap_bsps_kab_jember_semua_desa';
+        $data = [
+            ['<center><b>Kecamatan</b></center>', '<center><b>Desa / Kelurahan</b></center>', '<center><b>Total Usulan</b></center>', '<center><b>Sudah Survei</b></center>', '<center><b>Belum Survei</b></center>', '<center><b>Usulan Baru</b></center>', '<center><b>Backlog 1</b></center>', '<center><b>Backlog 2</b></center>', '<center><b>Progress Survei</b></center>']
+        ];
+        
+        $sumTotal = 0; $sumSudah = 0; $sumBelum = 0; $sumUsulanBaru = 0; $sumBacklog1 = 0; $sumBacklog2 = 0;
+        
+        foreach ($rekapDesaKecamatan as $r) {
+            $b = max(0, $r->total_penerima - $r->total_sudah_survei);
+            $sumTotal += $r->total_penerima;
+            $sumSudah += $r->total_sudah_survei;
+            $sumBelum += $b;
+            $sumUsulanBaru += $r->usulan_baru;
+            $sumBacklog1 += $r->backlog_1;
+            $sumBacklog2 += $r->backlog_2;
+            
+            $data[] = [
+                $r->kecamatan,
+                $r->desa_kelurahan,
+                $r->total_penerima,
+                $r->total_sudah_survei,
+                $b,
+                $r->usulan_baru,
+                $r->backlog_1,
+                $r->backlog_2,
+                $r->progres_survei . '%'
+            ];
         }
+        
+        $data[] = [
+            '<b>TOTAL KESELURUHAN:</b>',
+            '',
+            '<b>'.$sumTotal.'</b>',
+            '<b>'.$sumSudah.'</b>',
+            '<b>'.$sumBelum.'</b>',
+            '<b>'.$sumUsulanBaru.'</b>',
+            '<b>'.$sumBacklog1.'</b>',
+            '<b>'.$sumBacklog2.'</b>',
+            '<b>'.($sumTotal > 0 ? round(($sumSudah/$sumTotal)*100,1) : 0) . '%</b>'
+        ];
+        
         $prefix = ($kecamatan && $kecamatan !== 'all') 
-            ? 'rekap_bsps_kec_' . strtolower(str_replace([' ', '/', '\\'], '_', $kecamatan)) 
-            : 'rekap_bsps_kab_jember_semua_desa';
-        $filename = $prefix . '_' . date('Ymd_His') . '.xls';
-
-        $content = view('laporan.excel', compact(
-            'stats',
-            'rekapDesaKecamatan',
-            'detailPenerima',
-            'kecamatan',
-            'desa'
-        ))->render();
-
-        return response($content, 200, [
-            'Content-Type'        => 'application/vnd.ms-excel; charset=utf-8',
-            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
-            'Pragma'              => 'no-cache',
-            'Cache-Control'       => 'must-revalidate, post-check=0, pre-check=0',
-            'Expires'             => '0',
-        ]);
+            ? 'rekap_progress_kec_' . strtolower(str_replace([' ', '/', '\\'], '_', $kecamatan)) 
+            : 'rekap_progress_kab_jember_semua_desa';
+        $filename = $prefix . '_' . date('Ymd_His') . '.xlsx';
+        
+        \Shuchkin\SimpleXLSXGen::fromArray($data)->downloadAs($filename);
+        exit;
     }
 
     /**

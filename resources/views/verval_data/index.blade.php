@@ -844,6 +844,7 @@
                                             'meninggal' => '#343a40',
                                             'pindah' => '#ffc107',
                                             'tidak diketahui' => '#dc3545',
+                                            'menolak disurvey' => '#fd7e14',
                                         ];
                                         $textColor = $currentStatus == 'pindah' ? '#000' : '#fff';
                                         $bgColor = $statusColors[$currentStatus] ?? '#28a745';
@@ -859,6 +860,7 @@
                                                 'meninggal'       => 'Meninggal',
                                                 'pindah'          => 'Pindah',
                                                 'tidak diketahui' => 'Tidak Diketahui',
+                                                'menolak disurvey' => 'Menolak Disurvey',
                                             ];
                                             $ddId     = 'ddStatus_' . $item->id;
                                             $ddBtnId  = 'ddStatusBtn_' . $item->id;
@@ -878,6 +880,8 @@
                                                      onclick="updateVervalStatus({{ $item->id }}, 'pindah', 'Pindah', '{{ $ddId }}')"><i class="fas fa-circle" style="font-size:8px;color:#ffc107;"></i> Pindah</div>
                                                 <div class="pupr-dropdown-item {{ $currentStatus === 'tidak diketahui' ? 'active' : '' }}"
                                                      onclick="updateVervalStatus({{ $item->id }}, 'tidak diketahui', 'Tidak Diketahui', '{{ $ddId }}')"><i class="fas fa-circle" style="font-size:8px;color:#dc3545;"></i> Tidak Diketahui</div>
+                                                <div class="pupr-dropdown-item {{ $currentStatus === 'menolak disurvey' ? 'active' : '' }}"
+                                                     onclick="updateVervalStatus({{ $item->id }}, 'menolak disurvey', 'Menolak Disurvey', '{{ $ddId }}')"><i class="fas fa-circle" style="font-size:8px;color:#fd7e14;"></i> Menolak Disurvey</div>
                                             </div>
                                         </div>
                                     @endif
@@ -1176,7 +1180,8 @@
             'ditemukan'      : '#28a745',
             'meninggal'      : '#343a40',
             'pindah'         : '#ffc107',
-            'tidak diketahui': '#dc3545'
+            'tidak diketahui': '#dc3545',
+            'menolak disurvey': '#fd7e14'
         };
 
         function updateVervalStatus(id, status, label, wrapperId) {

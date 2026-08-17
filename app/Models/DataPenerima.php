@@ -60,7 +60,7 @@ class DataPenerima extends Model
         ];
 
         return $query->where(function ($q) use ($fields, $fotoFields) {
-            $q->whereIn('status', ['meninggal', 'pindah', 'tidak diketahui'])
+            $q->whereIn('status', ['meninggal', 'pindah', 'tidak diketahui', 'menolak disurvey'])
               ->orWhere(function ($sub) use ($fields, $fotoFields) {
                   foreach ($fields as $field) {
                       $sub->whereNotNull($field);
@@ -97,7 +97,7 @@ class DataPenerima extends Model
 
         return $query->where(function ($q) use ($fields, $fotoFields) {
             $q->whereNull('status')
-              ->orWhereNotIn('status', ['meninggal', 'pindah', 'tidak diketahui']);
+              ->orWhereNotIn('status', ['meninggal', 'pindah', 'tidak diketahui', 'menolak disurvey']);
         })->where(function ($q) use ($fields, $fotoFields) {
             $q->where(function ($sub1) use ($fields) {
                 foreach ($fields as $field) {
@@ -119,7 +119,7 @@ class DataPenerima extends Model
      */
     public function isSudahSurvei(): bool
     {
-        if (in_array($this->status, ['meninggal', 'pindah', 'tidak diketahui'])) {
+        if (in_array($this->status, ['meninggal', 'pindah', 'tidak diketahui', 'menolak disurvey'])) {
             return true;
         }
 
