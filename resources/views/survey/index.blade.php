@@ -527,6 +527,34 @@
                 </div>
             </div>
 
+            <!-- Live GPS Status Banner (Top Alert) -->
+            <div id="topGpsBanner" style="background:{{ $vervalData->latitude && $vervalData->longitude ? '#f0fdf4' : '#eff6ff' }}; border:1px solid {{ $vervalData->latitude && $vervalData->longitude ? '#86efac' : '#bfdbfe' }}; border-radius:var(--radius-sm); padding:14px 18px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; transition:all 0.3s ease;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div id="topGpsIconBox" style="width:38px; height:38px; border-radius:50%; background:{{ $vervalData->latitude && $vervalData->longitude ? '#dcfce7' : '#dbeafe' }}; color:{{ $vervalData->latitude && $vervalData->longitude ? '#16a34a' : '#2563eb' }}; display:flex; align-items:center; justify-content:center; font-size:17px; flex-shrink:0;">
+                        <i class="fas {{ $vervalData->latitude && $vervalData->longitude ? 'fa-circle-check' : 'fa-satellite fa-spin' }}"></i>
+                    </div>
+                    <div>
+                        <div id="topGpsTitle" style="font-size:13.5px; font-weight:800; color:{{ $vervalData->latitude && $vervalData->longitude ? '#15803d' : '#1e40af' }};">
+                            @if($vervalData->latitude && $vervalData->longitude)
+                                Koordinat GPS Satelit Terkunci Presisi: Desa {{ $vervalData->desa_kelurahan }}, Kec. {{ $vervalData->kecamatan }} ({{ number_format((float)$vervalData->latitude, 5) }}, {{ number_format((float)$vervalData->longitude, 5) }})
+                            @else
+                                Mengunci Sinyal Satelit GPS Presisi...
+                            @endif
+                        </div>
+                        <div id="topGpsSub" style="font-size:12px; color:{{ $vervalData->latitude && $vervalData->longitude ? '#166534' : '#3b82f6' }};">
+                            @if($vervalData->latitude && $vervalData->longitude)
+                                Wilayah: <strong>Desa {{ $vervalData->desa_kelurahan }}, Kec. {{ $vervalData->kecamatan }}</strong> &bull; Koordinat GPS siap disimpan.
+                            @else
+                                Mohon tunggu (0–10 detik) hingga sinyal satelit di wilayah Desa {{ $vervalData->desa_kelurahan }}, Kec. {{ $vervalData->kecamatan }} terkunci.
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn" onclick="requestLocation()" style="background:#ffffff; color:var(--primary); border:1px solid #cbd5e1; font-size:12px; font-weight:700; padding:6px 14px; border-radius:6px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+                    <i class="fas fa-rotate"></i> Update GPS
+                </button>
+            </div>
+
             <!-- Display Validation Errors / Success if any -->
             @if ($errors->any())
                 <div
@@ -1534,6 +1562,17 @@
                         </div>
                     </div>
 
+                    {{-- STATE LOADING: Sedang mengunci satelit --}}
+                    <div id="gpsStateLoading" style="display:none; text-align:center; padding:18px 10px;">
+                        <div style="width:56px;height:56px;border-radius:50%;background:#eff6ff;color:#2563eb;display:inline-flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:14px;">
+                            <i class="fas fa-satellite fa-spin"></i>
+                        </div>
+                        <h4 style="margin:0 0 6px 0;color:#1e40af;font-size:15px;font-weight:800;">Sedang Mengunci Sinyal Satelit GPS...</h4>
+                        <p style="font-size:12.5px;color:#64748b;margin:0;line-height:1.6;">
+                            Mohon tunggu beberapa detik. Sistem sedang mencari koordinat presisi langsung dari satelit di Kabupaten Jember.
+                        </p>
+                    </div>
+
                     {{-- STATE DENIED: Sudah pernah ditolak --}}
                     <div id="gpsStateDenied" style="display:none;">
                         <div
@@ -1580,6 +1619,14 @@
                         onclick="requestLocation()">
                         <i class="fas fa-location-dot"></i> Izinkan & Deteksi Lokasi
                     </button>
+                </div>
+
+                {{-- FOOTER STATE LOADING --}}
+                <div id="gpsFooterLoading" class="modal-footer"
+                    style="display:none; padding: 14px 24px; background: var(--bg-body); border-top: 1px solid rgba(0, 40, 85, 0.06); justify-content: center;">
+                    <span style="font-size:12.5px;color:#2563eb;font-weight:700;display:inline-flex;align-items:center;gap:6px;">
+                        <i class="fas fa-spinner fa-spin"></i> Sedang memproses sinyal satelit...
+                    </span>
                 </div>
 
                 {{-- FOOTER STATE DENIED --}}
@@ -2658,52 +2705,167 @@
 
         // GPS Geolocation Handler (Auto-fill hidden coordinates dengan live UI update)
         function showGpsModal(isDenied = false) {
-            // Toggle state normal vs denied
+            // Toggle state normal vs denied vs loading
             const stateNormal = document.getElementById('gpsStateNormal');
+            const stateLoading = document.getElementById('gpsStateLoading');
             const stateDenied = document.getElementById('gpsStateDenied');
             const footerNormal = document.getElementById('gpsFooterNormal');
+            const footerLoading = document.getElementById('gpsFooterLoading');
             const footerDenied = document.getElementById('gpsFooterDenied');
 
             if (stateNormal) stateNormal.style.display = isDenied ? 'none' : 'block';
+            if (stateLoading) stateLoading.style.display = 'none';
             if (stateDenied) stateDenied.style.display = isDenied ? 'block' : 'none';
             if (footerNormal) footerNormal.style.display = isDenied ? 'none' : 'flex';
+            if (footerLoading) footerLoading.style.display = 'none';
             if (footerDenied) footerDenied.style.display = isDenied ? 'flex' : 'none';
 
             if (window.PuprModal) window.PuprModal.open('gpsModal');
         }
 
+        function setGpsModalLoading() {
+            const stateNormal = document.getElementById('gpsStateNormal');
+            const stateLoading = document.getElementById('gpsStateLoading');
+            const stateDenied = document.getElementById('gpsStateDenied');
+            const footerNormal = document.getElementById('gpsFooterNormal');
+            const footerLoading = document.getElementById('gpsFooterLoading');
+            const footerDenied = document.getElementById('gpsFooterDenied');
+
+            if (stateNormal) stateNormal.style.display = 'none';
+            if (stateLoading) stateLoading.style.display = 'block';
+            if (stateDenied) stateDenied.style.display = 'none';
+            if (footerNormal) footerNormal.style.display = 'none';
+            if (footerLoading) footerLoading.style.display = 'flex';
+            if (footerDenied) footerDenied.style.display = 'none';
+        }
+
         function requestLocation() {
+            const badge = document.getElementById('gpsDisplayBadge');
+            const wrapper = document.getElementById('gpsDisplayWrapper');
+            const topBanner = document.getElementById('topGpsBanner');
+            const topIconBox = document.getElementById('topGpsIconBox');
+            const topTitle = document.getElementById('topGpsTitle');
+            const topSub = document.getElementById('topGpsSub');
+
             if (!navigator.geolocation) {
-                const badge = document.getElementById('gpsDisplayBadge');
                 if (badge) {
                     badge.innerHTML = `<span style="color: #e11d48; font-size: 12.5px; font-weight: 700;"><i class="fas fa-triangle-exclamation"></i> Browser/Perangkat Anda tidak mendukung fitur GPS Geolocation.</span>`;
+                }
+                if (topBanner) {
+                    topBanner.style.background = '#fff1f2';
+                    topBanner.style.borderColor = '#fca5a5';
+                    if (topIconBox) { topIconBox.style.background = '#fee2e2'; topIconBox.style.color = '#dc2626'; topIconBox.innerHTML = '<i class="fas fa-ban"></i>'; }
+                    if (topTitle) { topTitle.style.color = '#991b1b'; topTitle.textContent = 'GPS Tidak Didukung'; }
+                    if (topSub) { topSub.style.color = '#b91c1c'; topSub.textContent = 'Perangkat atau browser tidak mendukung fitur GPS Geolocation.'; }
                 }
                 return;
             }
 
+            // Tampilkan animasi loading mengunci sinyal satelit di badge & banner atas
+            setGpsModalLoading();
+
+            if (badge) {
+                badge.innerHTML = `<span style="color: #2563eb; font-size: 12.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-satellite fa-spin" style="font-size:14px;color:#2563eb;"></i> 
+                    <span>Sedang mengunci sinyal GPS satelit presisi... Mohon tunggu (0–10 detik)</span>
+                </span>`;
+            }
+            if (wrapper) {
+                wrapper.style.borderColor = '#93c5fd';
+                wrapper.style.background = '#eff6ff';
+            }
+            if (topBanner) {
+                topBanner.style.background = '#eff6ff';
+                topBanner.style.borderColor = '#bfdbfe';
+                if (topIconBox) { topIconBox.style.background = '#dbeafe'; topIconBox.style.color = '#2563eb'; topIconBox.innerHTML = '<i class="fas fa-satellite fa-spin"></i>'; }
+                if (topTitle) { topTitle.style.color = '#1e40af'; topTitle.textContent = 'Sedang Mengunci Sinyal Satelit GPS Presisi...'; }
+                if (topSub) { topSub.style.color = '#3b82f6'; topSub.textContent = 'Mohon tunggu (0–10 detik) hingga koordinat satelit terkunci di wilayah Kabupaten Jember.'; }
+            }
+
+            // Data Wilayah Desa & Kecamatan Calon Penerima
+            const currentDesa = "{{ $vervalData->desa_kelurahan ?: 'Desa' }}";
+            const currentKec = "{{ $vervalData->kecamatan ?: 'Jember' }}";
+
+            // Batas Wilayah Geografis Kabupaten Jember
+            const isWithinJember = function (lat, lng) {
+                return (lat >= -8.70 && lat <= -7.80 && lng >= 113.15 && lng <= 114.15);
+            };
+
             const applyPosition = function (position) {
                 const lat = position.coords.latitude;
                 const lng = position.coords.longitude;
+                const accuracy = position.coords.accuracy ? Math.round(position.coords.accuracy) : null;
                 const latInput = document.getElementById('latitude');
                 const lngInput = document.getElementById('longitude');
 
-                if (latInput) latInput.value = lat;
-                if (lngInput) lngInput.value = lng;
-
-                const badge = document.getElementById('gpsDisplayBadge');
-                const wrapper = document.getElementById('gpsDisplayWrapper');
-                if (badge) {
-                    badge.innerHTML = `<strong style="color: #16a34a; font-family: monospace; font-size: 13.5px; display: inline-flex; align-items: center; gap: 6px;">
-                            <i class="fas fa-circle-check"></i> Terdeteksi Presisi: ${lat.toFixed(6)}, ${lng.toFixed(6)}
-                        </strong>
-                        <a href="https://maps.google.com/?q=${lat},${lng}" target="_blank" style="margin-left: 8px; font-size: 11px; color: var(--primary); text-decoration: none; font-weight: 600;">
-                            <i class="fas fa-arrow-up-right-from-square"></i> Tes di Google Maps
-                        </a>`;
+                // Format keterangan akurasi yang rapi & ramah
+                let accFormatted = '±5-15 meter';
+                if (accuracy) {
+                    if (accuracy >= 1000) {
+                        accFormatted = `±${(accuracy / 1000).toFixed(0)} km (Estimasi Jaringan/IP)`;
+                    } else {
+                        accFormatted = `±${accuracy} meter`;
+                    }
                 }
-                if (wrapper) {
-                    wrapper.style.borderColor = '#86efac';
-                    wrapper.style.background = '#f0fdf4';
-                    wrapper.classList.remove('is-invalid-highlight');
+
+                if (isWithinJember(lat, lng)) {
+                    if (latInput) latInput.value = lat;
+                    if (lngInput) lngInput.value = lng;
+
+                    if (badge) {
+                        badge.innerHTML = `
+                            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                                <strong style="color: #16a34a; font-family: monospace; font-size: 13.5px; display: inline-flex; align-items: center; gap: 6px;">
+                                    <i class="fas fa-circle-check"></i> Desa ${currentDesa}, Kec. ${currentKec}: ${lat.toFixed(6)}, ${lng.toFixed(6)}
+                                </strong>
+                                <span style="font-size:11px;font-weight:700;color:#15803d;background:#dcfce7;border:1px solid #86efac;padding:2px 8px;border-radius:12px;font-family:sans-serif;">Akurasi: ${accFormatted}</span>
+                                <a href="https://maps.google.com/?q=${lat},${lng}" target="_blank" style="font-size: 11.5px; color: var(--primary); text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                                    <i class="fas fa-arrow-up-right-from-square"></i> Cek di Google Maps
+                                </a>
+                            </div>
+                        `;
+                    }
+                    if (wrapper) {
+                        wrapper.style.borderColor = '#86efac';
+                        wrapper.style.background = '#f0fdf4';
+                        wrapper.classList.remove('is-invalid-highlight');
+                    }
+                    if (topBanner) {
+                        topBanner.style.background = '#f0fdf4';
+                        topBanner.style.borderColor = '#86efac';
+                        if (topIconBox) { topIconBox.style.background = '#dcfce7'; topIconBox.style.color = '#16a34a'; topIconBox.innerHTML = '<i class="fas fa-circle-check"></i>'; }
+                        if (topTitle) { topTitle.style.color = '#15803d'; topTitle.innerHTML = `Koordinat GPS Satelit Terkunci Presisi: Desa ${currentDesa}, Kec. ${currentKec} (${lat.toFixed(5)}, ${lng.toFixed(5)})`; }
+                        if (topSub) { topSub.style.color = '#166534'; topSub.innerHTML = `Akurasi sinyal satelit: <strong>${accFormatted}</strong> &bull; Wilayah: <strong>Desa ${currentDesa}, Kec. ${currentKec}</strong>. Titik koordinat siap disimpan bersama data survei.`; }
+                    }
+                } else {
+                    // Di luar area Kabupaten Jember (misal IP ISP Jakarta/Surabaya/luar negeri)
+                    if (latInput) latInput.value = '';
+                    if (lngInput) lngInput.value = '';
+
+                    if (badge) {
+                        badge.innerHTML = `
+                            <div style="display:flex;flex-direction:column;gap:4px;">
+                                <span style="color: #b45309; font-size: 12.5px; font-weight: 800; display: inline-flex; align-items: center; gap: 6px;">
+                                    <i class="fas fa-triangle-exclamation" style="font-size:14px;color:#d97706;"></i> 
+                                    Sinyal GPS Belum Terkunci di Jember (${lat.toFixed(4)}, ${lng.toFixed(4)})
+                                </span>
+                                <span style="font-size: 11.5px; color: #78350f; line-height: 1.5;">
+                                    Posisi terdeteksi di luar area survei Desa ${currentDesa}, Kec. ${currentKec} (kemungkinan GPS HP baru aktif atau sinyal satelit belum stabil). Silakan pastikan fitur Lokasi/GPS di HP aktif di ruang terbuka, lalu klik tombol <strong>"Update Koordinat GPS"</strong>.
+                                </span>
+                            </div>
+                        `;
+                    }
+                    if (wrapper) {
+                        wrapper.style.borderColor = '#fde68a';
+                        wrapper.style.background = '#fffbeb';
+                    }
+                    if (topBanner) {
+                        topBanner.style.background = '#fffbeb';
+                        topBanner.style.borderColor = '#fde68a';
+                        if (topIconBox) { topIconBox.style.background = '#fef3c7'; topIconBox.style.color = '#d97706'; topIconBox.innerHTML = '<i class="fas fa-triangle-exclamation"></i>'; }
+                        if (topTitle) { topTitle.style.color = '#92400e'; topTitle.textContent = `Sinyal GPS Terdeteksi di Luar Desa ${currentDesa}`; }
+                        if (topSub) { topSub.style.color = '#b45309'; topSub.textContent = `Koordinat (${lat.toFixed(4)}, ${lng.toFixed(4)}) berada di luar Jember. Pastikan GPS HP aktif di ruang terbuka.`; }
+                    }
                 }
 
                 if (window.PuprModal) {
@@ -2713,8 +2875,6 @@
 
             const handleError = function (err) {
                 console.warn('GPS location request error:', err);
-                const badge = document.getElementById('gpsDisplayBadge');
-                const wrapper = document.getElementById('gpsDisplayWrapper');
                 const latVal = document.getElementById('latitude')?.value;
 
                 // Kode 1 = PERMISSION_DENIED → tampilkan modal dengan alert merah
@@ -2726,36 +2886,42 @@
 
                 if (badge && !latVal) {
                     badge.innerHTML = `<span style="color: #e11d48; font-size: 12.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
-                            <i class="fas fa-triangle-exclamation"></i> GPS Belum Aktif / Ditolak. (Wajib izinkan akses lokasi pada HP/Browser)
+                            <i class="fas fa-triangle-exclamation"></i> GPS Belum Aktif / Sinyal Satelit Lemah. (Wajib aktifkan lokasi di HP lalu klik tombol Update Koordinat GPS)
                         </span>`;
                 }
                 if (wrapper && !latVal) {
                     wrapper.style.borderColor = '#fca5a5';
                     wrapper.style.background = '#fff1f2';
                 }
+                if (topBanner && !latVal) {
+                    topBanner.style.background = '#fff1f2';
+                    topBanner.style.borderColor = '#fca5a5';
+                    if (topIconBox) { topIconBox.style.background = '#fee2e2'; topIconBox.style.color = '#dc2626'; topIconBox.innerHTML = '<i class="fas fa-location-crosshairs-slash"></i>'; }
+                    if (topTitle) { topTitle.style.color = '#991b1b'; topTitle.textContent = 'GPS Belum Terdeteksi / Ditolak'; }
+                    if (topSub) { topSub.style.color = '#b91c1c'; topSub.textContent = 'Wajib aktifkan izin lokasi GPS pada perangkat/browser agar survei valid.'; }
+                }
             };
 
             const doGetPosition = function () {
-                // Percobaan 1: High Accuracy GPS (8 detik)
+                // High Accuracy GPS langsung dari sensor HP (tanpa cache lama: maximumAge: 0, timeout 12 detik)
                 navigator.geolocation.getCurrentPosition(
                     applyPosition,
                     function (error) {
-                        console.warn('GPS high-accuracy request timeout/failed, mencoba fallback low accuracy:', error);
-                        // Percobaan 2: Fallback Low Accuracy / Wi-Fi Triangulation untuk Laptop/Indoor (20 detik, cache 5 min)
+                        console.warn('GPS high-accuracy timeout, mencoba kembali mengambil posisi:', error);
                         navigator.geolocation.getCurrentPosition(
                             applyPosition,
                             handleError,
                             {
-                                enableHighAccuracy: false,
-                                timeout: 20000,
-                                maximumAge: 300000
+                                enableHighAccuracy: true,
+                                timeout: 15000,
+                                maximumAge: 0
                             }
                         );
                     },
                     {
                         enableHighAccuracy: true,
-                        timeout: 8000,
-                        maximumAge: 60000
+                        timeout: 12000,
+                        maximumAge: 0
                     }
                 );
             };
@@ -2764,32 +2930,26 @@
             if (navigator.permissions && navigator.permissions.query) {
                 navigator.permissions.query({ name: 'geolocation' }).then(function (result) {
                     if (result.state === 'denied') {
-                        // Sudah pernah ditolak — langsung tampilkan modal panduan dengan alert merah
                         showGpsModal(true);
                     } else if (result.state === 'prompt') {
-                        // Belum pernah diminta — buka modal panduan dulu agar user siap klik "Izinkan" di browser
                         showGpsModal(false);
                         doGetPosition();
                     } else {
-                        // 'granted' — langsung ambil lokasi tanpa tampilkan modal
                         doGetPosition();
                     }
 
-                    // Monitor perubahan status permission secara real-time
                     result.onchange = function () {
                         if (result.state === 'granted') {
-                            if (window.PuprModal) window.PuprModal.close('gpsModal');
+                            setGpsModalLoading();
                             doGetPosition();
                         } else if (result.state === 'denied') {
                             showGpsModal(true);
                         }
                     };
                 }).catch(function () {
-                    // Browser tidak support permissions API → langsung minta saja
                     doGetPosition();
                 });
             } else {
-                // Fallback untuk browser lama
                 doGetPosition();
             }
         }
