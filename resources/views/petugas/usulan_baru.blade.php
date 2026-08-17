@@ -781,33 +781,65 @@
         const formUsulan = document.getElementById('formTambahUsulan');
         if (formUsulan) {
             formUsulan.addEventListener('submit', async function(e) {
-                if (!navigator.onLine) {
+                const isOffline = !navigator.onLine;
+
+                const namaInput = this.querySelector('input[name="nama"]');
+                const namaVal = namaInput ? namaInput.value.trim() : '';
+
+                const noKtpInput = this.querySelector('input[name="no_ktp"]');
+                const noKtpVal = noKtpInput ? noKtpInput.value.trim() : '';
+
+                const noKkInput = this.querySelector('input[name="no_kk"]');
+                const noKkVal = noKkInput ? noKkInput.value.trim() : '';
+
+                if (!namaVal) {
+                    e.preventDefault();
+                    alert('Nama lengkap calon penerima wajib diisi!');
+                    return;
+                }
+
+                if (noKtpVal.length !== 16 || isNaN(noKtpVal)) {
+                    e.preventDefault();
+                    alert('NIK (No. KTP) wajib berupa 16 digit angka!');
+                    return;
+                }
+
+                if (noKkVal && (noKkVal.length !== 16 || isNaN(noKkVal))) {
+                    e.preventDefault();
+                    alert('Nomor Kartu Keluarga (KK) jika diisi harus berupa 16 digit angka!');
+                    return;
+                }
+
+                if (isOffline) {
                     e.preventDefault();
                     
                     const fd = new FormData(formUsulan);
                     const usulanData = {
-                        id: 'OFFLINE_USULAN_' + Date.now(),
+                        id: 'usulan_off_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
                         nama: fd.get('nama'),
                         no_ktp: fd.get('no_ktp'),
                         no_kk: fd.get('no_kk'),
-                        jenis_kelamin: fd.get('jenis_kelamin'),
-                        pengelompokan_desil: fd.get('pengelompokan_desil'),
-                        dusun: fd.get('dusun'),
-                        rt: fd.get('rt'),
-                        rw: fd.get('rw'),
-                        alamat: fd.get('alamat')
+                        jenis_kelamin: fd.get('jenis_kelamin') || 'L',
+                        pengelompokan_desil: fd.get('pengelompokan_desil') || 'Usulan Baru Lapangan',
+                        dusun: fd.get('dusun') || '',
+                        rt: fd.get('rt') || '',
+                        rw: fd.get('rw') || '',
+                        alamat: fd.get('alamat') || '',
+                        saved_at: new Date().toISOString()
                     };
 
                     if (window.BspsOffline && window.BspsOffline.saveUsulanToIndexedDB) {
                         const success = await window.BspsOffline.saveUsulanToIndexedDB(usulanData);
                         if (success) {
                             if (window.BspsOffline.showPuprToast) {
-                                window.BspsOffline.showPuprToast('Usulan baru berhasil disimpan secara offline!', 'success');
+                                window.BspsOffline.showPuprToast(`📲 Mode Offline: Usulan "${usulanData.nama}" tersimpan di memori HP! Data akan terunggah otomatis saat online.`, 'warning');
                             }
                             if (window.PuprModal) window.PuprModal.close('modalTambahUsulan');
                             
-                            ALL_DATA_USULAN.unshift(usulanData);
-                            filterUsulanTableOffline();
+                            if (typeof ALL_DATA_USULAN !== 'undefined') {
+                                ALL_DATA_USULAN.unshift(usulanData);
+                                if (typeof filterUsulanTableOffline === 'function') filterUsulanTableOffline();
+                            }
                             formUsulan.reset();
                         } else {
                             alert('Gagal menyimpan usulan ke penyimpanan lokal (offline).');

@@ -273,13 +273,18 @@ async function saveUsulanToIndexedDB(usulanData) {
         return new Promise((resolve, reject) => {
             const tx = db.transaction(STORE_USULAN, 'readwrite');
             const store = tx.objectStore(STORE_USULAN);
-            usulanData.saved_at = new Date().toISOString();
+            if (!usulanData.id) {
+                usulanData.id = 'usulan_off_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+            }
+            usulanData.saved_at = usulanData.saved_at || new Date().toISOString();
             usulanData.sync_status = 'pending';
+            delete usulanData.sync_error;
 
             store.put(usulanData);
 
             tx.oncomplete = function () {
                 console.log('[IndexedDB] Sukses menyimpan usulan baru offline NIK:', usulanData.no_ktp);
+                window.dispatchEvent(new CustomEvent('offlineUsulanUpdated', { detail: { action: 'save', item: usulanData } }));
                 resolve(true);
             };
 
@@ -313,16 +318,17 @@ async function getAllPendingUsulan() {
     }
 }
 
-// 11. Hapus Usulan dari IndexedDB setelah Sukses Diunggah
-async function removeUsulanFromIndexedDB(id) {
+// 11. Perbarui Data Usulan di IndexedDB (misal update status error)
+async function updateUsulanInIndexedDB(usulanData) {
     try {
         const db = await openOfflineDB();
         return new Promise((resolve, reject) => {
             const tx = db.transaction(STORE_USULAN, 'readwrite');
             const store = tx.objectStore(STORE_USULAN);
-            store.delete(id);
+            store.put(usulanData);
 
             tx.oncomplete = function () {
+                window.dispatchEvent(new CustomEvent('offlineUsulanUpdated', { detail: { action: 'update', item: usulanData } }));
                 resolve(true);
             };
             tx.onerror = reject;
@@ -332,16 +338,49 @@ async function removeUsulanFromIndexedDB(id) {
     }
 }
 
-// 12. Sync Usulan Baru ke Server saat Terhubung Kembali
+// 12. Hapus Usulan dari IndexedDB setelah Sukses Diunggah atau Dihapus Manual
+async function removeUsulanFromIndexedDB(id) {
+    try {
+        const db = await openOfflineDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_USULAN, 'readwrite');
+            const store = tx.objectStore(STORE_USULAN);
+            store.delete(id);
+
+            tx.oncomplete = function () {
+                window.dispatchEvent(new CustomEvent('offlineUsulanUpdated', { detail: { action: 'delete', id: id } }));
+                resolve(true);
+            };
+            tx.onerror = reject;
+        });
+    } catch (err) {
+        return false;
+    }
+}
+
+// 13. Sync Usulan Baru ke Server saat Terhubung Kembali
 let isUsulanSyncing = false;
-async function syncPendingUsulan() {
-    if (!navigator.onLine || isUsulanSyncing) return;
+async function syncPendingUsulan(isManual = false) {
+    if (!navigator.onLine) {
+        if (isManual) {
+            showPuprToast('⚠️ Perangkat Anda masih dalam keadaan offline (tidak ada koneksi internet).', 'warning');
+        }
+        return;
+    }
+
+    if (isUsulanSyncing) return;
 
     const pendingList = await getAllPendingUsulan();
-    if (pendingList.length === 0) return;
+    if (pendingList.length === 0) {
+        if (isManual) {
+            showPuprToast('ℹ️ Tidak ada antrian usulan baru offline yang perlu disinkronkan.', 'info');
+        }
+        return;
+    }
 
     isUsulanSyncing = true;
     let successCount = 0;
+    const syncErrors = [];
 
     for (const item of pendingList) {
         try {
@@ -372,21 +411,62 @@ async function syncPendingUsulan() {
                     await removeUsulanFromIndexedDB(item.id);
                     successCount++;
                 }
-            } else if (response.status === 422) {
+            } else {
                 const errData = await response.json().catch(() => ({}));
-                console.warn('[Sync Usulan] Duplikat NIK atau Gagal Validasi:', item.no_ktp, errData);
-                await removeUsulanFromIndexedDB(item.id);
+                let errorMsg = errData.message;
+                if (!errorMsg && errData.errors) {
+                    errorMsg = Object.values(errData.errors).flat().join(', ');
+                }
+                if (!errorMsg) {
+                    if (response.status === 419) {
+                        errorMsg = 'Sesi / Token CSRF telah kadaluarsa. Silakan refresh halaman web.';
+                    } else {
+                        errorMsg = `Data ditolak oleh server (Kode Status HTTP: ${response.status}). Periksa format NIK / KK.`;
+                    }
+                }
+
+                console.warn('[Sync Usulan] Validasi Gagal untuk NIK:', item.no_ktp, errorMsg);
+                
+                // Simpan pesan error di item IndexedDB agar user tahu di dashboard
+                item.sync_status = 'error';
+                item.sync_error = errorMsg;
+                item.error_at = new Date().toISOString();
+                await updateUsulanInIndexedDB(item);
+
+                syncErrors.push({
+                    id: item.id,
+                    nama: item.nama || 'Tanpa Nama',
+                    no_ktp: item.no_ktp || '-',
+                    error: errorMsg
+                });
             }
         } catch (err) {
-            console.error('[Sync Usulan] Gagal mengunggah usulan NIK:', item.no_ktp, err);
+            console.error('[Sync Usulan] Network exception NIK:', item.no_ktp, err);
         }
     }
 
     isUsulanSyncing = false;
 
+    // Trigger event notifikasi list
+    window.dispatchEvent(new CustomEvent('offlineUsulanUpdated', { 
+        detail: { action: 'sync_completed', successCount, syncErrors } 
+    }));
+
     if (successCount > 0) {
-        showPuprToast(`🎉 ${successCount} usulan baru offline berhasil tersinkron ke server!`, 'success');
-        setTimeout(() => window.location.reload(), 1500);
+        showPuprToast(`🎉 ${successCount} usulan baru offline berhasil disimpan ke server!`, 'success');
+    }
+
+    if (syncErrors.length > 0) {
+        window.dispatchEvent(new CustomEvent('offlineUsulanSyncError', { detail: syncErrors }));
+        showPuprToast(`⚠️ Terdapat ${syncErrors.length} usulan offline yang gagal validasi server (periksa NIK/No.KK).`, 'error');
+    }
+
+    if (successCount > 0 && syncErrors.length === 0 && !isManual) {
+        setTimeout(() => {
+            if (window.location.pathname.includes('/petugas/')) {
+                window.location.reload();
+            }
+        }, 1800);
     }
 }
 
@@ -418,6 +498,7 @@ window.BspsOffline = {
     syncPendingSurveys,
     saveUsulanToIndexedDB,
     getAllPendingUsulan,
+    updateUsulanInIndexedDB,
     removeUsulanFromIndexedDB,
     syncPendingUsulan,
     updatePendingBadgeUI,

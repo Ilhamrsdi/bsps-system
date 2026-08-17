@@ -3,7 +3,7 @@
  * Dinas PUPR / BSPS Verval System
  */
 
-const CACHE_NAME = 'bsps-verval-v4';
+const CACHE_NAME = 'bsps-verval-v5';
 
 // Aset Statis Inti yang Wajib Di-cache
 const STATIC_ASSETS = [
@@ -28,12 +28,12 @@ self.addEventListener('install', (event) => {
     self.skipWaiting();
     event.waitUntil(
         caches.open(CACHE_NAME).then(async (cache) => {
-            console.log('[ServiceWorker v4] Pre-caching static assets...');
+            console.log('[ServiceWorker v5] Pre-caching static assets...');
             for (const asset of STATIC_ASSETS) {
                 try {
                     await cache.add(asset);
                 } catch (err) {
-                    console.warn('[ServiceWorker v4] Gagal pre-cache asset:', asset, err);
+                    console.warn('[ServiceWorker v5] Gagal pre-cache asset:', asset, err);
                 }
             }
         })
@@ -47,7 +47,7 @@ self.addEventListener('activate', (event) => {
             return Promise.all(
                 keyList.map((key) => {
                     if (key !== CACHE_NAME) {
-                        console.log('[ServiceWorker v4] Menghapus cache lama:', key);
+                        console.log('[ServiceWorker v5] Menghapus cache lama:', key);
                         return caches.delete(key);
                     }
                 })
@@ -62,11 +62,27 @@ self.addEventListener('fetch', (event) => {
 
     const url = new URL(event.request.url);
 
-    // Strategi 1: Aset Statis (CSS, JS, Gambar, Font, CDN) -> Cache First
-    const isStaticAsset = url.pathname.includes('/assets/') ||
-        url.pathname.endsWith('.css') ||
-        url.pathname.endsWith('.js') ||
-        url.pathname.endsWith('.jpg') ||
+    // Strategi 1A: Script & CSS Lokal Aplikasi (/assets/) -> Network First agar update kode selalu fresh
+    const isAppAsset = url.pathname.includes('/assets/js/') || url.pathname.includes('/assets/css/');
+    if (isAppAsset) {
+        event.respondWith(
+            fetch(event.request).then((networkResponse) => {
+                if (networkResponse && networkResponse.status === 200) {
+                    const responseToCache = networkResponse.clone();
+                    caches.open(CACHE_NAME).then((cache) => {
+                        cache.put(event.request, responseToCache);
+                    });
+                }
+                return networkResponse;
+            }).catch(() => {
+                return caches.match(event.request, { ignoreSearch: true });
+            })
+        );
+        return;
+    }
+
+    // Strategi 1B: Font, CDN, dan Gambar Statis -> Cache First
+    const isStaticAsset = url.pathname.endsWith('.jpg') ||
         url.pathname.endsWith('.jpeg') ||
         url.pathname.endsWith('.png') ||
         url.pathname.endsWith('.svg') ||
