@@ -412,46 +412,106 @@ class LaporanController extends Controller
             ? 'rekap_progress_kec_' . strtolower(str_replace([' ', '/', '\\'], '_', $kecamatan)) 
             : 'rekap_progress_kab_jember_semua_desa';
 
+        $wilayahLabel = ($kecamatan && $kecamatan !== 'all') ? 'Kecamatan ' . strtoupper($kecamatan) : 'Seluruh 31 Kecamatan & Desa di Kab. Jember';
+        $totalPersen = $sumTotal > 0 ? round(($sumSudah / $sumTotal) * 100, 1) : 0;
+        $totalLayakPersen = $sumSudah > 0 ? round(($sumLayak / $sumSudah) * 100, 1) : 0;
+
         if (class_exists('\Shuchkin\SimpleXLSXGen')) {
             $data = [
-                ['<center><b>No</b></center>', '<center><b>Kecamatan</b></center>', '<center><b>Desa / Kelurahan</b></center>', '<center><b>Total Usulan</b></center>', '<center><b>Sudah Survei</b></center>', '<center><b>Belum Survei</b></center>', '<center><b>Layak Diusulkan</b></center>', '<center><b>Tidak Layak</b></center>', '<center><b>Usulan Baru</b></center>', '<center><b>Backlog 1</b></center>', '<center><b>Backlog 2</b></center>', '<center><b>% Progress Survei</b></center>', '<center><b>% Kelayakan</b></center>']
+                // Row 1: Judul Utama
+                [
+                    '<center><middle><style font-size="14" color="#002855" height="32"><b>REKAPITULASI PROGRES SURVEI BSPS KABUPATEN JEMBER</b></style></middle></center>',
+                    '', '', '', '', '', '', '', '', '', '', '', ''
+                ],
+                // Row 2: Subtitle Info
+                [
+                    '<center><middle><style font-size="10" color="#475569" height="22">Wilayah: ' . htmlspecialchars($wilayahLabel) . ' • Total Usulan: ' . number_format($sumTotal) . ' Penerima • Tanggal Ekspor: ' . date('d M Y, H:i') . ' WIB</style></middle></center>',
+                    '', '', '', '', '', '', '', '', '', '', '', ''
+                ],
+                // Row 3: Baris Kosong Pemisah
+                ['', '', '', '', '', '', '', '', '', '', '', '', ''],
+                // Row 4: Header Tabel PUPR Biru Tua
+                [
+                    '<center><middle><style bgcolor="#002855" color="#FFFFFF" border="thin#001833" height="28" font-size="10"><b>No</b></style></middle></center>',
+                    '<center><middle><style bgcolor="#002855" color="#FFFFFF" border="thin#001833" height="28" font-size="10"><b>Kecamatan</b></style></middle></center>',
+                    '<center><middle><style bgcolor="#002855" color="#FFFFFF" border="thin#001833" height="28" font-size="10"><b>Desa / Kelurahan</b></style></middle></center>',
+                    '<center><middle><style bgcolor="#002855" color="#FFFFFF" border="thin#001833" height="28" font-size="10"><b>Total Usulan</b></style></middle></center>',
+                    '<center><middle><style bgcolor="#002855" color="#FFFFFF" border="thin#001833" height="28" font-size="10"><b>Sudah Survei</b></style></middle></center>',
+                    '<center><middle><style bgcolor="#002855" color="#FFFFFF" border="thin#001833" height="28" font-size="10"><b>Belum Survei</b></style></middle></center>',
+                    '<center><middle><style bgcolor="#002855" color="#FFFFFF" border="thin#001833" height="28" font-size="10"><b>Layak</b></style></middle></center>',
+                    '<center><middle><style bgcolor="#002855" color="#FFFFFF" border="thin#001833" height="28" font-size="10"><b>Tidak Layak</b></style></middle></center>',
+                    '<center><middle><style bgcolor="#002855" color="#FFFFFF" border="thin#001833" height="28" font-size="10"><b>Usulan Baru</b></style></middle></center>',
+                    '<center><middle><style bgcolor="#002855" color="#FFFFFF" border="thin#001833" height="28" font-size="10"><b>Backlog 1</b></style></middle></center>',
+                    '<center><middle><style bgcolor="#002855" color="#FFFFFF" border="thin#001833" height="28" font-size="10"><b>Backlog 2</b></style></middle></center>',
+                    '<center><middle><style bgcolor="#002855" color="#FFFFFF" border="thin#001833" height="28" font-size="10"><b>% Selesai Verval</b></style></middle></center>',
+                    '<center><middle><style bgcolor="#002855" color="#FFFFFF" border="thin#001833" height="28" font-size="10"><b>% Kelayakan</b></style></middle></center>'
+                ]
             ];
+
             $noIdx = 1;
             foreach ($rekapDesaKecamatan as $r) {
                 $b = max(0, $r->total_penerima - $r->total_sudah_survei);
+                $badgeBg = $r->progres_survei >= 100 ? '#DCFCE7' : ($r->progres_survei > 0 ? '#FEF3C7' : '#F1F5F9');
+                $badgeColor = $r->progres_survei >= 100 ? '#15803D' : ($r->progres_survei > 0 ? '#B45309' : '#64748B');
+
                 $data[] = [
-                    $noIdx++,
-                    $r->kecamatan,
-                    $r->desa_kelurahan,
-                    $r->total_penerima,
-                    $r->total_sudah_survei,
-                    $b,
-                    $r->total_layak,
-                    $r->total_tidak_layak,
-                    $r->usulan_baru,
-                    $r->backlog_1,
-                    $r->backlog_2,
-                    $r->progres_survei . '%',
-                    $r->persen_layak . '%'
+                    '<center><middle><style border="thin#CBD5E1">' . ($noIdx++) . '</style></middle></center>',
+                    '<left><middle><style border="thin#CBD5E1">' . htmlspecialchars($r->kecamatan) . '</style></middle></left>',
+                    '<left><middle><style border="thin#CBD5E1"><b>' . htmlspecialchars($r->desa_kelurahan) . '</b></style></middle></left>',
+                    '<center><middle><style border="thin#CBD5E1"><b>' . $r->total_penerima . '</b></style></middle></center>',
+                    '<center><middle><style color="#15803D" border="thin#CBD5E1"><b>' . $r->total_sudah_survei . '</b></style></middle></center>',
+                    '<center><middle><style color="#B91C1C" border="thin#CBD5E1">' . $b . '</style></middle></center>',
+                    '<center><middle><style color="#15803D" border="thin#CBD5E1">' . $r->total_layak . '</style></middle></center>',
+                    '<center><middle><style color="#B91C1C" border="thin#CBD5E1">' . $r->total_tidak_layak . '</style></middle></center>',
+                    '<center><middle><style border="thin#CBD5E1">' . $r->usulan_baru . '</style></middle></center>',
+                    '<center><middle><style border="thin#CBD5E1">' . $r->backlog_1 . '</style></middle></center>',
+                    '<center><middle><style border="thin#CBD5E1">' . $r->backlog_2 . '</style></middle></center>',
+                    '<center><middle><style bgcolor="' . $badgeBg . '" color="' . $badgeColor . '" border="thin#CBD5E1"><b>' . $r->progres_survei . '%</b></style></middle></center>',
+                    '<center><middle><style color="#002855" border="thin#CBD5E1"><b>' . $r->persen_layak . '%</b></style></middle></center>'
                 ];
             }
+
+            // Baris Total
+            $totalRowIdx = count($data) + 1;
             $data[] = [
-                '<b>TOTAL:</b>',
-                '',
-                '',
-                '<b>'.$sumTotal.'</b>',
-                '<b>'.$sumSudah.'</b>',
-                '<b>'.$sumBelum.'</b>',
-                '<b>'.$sumLayak.'</b>',
-                '<b>'.$sumTidakLayak.'</b>',
-                '<b>'.$sumUsulanBaru.'</b>',
-                '<b>'.$sumBacklog1.'</b>',
-                '<b>'.$sumBacklog2.'</b>',
-                '<b>'.($sumTotal > 0 ? round(($sumSudah/$sumTotal)*100,1) : 0) . '%</b>',
-                '<b>'.($sumSudah > 0 ? round(($sumLayak/$sumSudah)*100,1) : 0) . '%</b>'
+                '<center><middle><style bgcolor="#E2E8F0" color="#002855" border="thin#94A3B8" height="26"><b>TOTAL KESELURUHAN:</b></style></middle></center>',
+                '<center><middle><style bgcolor="#E2E8F0" border="thin#94A3B8"></style></middle></center>',
+                '<center><middle><style bgcolor="#E2E8F0" border="thin#94A3B8"></style></middle></center>',
+                '<center><middle><style bgcolor="#E2E8F0" color="#002855" border="thin#94A3B8"><b>' . number_format($sumTotal) . '</b></style></middle></center>',
+                '<center><middle><style bgcolor="#E2E8F0" color="#15803D" border="thin#94A3B8"><b>' . number_format($sumSudah) . '</b></style></middle></center>',
+                '<center><middle><style bgcolor="#E2E8F0" color="#B91C1C" border="thin#94A3B8"><b>' . number_format($sumBelum) . '</b></style></middle></center>',
+                '<center><middle><style bgcolor="#E2E8F0" color="#15803D" border="thin#94A3B8"><b>' . number_format($sumLayak) . '</b></style></middle></center>',
+                '<center><middle><style bgcolor="#E2E8F0" color="#B91C1C" border="thin#94A3B8"><b>' . number_format($sumTidakLayak) . '</b></style></middle></center>',
+                '<center><middle><style bgcolor="#E2E8F0" color="#002855" border="thin#94A3B8"><b>' . number_format($sumUsulanBaru) . '</b></style></middle></center>',
+                '<center><middle><style bgcolor="#E2E8F0" color="#002855" border="thin#94A3B8"><b>' . number_format($sumBacklog1) . '</b></style></middle></center>',
+                '<center><middle><style bgcolor="#E2E8F0" color="#002855" border="thin#94A3B8"><b>' . number_format($sumBacklog2) . '</b></style></middle></center>',
+                '<center><middle><style bgcolor="#CBD5E1" color="#002855" border="thin#94A3B8"><b>' . $totalPersen . '%</b></style></middle></center>',
+                '<center><middle><style bgcolor="#CBD5E1" color="#002855" border="thin#94A3B8"><b>' . $totalLayakPersen . '%</b></style></middle></center>'
             ];
+
+            $xlsx = \Shuchkin\SimpleXLSXGen::fromArray($data, 'Rekapitulasi BSPS');
+            $xlsx->setDefaultFont('Calibri');
+            $xlsx->setDefaultFontSize(10);
+            $xlsx->mergeCells('A1:M1');
+            $xlsx->mergeCells('A2:M2');
+            $xlsx->mergeCells('A' . $totalRowIdx . ':C' . $totalRowIdx);
+            $xlsx->setColWidth('A', 6);
+            $xlsx->setColWidth('B', 18);
+            $xlsx->setColWidth('C', 24);
+            $xlsx->setColWidth('D', 14);
+            $xlsx->setColWidth('E', 14);
+            $xlsx->setColWidth('F', 14);
+            $xlsx->setColWidth('G', 14);
+            $xlsx->setColWidth('H', 14);
+            $xlsx->setColWidth('I', 13);
+            $xlsx->setColWidth('J', 12);
+            $xlsx->setColWidth('K', 12);
+            $xlsx->setColWidth('L', 16);
+            $xlsx->setColWidth('M', 15);
+            $xlsx->autoFilter('A4:M4');
+
             $filenameXlsx = $prefix . '_' . date('Ymd_His') . '.xlsx';
-            \Shuchkin\SimpleXLSXGen::fromArray($data)->downloadAs($filenameXlsx);
+            $xlsx->downloadAs($filenameXlsx);
             exit;
         }
 
