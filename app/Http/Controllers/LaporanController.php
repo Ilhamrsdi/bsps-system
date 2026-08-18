@@ -314,21 +314,22 @@ class LaporanController extends Controller
         $user = Auth::user();
         $scope = $request->get('export_scope', 'all');
         $kecamatan = $request->get('kecamatan', 'all');
-        
-        if ($scope === 'all' && (!$user || !$user->isAdminKecamatan())) {
-            $kecamatan = 'all';
-        }
-
         $desa = $request->get('desa', 'all');
         $status = $request->get('status', 'all');
         $search = $request->get('search');
 
-        if ($user) {
-            if ($user->isAdminKecamatan() && $user->kecamatan) {
-                $kecamatan = $user->kecamatan;
-            } elseif ($user->isPetugas()) {
-                if ($user->kecamatan) $kecamatan = $user->kecamatan;
-                if ($user->desa) $desa = $user->desa;
+        // Jika export scope 'all' (Seluruh Kabupaten), reset filter wilayah agar mengekspor seluruh 31 kecamatan
+        if ($scope === 'all') {
+            $kecamatan = 'all';
+            $desa = 'all';
+        } else {
+            if ($user) {
+                if ($user->isAdminKecamatan() && $user->kecamatan) {
+                    $kecamatan = $user->kecamatan;
+                } elseif ($user->isPetugas()) {
+                    if ($user->kecamatan) $kecamatan = $user->kecamatan;
+                    if ($user->desa) $desa = $user->desa;
+                }
             }
         }
 
@@ -360,20 +361,6 @@ class LaporanController extends Controller
             $query->belumSurvei();
         }
 
-        $totalPenerima = (clone $query)->count();
-        $totalSudahSurvei = (clone $query)->sudahSurvei()->count();
-        $totalBelumSurvei = (clone $query)->belumSurvei()->count();
-        $totalLayak = (clone $query)->where('status_kelayakan', 'Layak Diusulkan')->count();
-        $totalTidakLayak = (clone $query)->where('status_kelayakan', 'Tidak Layak Diusulkan')->count();
-
-        $stats = [
-            'total'       => $totalPenerima,
-            'sudah'       => $totalSudahSurvei,
-            'belum'       => $totalBelumSurvei,
-            'layak'       => $totalLayak,
-            'tidak_layak' => $totalTidakLayak,
-        ];
-
         $conds = [];
         foreach (DataPenerima::$fieldWajibSurvei as $field) {
             $conds[] = "({$field} IS NOT NULL AND TRIM({$field}) != '')";
@@ -382,70 +369,201 @@ class LaporanController extends Controller
         $sudahSql = "(status IN ('meninggal', 'pindah', 'tidak diketahui') OR {$formLengkapSql})";
 
         $rekapDesaKecamatan = (clone $query)
+            ->whereNotNull('kecamatan')
+            ->where('kecamatan', '!=', '')
+            ->whereNotNull('desa_kelurahan')
+            ->where('desa_kelurahan', '!=', '')
             ->selectRaw("
                 kecamatan,
                 desa_kelurahan,
                 COUNT(*) as total_penerima,
+                SUM(CASE WHEN status_kelayakan = 'Layak Diusulkan' THEN 1 ELSE 0 END) as total_layak,
+                SUM(CASE WHEN status_kelayakan = 'Tidak Layak Diusulkan' THEN 1 ELSE 0 END) as total_tidak_layak,
                 SUM(CASE WHEN {$sudahSql} THEN 1 ELSE 0 END) as total_sudah_survei,
                 SUM(CASE WHEN pengelompokan_desil LIKE '%Usulan Baru%' THEN 1 ELSE 0 END) as usulan_baru,
                 SUM(CASE WHEN pengelompokan_desil LIKE '%Backlog 1%' THEN 1 ELSE 0 END) as backlog_1,
                 SUM(CASE WHEN pengelompokan_desil LIKE '%Backlog 2%' THEN 1 ELSE 0 END) as backlog_2
             ")
             ->groupBy('kecamatan', 'desa_kelurahan')
+            ->orderBy('kecamatan', 'asc')
+            ->orderBy('desa_kelurahan', 'asc')
             ->get();
 
-        // Hitung progress dan urutkan berdasarkan progress tertinggi
+        // Hitung progress survei dan kelayakan per desa
         $rekapDesaKecamatan = $rekapDesaKecamatan->map(function($item) {
             $item->progres_survei = $item->total_penerima > 0 ? round(($item->total_sudah_survei / $item->total_penerima) * 100, 1) : 0;
+            $item->persen_layak = $item->total_sudah_survei > 0 ? round(($item->total_layak / $item->total_sudah_survei) * 100, 1) : 0;
             return $item;
-        })->sortByDesc('progres_survei')->values();
+        });
 
-        $data = [
-            ['<center><b>Kecamatan</b></center>', '<center><b>Desa / Kelurahan</b></center>', '<center><b>Total Usulan</b></center>', '<center><b>Sudah Survei</b></center>', '<center><b>Belum Survei</b></center>', '<center><b>Usulan Baru</b></center>', '<center><b>Backlog 1</b></center>', '<center><b>Backlog 2</b></center>', '<center><b>Progress Survei</b></center>']
-        ];
-        
-        $sumTotal = 0; $sumSudah = 0; $sumBelum = 0; $sumUsulanBaru = 0; $sumBacklog1 = 0; $sumBacklog2 = 0;
-        
+        $sumTotal = 0; $sumSudah = 0; $sumBelum = 0; $sumLayak = 0; $sumTidakLayak = 0; $sumUsulanBaru = 0; $sumBacklog1 = 0; $sumBacklog2 = 0;
         foreach ($rekapDesaKecamatan as $r) {
-            $b = max(0, $r->total_penerima - $r->total_sudah_survei);
             $sumTotal += $r->total_penerima;
             $sumSudah += $r->total_sudah_survei;
-            $sumBelum += $b;
+            $sumBelum += max(0, $r->total_penerima - $r->total_sudah_survei);
+            $sumLayak += $r->total_layak;
+            $sumTidakLayak += $r->total_tidak_layak;
             $sumUsulanBaru += $r->usulan_baru;
             $sumBacklog1 += $r->backlog_1;
             $sumBacklog2 += $r->backlog_2;
-            
-            $data[] = [
-                $r->kecamatan,
-                $r->desa_kelurahan,
-                $r->total_penerima,
-                $r->total_sudah_survei,
-                $b,
-                $r->usulan_baru,
-                $r->backlog_1,
-                $r->backlog_2,
-                $r->progres_survei . '%'
-            ];
         }
-        
-        $data[] = [
-            '<b>TOTAL KESELURUHAN:</b>',
-            '',
-            '<b>'.$sumTotal.'</b>',
-            '<b>'.$sumSudah.'</b>',
-            '<b>'.$sumBelum.'</b>',
-            '<b>'.$sumUsulanBaru.'</b>',
-            '<b>'.$sumBacklog1.'</b>',
-            '<b>'.$sumBacklog2.'</b>',
-            '<b>'.($sumTotal > 0 ? round(($sumSudah/$sumTotal)*100,1) : 0) . '%</b>'
-        ];
-        
+
         $prefix = ($kecamatan && $kecamatan !== 'all') 
             ? 'rekap_progress_kec_' . strtolower(str_replace([' ', '/', '\\'], '_', $kecamatan)) 
             : 'rekap_progress_kab_jember_semua_desa';
-        $filename = $prefix . '_' . date('Ymd_His') . '.xlsx';
-        
-        \Shuchkin\SimpleXLSXGen::fromArray($data)->downloadAs($filename);
+
+        if (class_exists('\Shuchkin\SimpleXLSXGen')) {
+            $data = [
+                ['<center><b>No</b></center>', '<center><b>Kecamatan</b></center>', '<center><b>Desa / Kelurahan</b></center>', '<center><b>Total Usulan</b></center>', '<center><b>Sudah Survei</b></center>', '<center><b>Belum Survei</b></center>', '<center><b>Layak Diusulkan</b></center>', '<center><b>Tidak Layak</b></center>', '<center><b>Usulan Baru</b></center>', '<center><b>Backlog 1</b></center>', '<center><b>Backlog 2</b></center>', '<center><b>% Progress Survei</b></center>', '<center><b>% Kelayakan</b></center>']
+            ];
+            $noIdx = 1;
+            foreach ($rekapDesaKecamatan as $r) {
+                $b = max(0, $r->total_penerima - $r->total_sudah_survei);
+                $data[] = [
+                    $noIdx++,
+                    $r->kecamatan,
+                    $r->desa_kelurahan,
+                    $r->total_penerima,
+                    $r->total_sudah_survei,
+                    $b,
+                    $r->total_layak,
+                    $r->total_tidak_layak,
+                    $r->usulan_baru,
+                    $r->backlog_1,
+                    $r->backlog_2,
+                    $r->progres_survei . '%',
+                    $r->persen_layak . '%'
+                ];
+            }
+            $data[] = [
+                '<b>TOTAL:</b>',
+                '',
+                '',
+                '<b>'.$sumTotal.'</b>',
+                '<b>'.$sumSudah.'</b>',
+                '<b>'.$sumBelum.'</b>',
+                '<b>'.$sumLayak.'</b>',
+                '<b>'.$sumTidakLayak.'</b>',
+                '<b>'.$sumUsulanBaru.'</b>',
+                '<b>'.$sumBacklog1.'</b>',
+                '<b>'.$sumBacklog2.'</b>',
+                '<b>'.($sumTotal > 0 ? round(($sumSudah/$sumTotal)*100,1) : 0) . '%</b>',
+                '<b>'.($sumSudah > 0 ? round(($sumLayak/$sumSudah)*100,1) : 0) . '%</b>'
+            ];
+            $filenameXlsx = $prefix . '_' . date('Ymd_His') . '.xlsx';
+            \Shuchkin\SimpleXLSXGen::fromArray($data)->downloadAs($filenameXlsx);
+            exit;
+        }
+
+        // Native Microsoft Excel (.xls) dengan UTF-8 BOM & Styling Standar PUPR (Bisa dibuka di semua Excel tanpa package tambahan)
+        $filename = $prefix . '_' . date('Ymd_His') . '.xls';
+        $wilayahLabel = ($kecamatan && $kecamatan !== 'all') ? 'Kecamatan ' . strtoupper($kecamatan) : 'Seluruh 31 Kecamatan & Desa di Kab. Jember';
+        $totalPersen = $sumTotal > 0 ? round(($sumSudah / $sumTotal) * 100, 1) : 0;
+        $totalLayakPersen = $sumSudah > 0 ? round(($sumLayak / $sumSudah) * 100, 1) : 0;
+
+        header('Content-Type: application/vnd.ms-excel; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: max-age=0, no-cache, no-store, must-revalidate');
+        header('Pragma: public');
+
+        echo "\xEF\xBB\xBF"; // UTF-8 BOM agar terbaca sempurna di Microsoft Excel
+        ?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <style>
+        body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; color: #1e293b; }
+        table { border-collapse: collapse; width: 100%; }
+        th { background-color: #002855; color: #ffffff; font-weight: bold; text-align: center; border: 1px solid #001833; padding: 8px 12px; }
+        td { border: 1px solid #cbd5e1; padding: 6px 10px; font-size: 11pt; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .total-row { background-color: #f1f5f9; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <table>
+        <tr>
+            <td colspan="13" style="border:none; text-align:center; font-size:16pt; font-weight:bold; color:#002855; height:32px;">
+                REKAPITULASI PROGRES SURVEI BSPS KABUPATEN JEMBER
+            </td>
+        </tr>
+        <tr>
+            <td colspan="13" style="border:none; text-align:center; font-size:11pt; color:#475569; height:24px;">
+                Wilayah: <?= htmlspecialchars($wilayahLabel) ?> &bull; Total Usulan: <?= number_format($sumTotal) ?> Penerima &bull; Tanggal Ekspor: <?= date('d M Y, H:i') ?> WIB
+            </td>
+        </tr>
+        <tr><td colspan="13" style="border:none; height:10px;"></td></tr>
+        <thead>
+            <tr>
+                <th style="background-color:#002855; color:#ffffff; font-weight:bold; text-align:center; border:1px solid #001833;">No</th>
+                <th style="background-color:#002855; color:#ffffff; font-weight:bold; text-align:center; border:1px solid #001833;">Kecamatan</th>
+                <th style="background-color:#002855; color:#ffffff; font-weight:bold; text-align:center; border:1px solid #001833;">Desa / Kelurahan</th>
+                <th style="background-color:#002855; color:#ffffff; font-weight:bold; text-align:center; border:1px solid #001833;">Total Usulan</th>
+                <th style="background-color:#002855; color:#ffffff; font-weight:bold; text-align:center; border:1px solid #001833;">Sudah Survei</th>
+                <th style="background-color:#002855; color:#ffffff; font-weight:bold; text-align:center; border:1px solid #001833;">Belum Survei</th>
+                <th style="background-color:#002855; color:#ffffff; font-weight:bold; text-align:center; border:1px solid #001833;">Layak</th>
+                <th style="background-color:#002855; color:#ffffff; font-weight:bold; text-align:center; border:1px solid #001833;">Tidak Layak</th>
+                <th style="background-color:#002855; color:#ffffff; font-weight:bold; text-align:center; border:1px solid #001833;">Usulan Baru</th>
+                <th style="background-color:#002855; color:#ffffff; font-weight:bold; text-align:center; border:1px solid #001833;">Backlog 1</th>
+                <th style="background-color:#002855; color:#ffffff; font-weight:bold; text-align:center; border:1px solid #001833;">Backlog 2</th>
+                <th style="background-color:#002855; color:#ffffff; font-weight:bold; text-align:center; border:1px solid #001833;">% Selesai Verval</th>
+                <th style="background-color:#002855; color:#ffffff; font-weight:bold; text-align:center; border:1px solid #001833;">% Kelayakan</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php $no = 1; ?>
+            <?php foreach ($rekapDesaKecamatan as $r): ?>
+                <?php 
+                    $b = max(0, $r->total_penerima - $r->total_sudah_survei); 
+                    $badgeBg = $r->progres_survei >= 100 ? '#dcfce7' : ($r->progres_survei > 0 ? '#fef3c7' : '#f1f5f9');
+                    $badgeColor = $r->progres_survei >= 100 ? '#15803d' : ($r->progres_survei > 0 ? '#b45309' : '#64748b');
+                ?>
+                <tr>
+                    <td style="text-align:center; border:1px solid #cbd5e1;"><?= $no++ ?></td>
+                    <td style="border:1px solid #cbd5e1;"><?= htmlspecialchars($r->kecamatan) ?></td>
+                    <td style="border:1px solid #cbd5e1; font-weight:bold;"><?= htmlspecialchars($r->desa_kelurahan) ?></td>
+                    <td style="text-align:center; border:1px solid #cbd5e1; font-weight:bold;"><?= $r->total_penerima ?></td>
+                    <td style="text-align:center; border:1px solid #cbd5e1; color:#15803d; font-weight:bold;"><?= $r->total_sudah_survei ?></td>
+                    <td style="text-align:center; border:1px solid #cbd5e1; color:#b91c1c;"><?= $b ?></td>
+                    <td style="text-align:center; border:1px solid #cbd5e1; color:#15803d;"><?= $r->total_layak ?></td>
+                    <td style="text-align:center; border:1px solid #cbd5e1; color:#b91c1c;"><?= $r->total_tidak_layak ?></td>
+                    <td style="text-align:center; border:1px solid #cbd5e1;"><?= $r->usulan_baru ?></td>
+                    <td style="text-align:center; border:1px solid #cbd5e1;"><?= $r->backlog_1 ?></td>
+                    <td style="text-align:center; border:1px solid #cbd5e1;"><?= $r->backlog_2 ?></td>
+                    <td style="text-align:center; border:1px solid #cbd5e1; font-weight:bold; background-color:<?= $badgeBg ?>; color:<?= $badgeColor ?>;">
+                        <?= $r->progres_survei ?>%
+                    </td>
+                    <td style="text-align:center; border:1px solid #cbd5e1; font-weight:bold; color:#002855;">
+                        <?= $r->persen_layak ?>%
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+        <tfoot>
+            <tr style="background-color:#e2e8f0; font-weight:bold;">
+                <td colspan="3" style="text-align:center; border:1px solid #94a3b8; font-weight:bold; padding:8px; font-size:11pt;">TOTAL KESELURUHAN:</td>
+                <td style="text-align:center; border:1px solid #94a3b8; font-weight:bold;"><?= number_format($sumTotal) ?></td>
+                <td style="text-align:center; border:1px solid #94a3b8; font-weight:bold; color:#15803d;"><?= number_format($sumSudah) ?></td>
+                <td style="text-align:center; border:1px solid #94a3b8; font-weight:bold; color:#b91c1c;"><?= number_format($sumBelum) ?></td>
+                <td style="text-align:center; border:1px solid #94a3b8; font-weight:bold; color:#15803d;"><?= number_format($sumLayak) ?></td>
+                <td style="text-align:center; border:1px solid #94a3b8; font-weight:bold; color:#b91c1c;"><?= number_format($sumTidakLayak) ?></td>
+                <td style="text-align:center; border:1px solid #94a3b8; font-weight:bold;"><?= number_format($sumUsulanBaru) ?></td>
+                <td style="text-align:center; border:1px solid #94a3b8; font-weight:bold;"><?= number_format($sumBacklog1) ?></td>
+                <td style="text-align:center; border:1px solid #94a3b8; font-weight:bold;"><?= number_format($sumBacklog2) ?></td>
+                <td style="text-align:center; border:1px solid #94a3b8; font-weight:bold; background-color:#cbd5e1; color:#002855;">
+                    <?= $totalPersen ?>%
+                </td>
+                <td style="text-align:center; border:1px solid #94a3b8; font-weight:bold; background-color:#cbd5e1; color:#002855;">
+                    <?= $totalLayakPersen ?>%
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</body>
+</html>
+        <?php
         exit;
     }
 
