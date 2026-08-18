@@ -389,12 +389,20 @@ class LaporanController extends Controller
             ->orderBy('desa_kelurahan', 'asc')
             ->get();
 
-        // Hitung progress survei dan kelayakan per desa
+        // Hitung progress survei dan kelayakan per desa, lalu urutkan dari progress tertinggi (100%) ke terendah
         $rekapDesaKecamatan = $rekapDesaKecamatan->map(function($item) {
             $item->progres_survei = $item->total_penerima > 0 ? round(($item->total_sudah_survei / $item->total_penerima) * 100, 1) : 0;
             $item->persen_layak = $item->total_sudah_survei > 0 ? round(($item->total_layak / $item->total_sudah_survei) * 100, 1) : 0;
             return $item;
-        });
+        })->sort(function($a, $b) {
+            if ($b->progres_survei != $a->progres_survei) {
+                return $b->progres_survei <=> $a->progres_survei;
+            }
+            if ($b->total_sudah_survei != $a->total_sudah_survei) {
+                return $b->total_sudah_survei <=> $a->total_sudah_survei;
+            }
+            return strcmp($a->kecamatan, $b->kecamatan);
+        })->values();
 
         $sumTotal = 0; $sumSudah = 0; $sumBelum = 0; $sumLayak = 0; $sumTidakLayak = 0; $sumUsulanBaru = 0; $sumBacklog1 = 0; $sumBacklog2 = 0;
         foreach ($rekapDesaKecamatan as $r) {
