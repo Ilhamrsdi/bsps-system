@@ -146,7 +146,7 @@ class LaporanController extends Controller
             $conds[] = "({$field} IS NOT NULL AND TRIM({$field}) != '')";
         }
         $formLengkapSql = "(" . implode(" AND ", $conds) . ")";
-        $sudahSql = "(status IN ('meninggal', 'pindah', 'tidak diketahui') OR {$formLengkapSql})";
+        $sudahSql = "(status IN ('meninggal', 'pindah', 'tidak diketahui', 'menolak disurvey') OR {$formLengkapSql})";
 
         if ($tab === 'rekap') {
             // TAB 1: REKAP HASIL SESUAI VS TIDAK SESUAI PER DESA & KECAMATAN
@@ -278,7 +278,7 @@ class LaporanController extends Controller
             $conds[] = "({$field} IS NOT NULL AND TRIM({$field}) != '')";
         }
         $formLengkapSql = "(" . implode(" AND ", $conds) . ")";
-        $sudahSql = "(status IN ('meninggal', 'pindah', 'tidak diketahui') OR {$formLengkapSql})";
+        $sudahSql = "(status IN ('meninggal', 'pindah', 'tidak diketahui', 'menolak disurvey') OR {$formLengkapSql})";
 
         $rekapDesaKecamatan = (clone $query)
             ->selectRaw("
@@ -366,7 +366,7 @@ class LaporanController extends Controller
             $conds[] = "({$field} IS NOT NULL AND TRIM({$field}) != '')";
         }
         $formLengkapSql = "(" . implode(" AND ", $conds) . ")";
-        $sudahSql = "(status IN ('meninggal', 'pindah', 'tidak diketahui') OR {$formLengkapSql})";
+        $sudahSql = "(status IN ('meninggal', 'pindah', 'tidak diketahui', 'menolak disurvey') OR {$formLengkapSql})";
 
         $rekapDesaKecamatan = (clone $query)
             ->whereNotNull('kecamatan')

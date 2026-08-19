@@ -54,7 +54,7 @@ class DashboardController extends Controller
             $conds[] = "({$field} IS NOT NULL AND TRIM({$field}) != '')";
         }
         $formLengkapSql = "(" . implode(" AND ", $conds) . ")";
-        $sudahSql = "(status IN ('meninggal', 'pindah', 'tidak diketahui') OR {$formLengkapSql})";
+        $sudahSql = "(status IN ('meninggal', 'pindah', 'tidak diketahui', 'menolak disurvey') OR {$formLengkapSql})";
 
         // 4. Top 6 Desa/Kelurahan dengan Capaian Layak Terbanyak
         $topDesa = DataPenerima::selectRaw("
@@ -98,7 +98,7 @@ class DashboardController extends Controller
             $conds[] = "({$field} IS NOT NULL AND TRIM({$field}) != '')";
         }
         $formLengkapSql = "(" . implode(" AND ", $conds) . ")";
-        $sudahSql = "(status IN ('meninggal', 'pindah', 'tidak diketahui') OR {$formLengkapSql})";
+        $sudahSql = "(status IN ('meninggal', 'pindah', 'tidak diketahui', 'menolak disurvey') OR {$formLengkapSql})";
 
         $globalTotalTarget = $totalPenerima;
         $globalTotalSudah = DataPenerima::sudahSurvei()->count();
@@ -519,7 +519,7 @@ class DashboardController extends Controller
             $conds[] = "({$field} IS NOT NULL AND TRIM({$field}) != '')";
         }
         $formLengkapSql = "(" . implode(" AND ", $conds) . ")";
-        $sudahSql = "(status IN ('meninggal', 'pindah', 'tidak diketahui') OR {$formLengkapSql})";
+        $sudahSql = "(status IN ('meninggal', 'pindah', 'tidak diketahui', 'menolak disurvey') OR {$formLengkapSql})";
 
         $desaStatsQuery = DataPenerima::selectRaw("
             kecamatan,

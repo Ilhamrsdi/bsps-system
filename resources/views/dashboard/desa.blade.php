@@ -552,9 +552,14 @@
                                 </span>
                             </td>
                             <td>
-                                @if(in_array($row->status, ['meninggal', 'pindah', 'tidak diketahui']))
+                                @if(in_array($row->status, ['meninggal', 'pindah', 'tidak diketahui', 'menolak disurvey']))
                                     @php
-                                        $specLabel = ['meninggal' => ['icon' => 'fa-heart-crack', 'text' => 'Meninggal Dunia', 'color' => '#dc2626', 'bg' => '#fee2e2'], 'pindah' => ['icon' => 'fa-house-chimney-crack', 'text' => 'Pindah Alamat', 'color' => '#d97706', 'bg' => '#fef3c7'], 'tidak diketahui' => ['icon' => 'fa-question-circle', 'text' => 'Tidak Diketahui', 'color' => '#6b7280', 'bg' => '#f3f4f6']];
+                                        $specLabel = [
+                                            'meninggal' => ['icon' => 'fa-heart-crack', 'text' => 'Meninggal Dunia', 'color' => '#dc2626', 'bg' => '#fee2e2'],
+                                            'pindah' => ['icon' => 'fa-house-chimney-crack', 'text' => 'Pindah Alamat', 'color' => '#d97706', 'bg' => '#fef3c7'],
+                                            'tidak diketahui' => ['icon' => 'fa-question-circle', 'text' => 'Tidak Diketahui', 'color' => '#6b7280', 'bg' => '#f3f4f6'],
+                                            'menolak disurvey' => ['icon' => 'fa-hand-paper', 'text' => 'Menolak Disurvei', 'color' => '#ea580c', 'bg' => '#fff7ed']
+                                        ];
                                         $sl = $specLabel[$row->status] ?? $specLabel['tidak diketahui'];
                                     @endphp
                                     <span style="font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 12px; background: {{ $sl['bg'] }}; color: {{ $sl['color'] }}; display: inline-flex; align-items: center; gap: 5px;">
@@ -583,10 +588,15 @@
                                 @endif
                             </td>
                             <td style="text-align: center;">
-                                @if(in_array($row->status, ['meninggal', 'pindah', 'tidak diketahui']))
+                                @if(in_array($row->status, ['meninggal', 'pindah', 'tidak diketahui', 'menolak disurvey']))
                                     @php
-                                        $statusLabel = ['meninggal' => ['icon' => 'fa-heart-crack', 'text' => 'Meninggal', 'color' => '#dc2626', 'bg' => '#fee2e2'], 'pindah' => ['icon' => 'fa-house-chimney-crack', 'text' => 'Pindah', 'color' => '#d97706', 'bg' => '#fef3c7'], 'tidak diketahui' => ['icon' => 'fa-question-circle', 'text' => 'Tdk Diketahui', 'color' => '#6b7280', 'bg' => '#f3f4f6']];
-                                        $sl = $statusLabel[$row->status];
+                                        $statusLabel = [
+                                            'meninggal' => ['icon' => 'fa-heart-crack', 'text' => 'Meninggal', 'color' => '#dc2626', 'bg' => '#fee2e2'],
+                                            'pindah' => ['icon' => 'fa-house-chimney-crack', 'text' => 'Pindah', 'color' => '#d97706', 'bg' => '#fef3c7'],
+                                            'tidak diketahui' => ['icon' => 'fa-question-circle', 'text' => 'Tdk Diketahui', 'color' => '#6b7280', 'bg' => '#f3f4f6'],
+                                            'menolak disurvey' => ['icon' => 'fa-hand-paper', 'text' => 'Menolak Disurvei', 'color' => '#ea580c', 'bg' => '#fff7ed']
+                                        ];
+                                        $sl = $statusLabel[$row->status] ?? $statusLabel['tidak diketahui'];
                                     @endphp
                                     <span style="font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 12px; background: {{ $sl['bg'] }}; color: {{ $sl['color'] }}; border: 1px solid {{ $sl['color'] }}40; display: inline-flex; align-items: center; gap: 4px;">
                                         <i class="fas {{ $sl['icon'] }}"></i> {{ $sl['text'] }}

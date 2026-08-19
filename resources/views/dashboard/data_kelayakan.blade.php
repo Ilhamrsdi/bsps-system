@@ -290,6 +290,10 @@
                                     <span style="font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 12px; background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; display: inline-flex; align-items: center; gap: 4px;">
                                         <i class="fas fa-question-circle"></i> Tdk Diketahui
                                     </span>
+                                @elseif($row->status === 'menolak disurvey')
+                                    <span style="font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 12px; background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa; display: inline-flex; align-items: center; gap: 4px;">
+                                        <i class="fas fa-hand-paper"></i> Menolak
+                                    </span>
                                 @else
                                     <span style="font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 12px; background: #f8fafc; color: #94a3b8; border: 1px solid #f1f5f9; display: inline-flex; align-items: center; gap: 4px;">
                                         <i class="fas fa-minus"></i> Belum Verval
@@ -320,7 +324,7 @@
                                 @endif
                             </td>
                             <td style="text-align: center;">
-                                @if(in_array($row->status, ['meninggal', 'pindah', 'tidak diketahui']))
+                                @if(in_array($row->status, ['meninggal', 'pindah', 'tidak diketahui', 'menolak disurvey']))
                                     <span style="font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 12px; background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; display: inline-flex; align-items: center; gap: 4px;">
                                         <i class="fas fa-times"></i> Gugur
                                     </span>
