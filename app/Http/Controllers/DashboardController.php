@@ -265,6 +265,21 @@ class DashboardController extends Controller
                   ->orWhere('kecamatan', 'like', "%{$search}%");
             });
         }
+        
+        $statusFoto = $request->get('status_foto');
+        if ($statusFoto === 'ditolak') {
+            $query->where(function ($q) {
+                $q->where('status_foto_sudut_depan', 'tidak layak')
+                  ->orWhere('status_foto_sudut_belakang', 'tidak layak')
+                  ->orWhere('status_foto_bagian_dalam', 'tidak layak')
+                  ->orWhere('status_foto_sudut_kiri', 'tidak layak')
+                  ->orWhere('status_foto_sudut_kanan', 'tidak layak')
+                  ->orWhere('status_ktp', 'tidak layak')
+                  ->orWhere('status_kk', 'tidak layak')
+                  ->orWhere('status_surat_pernyataan', 'tidak layak');
+            });
+        }
+
         if ($status === 'layak') {
             $query->select('*')
                   ->selectRaw('(IF(indikator_lantai = "tidak_ada", 1, 0) + IF(indikator_pondasi = "tidak_ada", 1, 0) + IF(indikator_dinding = "tidak_ada", 1, 0) + IF(indikator_struktur = "tidak_ada", 1, 0) + IF(indikator_atap = "tidak_ada", 1, 0) + IF(indikator_penghasilan = "ada", 1, 0)) as jumlah_indikator_rusak')
@@ -300,7 +315,8 @@ class DashboardController extends Controller
             'kecamatan',
             'desa',
             'search',
-            'perPage'
+            'perPage',
+            'statusFoto'
         ));
     }
 

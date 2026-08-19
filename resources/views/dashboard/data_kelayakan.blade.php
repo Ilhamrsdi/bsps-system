@@ -172,6 +172,14 @@
                     </select>
                 </div>
 
+                <!-- Filter Status Foto -->
+                <div class="filter-item-box" style="max-width: 200px;">
+                    <select name="status_foto" class="form-control" onchange="this.form.submit()" style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; font-weight: 600; background: #fff;">
+                        <option value="">-- Semua Status Dokumen --</option>
+                        <option value="ditolak" {{ request('status_foto') === 'ditolak' ? 'selected' : '' }}>Ada Dok. Ditolak</option>
+                    </select>
+                </div>
+
                 <!-- Per Page -->
                 <div class="filter-item-box" style="max-width: 130px;">
                     <select name="per_page" class="form-control" onchange="this.form.submit()" style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; font-weight: 600; background: #fff;">
@@ -321,6 +329,47 @@
                                     </div>
                                 @else
                                     <span style="font-size: 12px; color: #94a3b8; font-style: italic;">Belum Diisi</span>
+                                @endif
+
+                                @php
+                                    $rejectedPhotos = [];
+                                    $fields = [
+                                        'foto_sudut_depan' => 'S. Depan',
+                                        'foto_sudut_belakang' => 'S. Belakang',
+                                        'foto_bagian_dalam' => 'B. Dalam',
+                                        'foto_sudut_kiri' => 'S. Kiri',
+                                        'foto_sudut_kanan' => 'S. Kanan',
+                                        'ktp' => 'KTP',
+                                        'kk' => 'KK',
+                                        'surat_pernyataan' => 'S. Pernyataan'
+                                    ];
+                                    foreach($fields as $key => $label) {
+                                        if($row->{'status_'.$key} === 'tidak layak') {
+                                            $rejectedPhotos[] = [
+                                                'label' => $label,
+                                                'url' => $row->$key,
+                                                'catatan' => $row->{'catatan_'.$key}
+                                            ];
+                                        }
+                                    }
+                                @endphp
+                                @if(count($rejectedPhotos) > 0)
+                                    <div style="margin-top: 10px; border-top: 1px dashed #cbd5e1; padding-top: 8px;">
+                                        <strong style="font-size: 11px; color: #dc2626; display: block; margin-bottom: 6px;"><i class="fas fa-exclamation-triangle"></i> Dokumen Ditolak / Revisi:</strong>
+                                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                            @foreach($rejectedPhotos as $rp)
+                                                <div style="border: 1px solid #fecaca; border-radius: 4px; padding: 4px; background: #fff5f5; width: 90px;">
+                                                    <div style="font-size: 10px; font-weight: bold; color: #b91c1c; margin-bottom: 2px; text-align: center;">{{ $rp['label'] }}</div>
+                                                    <a href="{{ str_starts_with($rp['url'], 'http') ? $rp['url'] : asset($rp['url']) }}" target="_blank">
+                                                        <img src="{{ str_starts_with($rp['url'], 'http') ? $rp['url'] : asset($rp['url']) }}" style="width: 100%; height: 50px; object-fit: cover; border-radius: 2px;" alt="{{ $rp['label'] }}" onerror="this.src='https://via.placeholder.com/90x50?text=No+Image'">
+                                                    </a>
+                                                    <div style="font-size: 9px; color: #7f1d1d; margin-top: 3px; line-height: 1.2; text-align: center; word-wrap: break-word;">
+                                                        {{ $rp['catatan'] ?: '-' }}
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
                                 @endif
                             </td>
                             <td style="text-align: center;">
