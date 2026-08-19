@@ -60,6 +60,11 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
     if (event.request.method !== 'GET') return;
 
+    // Abaikan request dari Chrome extension / DevTools reload cache
+    if (event.request.cache === 'only-if-cached' && event.request.mode !== 'same-origin') {
+        return;
+    }
+
     const url = new URL(event.request.url);
 
     // Strategi 1: Aset Statis (CSS, JS, Gambar, Font, CDN) -> Cache First
@@ -145,28 +150,27 @@ self.addEventListener('fetch', (event) => {
 
                     // 3. Fallback Darurat HTML (Anti Layar Dinosaurus)
                     return new Response(
-                        `<!DOCTYPE html>
+                        <!DOCTYPE html>
                         <html lang="id">
                         <head>
                             <meta charset="UTF-8">
                             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                            <title>BSPS Verval - Mode Offline</title>
-                            <link rel="stylesheet" href="/assets/css/app.css">
+                            <title>BSPS Verval - Tidak Ada Koneksi</title>
                             <style>
                                 body { background: #002855; color: #ffffff; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; font-family: sans-serif; padding: 20px; box-sizing: border-box; }
                                 .offline-card { background: #ffffff; color: #002855; max-width: 440px; width: 100%; border-radius: 16px; padding: 32px 24px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
                                 .offline-icon { width: 70px; height: 70px; background: rgba(255, 184, 0, 0.15); color: #d69e00; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 30px; margin-bottom: 18px; }
-                                .offline-btn { background: #002855; color: #ffffff; padding: 12px 24px; border-radius: 8px; font-weight: bold; text-decoration: none; display: inline-block; margin-top: 18px; }
+                                .offline-btn { background: #002855; color: #ffffff; padding: 12px 24px; border-radius: 8px; font-weight: bold; text-decoration: none; display: inline-block; margin-top: 18px; border: none; cursor: pointer; }
                             </style>
                         </head>
                         <body>
                             <div class="offline-card">
                                 <div class="offline-icon">📡</div>
-                                <h3 style="margin: 0 0 10px 0; font-size: 18px;">Mode Offline Aktif</h3>
+                                <h3 style="margin: 0 0 10px 0; font-size: 18px;">Gagal Menghubungkan ke Server</h3>
                                 <p style="color: #64748b; font-size: 13.5px; line-height: 1.5; margin: 0;">
-                                    Perangkat Anda sedang berada di area tanpa sinyal. Halaman yang pernah Anda buka sebelumnya tetap dapat diakses.
+                                    Sistem mendeteksi mode offline, atau server sedang tidak dapat diakses saat ini.
                                 </p>
-                                <a href="javascript:window.history.back()" class="offline-btn">Kembali ke Halaman Sebelumnya</a>
+                                <button onclick="window.location.reload()" class="offline-btn">Coba Muat Ulang Halaman</button>
                             </div>
                         </body>
                         </html>`,

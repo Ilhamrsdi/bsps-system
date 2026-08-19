@@ -503,4 +503,82 @@ class LaporanController extends Controller
             'base64'   => $base64,
         ];
     }
+
+    /**
+     * Export Raw Data (BNBA) langsung dari database ke format Excel
+     */
+    public function exportRawData(Request $request)
+    {
+        @set_time_limit(600);
+        @ini_set('memory_limit', '1024M');
+
+        $query = DataPenerima::query();
+        
+        // Cek filter jika diperlukan, misalnya kecamatan, desa, dll
+        $kecamatan = $request->get('kecamatan', 'all');
+        $desa = $request->get('desa', 'all');
+        $status = $request->get('status', 'all');
+
+        if ($kecamatan !== 'all') {
+            $query->whereRaw('LOWER(TRIM(kecamatan)) = ?', [strtolower(trim($kecamatan))]);
+        }
+        if ($desa !== 'all') {
+            $query->whereRaw('LOWER(TRIM(desa_kelurahan)) = ?', [strtolower(trim($desa))]);
+        }
+        if ($status === 'layak') {
+            $query->where('status_kelayakan', 'Layak Diusulkan');
+        } elseif ($status === 'tidak_layak') {
+            $query->where('status_kelayakan', 'Tidak Layak Diusulkan');
+        } elseif ($status === 'sudah') {
+            $query->sudahSurvei();
+        } elseif ($status === 'belum') {
+            $query->belumSurvei();
+        }
+
+        $penerimas = $query->get();
+
+        $data = [];
+        // Header
+        $data[] = [
+            'No', 'Nama', 'No KTP', 'No KK', 'Jenis Kelamin', 'Tempat Lahir', 'Tanggal Lahir',
+            'Alamat', 'Desa/Kelurahan', 'Kecamatan', 'Status', 'Pengelompokan Desil', 
+            'Luas Tanah', 'Status Tanah', 'Telah Ditempati Selama', 
+            'Indikator Atap', 'Indikator Dinding', 'Indikator Lantai', 'Indikator Pondasi', 
+            'Indikator Struktur', 'Indikator Penghasilan', 'Status Kelayakan', 'DG Status'
+        ];
+
+        $no = 1;
+        foreach ($penerimas as $p) {
+            $data[] = [
+                $no++,
+                $p->nama,
+                "'" . $p->no_ktp, // escape for excel
+                "'" . $p->no_kk,  // escape for excel
+                $p->jenis_kelamin,
+                $p->tempat_lahir,
+                $p->tanggal_lahir,
+                $p->alamat,
+                $p->desa_kelurahan,
+                $p->kecamatan,
+                $p->status,
+                $p->pengelompokan_desil,
+                $p->luas_tanah,
+                $p->status_tanah,
+                $p->telah_ditempati_selama,
+                $p->indikator_atap,
+                $p->indikator_dinding,
+                $p->indikator_lantai,
+                $p->indikator_pondasi,
+                $p->indikator_struktur,
+                $p->indikator_penghasilan,
+                $p->status_kelayakan,
+                $p->dg_status
+            ];
+        }
+
+        $filename = 'Tarikan_Data_Raw_Penerima_' . date('Ymd_His') . '.xlsx';
+        
+        \Shuchkin\SimpleXLSXGen::fromArray($data)->downloadAs($filename);
+        exit;
+    }
 }
