@@ -107,12 +107,12 @@
         </div>
     </div>
 
+    <!-- PWA Offline Survey Engine & IndexedDB Auto-Sync (Loaded before page scripts) -->
+    <script src="{{ asset('assets/js/offline-survey.js') }}?v={{ time() }}"></script>
+
     <!-- Page Specific Scripts -->
     @stack('scripts')
     @yield('scripts')
-
-    <!-- PWA Offline Survey Engine & IndexedDB Auto-Sync -->
-    <script src="{{ asset('assets/js/offline-survey.js') }}?v={{ time() }}"></script>
 
     <!-- PWA Service Worker Registration & Realtime Offline Detector -->
     <script>

@@ -65,7 +65,7 @@ class DashboardKecamatanController extends Controller
             $conds[] = "({$field} IS NOT NULL AND TRIM({$field}) != '')";
         }
         $formLengkapSql = "(" . implode(" AND ", $conds) . ")";
-        $sudahSql = "(status IN ('meninggal', 'pindah', 'tidak diketahui') OR {$formLengkapSql})";
+        $sudahSql = "(status IN ('meninggal', 'pindah', 'tidak diketahui', 'menolak disurvey') OR {$formLengkapSql})";
 
         $desaStatsQuery = DataPenerima::selectRaw("
                 desa_kelurahan,

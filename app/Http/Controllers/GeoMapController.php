@@ -123,7 +123,7 @@ class GeoMapController extends Controller
             if ($item->indikator_atap === 'tidak_ada')      $indikatorTerpenuhi++;
             if ($item->indikator_penghasilan === 'ada')     $indikatorTerpenuhi++;
 
-            $isStatusKhusus = in_array(strtolower($item->status), ['meninggal', 'pindah', 'tidak diketahui']);
+            $isStatusKhusus = in_array(strtolower($item->status), ['meninggal', 'pindah', 'tidak diketahui', 'menolak disurvey']);
 
             if ($isStatusKhusus) {
                 $statusLabel = 'Khusus: ' . ucfirst($item->status);

@@ -91,8 +91,8 @@ class SurveyController extends Controller
             'foto_bagian_dalam'       => 'nullable|image|max:5120',
             'foto_sudut_kiri'         => 'nullable|image|max:5120',
             'foto_sudut_kanan'        => 'nullable|image|max:5120',
-            'latitude'                => 'required|numeric',
-            'longitude'               => 'required|numeric',
+            'latitude'                => ['required', 'numeric', 'between:-8.70,-7.80'],
+            'longitude'               => ['required', 'numeric', 'between:113.15,114.15'],
         ], [
             'required'           => 'Kolom :attribute wajib diisi lengkap.',
             'in'                 => 'Pilihan :attribute tidak valid.',
@@ -100,6 +100,8 @@ class SurveyController extends Controller
             'longitude.required' => 'Koordinat GPS (Longitude) wajib direkam dari lokasi rumah/petugas. Harap aktifkan lokasi (GPS) pada perangkat Anda.',
             'latitude.numeric'   => 'Format koordinat Latitude tidak valid.',
             'longitude.numeric'  => 'Format koordinat Longitude tidak valid.',
+            'latitude.between'   => 'Koordinat GPS (Latitude) terdeteksi di luar wilayah Kabupaten Jember. Pastikan GPS HP aktif dan sinyal satelit terkunci.',
+            'longitude.between'  => 'Koordinat GPS (Longitude) terdeteksi di luar wilayah Kabupaten Jember. Pastikan GPS HP aktif dan sinyal satelit terkunci.',
         ]);
 
         // Cek kelengkapan 8 Berkas & Foto Lapangan
