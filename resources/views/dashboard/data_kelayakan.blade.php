@@ -356,15 +356,17 @@
                                 @if(count($rejectedPhotos) > 0)
                                     <div style="margin-top: 10px; border-top: 1px dashed #cbd5e1; padding-top: 8px;">
                                         <strong style="font-size: 11px; color: #dc2626; display: block; margin-bottom: 6px;"><i class="fas fa-exclamation-triangle"></i> Dokumen Ditolak / Revisi:</strong>
-                                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                        <div style="display: flex; flex-direction: column; gap: 4px;">
                                             @foreach($rejectedPhotos as $rp)
-                                                <div style="border: 1px solid #fecaca; border-radius: 4px; padding: 4px; background: #fff5f5; width: 90px;">
-                                                    <div style="font-size: 10px; font-weight: bold; color: #b91c1c; margin-bottom: 2px; text-align: center;">{{ $rp['label'] }}</div>
-                                                    <a href="{{ str_starts_with($rp['url'], 'http') ? $rp['url'] : asset($rp['url']) }}" target="_blank">
-                                                        <img src="{{ str_starts_with($rp['url'], 'http') ? $rp['url'] : asset($rp['url']) }}" style="width: 100%; height: 50px; object-fit: cover; border-radius: 2px;" alt="{{ $rp['label'] }}" onerror="this.src='https://via.placeholder.com/90x50?text=No+Image'">
+                                                <div style="display: flex; gap: 6px; background: #fff5f5; border: 1px solid #fecaca; border-radius: 4px; padding: 4px; align-items: flex-start;">
+                                                    <a href="{{ str_starts_with($rp['url'], 'http') ? $rp['url'] : asset($rp['url']) }}" target="_blank" style="flex-shrink: 0;">
+                                                        <img src="{{ str_starts_with($rp['url'], 'http') ? $rp['url'] : asset($rp['url']) }}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 2px;" alt="{{ $rp['label'] }}" onerror="this.src='https://via.placeholder.com/40?text=NA'">
                                                     </a>
-                                                    <div style="font-size: 9px; color: #7f1d1d; margin-top: 3px; line-height: 1.2; text-align: center; word-wrap: break-word;">
-                                                        {{ $rp['catatan'] ?: '-' }}
+                                                    <div style="flex: 1; min-width: 0;">
+                                                        <div style="font-size: 10.5px; font-weight: 700; color: #b91c1c; margin-bottom: 2px;">{{ $rp['label'] }}</div>
+                                                        <div style="font-size: 10px; color: #7f1d1d; line-height: 1.3;">
+                                                            {{ $rp['catatan'] ?: '-' }}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             @endforeach
