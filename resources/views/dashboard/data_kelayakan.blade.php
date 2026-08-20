@@ -1,7 +1,7 @@
 @extends('layouts.partial.app')
 
-@section('title', 'Data Calon Penerima ' . ($status === 'tidak_layak' ? 'Tidak Layak' : ($status === 'mypkp' ? 'Telah Diusulkan di myPKP' : ($status === 'all' ? 'Hasil Verval' : 'Layak Diusulkan'))))
-@section('title_header', 'Data Penerima BSPS (' . ($status === 'tidak_layak' ? 'Tidak Layak Diusulkan' : ($status === 'mypkp' ? 'Telah Diusulkan di myPKP' : ($status === 'all' ? 'Semua Hasil Verval' : 'Layak Diusulkan'))) . ')')
+@section('title', 'Data Calon Penerima ' . ($status === 'tidak_layak' ? 'Tidak Layak' : ($status === 'mypkp' ? 'Telah Diusulkan di myPKP' : ($status === 'belum_verval' ? 'Belum Verval' : ($status === 'all' ? 'Hasil Verval' : 'Layak Diusulkan')))))
+@section('title_header', 'Data Penerima BSPS (' . ($status === 'tidak_layak' ? 'Tidak Layak Diusulkan' : ($status === 'mypkp' ? 'Telah Diusulkan di myPKP' : ($status === 'belum_verval' ? 'Belum Verval' : ($status === 'all' ? 'Semua Hasil Verval' : 'Layak Diusulkan')))) . ')')
 @section('subtitle_header', 'Daftar By Name By Address (BNBA) Calon Penerima Bantuan Stimulan Perumahan Swadaya')
 
 @push('styles')
@@ -47,6 +47,13 @@
         color: #ffffff;
         border-color: #1d4ed8;
         box-shadow: 0 6px 18px rgba(29, 78, 216, 0.25);
+    }
+
+    .kelayakan-pill-btn.active.pill-belum {
+        background: #d97706;
+        color: #ffffff;
+        border-color: #d97706;
+        box-shadow: 0 6px 18px rgba(217, 119, 6, 0.25);
     }
 
     .kelayakan-pill-btn.active.pill-tidak {
@@ -121,10 +128,10 @@
         <div class="breadcrumb" style="margin-bottom: 16px; font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
             <a href="{{ route('dashboard') }}" style="color: var(--primary); text-decoration: none; font-weight: 600;"><i class="fas fa-th-large"></i> Dashboard Global</a>
             <i class="fas fa-chevron-right" style="font-size: 10px;"></i>
-            <span>Data Kelayakan Penerima ({{ $status === 'tidak_layak' ? 'Tidak Layak' : ($status === 'mypkp' ? 'Telah Diusulkan di myPKP' : ($status === 'all' ? 'Semua Verval' : 'Layak Diusulkan')) }})</span>
+            <span>Data Kelayakan Penerima ({{ $status === 'tidak_layak' ? 'Tidak Layak' : ($status === 'mypkp' ? 'Telah Diusulkan di myPKP' : ($status === 'belum_verval' ? 'Belum Verval' : ($status === 'all' ? 'Semua Verval' : 'Layak Diusulkan'))) }})</span>
         </div>
 
-        <!-- 4 Tab Selector: Layak Diusulkan vs Diusulkan myPKP vs Tidak Layak vs Semua Verval -->
+        <!-- 5 Tab Selector: Layak Diusulkan vs Diusulkan myPKP vs Belum Verval vs Tidak Layak vs Semua Verval -->
         <div class="kelayakan-filter-pills">
             <a href="{{ route('dashboard.data-kelayakan', ['status' => 'layak', 'kecamatan' => request('kecamatan'), 'desa' => request('desa')]) }}"
                class="kelayakan-pill-btn pill-layak {{ $status === 'layak' ? 'active' : '' }}">
@@ -140,6 +147,13 @@
                 <span class="badge-pill-count">{{ number_format($totalMypkpGlobal ?? 0) }} KK</span>
             </a>
 
+            <a href="{{ route('dashboard.data-kelayakan', ['status' => 'belum_verval', 'kecamatan' => request('kecamatan'), 'desa' => request('desa')]) }}"
+               class="kelayakan-pill-btn pill-belum {{ $status === 'belum_verval' ? 'active' : '' }}">
+                <i class="fas fa-hourglass-half"></i>
+                <span>Belum Verval</span>
+                <span class="badge-pill-count">{{ number_format($totalBelumGlobal ?? 0) }} KK</span>
+            </a>
+
             <a href="{{ route('dashboard.data-kelayakan', ['status' => 'tidak_layak', 'kecamatan' => request('kecamatan'), 'desa' => request('desa')]) }}"
                class="kelayakan-pill-btn pill-tidak {{ $status === 'tidak_layak' ? 'active' : '' }}">
                 <i class="fas fa-circle-xmark"></i>
@@ -150,8 +164,8 @@
             <a href="{{ route('dashboard.data-kelayakan', ['status' => 'all', 'kecamatan' => request('kecamatan'), 'desa' => request('desa')]) }}"
                class="kelayakan-pill-btn pill-all {{ $status === 'all' ? 'active' : '' }}">
                 <i class="fas fa-clipboard-check"></i>
-                <span>Semua Hasil Verval</span>
-                <span class="badge-pill-count">{{ number_format($totalSudahSurveiGlobal) }} KK</span>
+                <span>Semua Target Verval</span>
+                <span class="badge-pill-count">{{ number_format($totalTargetGlobal) }} KK</span>
             </a>
         </div>
 
@@ -248,18 +262,21 @@
                     @elseif($status === 'mypkp')
                         <i class="fas fa-paper-plane" style="color: #1d4ed8;"></i>
                         <span>Daftar Calon Penerima Telah Diusulkan di myPKP</span>
+                    @elseif($status === 'belum_verval')
+                        <i class="fas fa-hourglass-half" style="color: #d97706;"></i>
+                        <span>Daftar Calon Penerima Belum Verval</span>
                     @elseif($status === 'tidak_layak')
                         <i class="fas fa-circle-xmark" style="color: #dc2626;"></i>
                         <span>Daftar Calon Penerima Tidak Layak</span>
                     @else
                         <i class="fas fa-clipboard-list" style="color: #002855;"></i>
-                        <span>Daftar Seluruh Calon Penerima Selesai Verval</span>
+                        <span>Daftar Seluruh Calon Penerima Verval</span>
                     @endif
                     <span style="font-size: 13px; color: #64748b; font-weight: 600;">({{ number_format($penerimaList->total()) }} data ditemukan)</span>
                 </h3>
 
                 <div style="display: flex; gap: 8px;">
-                    <a href="{{ route('laporan.export', ['status' => ($status === 'layak' ? 'layak' : ($status === 'mypkp' ? 'mypkp' : ($status === 'tidak_layak' ? 'tidak_layak' : 'all'))), 'kecamatan' => request('kecamatan', 'all')]) }}" class="btn btn-outline" style="padding: 6px 14px; font-size: 12px; font-weight: 700; border-radius: 6px; text-decoration: none; border: 1px solid #107c41; color: #107c41; background: #ffffff; display: inline-flex; align-items: center; gap: 6px;">
+                    <a href="{{ route('laporan.export', ['status' => ($status === 'layak' ? 'layak' : ($status === 'mypkp' ? 'mypkp' : ($status === 'belum_verval' ? 'belum' : ($status === 'tidak_layak' ? 'tidak_layak' : 'all')))), 'kecamatan' => request('kecamatan', 'all')]) }}" class="btn btn-outline" style="padding: 6px 14px; font-size: 12px; font-weight: 700; border-radius: 6px; text-decoration: none; border: 1px solid #107c41; color: #107c41; background: #ffffff; display: inline-flex; align-items: center; gap: 6px;">
                         <i class="fas fa-file-excel"></i> Export Excel
                     </a>
                 </div>

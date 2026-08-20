@@ -443,6 +443,14 @@
         border-color: #2563eb;
         box-shadow: 0 12px 28px rgba(37, 99, 235, 0.18);
     }
+    .kelayakan-action-card.card-belum {
+        border-color: #fcd34d;
+        background: linear-gradient(180deg, #fffdf5 0%, #ffffff 100%);
+    }
+    .kelayakan-action-card.card-belum:hover {
+        border-color: #f59e0b;
+        box-shadow: 0 12px 28px rgba(245, 158, 11, 0.18);
+    }
     .card-top-icon {
         display: flex;
         align-items: center;
@@ -460,6 +468,7 @@
     .icon-green { background: #dcfce7; color: #16a34a; }
     .icon-red { background: #fee2e2; color: #dc2626; }
     .icon-mypkp { background: #dbeafe; color: #1d4ed8; }
+    .icon-belum { background: #fef3c7; color: #d97706; }
     .badge-status-pill {
         font-size: 11px;
         font-weight: 800;
@@ -469,6 +478,7 @@
     .pill-green { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
     .pill-red { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
     .pill-mypkp { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+    .pill-belum { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
     .card-main-metric .metric-val {
         font-size: 28px;
         font-weight: 900;
@@ -478,6 +488,119 @@
     .card-main-metric .unit { font-size: 16px; font-weight: 700; opacity: 0.8; }
     .text-green { color: #15803d; }
     .text-red { color: #b91c1c; }
+    .text-mypkp { color: #1d4ed8; }
+    .text-belum { color: #d97706; }
+    .btn-goto-table.text-belum { color: #d97706; }
+
+    /* Embedded Info Boxes inside Top Executive Cards */
+    .mypkp-embedded-box {
+        background: rgba(37, 99, 235, 0.07);
+        border: 1px solid #bfdbfe;
+        border-radius: 9px;
+        padding: 7px 11px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        transition: background 0.2s ease;
+    }
+    .mypkp-embedded-box:hover {
+        background: rgba(37, 99, 235, 0.12);
+    }
+    .mypkp-box-left {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11.5px;
+        font-weight: 700;
+        color: #1e40af;
+    }
+    .mypkp-box-right {
+        font-size: 12.5px;
+        font-weight: 900;
+        color: #1d4ed8;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .mypkp-box-pct {
+        font-size: 10.5px;
+        font-weight: 800;
+        color: #1e40af;
+        background: #dbeafe;
+        padding: 1px 6px;
+        border-radius: 6px;
+    }
+
+    .belum-embedded-box {
+        background: rgba(245, 158, 11, 0.08);
+        border: 1px solid #fde68a;
+        border-radius: 9px;
+        padding: 7px 11px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+    }
+    .belum-box-left {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11.5px;
+        font-weight: 700;
+        color: #92400e;
+    }
+    .belum-box-right {
+        font-size: 12.5px;
+        font-weight: 900;
+        color: #b45309;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .belum-box-pct {
+        font-size: 10.5px;
+        font-weight: 800;
+        color: #92400e;
+        background: #fef3c7;
+        padding: 1px 6px;
+        border-radius: 6px;
+    }
+
+    .tidak-embedded-box {
+        background: rgba(239, 68, 68, 0.06);
+        border: 1px solid #fecaca;
+        border-radius: 9px;
+        padding: 7px 11px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+    }
+    .tidak-box-left {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11.5px;
+        font-weight: 700;
+        color: #991b1b;
+    }
+    .tidak-box-right {
+        font-size: 12.5px;
+        font-weight: 900;
+        color: #dc2626;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .tidak-box-pct {
+        font-size: 10.5px;
+        font-weight: 800;
+        color: #991b1b;
+        background: #fee2e2;
+        padding: 1px 6px;
+        border-radius: 6px;
+    }
     .text-mypkp { color: #1d4ed8; }
     .card-main-metric .metric-title {
         font-size: 12px;
@@ -510,7 +633,7 @@
     /* Mini Cards Status Verval */
     .verval-status-row {
         display: grid;
-        grid-template-columns: repeat(6, 1fr);
+        grid-template-columns: repeat(5, 1fr);
         gap: 12px;
         padding: 0 20px 20px 20px;
     }
@@ -1168,82 +1291,93 @@
 
         <!-- SECTION CAPAIAN VERVAL GLOBAL & DROP-EXPAND DESA CARDS (KESELURUHAN KABUPATEN JEMBER) -->
         <div class="global-verval-card" id="globalVervalSection" style="display: none;">
-            <!-- 3 CARD UTAMA: KELAYAKAN HASIL VERVAL & USULAN MYPKP (KLIK UNTUK PINDAH KE TABEL RINCIAN) -->
-            <div style="padding: 20px 20px 12px 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; background: transparent;">
-                <!-- 1. CARD LAYAK DIUSULKAN -->
-                <a href="{{ route('dashboard.data-kelayakan', ['status' => 'layak']) }}" class="kelayakan-action-card card-layak" style="text-decoration: none;" title="Klik untuk membuka tabel rincian data calon penerima Layak Diusulkan">
-                    <div class="card-top-icon">
-                        <div class="icon-circle icon-green">
-                            <i class="fas fa-circle-check"></i>
+            <!-- 2 CARD UTAMA: KELAYAKAN HASIL VERVAL & BELUM VERVAL (KLIK CARD LAYAK UNTUK MUNCULKAN CARD MYPKP) -->
+            <div style="padding: 20px 20px 12px 20px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; margin-bottom: 14px;">
+                    <!-- 1. CARD LAYAK DIUSULKAN (KLIK UNTUK MUNCULKAN CARD USULAN MYPKP) -->
+                    <div class="kelayakan-action-card card-layak" id="cardLayakAction" onclick="toggleMyPkpCard()" style="cursor: pointer; text-decoration: none;" title="Klik untuk menampilkan / menutup card Telah Diusulkan di myPKP">
+                        <div class="card-top-icon">
+                            <div class="icon-circle icon-green">
+                                <i class="fas fa-circle-check"></i>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                <span class="badge-status-pill pill-green">
+                                    <i class="fas fa-award"></i> Memenuhi Kriteria (≥2 RTLH)
+                                </span>
+                                <span class="badge-status-pill" id="badgeMyPkpTrigger" style="background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; display: inline-flex; align-items: center; gap: 4px; cursor: pointer; transition: all 0.2s ease;">
+                                    <i class="fas fa-paper-plane" style="font-size: 10px;"></i>
+                                    <span>myPKP: {{ number_format($globalVervalStats['total_mypkp'] ?? 0) }}</span>
+                                    <i class="fas fa-chevron-down" id="iconMyPkpChevron" style="font-size: 9px; transition: transform 0.3s ease;"></i>
+                                </span>
+                            </div>
                         </div>
-                        <span class="badge-status-pill pill-green">
-                            <i class="fas fa-award"></i> Memenuhi Kriteria (≥2 RTLH)
-                        </span>
-                    </div>
-                    <div class="card-main-metric">
-                        <div class="metric-val text-green">{{ number_format($globalVervalStats['total_layak']) }} <span class="unit">KK</span></div>
-                        <div class="metric-title">CALON PENERIMA LAYAK DIUSULKAN</div>
-                    </div>
-                    <div class="card-footer-info">
-                        <div class="pct-text">
-                            <strong>{{ $globalVervalStats['persen_layak'] }}%</strong> dari total verval selesai
+                        <div class="card-main-metric">
+                            <div class="metric-val text-green">{{ number_format($globalVervalStats['total_layak']) }} <span class="unit">KK</span></div>
+                            <div class="metric-title">CALON PENERIMA LAYAK DIUSULKAN</div>
                         </div>
-                        <div class="btn-goto-table text-green">
-                            <span>Buka Tabel Data Layak</span>
-                            <i class="fas fa-arrow-right"></i>
+                        <div class="card-footer-info">
+                            <div class="pct-text">
+                                <strong>{{ $globalVervalStats['persen_layak'] }}%</strong> dari total verval selesai
+                            </div>
+                            <a href="{{ route('dashboard.data-kelayakan', ['status' => 'layak']) }}" onclick="event.stopPropagation();" class="btn-goto-table text-green" style="text-decoration: none;" title="Buka Tabel Rincian Data Layak">
+                                <span>Buka Tabel Data Layak</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
                         </div>
                     </div>
-                </a>
 
-                <!-- 2. CARD TELAH DIUSULKAN DI myPKP -->
-                <a href="{{ route('dashboard.data-kelayakan', ['status' => 'mypkp']) }}" class="kelayakan-action-card card-mypkp" style="text-decoration: none;" title="Klik untuk membuka rincian data calon penerima yang telah diusulkan di myPKP">
-                    <div class="card-top-icon">
-                        <div class="icon-circle icon-mypkp">
-                            <i class="fas fa-paper-plane"></i>
+                    <!-- 2. CARD BELUM VERVAL -->
+                    <a href="{{ route('dashboard.data-kelayakan', ['status' => 'belum_verval']) }}" class="kelayakan-action-card card-belum" style="text-decoration: none;" title="Klik untuk membuka rincian data calon penerima yang Belum Verval">
+                        <div class="card-top-icon">
+                            <div class="icon-circle icon-belum">
+                                <i class="fas fa-hourglass-half"></i>
+                            </div>
+                            <span class="badge-status-pill pill-belum">
+                                <i class="fas fa-clock"></i> Belum Disurvei Lapangan
+                            </span>
                         </div>
-                        <span class="badge-status-pill pill-mypkp">
-                            <i class="fas fa-cloud-arrow-up"></i> Usulan myPKP
-                        </span>
-                    </div>
-                    <div class="card-main-metric">
-                        <div class="metric-val text-mypkp">{{ number_format($globalVervalStats['total_mypkp'] ?? 0) }} <span class="unit">KK</span></div>
-                        <div class="metric-title">TELAH DIUSULKAN DI MYPKP</div>
-                    </div>
-                    <div class="card-footer-info">
-                        <div class="pct-text">
-                            <strong>{{ $globalVervalStats['total_layak'] > 0 ? round((($globalVervalStats['total_mypkp'] ?? 0) / $globalVervalStats['total_layak']) * 100, 1) : 0 }}%</strong> dari calon layak diusulkan
+                        <div class="card-main-metric">
+                            <div class="metric-val text-belum">{{ number_format($globalVervalStats['total_belum']) }} <span class="unit">KK</span></div>
+                            <div class="metric-title">CALON PENERIMA BELUM VERVAL</div>
                         </div>
-                        <div class="btn-goto-table text-mypkp">
-                            <span>Buka Data myPKP</span>
-                            <i class="fas fa-arrow-right"></i>
+                        <div class="card-footer-info">
+                            <div class="pct-text">
+                                <strong>{{ $globalVervalStats['total_target'] > 0 ? round(($globalVervalStats['total_belum'] / $globalVervalStats['total_target']) * 100, 1) : 0 }}%</strong> dari total target ({{ number_format($globalVervalStats['total_target']) }} KK)
+                            </div>
+                            <div class="btn-goto-table text-belum">
+                                <span>Buka Data Belum Verval</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
                         </div>
-                    </div>
-                </a>
+                    </a>
+                </div>
 
-                <!-- 3. CARD TIDAK LAYAK DIUSULKAN -->
-                <a href="{{ route('dashboard.data-kelayakan', ['status' => 'tidak_layak']) }}" class="kelayakan-action-card card-tidak" style="text-decoration: none;" title="Klik untuk membuka tabel rincian data calon penerima Tidak Layak">
-                    <div class="card-top-icon">
-                        <div class="icon-circle icon-red">
-                            <i class="fas fa-circle-xmark"></i>
+                <!-- CARD TELAH DIUSULKAN DI myPKP (MUNCUL KETIKA CARD LAYAK DIKLIK) -->
+                <div id="myPkpCardExpand" style="display: none; margin-bottom: 14px; animation: fadeInSlideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+                    <a href="{{ route('dashboard.data-kelayakan', ['status' => 'mypkp']) }}" class="kelayakan-action-card card-mypkp" style="text-decoration: none; border-width: 2px; box-shadow: 0 8px 24px rgba(37, 99, 235, 0.12);" title="Klik untuk membuka rincian data calon penerima yang telah diusulkan di myPKP">
+                        <div class="card-top-icon">
+                            <div class="icon-circle icon-mypkp">
+                                <i class="fas fa-paper-plane"></i>
+                            </div>
+                            <span class="badge-status-pill pill-mypkp">
+                                <i class="fas fa-cloud-arrow-up"></i> Usulan myPKP
+                            </span>
                         </div>
-                        <span class="badge-status-pill pill-red">
-                            <i class="fas fa-circle-exclamation"></i> Tidak Memenuhi (&lt;2 RTLH)
-                        </span>
-                    </div>
-                    <div class="card-main-metric">
-                        <div class="metric-val text-red">{{ number_format($globalVervalStats['total_tidak_layak']) }} <span class="unit">KK</span></div>
-                        <div class="metric-title">CALON PENERIMA TIDAK LAYAK</div>
-                    </div>
-                    <div class="card-footer-info">
-                        <div class="pct-text">
-                            <strong>{{ $globalVervalStats['total_sudah'] > 0 ? round(($globalVervalStats['total_tidak_layak'] / $globalVervalStats['total_sudah']) * 100, 1) : 0 }}%</strong> dari total verval selesai
+                        <div class="card-main-metric">
+                            <div class="metric-val text-mypkp">{{ number_format($globalVervalStats['total_mypkp'] ?? 0) }} <span class="unit">KK</span></div>
+                            <div class="metric-title">TELAH DIUSULKAN DI MYPKP</div>
                         </div>
-                        <div class="btn-goto-table text-red">
-                            <span>Buka Tabel Data Tidak Layak</span>
-                            <i class="fas fa-arrow-right"></i>
+                        <div class="card-footer-info">
+                            <div class="pct-text">
+                                <strong>{{ $globalVervalStats['total_layak'] > 0 ? round((($globalVervalStats['total_mypkp'] ?? 0) / $globalVervalStats['total_layak']) * 100, 1) : 0 }}%</strong> dari total {{ number_format($globalVervalStats['total_layak']) }} KK calon layak diusulkan
+                            </div>
+                            <div class="btn-goto-table text-mypkp">
+                                <span>Buka Data myPKP</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
                         </div>
-                    </div>
-                </a>
+                    </a>
+                </div>
             </div>
 
             <!-- Mini Cards Status Verval -->
@@ -1285,14 +1419,6 @@
                     <div class="vstat-info">
                         <div class="vstat-count">{{ number_format($statusVervalStats->tidak_diketahui ?? 0) }}</div>
                         <div class="vstat-label">Tdk Diketahui</div>
-                    </div>
-                    <i class="fas fa-arrow-right vstat-arrow"></i>
-                </a>
-                <a href="{{ route('dashboard.data-kelayakan', ['status' => 'all', 'status_verval' => 'belum_verval']) }}" class="vstat-card vs-belum">
-                    <div class="vstat-icon"><i class="fas fa-hourglass-half"></i></div>
-                    <div class="vstat-info">
-                        <div class="vstat-count">{{ number_format($statusVervalStats->belum_verval ?? 0) }}</div>
-                        <div class="vstat-label">Belum Verval</div>
                     </div>
                     <i class="fas fa-arrow-right vstat-arrow"></i>
                 </a>
@@ -1625,6 +1751,41 @@ function toggleGlobalVervalSection() {
         if (card) {
             card.style.borderColor = '';
             card.style.boxShadow = '';
+        }
+    }
+}
+
+// Toggle Open / Close myPKP Card when Layak Diusulkan Card is clicked
+function toggleMyPkpCard() {
+    const expand = document.getElementById('myPkpCardExpand');
+    const chevron = document.getElementById('iconMyPkpChevron');
+    const trigger = document.getElementById('badgeMyPkpTrigger');
+    const cardLayak = document.getElementById('cardLayakAction');
+    if (!expand) return;
+
+    if (expand.style.display === 'none' || !expand.style.display) {
+        expand.style.display = 'block';
+        if (chevron) chevron.style.transform = 'rotate(180deg)';
+        if (trigger) {
+            trigger.style.background = '#1d4ed8';
+            trigger.style.color = '#ffffff';
+            trigger.style.borderColor = '#1d4ed8';
+        }
+        if (cardLayak) {
+            cardLayak.style.borderColor = '#2563eb';
+            cardLayak.style.boxShadow = '0 8px 24px rgba(37, 99, 235, 0.16)';
+        }
+    } else {
+        expand.style.display = 'none';
+        if (chevron) chevron.style.transform = 'rotate(0deg)';
+        if (trigger) {
+            trigger.style.background = '#dbeafe';
+            trigger.style.color = '#1e40af';
+            trigger.style.borderColor = '#93c5fd';
+        }
+        if (cardLayak) {
+            cardLayak.style.borderColor = '';
+            cardLayak.style.boxShadow = '';
         }
     }
 }

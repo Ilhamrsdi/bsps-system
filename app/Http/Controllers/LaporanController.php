@@ -704,7 +704,7 @@ class LaporanController extends Controller
             $query->where('is_mypkp', true);
         } elseif ($status === 'sudah') {
             $query->sudahSurvei();
-        } elseif ($status === 'belum') {
+        } elseif ($status === 'belum' || $status === 'belum_verval') {
             $query->belumSurvei();
         }
 

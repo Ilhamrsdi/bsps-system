@@ -90,9 +90,19 @@ class DashboardController extends Controller
         // 8. STATISTIK GLOBAL VERVAL & CAPAIAN PER DESA SE-KABUPATEN JEMBER (~12.000 DATA)
         $sudahSql = DataPenerima::getSudahSql();
 
+        // Statistik per-status verval
+        $statusVervalStats = DataPenerima::selectRaw("
+            SUM(CASE WHEN status = 'ditemukan' THEN 1 ELSE 0 END) as ditemukan,
+            SUM(CASE WHEN status = 'meninggal' THEN 1 ELSE 0 END) as meninggal,
+            SUM(CASE WHEN status = 'pindah' THEN 1 ELSE 0 END) as pindah,
+            SUM(CASE WHEN status = 'menolak disurvey' THEN 1 ELSE 0 END) as menolak,
+            SUM(CASE WHEN status = 'tidak diketahui' THEN 1 ELSE 0 END) as tidak_diketahui,
+            SUM(CASE WHEN (status IS NULL OR status = '' OR status NOT IN ('ditemukan','meninggal','pindah','menolak disurvey','tidak diketahui')) THEN 1 ELSE 0 END) as belum_verval
+        ")->first();
+
         $globalTotalTarget = $totalPenerima;
         $globalTotalSudah = DataPenerima::sudahSurvei()->count();
-        $globalTotalBelum = max(0, $globalTotalTarget - $globalTotalSudah);
+        $globalTotalBelum = (int)($statusVervalStats->belum_verval ?? 0);
         $globalTotalLayak = DataPenerima::where('status_kelayakan', 'Layak Diusulkan')->count();
         $globalTotalTidakLayak = DataPenerima::where('status_kelayakan', 'Tidak Layak Diusulkan')->count();
         $globalTotalMypkp = DataPenerima::where('is_mypkp', true)->count();
@@ -109,16 +119,6 @@ class DashboardController extends Controller
             'persen_survei' => $globalPersenSurvei,
             'persen_layak' => $globalPersenLayak,
         ];
-
-        // Statistik per-status verval
-        $statusVervalStats = DataPenerima::selectRaw("
-            SUM(CASE WHEN status = 'ditemukan' THEN 1 ELSE 0 END) as ditemukan,
-            SUM(CASE WHEN status = 'meninggal' THEN 1 ELSE 0 END) as meninggal,
-            SUM(CASE WHEN status = 'pindah' THEN 1 ELSE 0 END) as pindah,
-            SUM(CASE WHEN status = 'menolak disurvey' THEN 1 ELSE 0 END) as menolak,
-            SUM(CASE WHEN status = 'tidak diketahui' THEN 1 ELSE 0 END) as tidak_diketahui,
-            SUM(CASE WHEN (status IS NULL OR status = '' OR status NOT IN ('ditemukan','meninggal','pindah','menolak disurvey','tidak diketahui')) THEN 1 ELSE 0 END) as belum_verval
-        ")->first();
 
         // Agregasi Desa & Kecamatan Lengkap (Semua Kecamatan & Seluruh Desa se-Kabupaten Jember)
         $desaStats = DataPenerima::selectRaw("
@@ -242,6 +242,11 @@ class DashboardController extends Controller
         $totalMypkpGlobal = DataPenerima::where('is_mypkp', true)->count();
         $totalSudahSurveiGlobal = DataPenerima::sudahSurvei()->count();
         $totalTargetGlobal = DataPenerima::count();
+        $totalBelumGlobal = DataPenerima::where(function ($q) {
+            $q->whereNull('status')
+              ->orWhere('status', '')
+              ->orWhereNotIn('status', ['ditemukan', 'meninggal', 'pindah', 'menolak disurvey', 'tidak diketahui']);
+        })->count();
 
         // Base Query
         $query = DataPenerima::with('petugas');
@@ -252,6 +257,12 @@ class DashboardController extends Controller
             $query->where('status_kelayakan', 'Tidak Layak Diusulkan');
         } elseif ($status === 'mypkp') {
             $query->where('is_mypkp', true);
+        } elseif ($status === 'belum_verval') {
+            $query->where(function ($q) {
+                $q->whereNull('status')
+                  ->orWhere('status', '')
+                  ->orWhereNotIn('status', ['ditemukan', 'meninggal', 'pindah', 'menolak disurvey', 'tidak diketahui']);
+            });
         } else {
             $query->sudahSurvei();
         }
@@ -330,6 +341,7 @@ class DashboardController extends Controller
             'totalLayakGlobal',
             'totalTidakLayakGlobal',
             'totalMypkpGlobal',
+            'totalBelumGlobal',
             'totalSudahSurveiGlobal',
             'totalTargetGlobal',
             'listKecamatan',
