@@ -700,6 +700,8 @@ class LaporanController extends Controller
             $query->where('status_kelayakan', 'Layak Diusulkan');
         } elseif ($status === 'tidak_layak') {
             $query->where('status_kelayakan', 'Tidak Layak Diusulkan');
+        } elseif ($status === 'mypkp') {
+            $query->where('is_mypkp', true);
         } elseif ($status === 'sudah') {
             $query->sudahSurvei();
         } elseif ($status === 'belum') {

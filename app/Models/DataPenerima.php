@@ -11,6 +11,18 @@ class DataPenerima extends Model
 
     protected $guarded = [];
 
+    protected $casts = [
+        'is_mypkp' => 'boolean',
+    ];
+
+    /**
+     * Scope: Data yang telah diusulkan di myPKP.
+     */
+    public function scopeMypkp($query)
+    {
+        return $query->where('is_mypkp', true);
+    }
+
     /**
      * Daftar kolom WAJIB yang harus terisi agar dianggap "Sudah Survei / Selesai".
      * (Catatan: latitude & longitude/peta lokasi dikecualikan karena bisa menyusul).

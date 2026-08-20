@@ -95,6 +95,7 @@ class DashboardController extends Controller
         $globalTotalBelum = max(0, $globalTotalTarget - $globalTotalSudah);
         $globalTotalLayak = DataPenerima::where('status_kelayakan', 'Layak Diusulkan')->count();
         $globalTotalTidakLayak = DataPenerima::where('status_kelayakan', 'Tidak Layak Diusulkan')->count();
+        $globalTotalMypkp = DataPenerima::where('is_mypkp', true)->count();
         $globalPersenSurvei = $globalTotalTarget > 0 ? round(($globalTotalSudah / $globalTotalTarget) * 100, 1) : 0;
         $globalPersenLayak = $globalTotalSudah > 0 ? round(($globalTotalLayak / $globalTotalSudah) * 100, 1) : 0;
 
@@ -104,6 +105,7 @@ class DashboardController extends Controller
             'total_belum' => $globalTotalBelum,
             'total_layak' => $globalTotalLayak,
             'total_tidak_layak' => $globalTotalTidakLayak,
+            'total_mypkp' => $globalTotalMypkp,
             'persen_survei' => $globalPersenSurvei,
             'persen_layak' => $globalPersenLayak,
         ];
@@ -237,6 +239,7 @@ class DashboardController extends Controller
         // Summary Counts Global
         $totalLayakGlobal = DataPenerima::where('status_kelayakan', 'Layak Diusulkan')->count();
         $totalTidakLayakGlobal = DataPenerima::where('status_kelayakan', 'Tidak Layak Diusulkan')->count();
+        $totalMypkpGlobal = DataPenerima::where('is_mypkp', true)->count();
         $totalSudahSurveiGlobal = DataPenerima::sudahSurvei()->count();
         $totalTargetGlobal = DataPenerima::count();
 
@@ -247,6 +250,8 @@ class DashboardController extends Controller
             $query->where('status_kelayakan', 'Layak Diusulkan');
         } elseif ($status === 'tidak_layak') {
             $query->where('status_kelayakan', 'Tidak Layak Diusulkan');
+        } elseif ($status === 'mypkp') {
+            $query->where('is_mypkp', true);
         } else {
             $query->sudahSurvei();
         }
@@ -296,7 +301,7 @@ class DashboardController extends Controller
             }
         }
 
-        if ($status === 'layak') {
+        if ($status === 'layak' || $status === 'mypkp') {
             $query->select('*')
                   ->selectRaw('(IF(indikator_lantai = "tidak_ada", 1, 0) + IF(indikator_pondasi = "tidak_ada", 1, 0) + IF(indikator_dinding = "tidak_ada", 1, 0) + IF(indikator_struktur = "tidak_ada", 1, 0) + IF(indikator_atap = "tidak_ada", 1, 0) + IF(indikator_penghasilan = "ada", 1, 0)) as jumlah_indikator_rusak')
                   ->orderByDesc('jumlah_indikator_rusak');
@@ -324,6 +329,7 @@ class DashboardController extends Controller
             'penerimaList',
             'totalLayakGlobal',
             'totalTidakLayakGlobal',
+            'totalMypkpGlobal',
             'totalSudahSurveiGlobal',
             'totalTargetGlobal',
             'listKecamatan',
@@ -460,6 +466,7 @@ class DashboardController extends Controller
         $totalBelum = max(0, $totalTarget - $totalSudah);
         $totalLayak = (clone $baseQuery)->where('status_kelayakan', 'Layak Diusulkan')->count();
         $totalTidakLayak = (clone $baseQuery)->where('status_kelayakan', 'Tidak Layak Diusulkan')->count();
+        $totalMypkp = (clone $baseQuery)->where('is_mypkp', true)->count();
 
         $progresPercent = $totalTarget > 0 ? round(($totalSudah / $totalTarget) * 100, 1) : 0;
         $persenLayak = $totalSudah > 0 ? round(($totalLayak / $totalSudah) * 100, 1) : 0;
@@ -474,7 +481,7 @@ class DashboardController extends Controller
             ->get();
 
         // 3. Query Tabel BNBA
-        $status = $request->get('status', 'all'); // 'all', 'layak', 'tidak_layak', 'belum'
+        $status = $request->get('status', 'all'); // 'all', 'layak', 'tidak_layak', 'mypkp', 'belum'
         $search = $request->get('search');
         $perPage = $request->get('per_page', '15');
         $perPageLimit = ($perPage === 'all') ? 10000 : (int)$perPage;
@@ -485,6 +492,8 @@ class DashboardController extends Controller
             $tableQuery->where('status_kelayakan', 'Layak Diusulkan');
         } elseif ($status === 'tidak_layak') {
             $tableQuery->where('status_kelayakan', 'Tidak Layak Diusulkan');
+        } elseif ($status === 'mypkp') {
+            $tableQuery->where('is_mypkp', true);
         } elseif ($status === 'belum') {
             $tableQuery->belumSurvei();
         }
@@ -522,6 +531,7 @@ class DashboardController extends Controller
             'totalBelum',
             'totalLayak',
             'totalTidakLayak',
+            'totalMypkp',
             'progresPercent',
             'persenLayak',
             'persenTidak',

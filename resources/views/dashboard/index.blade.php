@@ -435,6 +435,14 @@
         border-color: #ef4444;
         box-shadow: 0 12px 28px rgba(239, 68, 68, 0.18);
     }
+    .kelayakan-action-card.card-mypkp {
+        border-color: #93c5fd;
+        background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+    }
+    .kelayakan-action-card.card-mypkp:hover {
+        border-color: #2563eb;
+        box-shadow: 0 12px 28px rgba(37, 99, 235, 0.18);
+    }
     .card-top-icon {
         display: flex;
         align-items: center;
@@ -451,6 +459,7 @@
     }
     .icon-green { background: #dcfce7; color: #16a34a; }
     .icon-red { background: #fee2e2; color: #dc2626; }
+    .icon-mypkp { background: #dbeafe; color: #1d4ed8; }
     .badge-status-pill {
         font-size: 11px;
         font-weight: 800;
@@ -459,6 +468,7 @@
     }
     .pill-green { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
     .pill-red { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+    .pill-mypkp { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
     .card-main-metric .metric-val {
         font-size: 28px;
         font-weight: 900;
@@ -468,6 +478,7 @@
     .card-main-metric .unit { font-size: 16px; font-weight: 700; opacity: 0.8; }
     .text-green { color: #15803d; }
     .text-red { color: #b91c1c; }
+    .text-mypkp { color: #1d4ed8; }
     .card-main-metric .metric-title {
         font-size: 12px;
         font-weight: 800;
@@ -1157,8 +1168,8 @@
 
         <!-- SECTION CAPAIAN VERVAL GLOBAL & DROP-EXPAND DESA CARDS (KESELURUHAN KABUPATEN JEMBER) -->
         <div class="global-verval-card" id="globalVervalSection" style="display: none;">
-            <!-- 2 CARD UTAMA: KELAYAKAN HASIL VERVAL (KLIK UNTUK PINDAH KE TABEL RINCIAN) -->
-            <div style="padding: 20px 20px 12px 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; background: transparent;">
+            <!-- 3 CARD UTAMA: KELAYAKAN HASIL VERVAL & USULAN MYPKP (KLIK UNTUK PINDAH KE TABEL RINCIAN) -->
+            <div style="padding: 20px 20px 12px 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; background: transparent;">
                 <!-- 1. CARD LAYAK DIUSULKAN -->
                 <a href="{{ route('dashboard.data-kelayakan', ['status' => 'layak']) }}" class="kelayakan-action-card card-layak" style="text-decoration: none;" title="Klik untuk membuka tabel rincian data calon penerima Layak Diusulkan">
                     <div class="card-top-icon">
@@ -1184,7 +1195,32 @@
                     </div>
                 </a>
 
-                <!-- 2. CARD TIDAK LAYAK DIUSULKAN -->
+                <!-- 2. CARD TELAH DIUSULKAN DI myPKP -->
+                <a href="{{ route('dashboard.data-kelayakan', ['status' => 'mypkp']) }}" class="kelayakan-action-card card-mypkp" style="text-decoration: none;" title="Klik untuk membuka rincian data calon penerima yang telah diusulkan di myPKP">
+                    <div class="card-top-icon">
+                        <div class="icon-circle icon-mypkp">
+                            <i class="fas fa-paper-plane"></i>
+                        </div>
+                        <span class="badge-status-pill pill-mypkp">
+                            <i class="fas fa-cloud-arrow-up"></i> Usulan myPKP
+                        </span>
+                    </div>
+                    <div class="card-main-metric">
+                        <div class="metric-val text-mypkp">{{ number_format($globalVervalStats['total_mypkp'] ?? 0) }} <span class="unit">KK</span></div>
+                        <div class="metric-title">TELAH DIUSULKAN DI MYPKP</div>
+                    </div>
+                    <div class="card-footer-info">
+                        <div class="pct-text">
+                            <strong>{{ $globalVervalStats['total_layak'] > 0 ? round((($globalVervalStats['total_mypkp'] ?? 0) / $globalVervalStats['total_layak']) * 100, 1) : 0 }}%</strong> dari calon layak diusulkan
+                        </div>
+                        <div class="btn-goto-table text-mypkp">
+                            <span>Buka Data myPKP</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- 3. CARD TIDAK LAYAK DIUSULKAN -->
                 <a href="{{ route('dashboard.data-kelayakan', ['status' => 'tidak_layak']) }}" class="kelayakan-action-card card-tidak" style="text-decoration: none;" title="Klik untuk membuka tabel rincian data calon penerima Tidak Layak">
                     <div class="card-top-icon">
                         <div class="icon-circle icon-red">

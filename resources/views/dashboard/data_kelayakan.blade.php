@@ -1,7 +1,7 @@
 @extends('layouts.partial.app')
 
-@section('title', 'Data Calon Penerima ' . ($status === 'tidak_layak' ? 'Tidak Layak' : ($status === 'all' ? 'Hasil Verval' : 'Layak Diusulkan')))
-@section('title_header', 'Data Penerima BSPS (' . ($status === 'tidak_layak' ? 'Tidak Layak Diusulkan' : ($status === 'all' ? 'Semua Hasil Verval' : 'Layak Diusulkan')) . ')')
+@section('title', 'Data Calon Penerima ' . ($status === 'tidak_layak' ? 'Tidak Layak' : ($status === 'mypkp' ? 'Telah Diusulkan di myPKP' : ($status === 'all' ? 'Hasil Verval' : 'Layak Diusulkan'))))
+@section('title_header', 'Data Penerima BSPS (' . ($status === 'tidak_layak' ? 'Tidak Layak Diusulkan' : ($status === 'mypkp' ? 'Telah Diusulkan di myPKP' : ($status === 'all' ? 'Semua Hasil Verval' : 'Layak Diusulkan'))) . ')')
 @section('subtitle_header', 'Daftar By Name By Address (BNBA) Calon Penerima Bantuan Stimulan Perumahan Swadaya')
 
 @push('styles')
@@ -40,6 +40,13 @@
         color: #ffffff;
         border-color: #15803d;
         box-shadow: 0 6px 18px rgba(21, 128, 61, 0.25);
+    }
+
+    .kelayakan-pill-btn.active.pill-mypkp {
+        background: #1d4ed8;
+        color: #ffffff;
+        border-color: #1d4ed8;
+        box-shadow: 0 6px 18px rgba(29, 78, 216, 0.25);
     }
 
     .kelayakan-pill-btn.active.pill-tidak {
@@ -114,16 +121,23 @@
         <div class="breadcrumb" style="margin-bottom: 16px; font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
             <a href="{{ route('dashboard') }}" style="color: var(--primary); text-decoration: none; font-weight: 600;"><i class="fas fa-th-large"></i> Dashboard Global</a>
             <i class="fas fa-chevron-right" style="font-size: 10px;"></i>
-            <span>Data Kelayakan Penerima ({{ $status === 'tidak_layak' ? 'Tidak Layak' : ($status === 'all' ? 'Semua Verval' : 'Layak Diusulkan') }})</span>
+            <span>Data Kelayakan Penerima ({{ $status === 'tidak_layak' ? 'Tidak Layak' : ($status === 'mypkp' ? 'Telah Diusulkan di myPKP' : ($status === 'all' ? 'Semua Verval' : 'Layak Diusulkan')) }})</span>
         </div>
 
-        <!-- 3 Tab Selector: Layak Diusulkan vs Tidak Layak vs Semua Verval -->
+        <!-- 4 Tab Selector: Layak Diusulkan vs Diusulkan myPKP vs Tidak Layak vs Semua Verval -->
         <div class="kelayakan-filter-pills">
             <a href="{{ route('dashboard.data-kelayakan', ['status' => 'layak', 'kecamatan' => request('kecamatan'), 'desa' => request('desa')]) }}"
                class="kelayakan-pill-btn pill-layak {{ $status === 'layak' ? 'active' : '' }}">
                 <i class="fas fa-circle-check"></i>
                 <span>Layak Diusulkan</span>
                 <span class="badge-pill-count">{{ number_format($totalLayakGlobal) }} KK</span>
+            </a>
+
+            <a href="{{ route('dashboard.data-kelayakan', ['status' => 'mypkp', 'kecamatan' => request('kecamatan'), 'desa' => request('desa')]) }}"
+               class="kelayakan-pill-btn pill-mypkp {{ $status === 'mypkp' ? 'active' : '' }}">
+                <i class="fas fa-paper-plane"></i>
+                <span>Diusulkan di myPKP</span>
+                <span class="badge-pill-count">{{ number_format($totalMypkpGlobal ?? 0) }} KK</span>
             </a>
 
             <a href="{{ route('dashboard.data-kelayakan', ['status' => 'tidak_layak', 'kecamatan' => request('kecamatan'), 'desa' => request('desa')]) }}"
@@ -231,6 +245,9 @@
                     @if($status === 'layak')
                         <i class="fas fa-circle-check" style="color: #16a34a;"></i>
                         <span>Daftar Calon Penerima Layak Diusulkan</span>
+                    @elseif($status === 'mypkp')
+                        <i class="fas fa-paper-plane" style="color: #1d4ed8;"></i>
+                        <span>Daftar Calon Penerima Telah Diusulkan di myPKP</span>
                     @elseif($status === 'tidak_layak')
                         <i class="fas fa-circle-xmark" style="color: #dc2626;"></i>
                         <span>Daftar Calon Penerima Tidak Layak</span>
@@ -242,7 +259,7 @@
                 </h3>
 
                 <div style="display: flex; gap: 8px;">
-                    <a href="{{ route('laporan.export', ['status' => ($status === 'layak' ? 'layak' : ($status === 'tidak_layak' ? 'tidak_layak' : 'all')), 'kecamatan' => request('kecamatan', 'all')]) }}" class="btn btn-outline" style="padding: 6px 14px; font-size: 12px; font-weight: 700; border-radius: 6px; text-decoration: none; border: 1px solid #107c41; color: #107c41; background: #ffffff; display: inline-flex; align-items: center; gap: 6px;">
+                    <a href="{{ route('laporan.export', ['status' => ($status === 'layak' ? 'layak' : ($status === 'mypkp' ? 'mypkp' : ($status === 'tidak_layak' ? 'tidak_layak' : 'all'))), 'kecamatan' => request('kecamatan', 'all')]) }}" class="btn btn-outline" style="padding: 6px 14px; font-size: 12px; font-weight: 700; border-radius: 6px; text-decoration: none; border: 1px solid #107c41; color: #107c41; background: #ffffff; display: inline-flex; align-items: center; gap: 6px;">
                         <i class="fas fa-file-excel"></i> Export Excel
                     </a>
                 </div>
@@ -277,6 +294,13 @@
                             <td>
                                 <div style="font-family: monospace; font-size: 12.5px; font-weight: 700; color: #0f172a;">{{ $row->no_ktp ?: '-' }}</div>
                                 <div style="font-family: monospace; font-size: 11px; color: #64748b;">KK: {{ $row->no_kk ?: '-' }}</div>
+                                @if($row->is_mypkp)
+                                    <div style="margin-top: 3px;">
+                                        <span style="font-size: 10px; font-weight: 800; padding: 1.5px 6px; border-radius: 4px; background: #dbeafe; color: #1d4ed8; border: 1px solid #93c5fd; display: inline-flex; align-items: center; gap: 3px;">
+                                            <i class="fas fa-paper-plane" style="font-size: 8px;"></i> Diusulkan myPKP
+                                        </span>
+                                    </div>
+                                @endif
                             </td>
                             <td>
                                 <div style="font-weight: 700; font-size: 12.5px; color: #002855;">
