@@ -47,6 +47,8 @@ class DataPenerima extends Model
      */
     public static array $nikKhususSelesai = [
         '3509072812800002',
+        '3509073103530001',
+        '3509070208730001',
     ];
 
     /**
