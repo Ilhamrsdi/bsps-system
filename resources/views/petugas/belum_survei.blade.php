@@ -314,7 +314,7 @@
                                     @elseif($item->status == 'meninggal')
                                         <span class="badge btn-trigger-status-modal" style="background:#fee2e2;color:#b91c1c;padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:800;cursor:pointer;"
                                               data-id="{{ $item->id }}" data-nama="{{ e($item->nama) }}" data-nik="{{ e($item->no_ktp ?: '-') }}" data-alamat="{{ e($item->alamat ?: '-') }}" data-status="{{ e($item->status) }}" data-url="{{ url('/survey/' . $item->id) }}" title="Klik untuk ubah status">
-                                            <i class="fas fa-cross"></i> Meninggal
+                                            <i class="fas fa-heart-crack"></i> Meninggal
                                         </span>
                                     @elseif($item->status == 'pindah')
                                         <span class="badge btn-trigger-status-modal" style="background:#fef3c7;color:#b45309;padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:800;cursor:pointer;"
