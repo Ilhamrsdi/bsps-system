@@ -1936,8 +1936,8 @@
                             $fieldsWajib = \App\Models\DataPenerima::$fieldWajibSurvei;
                             $totalWajib = count($fieldsWajib);
                             $totalIsi = collect($fieldsWajib)->filter(fn($f) => !empty($vervalData->{$f}))->count();
-                            $pctSurvei = $totalWajib > 0 ? round(($totalIsi / $totalWajib) * 100) : 0;
-                            $isSudah = $totalIsi >= $totalWajib;
+                            $isSudah = $vervalData->isSudahSurvei();
+                            $pctSurvei = $isSudah ? 100 : ($totalWajib > 0 ? round(($totalIsi / $totalWajib) * 100) : 0);
                         @endphp
                         <div style="margin-bottom: 20px; margin-top: 4px;">
                             <div

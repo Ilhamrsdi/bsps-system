@@ -43,7 +43,29 @@ class DataPenerima extends Model
     ];
 
     /**
-     * Scope: Data yang SUDAH survei / diverifikasi (seluruh 18 field wajib terisi atau status khusus).
+     * Daftar NIK khusus yang statusnya dianggap Selesai / Sudah Survei.
+     */
+    public static array $nikKhususSelesai = [
+        '3509072812800002',
+    ];
+
+    /**
+     * Helper: Mendapatkan ekspresi SQL untuk kondisi Sudah Survei / Selesai.
+     */
+    public static function getSudahSql(): string
+    {
+        $conds = [];
+        foreach (self::$fieldWajibSurvei as $field) {
+            $conds[] = "({$field} IS NOT NULL AND TRIM({$field}) != '')";
+        }
+        $formLengkapSql = "(" . implode(" AND ", $conds) . ")";
+        $nikKhususSql = "'" . implode("','", self::$nikKhususSelesai) . "'";
+
+        return "(status IN ('meninggal', 'pindah', 'tidak diketahui', 'menolak disurvey') OR no_ktp IN ({$nikKhususSql}) OR {$formLengkapSql})";
+    }
+
+    /**
+     * Scope: Data yang SUDAH survei / diverifikasi (seluruh 18 field wajib terisi, status khusus, atau NIK khusus).
      */
     public function scopeSudahSurvei($query)
     {
@@ -61,6 +83,7 @@ class DataPenerima extends Model
 
         return $query->where(function ($q) use ($fields, $fotoFields) {
             $q->whereIn('status', ['meninggal', 'pindah', 'tidak diketahui', 'menolak disurvey'])
+              ->orWhereIn('no_ktp', self::$nikKhususSelesai)
               ->orWhere(function ($sub) use ($fields, $fotoFields) {
                   foreach ($fields as $field) {
                       $sub->whereNotNull($field);
@@ -79,7 +102,7 @@ class DataPenerima extends Model
     }
 
     /**
-     * Scope: Data yang BELUM survei (ada field wajib yang belum terisi) ATAU REVISI (ada foto ditolak).
+     * Scope: Data yang BELUM survei (ada field wajib yang belum terisi) ATAU REVISI (ada foto ditolak), kecuali NIK khusus.
      */
     public function scopeBelumSurvei($query)
     {
@@ -98,7 +121,8 @@ class DataPenerima extends Model
         return $query->where(function ($q) use ($fields, $fotoFields) {
             $q->whereNull('status')
               ->orWhereNotIn('status', ['meninggal', 'pindah', 'tidak diketahui', 'menolak disurvey']);
-        })->where(function ($q) use ($fields, $fotoFields) {
+        })->whereNotIn('no_ktp', self::$nikKhususSelesai)
+          ->where(function ($q) use ($fields, $fotoFields) {
             $q->where(function ($sub1) use ($fields) {
                 foreach ($fields as $field) {
                     $sub1->orWhereNull($field);
@@ -115,10 +139,14 @@ class DataPenerima extends Model
     }
 
     /**
-     * Helper: Cek apakah satu record ini sudah lengkap surveinya atau memiliki status verifikasi khusus.
+     * Helper: Cek apakah satu record ini sudah lengkap surveinya atau memiliki status verifikasi khusus / NIK khusus.
      */
     public function isSudahSurvei(): bool
     {
+        if (in_array($this->no_ktp, self::$nikKhususSelesai)) {
+            return true;
+        }
+
         if (in_array($this->status, ['meninggal', 'pindah', 'tidak diketahui', 'menolak disurvey'])) {
             return true;
         }

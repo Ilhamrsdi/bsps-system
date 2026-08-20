@@ -60,12 +60,7 @@ class DashboardKecamatanController extends Controller
         $desaSelected = $request->get('desa', 'all');
 
         // 4. Data Monitoring Rincian per Desa/Kelurahan
-        $conds = [];
-        foreach (DataPenerima::$fieldWajibSurvei as $field) {
-            $conds[] = "({$field} IS NOT NULL AND TRIM({$field}) != '')";
-        }
-        $formLengkapSql = "(" . implode(" AND ", $conds) . ")";
-        $sudahSql = "(status IN ('meninggal', 'pindah', 'tidak diketahui', 'menolak disurvey') OR {$formLengkapSql})";
+        $sudahSql = DataPenerima::getSudahSql();
 
         $desaStatsQuery = DataPenerima::selectRaw("
                 desa_kelurahan,

@@ -50,7 +50,7 @@ class GeoMapController extends Controller
                 && $item->foto_sudut_kanan;
 
             // Tentukan warna & status berdasarkan kelengkapan survei
-            if ($allIndicatorsFilled && $hasAllPhotos) {
+            if ($item->isSudahSurvei() || ($allIndicatorsFilled && $hasAllPhotos)) {
                 $color       = $indikatorTerpenuhi >= 2 ? 'green' : 'orange';
                 $statusLabel = $indikatorTerpenuhi >= 2 ? '✅ Layak Diusulkan' : '⚠️ Tidak Layak';
                 $status      = 'selesai';

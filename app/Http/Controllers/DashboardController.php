@@ -49,12 +49,7 @@ class DashboardController extends Controller
 
         $topKecamatan = $rawKecamatan;
 
-        $conds = [];
-        foreach (DataPenerima::$fieldWajibSurvei as $field) {
-            $conds[] = "({$field} IS NOT NULL AND TRIM({$field}) != '')";
-        }
-        $formLengkapSql = "(" . implode(" AND ", $conds) . ")";
-        $sudahSql = "(status IN ('meninggal', 'pindah', 'tidak diketahui', 'menolak disurvey') OR {$formLengkapSql})";
+        $sudahSql = DataPenerima::getSudahSql();
 
         // 4. Top 6 Desa/Kelurahan dengan Capaian Layak Terbanyak
         $topDesa = DataPenerima::selectRaw("
@@ -93,12 +88,7 @@ class DashboardController extends Controller
         $chartTotalData = $chartTop8->pluck('total');
 
         // 8. STATISTIK GLOBAL VERVAL & CAPAIAN PER DESA SE-KABUPATEN JEMBER (~12.000 DATA)
-        $conds = [];
-        foreach (DataPenerima::$fieldWajibSurvei as $field) {
-            $conds[] = "({$field} IS NOT NULL AND TRIM({$field}) != '')";
-        }
-        $formLengkapSql = "(" . implode(" AND ", $conds) . ")";
-        $sudahSql = "(status IN ('meninggal', 'pindah', 'tidak diketahui', 'menolak disurvey') OR {$formLengkapSql})";
+        $sudahSql = DataPenerima::getSudahSql();
 
         $globalTotalTarget = $totalPenerima;
         $globalTotalSudah = DataPenerima::sudahSurvei()->count();
@@ -562,12 +552,7 @@ class DashboardController extends Controller
             $kecamatan = $user->kecamatan;
         }
 
-        $conds = [];
-        foreach (DataPenerima::$fieldWajibSurvei as $field) {
-            $conds[] = "({$field} IS NOT NULL AND TRIM({$field}) != '')";
-        }
-        $formLengkapSql = "(" . implode(" AND ", $conds) . ")";
-        $sudahSql = "(status IN ('meninggal', 'pindah', 'tidak diketahui', 'menolak disurvey') OR {$formLengkapSql})";
+        $sudahSql = DataPenerima::getSudahSql();
 
         $desaStatsQuery = DataPenerima::selectRaw("
             kecamatan,
