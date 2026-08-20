@@ -118,6 +118,16 @@ class DashboardController extends Controller
             'persen_layak' => $globalPersenLayak,
         ];
 
+        // Statistik per-status verval
+        $statusVervalStats = DataPenerima::selectRaw("
+            SUM(CASE WHEN status = 'ditemukan' THEN 1 ELSE 0 END) as ditemukan,
+            SUM(CASE WHEN status = 'meninggal' THEN 1 ELSE 0 END) as meninggal,
+            SUM(CASE WHEN status = 'pindah' THEN 1 ELSE 0 END) as pindah,
+            SUM(CASE WHEN status = 'menolak disurvey' THEN 1 ELSE 0 END) as menolak,
+            SUM(CASE WHEN status = 'tidak diketahui' THEN 1 ELSE 0 END) as tidak_diketahui,
+            SUM(CASE WHEN (status IS NULL OR status = '' OR status NOT IN ('ditemukan','meninggal','pindah','menolak disurvey','tidak diketahui')) THEN 1 ELSE 0 END) as belum_verval
+        ")->first();
+
         // Agregasi Desa & Kecamatan Lengkap (Semua Kecamatan & Seluruh Desa se-Kabupaten Jember)
         $desaStats = DataPenerima::selectRaw("
             UPPER(TRIM(kecamatan)) as kecamatan,
@@ -211,7 +221,8 @@ class DashboardController extends Controller
             'rekapPerKecamatan',
             'rankingKecamatan',
             'top1KecamatanCapaian',
-            'allKecamatanCapaian'
+            'allKecamatanCapaian',
+            'statusVervalStats'
         ));
     }
 
@@ -226,6 +237,7 @@ class DashboardController extends Controller
         $search = $request->get('search');
         $perPage = $request->get('per_page', '15');
         $perPageLimit = ($perPage === 'all') ? 10000 : (int)$perPage;
+        $statusVerval = $request->get('status_verval'); // filter status lapangan
 
         $user = Auth::user();
         if ($user && $user->isAdminKecamatan()) {
@@ -280,6 +292,20 @@ class DashboardController extends Controller
             });
         }
 
+        // Filter status verval (ditemukan, meninggal, pindah, dll.)
+        $validStatusVerval = ['ditemukan', 'meninggal', 'pindah', 'menolak disurvey', 'tidak diketahui', 'belum_verval'];
+        if ($statusVerval && in_array($statusVerval, $validStatusVerval)) {
+            if ($statusVerval === 'belum_verval') {
+                $query->where(function ($q) {
+                    $q->whereNull('status')
+                      ->orWhere('status', '')
+                      ->orWhereNotIn('status', ['ditemukan', 'meninggal', 'pindah', 'menolak disurvey', 'tidak diketahui']);
+                });
+            } else {
+                $query->where('status', $statusVerval);
+            }
+        }
+
         if ($status === 'layak') {
             $query->select('*')
                   ->selectRaw('(IF(indikator_lantai = "tidak_ada", 1, 0) + IF(indikator_pondasi = "tidak_ada", 1, 0) + IF(indikator_dinding = "tidak_ada", 1, 0) + IF(indikator_struktur = "tidak_ada", 1, 0) + IF(indikator_atap = "tidak_ada", 1, 0) + IF(indikator_penghasilan = "ada", 1, 0)) as jumlah_indikator_rusak')
@@ -316,7 +342,8 @@ class DashboardController extends Controller
             'desa',
             'search',
             'perPage',
-            'statusFoto'
+            'statusFoto',
+            'statusVerval'
         ));
     }
 

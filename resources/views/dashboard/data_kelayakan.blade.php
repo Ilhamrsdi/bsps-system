@@ -180,6 +180,19 @@
                     </select>
                 </div>
 
+                <!-- Filter Status Verval -->
+                <div class="filter-item-box" style="max-width: 200px;">
+                    <select name="status_verval" class="form-control" onchange="this.form.submit()" style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid {{ $statusVerval ? '#002855' : '#cbd5e1' }}; font-size: 13px; font-weight: 600; background: {{ $statusVerval ? '#f0f4ff' : '#fff' }}; color: {{ $statusVerval ? '#002855' : 'inherit' }};">
+                        <option value="">-- Semua Status Verval --</option>
+                        <option value="ditemukan" {{ $statusVerval === 'ditemukan' ? 'selected' : '' }}>✅ Ditemukan</option>
+                        <option value="meninggal" {{ $statusVerval === 'meninggal' ? 'selected' : '' }}>✝ Meninggal</option>
+                        <option value="pindah" {{ $statusVerval === 'pindah' ? 'selected' : '' }}>🚚 Pindah</option>
+                        <option value="menolak disurvey" {{ $statusVerval === 'menolak disurvey' ? 'selected' : '' }}>✋ Menolak Survey</option>
+                        <option value="tidak diketahui" {{ $statusVerval === 'tidak diketahui' ? 'selected' : '' }}>❓ Tidak Diketahui</option>
+                        <option value="belum_verval" {{ $statusVerval === 'belum_verval' ? 'selected' : '' }}>⏳ Belum Verval</option>
+                    </select>
+                </div>
+
                 <!-- Per Page -->
                 <div class="filter-item-box" style="max-width: 130px;">
                     <select name="per_page" class="form-control" onchange="this.form.submit()" style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; font-weight: 600; background: #fff;">

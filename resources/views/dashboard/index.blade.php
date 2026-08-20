@@ -496,6 +496,80 @@
         font-size: 12px;
     }
 
+    /* Mini Cards Status Verval */
+    .verval-status-row {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 12px;
+        padding: 0 20px 20px 20px;
+    }
+    @media (max-width: 1200px) {
+        .verval-status-row { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 700px) {
+        .verval-status-row { grid-template-columns: repeat(2, 1fr); }
+    }
+    .vstat-card {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 12px 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border: 1.5px solid #e9eef5;
+        box-shadow: 0 2px 6px rgba(0,40,85,0.04);
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .vstat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0,40,85,0.10);
+    }
+    .vstat-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0;
+        width: 4px;
+        height: 100%;
+    }
+    .vstat-card.vs-ditemukan::before  { background: #16a34a; }
+    .vstat-card.vs-meninggal::before  { background: #b91c1c; }
+    .vstat-card.vs-pindah::before     { background: #ea580c; }
+    .vstat-card.vs-menolak::before    { background: #d97706; }
+    .vstat-card.vs-tdk::before        { background: #64748b; }
+    .vstat-card.vs-belum::before      { background: #94a3b8; }
+    .vstat-icon {
+        width: 36px; height: 36px;
+        border-radius: 9px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 15px; flex-shrink: 0;
+    }
+    .vs-ditemukan .vstat-icon { background: #dcfce7; color: #16a34a; }
+    .vs-meninggal .vstat-icon { background: #fee2e2; color: #b91c1c; }
+    .vs-pindah    .vstat-icon { background: #ffedd5; color: #ea580c; }
+    .vs-menolak   .vstat-icon { background: #fef3c7; color: #d97706; }
+    .vs-tdk       .vstat-icon { background: #f1f5f9; color: #64748b; }
+    .vs-belum     .vstat-icon { background: #f8fafc; color: #94a3b8; }
+    .vstat-info { flex: 1; min-width: 0; }
+    .vstat-count {
+        font-size: 18px; font-weight: 900; line-height: 1;
+        color: #0f172a; margin-bottom: 2px;
+    }
+    .vstat-label {
+        font-size: 10px; font-weight: 700; color: #64748b;
+        text-transform: uppercase; letter-spacing: 0.4px;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    a.vstat-card { text-decoration: none; cursor: pointer; }
+    a.vstat-card:hover .vstat-label { color: #002855; }
+    a.vstat-card:hover .vstat-count { color: #002855; }
+    .vstat-arrow {
+        font-size: 10px; color: #cbd5e1; margin-left: auto; flex-shrink: 0;
+        transition: transform 0.2s, color 0.2s;
+    }
+    a.vstat-card:hover .vstat-arrow { color: #002855; transform: translateX(3px); }
+
     /* Accordion Capaian Global Desa */
     .global-verval-card {
         background: var(--bg-card);
@@ -1133,6 +1207,58 @@
                             <i class="fas fa-arrow-right"></i>
                         </div>
                     </div>
+                </a>
+            </div>
+
+            <!-- Mini Cards Status Verval -->
+            <div class="verval-status-row">
+                <a href="{{ route('dashboard.data-kelayakan', ['status' => 'all', 'status_verval' => 'ditemukan']) }}" class="vstat-card vs-ditemukan">
+                    <div class="vstat-icon"><i class="fas fa-check-circle"></i></div>
+                    <div class="vstat-info">
+                        <div class="vstat-count">{{ number_format($statusVervalStats->ditemukan ?? 0) }}</div>
+                        <div class="vstat-label">Ditemukan</div>
+                    </div>
+                    <i class="fas fa-arrow-right vstat-arrow"></i>
+                </a>
+                <a href="{{ route('dashboard.data-kelayakan', ['status' => 'all', 'status_verval' => 'meninggal']) }}" class="vstat-card vs-meninggal">
+                    <div class="vstat-icon"><i class="fas fa-cross"></i></div>
+                    <div class="vstat-info">
+                        <div class="vstat-count">{{ number_format($statusVervalStats->meninggal ?? 0) }}</div>
+                        <div class="vstat-label">Meninggal</div>
+                    </div>
+                    <i class="fas fa-arrow-right vstat-arrow"></i>
+                </a>
+                <a href="{{ route('dashboard.data-kelayakan', ['status' => 'all', 'status_verval' => 'pindah']) }}" class="vstat-card vs-pindah">
+                    <div class="vstat-icon"><i class="fas fa-truck-moving"></i></div>
+                    <div class="vstat-info">
+                        <div class="vstat-count">{{ number_format($statusVervalStats->pindah ?? 0) }}</div>
+                        <div class="vstat-label">Pindah</div>
+                    </div>
+                    <i class="fas fa-arrow-right vstat-arrow"></i>
+                </a>
+                <a href="{{ route('dashboard.data-kelayakan', ['status' => 'all', 'status_verval' => 'menolak disurvey']) }}" class="vstat-card vs-menolak">
+                    <div class="vstat-icon"><i class="fas fa-hand-paper"></i></div>
+                    <div class="vstat-info">
+                        <div class="vstat-count">{{ number_format($statusVervalStats->menolak ?? 0) }}</div>
+                        <div class="vstat-label">Menolak Survey</div>
+                    </div>
+                    <i class="fas fa-arrow-right vstat-arrow"></i>
+                </a>
+                <a href="{{ route('dashboard.data-kelayakan', ['status' => 'all', 'status_verval' => 'tidak diketahui']) }}" class="vstat-card vs-tdk">
+                    <div class="vstat-icon"><i class="fas fa-question-circle"></i></div>
+                    <div class="vstat-info">
+                        <div class="vstat-count">{{ number_format($statusVervalStats->tidak_diketahui ?? 0) }}</div>
+                        <div class="vstat-label">Tdk Diketahui</div>
+                    </div>
+                    <i class="fas fa-arrow-right vstat-arrow"></i>
+                </a>
+                <a href="{{ route('dashboard.data-kelayakan', ['status' => 'all', 'status_verval' => 'belum_verval']) }}" class="vstat-card vs-belum">
+                    <div class="vstat-icon"><i class="fas fa-hourglass-half"></i></div>
+                    <div class="vstat-info">
+                        <div class="vstat-count">{{ number_format($statusVervalStats->belum_verval ?? 0) }}</div>
+                        <div class="vstat-label">Belum Verval</div>
+                    </div>
+                    <i class="fas fa-arrow-right vstat-arrow"></i>
                 </a>
             </div>
         </div>
