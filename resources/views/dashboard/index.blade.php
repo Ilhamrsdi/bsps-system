@@ -1291,9 +1291,9 @@
 
         <!-- SECTION CAPAIAN VERVAL GLOBAL & DROP-EXPAND DESA CARDS (KESELURUHAN KABUPATEN JEMBER) -->
         <div class="global-verval-card" id="globalVervalSection" style="display: none;">
-            <!-- 2 CARD UTAMA: KELAYAKAN HASIL VERVAL & BELUM VERVAL (KLIK CARD LAYAK UNTUK MUNCULKAN CARD MYPKP) -->
+            <!-- 3 CARD UTAMA: KELAYAKAN HASIL VERVAL, BELUM VERVAL & TIDAK LAYAK (KLIK CARD LAYAK UNTUK MUNCULKAN CARD MYPKP) -->
             <div style="padding: 20px 20px 12px 20px;">
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; margin-bottom: 14px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-bottom: 14px;">
                     <!-- 1. CARD LAYAK DIUSULKAN (KLIK UNTUK MUNCULKAN CARD USULAN MYPKP) -->
                     <div class="kelayakan-action-card card-layak" id="cardLayakAction" onclick="toggleMyPkpCard()" style="cursor: pointer; text-decoration: none;" title="Klik untuk menampilkan / menutup card Telah Diusulkan di myPKP">
                         <div class="card-top-icon">
@@ -1346,6 +1346,31 @@
                             </div>
                             <div class="btn-goto-table text-belum">
                                 <span>Buka Data Belum Verval</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- 3. CARD TIDAK LAYAK DIUSULKAN -->
+                    <a href="{{ route('dashboard.data-kelayakan', ['status' => 'tidak_layak']) }}" class="kelayakan-action-card card-tidak" style="text-decoration: none;" title="Klik untuk membuka tabel rincian data calon penerima Tidak Layak">
+                        <div class="card-top-icon">
+                            <div class="icon-circle icon-red">
+                                <i class="fas fa-circle-xmark"></i>
+                            </div>
+                            <span class="badge-status-pill pill-red">
+                                <i class="fas fa-circle-exclamation"></i> Tidak Memenuhi (&lt;2 RTLH)
+                            </span>
+                        </div>
+                        <div class="card-main-metric">
+                            <div class="metric-val text-red">{{ number_format($globalVervalStats['total_tidak_layak']) }} <span class="unit">KK</span></div>
+                            <div class="metric-title">CALON PENERIMA TIDAK LAYAK</div>
+                        </div>
+                        <div class="card-footer-info">
+                            <div class="pct-text">
+                                <strong>{{ $globalVervalStats['total_sudah'] > 0 ? round(($globalVervalStats['total_tidak_layak'] / $globalVervalStats['total_sudah']) * 100, 1) : 0 }}%</strong> dari total verval selesai
+                            </div>
+                            <div class="btn-goto-table text-red">
+                                <span>Buka Tabel Data Tidak Layak</span>
                                 <i class="fas fa-arrow-right"></i>
                             </div>
                         </div>
