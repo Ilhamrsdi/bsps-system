@@ -1221,7 +1221,7 @@
                     <i class="fas fa-arrow-right vstat-arrow"></i>
                 </a>
                 <a href="{{ route('dashboard.data-kelayakan', ['status' => 'all', 'status_verval' => 'meninggal']) }}" class="vstat-card vs-meninggal">
-                    <div class="vstat-icon"><i class="fas fa-cross"></i></div>
+                    <div class="vstat-icon"><i class="fas fa-heart-crack"></i></div>
                     <div class="vstat-info">
                         <div class="vstat-count">{{ number_format($statusVervalStats->meninggal ?? 0) }}</div>
                         <div class="vstat-label">Meninggal</div>
